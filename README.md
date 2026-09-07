@@ -2,18 +2,6 @@
 
 This project contains a PyTorch pipeline for preparing the MNIST dataset, training a LeNet-5 baseline CNN, and extracting penultimate layer embeddings.
 
-## Requirements
-- Python 3.8+
-- PyTorch
-- torchvision
-- matplotlib
-- seaborn
-- scikit-learn
-- numpy
-- tqdm
-- pyyaml
-- nnsom
-
 ## Directory Structure
 ```
 .
