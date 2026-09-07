@@ -1,0 +1,66 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# ML Datasets (Regenerated via torchvision/scripts)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/ood/*
+!data/ood/.gitkeep
+
+# Embeddings & Heavy Arrays (.npy, .pt, .h5)
+data/embeddings/**/*.npy
+data/embeddings/**/*.pt
+data/embeddings/**/*.npz
+data/embeddings/**/*.h5
+
+# Model Checkpoints & Weights
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.h5
+checkpoints/
+
+# Trained SOM objects & pickle files
+*.som
+*.pkl
+*.joblib
+
+# Logs & Tracking
+runs/
+wandb/
+mlruns/
+*.log
+
+# LaTeX build byproducts (keep .tex and .bib, ignore compilation cache)
+reports/paper/*.aux
+reports/paper/*.bbl
+reports/paper/*.blg
+reports/paper/*.fdb_latexmk
+reports/paper/*.fls
+reports/paper/*.log
+reports/paper/*.out
+reports/paper/*.synctex.gz
+reports/paper/*.toc
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
