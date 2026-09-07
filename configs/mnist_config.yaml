@@ -1,0 +1,37 @@
+paths:
+  data_root: '../../All_Data'
+  output_dir: './outputs'
+  embeddings_dir: './outputs/embeddings'
+  figures_dir: './outputs/figures'
+
+dataset:
+  name: mnist
+  total_samples: 70000
+  num_classes: 10
+  channels: 1
+  image_size: 28
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+dataloader:
+  batch_size: 64
+  num_workers: 2
+  pin_memory: true
+
+model:
+  architecture: LeNet5
+  feature_layer: fc2
+  feature_dim: 84
+
+training:
+  epochs: 20
+  lr: 0.001
+  optimizer: Adam
+  weight_decay: 0.0001
+  scheduler: StepLR
+  step_size: 10
+  gamma: 0.1
+  seed: 42
+
+device: auto # "auto", "cuda", or "cpu"
