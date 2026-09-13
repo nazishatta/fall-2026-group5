@@ -23,8 +23,8 @@ def main():
     parser.add_argument(
         '--config',
         type=str,
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
-        help='Path to config file (default: week_3_baseline.yaml)'
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
+        help='Path to config file (default: week_2_baseline.yaml)'
     )
     args = parser.parse_args()
 
@@ -40,7 +40,7 @@ def main():
     test_dist = compute_class_distribution(test_labels, "test")
 
     print("\nGenerating plots...")
-    figures_dir = getattr(config.paths, 'figures_dir', './output/week_3/figures')
+    figures_dir = getattr(config.paths, 'figures_dir', './output/week_2/figures')
     os.makedirs(figures_dir, exist_ok=True)
     
     plot_class_distribution(train_dist, "Training Set Class Distribution", os.path.join(figures_dir, "train_dist.png"))
@@ -51,7 +51,7 @@ def main():
     plot_sample_images(train_loader.dataset, 5, os.path.join(figures_dir, "sample_images.png"))
 
     print("\nSaving split statistics...")
-    output_dir = getattr(config.paths, 'output_dir', './output/week_3')
+    output_dir = getattr(config.paths, 'output_dir', './output/week_2')
     os.makedirs(output_dir, exist_ok=True)
     
     stats = {
