@@ -1,13 +1,13 @@
 # ==============================================================================
-# Week 4 Milestone Configuration: NNSOM Training & Error Geography Analysis
-# Inputs loaded from: ./output/week_3/embeddings/mnist/
-# Outputs saved to:   ./output/week_4/
+# Week 3 Milestone Configuration: NNSOM Training & Error Geography Analysis
+# Inputs loaded from: ./output/week_2/embeddings/mnist/
+# Outputs saved to:   ./output/week_3/
 # ==============================================================================
 
 run:
-  name: week_4
+  name: week_3
   stage: som
-  input_run: week_3
+  input_run: week_2
 
 som:
   grid_height: 15

@@ -89,8 +89,8 @@ def main():
     )
     parser.add_argument(
         "--config",
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
-        help="Path to config file (default: week_3_baseline.yaml)"
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
+        help="Path to config file (default: week_2_baseline.yaml)"
     )
     parser.add_argument("--checkpoint", required=True, help="Best model checkpoint")
     args = parser.parse_args()

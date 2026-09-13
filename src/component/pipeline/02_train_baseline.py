@@ -28,8 +28,8 @@ def main():
     parser.add_argument(
         '--config',
         type=str,
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
-        help='Path to config file (default: week_3_baseline.yaml)'
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
+        help='Path to config file (default: week_2_baseline.yaml)'
     )
     args = parser.parse_args()
 
@@ -121,7 +121,7 @@ def main():
     test_results = evaluate_model(model, test_loader, device)
     print_evaluation_summary(test_results, "test")
     
-    figures_dir = getattr(config.paths, 'figures_dir', './output/week_3/figures')
+    figures_dir = getattr(config.paths, 'figures_dir', './output/week_2/figures')
     os.makedirs(figures_dir, exist_ok=True)
     plot_training_curves(train_losses, val_losses, train_accs, val_accs, os.path.join(figures_dir, 'training_curves.png'))
     plot_confusion_matrix(test_results['confusion_matrix'], [str(i) for i in range(10)], "Test Set Confusion Matrix", os.path.join(figures_dir, 'test_confusion_matrix.png'))
