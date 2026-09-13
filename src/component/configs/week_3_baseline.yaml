@@ -1,0 +1,13 @@
+# ==============================================================================
+# Week 3 Milestone Configuration: Baseline Data Preparation & LeNet-5 Training
+# Outputs saved to: ./output/week_3/
+# ==============================================================================
+
+run:
+  name: week_3
+  stage: baseline
+
+tasks:
+  prepare_data: true
+  train_baseline: true
+  extract_embeddings: true

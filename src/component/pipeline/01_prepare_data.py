@@ -2,17 +2,30 @@ import os
 import sys
 import argparse
 import json
+from pathlib import Path
 
-# Add parent directory to path to import src
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Project root: C:\GIT\Capstone-2026
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.utils.config import load_config, set_seed
-from src.data.mnist_dataset import get_dataloaders, compute_class_distribution
-from src.visualization.plots import plot_class_distribution, plot_sample_images
+from src.component.utils.config import load_config, set_seed
+from src.component.data.mnist_dataset import (
+    get_dataloaders,
+    compute_class_distribution
+)
+from src.component.visualization.plots import (
+    plot_class_distribution,
+    plot_sample_images
+)
 
 def main():
     parser = argparse.ArgumentParser(description="Prepare MNIST Dataset")
-    parser.add_argument('--config', type=str, default='configs/mnist_config.yaml', help='Path to config file')
+    parser.add_argument(
+        '--config',
+        type=str,
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
+        help='Path to config file (default: week_3_baseline.yaml)'
+    )
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -27,7 +40,8 @@ def main():
     test_dist = compute_class_distribution(test_labels, "test")
 
     print("\nGenerating plots...")
-    figures_dir = getattr(config.paths, 'figures_dir', './outputs/figures')
+    figures_dir = getattr(config.paths, 'figures_dir', './output/week_3/figures')
+    os.makedirs(figures_dir, exist_ok=True)
     
     plot_class_distribution(train_dist, "Training Set Class Distribution", os.path.join(figures_dir, "train_dist.png"))
     plot_class_distribution(val_dist, "Validation Set Class Distribution", os.path.join(figures_dir, "val_dist.png"))
@@ -37,7 +51,7 @@ def main():
     plot_sample_images(train_loader.dataset, 5, os.path.join(figures_dir, "sample_images.png"))
 
     print("\nSaving split statistics...")
-    output_dir = getattr(config.paths, 'output_dir', './outputs')
+    output_dir = getattr(config.paths, 'output_dir', './output/week_3')
     os.makedirs(output_dir, exist_ok=True)
     
     stats = {
