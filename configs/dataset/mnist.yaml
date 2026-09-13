@@ -1,7 +1,0 @@
-dataset:
-  name: "mnist"
-  num_classes: 10
-  channels: 1
-  image_size: 28
-  feature_dim: 84 # Penultimate dimension for LeNet-5
-  ood_dataset: "svhn"
