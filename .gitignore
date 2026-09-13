@@ -64,3 +64,9 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+# Add these rules to the repository .gitignore.
+# Keep small JSON/CSV manifests trackable while excluding heavy arrays.
+outputs/embeddings/**/*.npy
+outputs/embeddings/**/*.npz
+outputs/embeddings/**/*.pt
+outputs/embeddings/**/*.h5
