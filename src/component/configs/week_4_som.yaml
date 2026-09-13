@@ -1,0 +1,37 @@
+# ==============================================================================
+# Week 4 Milestone Configuration: NNSOM Training & Error Geography Analysis
+# Inputs loaded from: ./output/week_3/embeddings/mnist/
+# Outputs saved to:   ./output/week_4/
+# ==============================================================================
+
+run:
+  name: week_4
+  stage: som
+  input_run: week_3
+
+som:
+  grid_height: 15
+  grid_width: 15
+  topology: hexagonal
+  neighborhood: gaussian
+
+  epochs: 100
+  learning_rate_initial: 0.5
+  learning_rate_decay: exponential
+
+  sigma_initial: 3.0
+  sigma_decay: exponential
+
+  backend: numpy
+  random_seed: 42
+
+analysis:
+  hotspot_error_threshold: 0.35
+  purity_metric: majority_vote
+
+  visualizations:
+    - u_matrix
+    - hit_histogram
+    - component_planes
+    - class_colored_som
+    - error_hotspot_overlay

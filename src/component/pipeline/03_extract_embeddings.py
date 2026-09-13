@@ -3,17 +3,22 @@ import hashlib
 import json
 import os
 import sys
+from pathlib import Path
 from datetime import datetime, timezone
 
 import numpy as np
 import torch
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.data.mnist_dataset import get_dataloaders
-from src.features.extractor import FeatureExtractor, save_embeddings
-from src.models.lenet5 import LeNet5
-from src.utils.config import get_device, load_config, set_seed
+from src.component.utils.config import load_config, set_seed, get_device
+from src.component.data.mnist_dataset import get_dataloaders
+from src.component.models.lenet5 import LeNet5
+from src.component.features.extractor import (
+    FeatureExtractor,
+    save_embeddings
+)
 
 
 def sha256_file(path, chunk_size=1024 * 1024):
@@ -83,7 +88,9 @@ def main():
         description="Extract deterministic, traceable LeNet-5 embeddings"
     )
     parser.add_argument(
-        "--config", default="configs/mnist_config.yaml", help="Runtime YAML config"
+        "--config",
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
+        help="Path to config file (default: week_3_baseline.yaml)"
     )
     parser.add_argument("--checkpoint", required=True, help="Best model checkpoint")
     args = parser.parse_args()

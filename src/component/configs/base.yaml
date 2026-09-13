@@ -1,8 +1,8 @@
+project:
+  output_root: "./outputs"
+
 paths:
-  data_root: '../../All_Data'
-  output_dir: './outputs'
-  embeddings_dir: './outputs/embeddings'
-  figures_dir: './outputs/figures'
+  data_root: "../../All_Data"
 
 dataset:
   name: mnist

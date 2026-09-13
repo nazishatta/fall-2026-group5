@@ -2,21 +2,35 @@ import os
 import sys
 import argparse
 import json
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.utils.config import load_config, set_seed, get_device
-from src.data.mnist_dataset import get_dataloaders
-from src.models.lenet5 import LeNet5
-from src.evaluation.metrics import evaluate_model, print_evaluation_summary
-from src.visualization.plots import plot_training_curves, plot_confusion_matrix
+from src.component.utils.config import load_config, set_seed, get_device
+from src.component.data.mnist_dataset import get_dataloaders
+from src.component.models.lenet5 import LeNet5
+from src.component.evaluation.metrics import (
+    evaluate_model,
+    print_evaluation_summary
+)
+from src.component.visualization.plots import (
+    plot_training_curves,
+    plot_confusion_matrix
+)
 
 def main():
     parser = argparse.ArgumentParser(description="Train LeNet-5 Baseline on MNIST")
-    parser.add_argument('--config', type=str, default='configs/mnist_config.yaml', help='Path to config file')
+    parser.add_argument(
+        '--config',
+        type=str,
+        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_3_baseline.yaml'),
+        help='Path to config file (default: week_3_baseline.yaml)'
+    )
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -107,7 +121,8 @@ def main():
     test_results = evaluate_model(model, test_loader, device)
     print_evaluation_summary(test_results, "test")
     
-    figures_dir = config.paths.figures_dir
+    figures_dir = getattr(config.paths, 'figures_dir', './output/week_3/figures')
+    os.makedirs(figures_dir, exist_ok=True)
     plot_training_curves(train_losses, val_losses, train_accs, val_accs, os.path.join(figures_dir, 'training_curves.png'))
     plot_confusion_matrix(test_results['confusion_matrix'], [str(i) for i in range(10)], "Test Set Confusion Matrix", os.path.join(figures_dir, 'test_confusion_matrix.png'))
     
