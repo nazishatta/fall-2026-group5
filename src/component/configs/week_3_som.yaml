@@ -1,7 +1,14 @@
 # ==============================================================================
-# Week 3 Milestone Configuration: NNSOM Training & Error Geography Analysis
-# Inputs loaded from: ./output/week_2/embeddings/mnist/
-# Outputs saved to:   ./output/week_3/
+# Week 3 Milestone Configuration:
+# NNSOM Training & Error Geography Analysis
+#
+# Inputs loaded from: ./outputs/week_2/embeddings/mnist/
+# Outputs saved to:   ./outputs/week_3/
+#
+# Scientific split policy:
+# - SOM is trained only on training embeddings.
+# - Validation data is used for development / model selection.
+# - Test data is not used for SOM hyperparameter selection.
 # ==============================================================================
 
 run:
@@ -12,18 +19,22 @@ run:
 som:
   grid_height: 15
   grid_width: 15
-  topology: hexagonal
-  neighborhood: gaussian
-
+  init_neighborhood: 3
   epochs: 100
-  learning_rate_initial: 0.5
-  learning_rate_decay: exponential
-
-  sigma_initial: 3.0
-  sigma_decay: exponential
-
+  steps: 100
   backend: numpy
   random_seed: 42
+
+preprocessing:
+  scaler: minmax
+  feature_range:
+    - -1.0
+    - 1.0
+  fit_split: train
+
+evaluation:
+  development_split: val
+  use_test_for_selection: false
 
 analysis:
   hotspot_error_threshold: 0.35
