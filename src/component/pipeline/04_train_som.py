@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+import os
 from pathlib import Path
 
 import numpy as np
@@ -367,13 +368,21 @@ def main():
             f"som_{grid_height}x{grid_width}_seed{seed}"
         )
 
+        model_path = models_dir / model_name
+
         som.save_pickle(
             model_name,
-            str(models_dir),
+            str(models_dir) + os.sep,
         )
 
+        if not model_path.is_file():
+            raise RuntimeError(
+                f"NNSOM model save failed: expected artifact not found at "
+                f"{model_path}"
+            )
+
         print(
-            f"SOM model saved under: {models_dir}"
+            f"SOM model saved to: {model_path}"
         )
 
     # ------------------------------------------------------------------
