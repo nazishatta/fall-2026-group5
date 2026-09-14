@@ -70,3 +70,4 @@ outputs/embeddings/**/*.npy
 outputs/embeddings/**/*.npz
 outputs/embeddings/**/*.pt
 outputs/embeddings/**/*.h5
+outputs/week_3/logs/som_smoke_test_metrics.json
