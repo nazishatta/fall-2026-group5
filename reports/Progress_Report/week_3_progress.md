@@ -26,6 +26,7 @@
   - Trained the LeNet-5 baseline CNN and achieved approximately **99.18% test accuracy**.
   - Extracted and saved the **84-dimensional `fc2` embeddings** for train, validation, and test sets.
   - Saved checkpoints, embeddings, training curves, and confusion matrix under `outputs/week_2/`.
+  - Studied Chapter 16 on Competitive Networks to understand SOM, BMU, competitive learning, neighborhood updates, and topology preservation.
 
 - Action Items:
 
@@ -41,7 +42,6 @@
 
 - Topics of discussion
   - **PHASE 2: SOM TRAINING & VISUALIZATION**
-  - Studied Chapter 16 on Competitive Networks to understand SOM, BMU, competitive learning, neighborhood updates, and topology preservation.
   - Set up and explore NNSOM using the saved CNN embeddings.
   - Configure SOM hyperparameters: grid size, learning rate, sigma, and number of epochs.
   - Train SOM on the training embeddings and monitor quantization error.
