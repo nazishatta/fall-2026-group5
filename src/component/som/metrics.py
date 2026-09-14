@@ -11,8 +11,8 @@ class SOMQualityMetrics:
 
     n_samples: int
     quantization_error: float
-    topological_error_first: float
-    topological_error_first_second: float
+    topological_error_1st_order_pct: float
+    topological_error_1st_2nd_order_pct: float
     occupied_neurons: int
     empty_neurons: int
     total_neurons: int
@@ -32,10 +32,20 @@ def evaluate_som_quality(
     """
     Evaluate a trained NNSOM model on one embedding split.
 
-    NNSOM quantization_error() expects the cluster_distances returned
-    by cluster_data(), not the raw feature matrix.
+    Notes
+    -----
+    NNSOM quantization_error() expects the cluster_distances object
+    returned by cluster_data(), not the raw feature matrix.
 
-    NNSOM topological_error() returns two values.
+    NNSOM topological_error() returns two percentage-valued metrics:
+
+    - first-order topological error:
+      percentage of samples whose two closest SOM neurons have
+      neuron distance > 1.1.
+
+    - first+second-order topological error:
+      percentage of samples whose two closest SOM neurons have
+      neuron distance > 2.1.
     """
 
     if x.ndim != 2:
@@ -85,15 +95,19 @@ def evaluate_som_quality(
         else 0.0
     )
 
-    max_hits = int(sizes.max()) if sizes.size > 0 else 0
+    max_hits = (
+        int(sizes.max())
+        if sizes.size > 0
+        else 0
+    )
 
     return SOMQualityMetrics(
         n_samples=int(x.shape[0]),
         quantization_error=quantization_error,
-        topological_error_first=float(
+        topological_error_1st_order_pct=float(
             topological_error_first
         ),
-        topological_error_first_second=float(
+        topological_error_1st_2nd_order_pct=float(
             topological_error_first_second
         ),
         occupied_neurons=occupied_neurons,
