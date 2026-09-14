@@ -1,5 +1,6 @@
 import numpy as np
 from NNSOM.plots import SOMPlots
+from src.component.som.memory_safe_init import economy_svd_for_nnsom_init
 
 
 def train_som(
@@ -20,10 +21,11 @@ def train_som(
         dimensions=(grid_height, grid_width)
     )
 
-    som.init_w(
-        x_train,
-        norm_func=norm_func
-    )
+    with economy_svd_for_nnsom_init():
+        som.init_w(
+            x_train,
+            norm_func=norm_func
+        )
 
     som.train(
         x_train,
