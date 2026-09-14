@@ -1,0 +1,56 @@
+{
+  "train": {
+    "rows": 49000,
+    "feature_dim": 84,
+    "accuracy": 0.9995714285714286,
+    "correct_count": 48979,
+    "error_count": 21,
+    "mean_confidence": 0.9982674717903137,
+    "features_finite": true,
+    "sample_ids_unique": true,
+    "label_range": [
+      0,
+      9
+    ],
+    "prediction_range": [
+      0,
+      9
+    ]
+  },
+  "val": {
+    "rows": 10500,
+    "feature_dim": 84,
+    "accuracy": 0.9911428571428571,
+    "correct_count": 10407,
+    "error_count": 93,
+    "mean_confidence": 0.9954109787940979,
+    "features_finite": true,
+    "sample_ids_unique": true,
+    "label_range": [
+      0,
+      9
+    ],
+    "prediction_range": [
+      0,
+      9
+    ]
+  },
+  "test": {
+    "rows": 10500,
+    "feature_dim": 84,
+    "accuracy": 0.991904761904762,
+    "correct_count": 10415,
+    "error_count": 85,
+    "mean_confidence": 0.9958052635192871,
+    "features_finite": true,
+    "sample_ids_unique": true,
+    "label_range": [
+      0,
+      9
+    ],
+    "prediction_range": [
+      0,
+      9
+    ]
+  }
+}
