@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 import os
+import re
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +40,16 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--run-id",
+        type=str,
+        default=None,
+        help=(
+            "Unique identifier for a full scientific SOM run. "
+            "Required unless --smoke-test is used."
+        ),
+    )
+
+    parser.add_argument(
         "--smoke-test",
         action="store_true",
         help=(
@@ -48,6 +59,21 @@ def parse_args():
     )
 
     return parser.parse_args()
+
+
+def validate_run_id(run_id: str) -> str:
+    """Validate a filesystem-safe scientific experiment identifier."""
+
+    if not run_id:
+        raise ValueError("run_id must be a non-empty string.")
+
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", run_id) is None:
+        raise ValueError(
+            "run_id may contain only letters, numbers, '.', '_', and '-', "
+            "and must begin with a letter or number."
+        )
+
+    return run_id
 
 
 def deterministic_subset(
@@ -77,6 +103,17 @@ def main():
     args = parse_args()
 
     config = load_config(args.config)
+
+    if args.smoke_test:
+        run_id = "smoke_test"
+    else:
+        if args.run_id is None:
+            raise ValueError(
+                "Full scientific SOM runs require --run-id so artifacts "
+                "cannot silently overwrite previous experiments."
+            )
+
+        run_id = validate_run_id(args.run_id)
 
     # ------------------------------------------------------------------
     # Scientific and implementation safeguards
@@ -285,7 +322,14 @@ def main():
             logs_dir / "som_smoke_test_metrics.json"
         )
     else:
-        metrics_path = logs_dir / "som_metrics.json"
+        metrics_path = logs_dir / f"{run_id}_metrics.json"
+
+        if metrics_path.exists():
+            raise FileExistsError(
+                f"Scientific metrics artifact already exists: "
+                f"{metrics_path}. Use a new --run-id instead of "
+                f"overwriting an existing experiment."
+            )
 
     with open(
         metrics_path,
@@ -364,11 +408,15 @@ def main():
 
     # Smoke-test models are intentionally not saved as experiment models.
     if not args.smoke_test:
-        model_name = (
-            f"som_{grid_height}x{grid_width}_seed{seed}"
-        )
-
+        model_name = run_id
         model_path = models_dir / model_name
+
+        if model_path.exists():
+            raise FileExistsError(
+                f"Scientific SOM model already exists: {model_path}. "
+                f"Use a new --run-id instead of overwriting an "
+                f"existing experiment."
+            )
 
         som.save_pickle(
             model_name,
