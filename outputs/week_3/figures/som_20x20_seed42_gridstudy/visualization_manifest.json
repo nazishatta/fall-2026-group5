@@ -1,0 +1,81 @@
+{
+  "model_name": "som_20x20_seed42_gridstudy",
+  "grid": [
+    20,
+    20
+  ],
+  "train_shape": [
+    49000,
+    84
+  ],
+  "validation_shape": [
+    10500,
+    84
+  ],
+  "feature_dim": 84,
+  "class_map_split": "val",
+  "top_variance_fc2_features": [
+    15,
+    19,
+    79,
+    41,
+    35,
+    53
+  ],
+  "generated_files": [
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/topology.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/topology_numbered.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/neuron_connection.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/u_matrix_neuron_distance.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/train_hit_histogram.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/core/validation_hit_histogram.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_all84_nnsom.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_01.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_02.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_03.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_04.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_05.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_06.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/component_planes/component_planes_page_07.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_0_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_0_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_1_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_1_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_2_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_2_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_3_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_3_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_4_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_4_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_5_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_5_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_6_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_6_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_7_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_7_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_8_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_8_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_9_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/class_maps/digit_9_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_15_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_15_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_19_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_19_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_79_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_79_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_41_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_41_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_35_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_35_gray_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_53_color_hist.png",
+    "outputs/week_3/figures/som_20x20_seed42_gridstudy/feature_maps/fc2_53_gray_hist.png"
+  ],
+  "failed_or_skipped_due_to_runtime": {},
+  "intentionally_not_default": {
+    "pie": "400 mini pie charts are difficult to interpret on a 20x20 SOM.",
+    "stem": "400 mini 10-class stem plots are visually dense.",
+    "hist_box_violin_scatter": "84 fc2 dimensions are abstract; default output uses selected feature hist maps and component planes instead.",
+    "weight_as_image": "84 CNN embedding dimensions have no natural 2-D pixel arrangement, so reshaping 84 weights into an image would be arbitrary."
+  },
+  "test_evaluated": false
+}

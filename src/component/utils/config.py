@@ -63,25 +63,14 @@ def load_config(config_path):
 
         output_dir = os.path.join(output_root, week)
 
-        config_dict['paths']['output_dir'] = output_dir
-        config_dict['paths']['checkpoints_dir'] = os.path.join(
-            output_dir, 'checkpoints'
-        )
-        config_dict['paths']['embeddings_dir'] = os.path.join(
-            output_dir, 'embeddings'
-        )
-        config_dict['paths']['figures_dir'] = os.path.join(
-            output_dir, 'figures'
-        )
-        config_dict['paths']['tables_dir'] = os.path.join(
-            output_dir, 'tables'
-        )
-        config_dict['paths']['som_models_dir'] = os.path.join(
-            output_dir, 'som_models'
-        )
-        config_dict['paths']['logs_dir'] = os.path.join(
-            output_dir, 'logs'
-        )
+        config_dict['paths'].setdefault('output_dir', output_dir)
+        config_dict['paths'].setdefault('checkpoints_dir', os.path.join(output_dir, 'checkpoints'))
+        config_dict['paths'].setdefault('embeddings_dir', os.path.join(output_dir, 'embeddings'))
+        config_dict['paths'].setdefault('figures_dir', os.path.join(output_dir, 'figures'))
+        config_dict['paths'].setdefault('tables_dir', os.path.join(output_dir, 'tables'))
+        config_dict['paths'].setdefault('som_models_dir', os.path.join(output_dir, 'som_models'))
+        config_dict['paths'].setdefault('logs_dir', os.path.join(output_dir, 'logs'))
+        config_dict['paths'].setdefault('analysis_dir', os.path.join(output_dir, 'analysis'))
 
     # --------------------------------------------------
     # Convert dict to nested SimpleNamespace
