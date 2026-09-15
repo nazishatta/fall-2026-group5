@@ -649,75 +649,90 @@ def write_rows(
 def matrix_from_neuron_values(
     coordinates: np.ndarray,
     values: np.ndarray,
-) -> np.ndarray:
-    """Map neuron values to the actual NNSOM coordinate grid."""
-    x_values = np.unique(
-        coordinates[0]
-    )
+) -> tuple[np.ndarray, np.ndarray]:
+    """Package native NNSOM neuron coordinates with one value per neuron.
 
-    y_values = np.unique(
-        coordinates[1]
-    )
+    NNSOM's topology positions are not guaranteed to form a rectangular
+    Cartesian matrix with exactly grid_width unique x values. The selected
+    20x20 SOM uses staggered native positions, so forcing som.pos through
+    an imshow-style rectangular coordinate lookup is incorrect.
 
-    if len(x_values) != GRID_WIDTH:
-        raise RuntimeError(
-            "Unexpected number of SOM x coordinates: "
-            f"{len(x_values)}"
-        )
-
-    if len(y_values) != GRID_HEIGHT:
-        raise RuntimeError(
-            "Unexpected number of SOM y coordinates: "
-            f"{len(y_values)}"
-        )
-
-    x_map = {
-        float(value): index
-        for index, value
-        in enumerate(x_values)
-    }
-
-    y_map = {
-        float(value): index
-        for index, value
-        in enumerate(y_values)
-    }
-
-    matrix = np.full(
-        (
-            GRID_HEIGHT,
-            GRID_WIDTH,
-        ),
-        np.nan,
+    Preserve the actual NNSOM coordinates and render neurons directly.
+    """
+    coordinates = np.asarray(
+        coordinates,
         dtype=np.float64,
     )
 
-    for neuron_id in range(NUM_NEURONS):
-        x = float(
-            coordinates[0, neuron_id]
+    values = np.asarray(
+        values,
+        dtype=np.float64,
+    )
+
+    if coordinates.shape != (
+        2,
+        NUM_NEURONS,
+    ):
+        raise RuntimeError(
+            "Unexpected SOM coordinate shape: "
+            f"{coordinates.shape}"
         )
 
-        y = float(
-            coordinates[1, neuron_id]
+    if values.shape != (
+        NUM_NEURONS,
+    ):
+        raise RuntimeError(
+            "Unexpected neuron-value shape: "
+            f"{values.shape}"
         )
 
-        matrix[
-            y_map[y],
-            x_map[x],
-        ] = values[neuron_id]
+    unique_positions = np.unique(
+        coordinates.T,
+        axis=0,
+    )
 
-    return matrix
+    if unique_positions.shape[0] != NUM_NEURONS:
+        raise RuntimeError(
+            "SOM neuron positions are not unique: "
+            f"{unique_positions.shape[0]} unique positions "
+            f"for {NUM_NEURONS} neurons."
+        )
+
+    return coordinates, values
 
 
 def save_heatmap(
     path_base: Path,
-    matrix: np.ndarray,
+    matrix: tuple[np.ndarray, np.ndarray],
     title: str,
     colorbar_label: str,
     *,
     categorical: bool = False,
 ) -> None:
-    """Save one publication-oriented SOM heatmap."""
+    """Save a SOM neuron map using the model's native topology positions.
+
+    The historical function name is retained to minimize unrelated code
+    changes, but rendering is coordinate-based rather than imshow-based.
+    """
+    coordinates, values = matrix
+
+    coordinates = np.asarray(
+        coordinates,
+        dtype=np.float64,
+    )
+
+    values = np.asarray(
+        values,
+        dtype=np.float64,
+    )
+
+    finite = np.isfinite(values)
+
+    if not finite.any():
+        raise RuntimeError(
+            f"No finite neuron values available for figure: {title}"
+        )
+
     fig = plt.figure(
         figsize=(8.2, 7.2)
     )
@@ -726,30 +741,54 @@ def save_heatmap(
         [0.11, 0.11, 0.72, 0.80]
     )
 
+    # Draw every neuron location first so empty / undefined neurons
+    # remain visible as part of the SOM topology.
+    ax.scatter(
+        coordinates[0],
+        coordinates[1],
+        s=115,
+        marker="o",
+        facecolors="none",
+        edgecolors="0.80",
+        linewidths=0.45,
+    )
+
     if categorical:
-        image = ax.imshow(
-            matrix,
-            origin="lower",
-            interpolation="nearest",
-            cmap="tab10",
+        image = ax.scatter(
+            coordinates[0, finite],
+            coordinates[1, finite],
+            c=values[finite],
+            s=100,
+            marker="o",
+            cmap=plt.get_cmap(
+                "tab10",
+                CLASS_COUNT,
+            ),
             vmin=-0.5,
             vmax=9.5,
-            aspect="equal",
+            linewidths=0.0,
         )
     else:
-        image = ax.imshow(
-            matrix,
-            origin="lower",
-            interpolation="nearest",
-            aspect="equal",
+        image = ax.scatter(
+            coordinates[0, finite],
+            coordinates[1, finite],
+            c=values[finite],
+            s=100,
+            marker="o",
+            linewidths=0.0,
         )
 
     ax.set_title(title)
     ax.set_xlabel(
-        "SOM grid coordinate 0"
+        "NNSOM topology coordinate 0"
     )
     ax.set_ylabel(
-        "SOM grid coordinate 1"
+        "NNSOM topology coordinate 1"
+    )
+
+    ax.set_aspect(
+        "equal",
+        adjustable="box",
     )
 
     colorbar = fig.colorbar(
@@ -765,7 +804,7 @@ def save_heatmap(
 
     if categorical:
         colorbar.set_ticks(
-            list(range(10))
+            list(range(CLASS_COUNT))
         )
 
     fig.savefig(
