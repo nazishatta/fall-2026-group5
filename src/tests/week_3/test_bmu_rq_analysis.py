@@ -6,6 +6,7 @@ import unittest
 import numpy as np
 
 from src.component.analysis.som_bmu_rq_analysis import (
+    matrix_from_neuron_values,
     normalized_entropy,
     reconstruct_assignments,
     wilson_lower_bound,
@@ -57,6 +58,61 @@ class TestBMURQAnalysis(unittest.TestCase):
                 )
             )
         )
+
+    def test_native_coordinate_payload_allows_staggered_grid(self):
+        coordinates = np.zeros((2, 400), dtype=float)
+
+        # Mimic a staggered topology: alternating rows use
+        # integer and half-integer x positions. Across the
+        # full 20x20 map this produces 40 unique x values.
+        neuron = 0
+
+        for row in range(20):
+            offset = 0.5 if row % 2 else 0.0
+
+            for column in range(20):
+                coordinates[0, neuron] = (
+                    column + offset
+                )
+                coordinates[1, neuron] = row
+                neuron += 1
+
+        values = np.arange(
+            400,
+            dtype=float,
+        )
+
+        returned_coordinates, returned_values = (
+            matrix_from_neuron_values(
+                coordinates,
+                values,
+            )
+        )
+
+        self.assertEqual(
+            len(
+                np.unique(
+                    returned_coordinates[0]
+                )
+            ),
+            40,
+        )
+
+        self.assertEqual(
+            len(
+                np.unique(
+                    returned_coordinates.T,
+                    axis=0,
+                )
+            ),
+            400,
+        )
+
+        np.testing.assert_array_equal(
+            returned_values,
+            values,
+        )
+
 
     def test_reconstruct_assignments(self):
         clusters = [
