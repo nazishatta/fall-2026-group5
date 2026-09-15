@@ -76,6 +76,34 @@ def validate_run_id(run_id: str) -> str:
     return run_id
 
 
+def preflight_scientific_outputs(
+    run_id: str,
+    logs_dir: Path,
+    models_dir: Path,
+) -> tuple[Path, Path]:
+    """Reject duplicate scientific run IDs before expensive SOM training."""
+
+    metrics_path = logs_dir / f"{run_id}_metrics.json"
+    model_path = models_dir / run_id
+
+    existing_paths = [
+        path
+        for path in (metrics_path, model_path)
+        if path.exists()
+    ]
+
+    if existing_paths:
+        existing = ", ".join(str(path) for path in existing_paths)
+
+        raise FileExistsError(
+            f"Scientific run_id '{run_id}' already has existing "
+            f"artifact(s): {existing}. Use a new --run-id instead of "
+            f"overwriting an existing experiment."
+        )
+
+    return metrics_path, model_path
+
+
 def deterministic_subset(
     x: np.ndarray,
     n_samples: int,
@@ -158,6 +186,20 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     models_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # Artifact preflight
+    # ------------------------------------------------------------------
+
+    if args.smoke_test:
+        metrics_path = logs_dir / "som_smoke_test_metrics.json"
+        model_path = None
+    else:
+        metrics_path, model_path = preflight_scientific_outputs(
+            run_id=run_id,
+            logs_dir=logs_dir,
+            models_dir=models_dir,
+        )
 
     # ------------------------------------------------------------------
     # Run information
@@ -283,6 +325,7 @@ def main():
 
     metrics = {
         "experiment": {
+            "run_id": run_id,
             "run": config.run.name,
             "stage": config.run.stage,
             "input_run": config.run.input_run,
@@ -316,20 +359,6 @@ def main():
         "validation_metrics": val_metrics.to_dict(),
         "test_evaluated": False,
     }
-
-    if args.smoke_test:
-        metrics_path = (
-            logs_dir / "som_smoke_test_metrics.json"
-        )
-    else:
-        metrics_path = logs_dir / f"{run_id}_metrics.json"
-
-        if metrics_path.exists():
-            raise FileExistsError(
-                f"Scientific metrics artifact already exists: "
-                f"{metrics_path}. Use a new --run-id instead of "
-                f"overwriting an existing experiment."
-            )
 
     with open(
         metrics_path,
@@ -409,13 +438,10 @@ def main():
     # Smoke-test models are intentionally not saved as experiment models.
     if not args.smoke_test:
         model_name = run_id
-        model_path = models_dir / model_name
 
-        if model_path.exists():
-            raise FileExistsError(
-                f"Scientific SOM model already exists: {model_path}. "
-                f"Use a new --run-id instead of overwriting an "
-                f"existing experiment."
+        if model_path is None:
+            raise RuntimeError(
+                "Scientific model path was not initialized during preflight."
             )
 
         som.save_pickle(
