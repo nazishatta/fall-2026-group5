@@ -1,0 +1,6 @@
+outs:
+- md5: bab421ed006fc36e775e1526db0c793d.dir
+  size: 25552304
+  nfiles: 18
+  hash: md5
+  path: embeddings
