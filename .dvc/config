@@ -1,0 +1,4 @@
+[core]
+    remote = group5-s3
+['remote "group5-s3"']
+    url = s3://dats-capstone/f.khan1@gwu.edu/group5/dvc-cache
