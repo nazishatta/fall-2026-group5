@@ -2,10 +2,10 @@
   "train": {
     "rows": 49000,
     "feature_dim": 84,
-    "accuracy": 0.9995714285714286,
-    "correct_count": 48979,
-    "error_count": 21,
-    "mean_confidence": 0.9982674717903137,
+    "accuracy": 0.9994081632653061,
+    "correct_count": 48971,
+    "error_count": 29,
+    "mean_confidence": 0.9981508255004883,
     "features_finite": true,
     "sample_ids_unique": true,
     "label_range": [
@@ -20,10 +20,10 @@
   "val": {
     "rows": 10500,
     "feature_dim": 84,
-    "accuracy": 0.9911428571428571,
-    "correct_count": 10407,
-    "error_count": 93,
-    "mean_confidence": 0.9954109787940979,
+    "accuracy": 0.9912380952380953,
+    "correct_count": 10408,
+    "error_count": 92,
+    "mean_confidence": 0.9952903389930725,
     "features_finite": true,
     "sample_ids_unique": true,
     "label_range": [
@@ -38,10 +38,10 @@
   "test": {
     "rows": 10500,
     "feature_dim": 84,
-    "accuracy": 0.991904761904762,
-    "correct_count": 10415,
-    "error_count": 85,
-    "mean_confidence": 0.9958052635192871,
+    "accuracy": 0.9918095238095238,
+    "correct_count": 10414,
+    "error_count": 86,
+    "mean_confidence": 0.9951938390731812,
     "features_finite": true,
     "sample_ids_unique": true,
     "label_range": [
