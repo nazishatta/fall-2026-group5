@@ -1,0 +1,70 @@
+{
+  "experiment": {
+    "run_id": "som_15x15_seed42_final",
+    "run": "som",
+    "stage": "som",
+    "input_run": "cnn_baseline",
+    "smoke_test": false
+  },
+  "som": {
+    "grid_height": 15,
+    "grid_width": 15,
+    "num_neurons": 225,
+    "init_neighborhood": 3,
+    "epochs": 100,
+    "steps": 100,
+    "requested_backend": "auto",
+    "actual_backend": "gpu",
+    "random_seed": 42,
+    "track_qe_history": false,
+    "qe_history_every": 1
+  },
+  "preprocessing": {
+    "scaler": "minmax",
+    "feature_range": [
+      -1.0,
+      1.0
+    ],
+    "fit_split": "train"
+  },
+  "data": {
+    "train_shape": [
+      49000,
+      84
+    ],
+    "validation_shape": [
+      10500,
+      84
+    ],
+    "held_out_test_shape": [
+      10500,
+      84
+    ]
+  },
+  "train_metrics": {
+    "n_samples": 49000,
+    "quantization_error": 1.1407581296535279,
+    "topological_error_1st_order_pct": 3.704081632653061,
+    "topological_error_1st_2nd_order_pct": 1.6612244897959185,
+    "occupied_neurons": 210,
+    "empty_neurons": 15,
+    "total_neurons": 225,
+    "occupancy_rate": 0.9333333333333333,
+    "mean_hits_per_occupied_neuron": 233.33333333333334,
+    "max_hits_per_neuron": 2875
+  },
+  "validation_metrics": {
+    "n_samples": 10500,
+    "quantization_error": 1.1179131570290748,
+    "topological_error_1st_order_pct": 3.980952380952381,
+    "topological_error_1st_2nd_order_pct": 1.8095238095238095,
+    "occupied_neurons": 203,
+    "empty_neurons": 22,
+    "total_neurons": 225,
+    "occupancy_rate": 0.9022222222222223,
+    "mean_hits_per_occupied_neuron": 51.724137931034484,
+    "max_hits_per_neuron": 608
+  },
+  "qe_history_artifacts": null,
+  "test_evaluated": false
+}
