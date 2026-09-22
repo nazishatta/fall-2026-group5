@@ -80,7 +80,7 @@ These maps are analogous to the *Class Plot* and *Colour Hist* shown for Iris in
 ---
 
 ## 5. Feature Maps (Top‑variance FC2 features)
-The six most variable features from the `fc2` layer (indices 15, 19, 79, 41, 35, 53) are visualised to give insight into which learned representations drive the SOM organization.
+The six most variable features from the `fc2` layer (indices 15, 19, 79, 41, 35, 53) are visualised to give insight into the six highest-variance fc2 dimensions which are shown for detailed inspection of how learned representations vary across the SOM.
 
 | Feature (index) | Colour Histogram | Grey Histogram |
 |-----------------|------------------|----------------|
