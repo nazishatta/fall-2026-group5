@@ -1,4 +1,5 @@
 # CNN Baseline Results (v1_mnist)
+
 ## LeNet-5 on MNIST
 
 ### Results
@@ -14,6 +15,7 @@
 The model made **86 errors** across 10,500 test samples.
 
 Most frequent class confusions included:
+
 - 7 → 1: 4 samples
 - 5 → 8: 4 samples
 - 2 → 8: 4 samples
