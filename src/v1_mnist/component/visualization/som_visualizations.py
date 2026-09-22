@@ -19,6 +19,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+import matplotlib.patheffects as path_effects
 from NNSOM.utils import (
     count_classes_in_cluster,
     get_edge_widths,
@@ -27,6 +28,61 @@ from NNSOM.utils import (
     get_perc_misclassified,
     majority_class_cluster,
 )
+
+
+def _restyle_dense_som_text(result, plot_type: str) -> None:
+    """Improve label readability on dense 15x15 SOM plots.
+
+    NNSOM uses relatively large default text for numbered topology and hit
+    histograms.  For a 15x15 SOM, restyle those labels before the figure is
+    saved.
+    """
+
+    if not (
+        isinstance(result, tuple)
+        and len(result) >= 4
+    ):
+        return
+
+    text_objects = result[3]
+
+    if text_objects is None:
+        return
+
+    # Numbered SOM topology: small black labels on white hexagons.
+    if plot_type == "top_num":
+        for text_obj in text_objects:
+            text_obj.set_fontsize(5.5)
+            text_obj.set_color("black")
+            text_obj.set_fontweight("normal")
+            text_obj.set_path_effects([])
+
+    # Hit histograms: use adaptive size because counts vary from one digit
+    # to four or more digits.  Black text is requested; the thin white
+    # outline keeps it legible over dark inner hit hexagons.
+    elif plot_type == "hit_hist":
+        for text_obj in text_objects:
+            label = text_obj.get_text().strip()
+
+            if len(label) >= 4:
+                font_size = 3.8
+            elif len(label) == 3:
+                font_size = 4.5
+            else:
+                font_size = 5.0
+
+            text_obj.set_fontsize(font_size)
+            text_obj.set_color("black")
+            text_obj.set_fontweight("normal")
+            text_obj.set_path_effects(
+                [
+                    path_effects.Stroke(
+                        linewidth=1.0,
+                        foreground="white",
+                    ),
+                    path_effects.Normal(),
+                ]
+            )
 
 
 def save_figure(
@@ -72,7 +128,6 @@ def save_figure(
     plt.close(fig)
 
     return saved
-
 
 def build_data_dict(
     som,
@@ -138,6 +193,11 @@ def save_nnsom_plot(
         **kwargs,
     )
 
+    _restyle_dense_som_text(
+        result,
+        plot_type,
+    )
+
     if (
         isinstance(result, tuple)
         and len(result) > 0
@@ -153,9 +213,18 @@ def save_nnsom_plot(
         fig = plt.gcf()
 
     if title:
+        title_size = (
+            13
+            if plot_type in {
+                "top_num",
+                "hit_hist",
+            }
+            else 14
+        )
+
         fig.suptitle(
             title,
-            fontsize=14,
+            fontsize=title_size,
         )
 
     return save_figure(
