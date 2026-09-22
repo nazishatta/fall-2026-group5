@@ -38,7 +38,7 @@
 
 ---
 
-## Date: Week 3 - September 7, 2026
+## Date: Week 3 - September 8, 2026
 
 - Topics of discussion
   - **PHASE 2: SOM TRAINING & VISUALIZATION**
@@ -61,3 +61,15 @@
 * [ ] Create SOM confusion heatmaps
 
 ---
+
+## Date: Week 4 - September 15, 2026
+
+- Topics of discussion
+  - **PHASE 2: SOM TRAINING & VISUALIZATION**
+  - Reorganize git based on versioning
+  - select 15 x 15 grid and replot the figures
+  -
+
+- Action Items:
+
+* [ ]
