@@ -2,8 +2,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from src.component.features.extractor import FeatureExtractor
-from src.component.models.lenet5 import LeNet5
+from src.v1_mnist.component.features.extractor import FeatureExtractor
+from src.v1_mnist.component.models.lenet5 import LeNet5
 
 
 def make_loader(n=20):

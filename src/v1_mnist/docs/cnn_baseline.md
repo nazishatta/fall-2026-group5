@@ -1,16 +1,16 @@
-# Week 2 Baseline – Technical Documentation
+# CNN Baseline – Technical Documentation (v1_mnist)
 
 **Project:** Post-Training Analysis & Novelty Detection Using NNSOM  
 **Course:** GWU DATS 6501 Capstone | Advisor: Dr. Amir Jafari  
-**Milestone:** Week 2 – Data Preparation, LeNet-5 Training, Embedding Extraction
+**Phase:** CNN Baseline – Data Preparation, LeNet-5 Training, Embedding Extraction
 
 ---
 
 ## Pipeline Overview
 
-The Week 2 baseline consists of three sequential pipeline scripts, each driven by a single
-YAML config file (`src/component/configs/week_2_baseline.yaml`). All outputs land in
-`outputs/week_2/` automatically via the config system.
+The CNN baseline consists of three sequential pipeline scripts, each driven by a single
+YAML config file (`src/v1_mnist/component/configs/cnn_baseline.yaml`). All outputs land in
+`outputs/v1_mnist/cnn_baseline/` automatically via the config system.
 
 ```
 Raw MNIST IDX files (~/Capstone/All_Data/MNIST/raw/)
@@ -35,7 +35,7 @@ Raw MNIST IDX files (~/Capstone/All_Data/MNIST/raw/)
    - Saves {split}_features.npy  (shape: N x 84)
          |
          v
- outputs/week_2/embeddings/  <-- ready for Week 3 NNSOM training
+ outputs/v1_mnist/cnn_baseline/embeddings/  <-- ready for NNSOM training
 ```
 
 ---
@@ -90,14 +90,14 @@ code is not touched during inference — a clean separation of concerns.
 - _Accuracy_ is the primary MNIST benchmark metric for comparability with the literature.
 - _Macro F1_ catches per-class imbalance that accuracy can mask.
 - _Confusion matrix_ (saved to `figures/`) reveals which digit pairs the network confuses,
-  motivating the NNSOM post-training analysis in Week 3.
+  motivating the NNSOM post-training analysis.
 
 ---
 
-## What the Embeddings Are Used For (Week 3 Preview)
+## What the Embeddings Are Used For (NNSOM Training)
 
-The 84-dimensional fc2 vectors from `outputs/week_2/embeddings/` are the direct input to the
-Neural-Network Self-Organizing Map (NNSOM) in Week 3. The SOM will:
+The 84-dimensional fc2 vectors from `outputs/v1_mnist/cnn_baseline/embeddings/` are the direct input to the
+Neural-Network Self-Organizing Map (NNSOM). The SOM will:
 
 1. Cluster the 49,000 training embeddings into a 2-D topographic grid.
 2. Map each test embedding to its Best Matching Unit (BMU).
@@ -110,15 +110,15 @@ Neural-Network Self-Organizing Map (NNSOM) in Week 3. The SOM will:
 
 ## Config Architecture
 
-All hyperparameters live in two YAML files:
+All hyperparameters live in modular YAML files:
 
 | File                                         | Role                                                   |
 | -------------------------------------------- | ------------------------------------------------------ |
-| `src/component/configs/base.yaml`            | Shared defaults (model, dataset, training, dataloader) |
-| `src/component/configs/week_2_baseline.yaml` | Only `run.name: week_2` and `tasks:` overrides         |
+| `src/v1_mnist/component/configs/base.yaml`   | Shared defaults (model, dataset, training, dataloader) |
+| `src/v1_mnist/component/configs/cnn_baseline.yaml` | CNN baseline overrides (`run.name: cnn_baseline`) |
+| `src/v1_mnist/component/configs/som.yaml`    | SOM configuration (`run.name: som`)                   |
 
-`config.py` auto-merges these and auto-routes all output paths to `outputs/week_2/**`.
-To start Week 3, create `week_3_som.yaml` with `run.name: week_3` — no other file changes needed.
+`config.py` auto-merges these and auto-routes all output paths to `outputs/v1_mnist/{run.name}/**`.
 
 ---
 

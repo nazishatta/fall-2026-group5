@@ -1,6 +1,6 @@
 import torch
 
-from src.component.models.lenet5 import LeNet5
+from src.v1_mnist.component.models.lenet5 import LeNet5
 
 
 def test_forward_shape():

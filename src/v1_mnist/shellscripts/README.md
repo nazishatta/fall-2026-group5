@@ -2,9 +2,9 @@
 
 This folder contains scripts for reproducing project workflows.
 
-## Week 2 Baseline
+## CNN Baseline
 
-`run_week_2_baseline.sh` runs:
+`run_cnn_baseline.sh` runs:
 
 1. MNIST preparation with a 70/15/15 split
 2. LeNet-5 training and evaluation
@@ -13,7 +13,7 @@ This folder contains scripts for reproducing project workflows.
 Outputs are saved to:
 
 ```text
-outputs/week_2/
+outputs/v1_mnist/cnn_baseline/
 ```
 
 ## Setup
@@ -31,14 +31,14 @@ Activate your preferred Python environment first if you use one.
 From the project root:
 
 ```bash
-bash src/shellscripts/run_week_2_baseline.sh
+bash src/v1_mnist/shellscripts/run_cnn_baseline.sh
 ```
 
 Optional:
 
 ```bash
-chmod +x src/shellscripts/run_week_2_baseline.sh
-./src/shellscripts/run_week_2_baseline.sh
+chmod +x src/v1_mnist/shellscripts/run_cnn_baseline.sh
+./src/v1_mnist/shellscripts/run_cnn_baseline.sh
 ```
 
 ## Run on a Local Windows Machine
@@ -46,7 +46,7 @@ chmod +x src/shellscripts/run_week_2_baseline.sh
 The `.sh` script can be run with Git Bash or WSL:
 
 ```bash
-bash src/shellscripts/run_week_2_baseline.sh
+bash src/v1_mnist/shellscripts/run_cnn_baseline.sh
 ```
 
 Or run the three Python pipeline commands directly from PowerShell/Command Prompt if Bash is not available.

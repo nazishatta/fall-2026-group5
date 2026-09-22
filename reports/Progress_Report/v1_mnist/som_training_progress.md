@@ -21,11 +21,11 @@
   - **PHASE 1: MODEL TRAINING BASELINE**
   - Set up Python environment with PyTorch, NNSOM, matplotlib, scikit-learn, and required packages.
   - Set up AWS EC2 connection.
-  - Set up GitHub repository and organized the project using the professor's `src/component/` structure.
+  - Set up GitHub repository and organized the project using the modular `src/v1_mnist/component/` structure.
   - Prepared MNIST with a 70/15/15 stratified train/validation/test split.
   - Trained the LeNet-5 baseline CNN and achieved approximately **99.18% test accuracy**.
   - Extracted and saved the **84-dimensional `fc2` embeddings** for train, validation, and test sets.
-  - Saved checkpoints, embeddings, training curves, and confusion matrix under `outputs/week_2/`.
+  - Saved checkpoints, embeddings, training curves, and confusion matrix under `outputs/v1_mnist/cnn_baseline/`.
   - Studied Chapter 16 on Competitive Networks to understand SOM, BMU, competitive learning, neighborhood updates, and topology preservation.
 
 - Action Items:

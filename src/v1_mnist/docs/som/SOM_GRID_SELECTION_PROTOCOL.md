@@ -1,4 +1,4 @@
-# Week 3 SOM Grid-Selection Protocol
+# SOM Grid-Selection Protocol (v1_mnist)
 
 ## Status
 
@@ -40,7 +40,7 @@ The existing frozen 15x15 seed-42 run is reused rather than rerun.
 
 Across grid candidates, the following must remain fixed:
 
-- frozen Week 2 LeNet-5 embeddings;
+- frozen LeNet-5 embeddings;
 - feature layer and embedding dimensionality;
 - sample ordering;
 - train/validation split;
@@ -162,7 +162,7 @@ Every new scientific run must use a unique run_id.
 
 Artifacts are isolated under:
 
-`outputs/week_3/`
+`outputs/v1_mnist/som/`
 
 with run-specific:
 

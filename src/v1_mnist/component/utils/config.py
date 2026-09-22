@@ -45,28 +45,36 @@ def load_config(config_path):
         config_dict = weekly_config
 
     # --------------------------------------------------
-    # Automatically set output folders by week
+    # Automatically set output folders by milestone / task
     # --------------------------------------------------
     if 'run' in config_dict and 'name' in config_dict['run']:
 
-        week = config_dict['run']['name']
+        raw_run_name = str(config_dict['run']['name'])
+        # Map legacy or explicit names to standardized subfolder names
+        if raw_run_name in ('week_2', 'cnn_baseline'):
+            folder_name = 'cnn_baseline'
+        elif raw_run_name in ('week_3', 'som'):
+            folder_name = 'som'
+        else:
+            folder_name = raw_run_name
 
         output_root = config_dict.get(
             'project', {}
         ).get(
             'output_root',
-            './outputs'
+            './outputs/v1_mnist'
         )
 
         if 'paths' not in config_dict:
             config_dict['paths'] = {}
 
-        output_dir = os.path.join(output_root, week)
+        output_dir = os.path.join(output_root, folder_name)
 
         config_dict['paths'].setdefault('output_dir', output_dir)
         config_dict['paths'].setdefault('checkpoints_dir', os.path.join(output_dir, 'checkpoints'))
         config_dict['paths'].setdefault('embeddings_dir', os.path.join(output_dir, 'embeddings'))
         config_dict['paths'].setdefault('figures_dir', os.path.join(output_dir, 'figures'))
+        config_dict['paths'].setdefault('metrics_dir', os.path.join(output_dir, 'metrics'))
         config_dict['paths'].setdefault('tables_dir', os.path.join(output_dir, 'tables'))
         config_dict['paths'].setdefault('som_models_dir', os.path.join(output_dir, 'som_models'))
         config_dict['paths'].setdefault('logs_dir', os.path.join(output_dir, 'logs'))

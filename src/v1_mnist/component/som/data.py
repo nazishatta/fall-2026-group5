@@ -135,6 +135,32 @@ def _validate_split(
         )
 
 
+def resolve_embeddings_dir(
+    embeddings_dir: str | Path,
+    repo_root: Path | None = None,
+) -> Path:
+    """Resolve embeddings directory across EC2, local workstation, and relative paths."""
+    raw_path = Path(embeddings_dir)
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parents[4]
+
+    candidates = [
+        raw_path if raw_path.is_absolute() else (repo_root / raw_path).resolve(),
+        Path.cwd() / raw_path,
+        (repo_root / "outputs" / "v1_mnist" / "cnn_baseline" / "embeddings" / "mnist").resolve(),
+        (repo_root.parent / "week_2_codes" / "outputs" / "week_2" / "embeddings" / "mnist").resolve(),
+        (repo_root.parent / "week_2_codes_local" / "outputs" / "week_2" / "embeddings" / "mnist").resolve(),
+        (repo_root / "outputs" / "week_2" / "embeddings" / "mnist").resolve(),
+        (repo_root.parent / "outputs" / "week_2" / "embeddings" / "mnist").resolve(),
+        (repo_root.parent / "Code_local" / "outputs" / "week_2" / "embeddings" / "mnist").resolve(),
+    ]
+    for candidate in candidates:
+        if candidate.is_dir() and (candidate / "train_features.npy").is_file():
+            return candidate
+
+    return candidates[0]
+
+
 def load_som_data(
     embeddings_dir: str | Path,
     expected_feature_dim: int = 84,
@@ -146,7 +172,7 @@ def load_som_data(
     validation/test leakage.
     """
 
-    embeddings_dir = Path(embeddings_dir)
+    embeddings_dir = resolve_embeddings_dir(embeddings_dir)
 
     train = _load_split(embeddings_dir, "train")
     val = _load_split(embeddings_dir, "val")

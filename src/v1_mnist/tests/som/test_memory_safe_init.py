@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from NNSOM.plots import SOMPlots
 
-from src.component.som.memory_safe_init import economy_svd_for_nnsom_init
+from src.v1_mnist.component.som.memory_safe_init import economy_svd_for_nnsom_init
 
 
 class TestEconomySVDForNNSOMInit(unittest.TestCase):

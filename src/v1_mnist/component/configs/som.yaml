@@ -1,29 +1,48 @@
 # ==============================================================================
-# Week 3 Milestone Configuration:
-# NNSOM Training & Error Geography Analysis
+# SOM Milestone Configuration
+# NNSOM Training, Model Selection, Convergence Tracking, and Visualization
 #
-# Inputs loaded from: ./outputs/week_2/embeddings/mnist/
-# Outputs saved to:   ./outputs/week_3/
-#
-# Scientific split policy:
-# - SOM is trained only on training embeddings.
-# - Validation data is used for development / model selection.
-# - Test data is not used for SOM hyperparameter selection.
+# All SOM artifacts are written under ./outputs/v1_mnist/som/
 # ==============================================================================
 
 run:
-  name: week_3
+  name: som
+  version: v1_mnist
   stage: som
-  input_run: week_2
+  input_run: cnn_baseline
 
+# Keep SOM artifacts together and predictable.
+paths:
+  embeddings_dir: "./outputs/v1_mnist/cnn_baseline/embeddings/mnist"
+
+  output_dir: "./outputs/v1_mnist/som"
+  som_models_dir: "./outputs/v1_mnist/som/som_models"
+  logs_dir: "./outputs/v1_mnist/som/logs"
+  figures_dir: "./outputs/v1_mnist/som/figures"
+  tables_dir: "./outputs/v1_mnist/som/tables"
+  analysis_dir: "./outputs/v1_mnist/som/analysis"
+
+# Fixed 15x15 SOM grid based on project design and visual interpretability.
 som:
   grid_height: 15
   grid_width: 15
   init_neighborhood: 3
   epochs: 100
   steps: 100
-  backend: numpy
+
+  # Valid options:
+  # auto = SOMPlots chooses SOMGpu when CuPy is available,
+  #        otherwise falls back to SOM/NumPy.
+  # cpu  = explicitly use NNSOM.som.SOM.
+  # gpu  = explicitly use NNSOM.som_gpu.SOMGpu.
+  backend: auto
+
   random_seed: 42
+
+  # Keep false for the main NNSOM-native training path.
+  # The existing custom history trainer is NumPy/SciPy based.
+  track_qe_history: false
+  qe_history_every: 1
 
 preprocessing:
   scaler: minmax
@@ -40,9 +59,36 @@ analysis:
   hotspot_error_threshold: 0.35
   purity_metric: majority_vote
 
-  visualizations:
-    - u_matrix
-    - hit_histogram
-    - component_planes
-    - class_colored_som
-    - error_hotspot_overlay
+visualization:
+  selected_model: "som_15x15_seed42_final"
+
+  # Use validation labels for class-distribution maps so the visualization
+  # reflects generalization rather than only training assignments.
+  class_map_split: val
+
+  # For 84 abstract fc2 embedding dimensions, generate detailed histograms
+  # only for the most variable dimensions. All 84 dimensions still appear
+  # in component-plane outputs.
+  top_embedding_features: 6
+
+  # Core NNSOM plots requested for Week 3.
+  generate_topology: true
+  generate_neuron_connection: true
+  generate_u_matrix: true
+  generate_hit_histograms: true
+  generate_component_planes: true
+
+  # MNIST-relevant adaptations of professor's Iris plotting examples.
+  generate_class_color_histograms: true
+  generate_class_gray_histograms: true
+  generate_feature_color_histograms: true
+  generate_feature_gray_histograms: true
+
+  # Additional project-relevant NNSOM plots.
+  generate_simple_grid_error_support: true
+  generate_simple_grid_purity_support: true
+  generate_complex_error_map: true
+
+  # These are valid NNSOM plots, but a 15x15 map with 84 abstract embedding
+  # features can still make them visually dense. Keep disabled unless explicitly needed.
+  generate_extended_dense_plots: false

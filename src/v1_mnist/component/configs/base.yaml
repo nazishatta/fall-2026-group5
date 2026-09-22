@@ -1,5 +1,5 @@
 project:
-  output_root: "./outputs"
+  output_root: "./outputs/v1_mnist"
 
 paths:
   data_root: "../../All_Data"

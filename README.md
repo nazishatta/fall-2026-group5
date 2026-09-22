@@ -1,4 +1,4 @@
-# MNIST Baseline – Post-Training Analysis with NNSOM
+# MNIST Baseline & NNSOM Analysis (v1_mnist)
 
 > **GWU DATS 6501 Capstone | Group 5 | Advisor: Dr. Amir Jafari**  
 > _Post-Training Analysis & Novelty Detection Using Neural-Network Self-Organizing Maps_
@@ -8,54 +8,74 @@
 ## Repository Layout
 
 ```
-week_2_codes/
+Code_local/
 ├── src/
-│   ├── component/
-│   │   ├── configs/
-│   │   │   ├── base.yaml               # Shared hyperparameters (all weeks)
-│   │   │   ├── week_2_baseline.yaml    # Week 2 milestone config
-│   │   │   └── week_3_som.yaml         # Week 3 NNSOM config
-│   │   ├── data/
-│   │   │   └── mnist_dataset.py        # CustomMNISTDataset + get_dataloaders()
-│   │   ├── models/
-│   │   │   └── lenet5.py               # LeNet-5 architecture
-│   │   ├── features/
-│   │   │   └── extractor.py            # FeatureExtractor (forward hooks)
-│   │   ├── evaluation/
-│   │   │   └── evaluator.py            # Accuracy, F1, confusion matrix
-│   │   ├── visualization/
-│   │   │   └── plotter.py              # Training curves, confusion heatmap
-│   │   ├── utils/
-│   │   │   └── config.py               # YAML loader with auto path-routing
-│   │   └── pipeline/
-│   │       ├── 01_prepare_data.py      # Split & validate MNIST
-│   │       ├── 02_train_baseline.py    # Train LeNet-5
-│   │       └── 03_extract_embeddings.py# Extract fc2 embeddings
-│   ├── tests/
-│   │   ├── conftest.py
-│   │   └── week_2/
-│   │       ├── README.md
-│   │       ├── test_data_loader.py         # Split sizes, image shape, pixel range
-│   │       ├── test_lenet5.py              # Architecture, forward pass, numerics
-│   │       └── test_feature_extractor.py  # Shape (N,84), no NaN/Inf, alignment
-│   ├── docs/
-│   │   └── week_2_baseline.md          # Technical pipeline documentation
-│   └── shellscripts/
-│       ├── README.md
-│       └── run_week_2_baseline.sh      # One-command full pipeline
+│   └── v1_mnist/
+│       ├── component/
+│       │   ├── configs/
+│       │   │   ├── base.yaml               # Shared hyperparameters
+│       │   │   ├── cnn_baseline.yaml       # CNN baseline config
+│       │   │   └── som.yaml                # NNSOM config
+│       │   ├── data/
+│       │   │   └── mnist_dataset.py        # CustomMNISTDataset + get_dataloaders()
+│       │   ├── models/
+│       │   │   └── lenet5.py               # LeNet-5 architecture
+│       │   ├── features/
+│       │   │   └── extractor.py            # FeatureExtractor (forward hooks)
+│       │   ├── evaluation/
+│       │   │   └── evaluator.py            # Accuracy, F1, confusion matrix
+│       │   ├── visualization/
+│       │   │   └── cnn_baseline_plots.py   # Training curves, confusion heatmap
+│       │   ├── som/                        # NNSOM trainer, data loader, memory-safe init
+│       │   ├── analysis/                   # SOM grid selection, BMU/RQ analysis
+│       │   ├── utils/
+│       │   │   └── config.py               # YAML loader with auto path-routing
+│       │   └── pipeline/
+│       │       ├── 01_prepare_data.py      # Split & validate MNIST
+│       │       ├── 02_train_baseline.py    # Train LeNet-5
+│       │       ├── 03_extract_embeddings.py# Extract fc2 embeddings
+│       │       ├── 04_train_som.py         # Train SOM
+│       │       └── 05_visualize_som.py     # SOM visualizations
+│       ├── tests/
+│       │   ├── conftest.py
+│       │   ├── cnn_baseline/
+│       │   │   ├── README.md
+│       │   │   ├── test_data_loader.py     # Split sizes, image shape, pixel range
+│       │   │   ├── test_lenet5.py          # Architecture, forward pass, numerics
+│       │   │   └── test_feature_extractor.py # Shape (N,84), no NaN/Inf, alignment
+│       │   └── som/
+│       │       ├── test_bmu_rq_analysis.py # BMU/RQ analysis helpers
+│       │       ├── test_memory_safe_init.py # SVD economy context
+│       │       └── test_run_id_preflight.py # Output isolation preflight
+│       ├── docs/
+│       │   ├── cnn_baseline.md             # CNN technical documentation
+│       │   └── som/
+│       │       └── SOM_GRID_SELECTION_PROTOCOL.md # Grid selection protocol
+│       └── shellscripts/
+│           ├── README.md
+│           └── run_cnn_baseline.sh         # End-to-end CNN baseline pipeline
+├── cookbooks/
+│   └── v1_mnist/
+│       └── cnn_baseline.ipynb              # Baseline walkthrough notebook
+├── demo/
+│   └── fig/
+│       └── v1_mnist/                       # Visualizations & figures
 ├── reports/
+│   ├── Markdown_Report/
+│   │   └── v1_mnist/
+│   │       └── cnn_baseline_results.md
 │   └── Progress_Report/
-│       └── week_2_progress.md          # Week 2 results & decisions
-└── outputs/                            # Auto-created; NOT committed to git
-    └── week_2/
-        ├── checkpoints/
-        ├── embeddings/
-        └── figures/
+│       └── v1_mnist/
+│           └── som_training_progress.md
+└── outputs/
+    └── v1_mnist/
+        ├── cnn_baseline/                   # Checkpoints, embeddings, figures, logs
+        └── som/                            # SOM models, logs, tables, figures
 ```
 
 ---
 
-## Week 2 Results
+## CNN Baseline Results
 
 | Metric              | Value                    |
 | ------------------- | ------------------------ |
@@ -64,17 +84,15 @@ week_2_codes/
 | Embedding dimension | 84 (fc2 layer)           |
 | Train / Val / Test  | 49,000 / 10,500 / 10,500 |
 
-See [`reports/Progress_Report/week_2_progress.md`](reports/Progress_Report/week_2_progress.md)
-and [`src/docs/week_2_baseline.md`](src/docs/week_2_baseline.md) for full details.
+See [`reports/Markdown_Report/v1_mnist/cnn_baseline_results.md`](reports/Markdown_Report/v1_mnist/cnn_baseline_results.md)
+and [`src/v1_mnist/docs/cnn_baseline.md`](src/v1_mnist/docs/cnn_baseline.md) for full details.
 
 ---
 
-## Adding a New Week
+## Running Tests
 
-1. Create `src/component/configs/week_N_<name>.yaml` with `run.name: week_N`.
-2. Add any new hyperparameters (all shared ones are inherited from `base.yaml`).
-3. New pipeline scripts auto-save to `outputs/week_N/`.
+From the project root (`Codes/Code_local`):
 
-No other files need to change.
-
----
+```bash
+python -m pytest src/v1_mnist/tests -v
+```

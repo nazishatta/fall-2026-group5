@@ -4,16 +4,16 @@ import argparse
 import json
 from pathlib import Path
 
-# Project root: C:\GIT\Capstone-2026
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.component.utils.config import load_config, set_seed
-from src.component.data.mnist_dataset import (
+from src.v1_mnist.component.utils.config import load_config, set_seed
+from src.v1_mnist.component.data.mnist_dataset import (
     get_dataloaders,
     compute_class_distribution
 )
-from src.component.visualization.plots import (
+from src.v1_mnist.component.visualization.cnn_baseline_plots import (
     plot_class_distribution,
     plot_sample_images
 )
@@ -23,8 +23,8 @@ def main():
     parser.add_argument(
         '--config',
         type=str,
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
-        help='Path to config file (default: week_2_baseline.yaml)'
+        default=str(PROJECT_ROOT / 'src' / 'v1_mnist' / 'component' / 'configs' / 'cnn_baseline.yaml'),
+        help='Path to config file (default: cnn_baseline.yaml)'
     )
     args = parser.parse_args()
 
@@ -40,7 +40,7 @@ def main():
     test_dist = compute_class_distribution(test_labels, "test")
 
     print("\nGenerating plots...")
-    figures_dir = getattr(config.paths, 'figures_dir', './output/week_2/figures')
+    figures_dir = getattr(config.paths, 'figures_dir', './outputs/v1_mnist/cnn_baseline/figures')
     os.makedirs(figures_dir, exist_ok=True)
     
     plot_class_distribution(train_dist, "Training Set Class Distribution", os.path.join(figures_dir, "train_dist.png"))
@@ -51,8 +51,10 @@ def main():
     plot_sample_images(train_loader.dataset, 5, os.path.join(figures_dir, "sample_images.png"))
 
     print("\nSaving split statistics...")
-    output_dir = getattr(config.paths, 'output_dir', './output/week_2')
+    output_dir = getattr(config.paths, 'output_dir', './outputs/v1_mnist/cnn_baseline')
+    metrics_dir = getattr(config.paths, 'metrics_dir', os.path.join(output_dir, 'metrics'))
     os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(metrics_dir, exist_ok=True)
     
     stats = {
         'train_samples': len(train_labels),
@@ -63,9 +65,11 @@ def main():
         'test_dist': test_dist
     }
     
-    with open(os.path.join(output_dir, 'split_stats.json'), 'w') as f:
+    metrics_path = os.path.join(metrics_dir, 'split_stats.json')
+    with open(metrics_path, 'w') as f:
         json.dump(stats, f, indent=4)
 
+    print(f"Split statistics saved to {metrics_path}")
     print("\nData pipeline preparation complete!")
 
 if __name__ == '__main__':

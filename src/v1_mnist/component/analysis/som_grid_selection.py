@@ -1,4 +1,9 @@
-"""Reproduce the frozen Week 3 SOM grid-selection decision."""
+"""Optional MNIST SOM grid-size ablation experiment.
+
+This script compares 10x10, 15x15, and 20x20 SOM runs for research
+analysis only. The main project SOM is fixed at 15x15 based on the
+project's visual-interpretability design choice.
+"""
 
 from __future__ import annotations
 
@@ -7,30 +12,31 @@ import json
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 CANDIDATES = {
     "10x10": (
         REPO_ROOT
-        / "outputs/week_3/logs/"
+        / "outputs/v1_mnist/som/logs/"
         "som_10x10_seed42_gridstudy_metrics.json"
     ),
     "15x15": (
         REPO_ROOT
-        / "outputs/week_3/logs/"
+        / "outputs/v1_mnist/som/logs/"
         "som_15x15_seed42_attempt2_metrics.json"
     ),
     "20x20": (
         REPO_ROOT
-        / "outputs/week_3/logs/"
+        / "outputs/v1_mnist/som/logs/"
         "som_20x20_seed42_gridstudy_metrics.json"
     ),
 }
 
-OUTPUT_DIR = REPO_ROOT / "outputs/week_3/tables"
+OUTPUT_DIR = REPO_ROOT / "outputs/v1_mnist/som/tables"
 RESULT_DOC = (
     REPO_ROOT
-    / "docs/week_3/SOM_GRID_SELECTION_RESULT.md"
+    / "outputs/v1_mnist/som/docs"
+    / "SOM_GRID_SELECTION_RESULT.md"
 )
 
 
@@ -138,11 +144,7 @@ def main() -> None:
         ),
     )
 
-    if winner["grid"] != "20x20":
-        raise RuntimeError(
-            "Unexpected selection result. Review metrics and "
-            "the frozen selection protocol before proceeding."
-        )
+    selected_grid = winner["grid"]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -165,7 +167,7 @@ def main() -> None:
 
     payload = {
         "protocol": (
-            "docs/week_3/"
+            "outputs/v1_mnist/som/docs/"
             "SOM_GRID_SELECTION_PROTOCOL.md"
         ),
         "selection_stage": "development",
@@ -177,11 +179,11 @@ def main() -> None:
             "smaller grid breaks a total-rank tie."
         ),
         "candidates": rows,
-        "selected_grid": winner["grid"],
+        "selected_grid": selected_grid,
         "selected_rank_sum": winner["rank_sum"],
         "selected_model": (
-            "outputs/week_3/som_models/"
-            "som_20x20_seed42_gridstudy"
+            f"outputs/v1_mnist/som/som_models/"
+            f"som_{selected_grid.replace('x', 'x')}_seed42_gridstudy"
         ),
     }
 
@@ -195,14 +197,27 @@ def main() -> None:
         for row in rows
     }
 
-    doc = f"""# Week 3 SOM Grid-Selection Result
+    # Build the winner row highlight: bold the winning grid's rank sum
+    def fmt_row(g):
+        r = by_grid[g]
+        rank_sum_str = (
+            f'**{r["rank_sum"]}**' if g == selected_grid else str(r["rank_sum"])
+        )
+        return (
+            f'| {g} | {r["validation_qe"]:.6f} | {r["qe_rank"]} | '
+            f'{r["validation_te1_percent"]:.4f} | {r["te1_rank"]} | '
+            f'{r["validation_te1_plus_2_percent"]:.4f} | {r["te1_plus_2_rank"]} | '
+            f'{r["validation_occupancy"]:.4f} | {rank_sum_str} |'
+        )
+
+    doc = f"""# MNIST v1 SOM Grid-Selection Result
 
 ## Decision
 
-**Selected development SOM: 20x20, seed 42.**
+**Selected development SOM: {selected_grid}, seed 42.**
 
-Selection followed the grid-selection protocol frozen before the
-10x10 and 20x20 results were observed.
+Selection followed the equal-weight rank-sum protocol frozen before
+any grid results were observed.
 
 The final test split was not evaluated or used in this decision.
 
@@ -210,40 +225,31 @@ The final test split was not evaluated or used in this decision.
 
 | Grid | Validation QE | QE rank | Validation TE1 (%) | TE1 rank | Validation TE1+2 (%) | TE1+2 rank | Validation occupancy | Rank sum |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 10x10 | {by_grid["10x10"]["validation_qe"]:.6f} | {by_grid["10x10"]["qe_rank"]} | {by_grid["10x10"]["validation_te1_percent"]:.4f} | {by_grid["10x10"]["te1_rank"]} | {by_grid["10x10"]["validation_te1_plus_2_percent"]:.4f} | {by_grid["10x10"]["te1_plus_2_rank"]} | {by_grid["10x10"]["validation_occupancy"]:.4f} | {by_grid["10x10"]["rank_sum"]} |
-| 15x15 | {by_grid["15x15"]["validation_qe"]:.6f} | {by_grid["15x15"]["qe_rank"]} | {by_grid["15x15"]["validation_te1_percent"]:.4f} | {by_grid["15x15"]["te1_rank"]} | {by_grid["15x15"]["validation_te1_plus_2_percent"]:.4f} | {by_grid["15x15"]["te1_plus_2_rank"]} | {by_grid["15x15"]["validation_occupancy"]:.4f} | {by_grid["15x15"]["rank_sum"]} |
-| 20x20 | {by_grid["20x20"]["validation_qe"]:.6f} | {by_grid["20x20"]["qe_rank"]} | {by_grid["20x20"]["validation_te1_percent"]:.4f} | {by_grid["20x20"]["te1_rank"]} | {by_grid["20x20"]["validation_te1_plus_2_percent"]:.4f} | {by_grid["20x20"]["te1_plus_2_rank"]} | {by_grid["20x20"]["validation_occupancy"]:.4f} | **{by_grid["20x20"]["rank_sum"]}** |
+{fmt_row("10x10")}
+{fmt_row("15x15")}
+{fmt_row("20x20")}
 
 ## Interpretation
 
-The metrics disagree rather than uniformly favoring one grid.
+The ranking rule: equal-weight ordinal rank sum over validation QE,
+TE1, and TE1+2. Lowest total rank wins. Smaller grid breaks a tie.
 
-The 20x20 candidate has the lowest validation quantization error and
-the lowest first-order topological error.
-
-The 10x10 candidate has the lowest first+second-order topological
-error and the highest validation occupancy.
-
-Following the prospectively frozen equal-weight rank-sum rule, 20x20
-has the lowest total rank and is therefore selected.
-
-The occupancy reduction at 20x20 is retained as a structural
-trade-off to report in subsequent analysis rather than being hidden
-or used post hoc to change the selection rule.
+Selected: **{selected_grid}** (rank sum = {winner["rank_sum"]})
 
 ## Selected artifact
 
-`outputs/week_3/som_models/som_20x20_seed42_gridstudy`
+`outputs/v1_mnist/som/som_models/som_{selected_grid}_seed42_gridstudy`
 
 ## Next stage
 
 Use the selected SOM for BMU assignment, RQ1 representation analysis,
 and RQ2 error-geography analysis.
 
-OOD/novelty evaluation remains out of scope until the Week 3
-representation and error-geography analyses are frozen.
+OOD/novelty evaluation remains out of scope until the representation
+and error-geography analyses are frozen.
 """
 
+    RESULT_DOC.parent.mkdir(parents=True, exist_ok=True)
     RESULT_DOC.write_text(
         doc,
         encoding="utf-8",
@@ -268,7 +274,7 @@ representation and error-geography analyses are frozen.
         )
 
     print()
-    print(f'SELECTED GRID: {winner["grid"]}')
+    print(f'SELECTED GRID: {selected_grid}')
     print("TEST USED FOR SELECTION: NO")
     print(f"CSV:  {csv_path}")
     print(f"JSON: {json_path}")

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from src.component.data.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.data.mnist_dataset import get_dataloaders
 
 
 def make_config():

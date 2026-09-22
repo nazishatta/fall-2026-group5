@@ -1,42 +1,55 @@
-"""Week 3 pipeline: train and evaluate NNSOM on frozen Week 2 embeddings."""
+"""MNIST v1 pipeline: train and evaluate NNSOM on frozen LeNet-5 embeddings.
+
+All generated artifacts are written below ``outputs/v1_mnist/som`` through the
+paths declared in ``som.yaml``.
+"""
+
+from __future__ import annotations
 
 import argparse
+import csv
 import json
-import sys
 import os
 import re
+import sys
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 
-# Allow imports from repository root when executed as a script.
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 
-from src.component.som.data import load_som_data
-from src.component.som.metrics import evaluate_som_quality
-from src.component.som.trainer import train_som
-from src.component.utils.config import load_config
+from src.v1_mnist.component.som.data import load_som_data, resolve_embeddings_dir
+from src.v1_mnist.component.som.metrics import evaluate_som_quality
+from src.v1_mnist.component.som.trainer import (
+    get_nnsom_backend,
+    train_som,
+    train_som_with_history,
+)
+from src.v1_mnist.component.utils.config import load_config
 
 
 def parse_args():
-    """Parse command-line arguments."""
-
     parser = argparse.ArgumentParser(
         description=(
-            "Train Week 3 NNSOM on frozen Week 2 MNIST embeddings."
+            "Train NNSOM on frozen LeNet-5 MNIST embeddings."
         )
     )
 
     parser.add_argument(
         "--config",
         type=str,
-        default="src/component/configs/week_3_som.yaml",
-        help="Path to Week 3 SOM configuration.",
+        default="src/v1_mnist/component/configs/som.yaml",
+        help="Path to SOM configuration.",
     )
 
     parser.add_argument(
@@ -54,7 +67,25 @@ def parse_args():
         action="store_true",
         help=(
             "Run a small local integration test instead of the "
-            "full Week 3 scientific experiment."
+            "full scientific experiment."
+        ),
+    )
+
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing model and metrics if --run-id was already executed.",
+    )
+
+    parser.add_argument(
+        "--grid-size",
+        type=str,
+        default=None,
+        metavar="HxW",
+        help=(
+            "Override the SOM grid dimensions from the config file. "
+            "Format: HEIGHTxWIDTH, e.g. --grid-size 10x10 or --grid-size 15x15. "
+            "Useful for optional grid-size experiments."
         ),
     )
 
@@ -62,15 +93,16 @@ def parse_args():
 
 
 def validate_run_id(run_id: str) -> str:
-    """Validate a filesystem-safe scientific experiment identifier."""
-
     if not run_id:
         raise ValueError("run_id must be a non-empty string.")
 
-    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", run_id) is None:
+    if re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._-]*",
+        run_id,
+    ) is None:
         raise ValueError(
-            "run_id may contain only letters, numbers, '.', '_', and '-', "
-            "and must begin with a letter or number."
+            "run_id may contain only letters, numbers, '.', '_', "
+            "and '-', and must begin with a letter or number."
         )
 
     return run_id
@@ -80,28 +112,38 @@ def preflight_scientific_outputs(
     run_id: str,
     logs_dir: Path,
     models_dir: Path,
+    overwrite: bool = False,
 ) -> tuple[Path, Path]:
-    """Reject duplicate scientific run IDs before expensive SOM training."""
+    metrics_path = (
+        logs_dir
+        / f"{run_id}_metrics.json"
+    )
 
-    metrics_path = logs_dir / f"{run_id}_metrics.json"
     model_path = models_dir / run_id
 
     existing_paths = [
         path
-        for path in (metrics_path, model_path)
+        for path in (
+            metrics_path,
+            model_path,
+        )
         if path.exists()
     ]
 
-    if existing_paths:
-        existing = ", ".join(str(path) for path in existing_paths)
+    if existing_paths and not overwrite:
+        existing = ", ".join(
+            str(path)
+            for path in existing_paths
+        )
 
         raise FileExistsError(
-            f"Scientific run_id '{run_id}' already has existing "
-            f"artifact(s): {existing}. Use a new --run-id instead of "
-            f"overwriting an existing experiment."
+            f"Scientific run_id '{run_id}' already has "
+            f"existing artifact(s): {existing}. "
+            "Use a new --run-id or pass --overwrite to replace them."
         )
 
     return metrics_path, model_path
+
 
 
 def deterministic_subset(
@@ -109,8 +151,6 @@ def deterministic_subset(
     n_samples: int,
     seed: int,
 ) -> np.ndarray:
-    """Select a deterministic random subset without replacement."""
-
     if n_samples >= len(x):
         return x
 
@@ -125,133 +165,310 @@ def deterministic_subset(
     return x[indices]
 
 
-def main():
-    """Run Week 3 NNSOM training and development evaluation."""
+def save_qe_history(
+    history,
+    run_id: str,
+    logs_dir: Path,
+    tables_dir: Path,
+    figures_dir: Path,
+) -> dict[str, str]:
+    """Save epoch-wise QE history as JSON, CSV, and PNG."""
 
+    convergence_dir = (
+        figures_dir
+        / "convergence"
+    )
+
+    convergence_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    logs_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    tables_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    json_path = (
+        logs_dir
+        / f"{run_id}_qe_history.json"
+    )
+
+    csv_path = (
+        tables_dir
+        / f"{run_id}_qe_history.csv"
+    )
+
+    figure_path = (
+        convergence_dir
+        / f"{run_id}_qe_curve.png"
+    )
+
+    payload = history.to_dict()
+
+    json_path.write_text(
+        json.dumps(
+            payload,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with csv_path.open(
+        "w",
+        newline="",
+        encoding="utf-8",
+    ) as handle:
+        writer = csv.writer(handle)
+        writer.writerow(
+            [
+                "epoch",
+                "quantization_error",
+                "neighborhood_radius",
+            ]
+        )
+
+        writer.writerows(
+            zip(
+                history.epoch,
+                history.quantization_error,
+                history.neighborhood_radius,
+            )
+        )
+
+    fig, ax = plt.subplots(
+        figsize=(8, 5)
+    )
+
+    ax.plot(
+        history.epoch,
+        history.quantization_error,
+        marker="o",
+        markersize=2,
+    )
+
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel(
+        "NNSOM-style quantization error"
+    )
+
+    ax.set_title(
+        "SOM Quantization Error Across Training"
+    )
+
+    ax.grid(
+        alpha=0.25
+    )
+
+    fig.tight_layout()
+
+    fig.savefig(
+        figure_path,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.close(fig)
+
+    return {
+        "json": str(json_path),
+        "csv": str(csv_path),
+        "figure": str(figure_path),
+    }
+
+
+def main():
     args = parse_args()
 
-    config = load_config(args.config)
+    config_path = Path(args.config)
+    if not config_path.is_absolute() and not config_path.exists():
+        config_path = (REPO_ROOT / config_path).resolve()
+
+    config = load_config(str(config_path))
+
+    # --grid-size overrides the YAML values (e.g. --grid-size 10x10)
+    if args.grid_size is not None:
+        try:
+            h_str, w_str = args.grid_size.lower().split("x")
+            grid_override_h = int(h_str)
+            grid_override_w = int(w_str)
+        except ValueError:
+            raise ValueError(
+                f"--grid-size must be in HxW format (e.g. 10x10), got: '{args.grid_size}'"
+            )
+        if grid_override_h <= 0 or grid_override_w <= 0:
+            raise ValueError(
+                f"--grid-size dimensions must be positive integers, got: {args.grid_size}"
+            )
+        original_h = int(config.som.grid_height)
+        original_w = int(config.som.grid_width)
+        config.som.grid_height = grid_override_h
+        config.som.grid_width = grid_override_w
+        print(
+            f"[grid-size override] {grid_override_h}x{grid_override_w} "
+            f"(config default was {original_h}x{original_w})"
+        )
 
     if args.smoke_test:
         run_id = "smoke_test"
     else:
         if args.run_id is None:
             raise ValueError(
-                "Full scientific SOM runs require --run-id so artifacts "
-                "cannot silently overwrite previous experiments."
+                "Full scientific SOM runs require --run-id."
             )
 
-        run_id = validate_run_id(args.run_id)
-
-    # ------------------------------------------------------------------
-    # Scientific and implementation safeguards
-    # ------------------------------------------------------------------
-
-    if config.som.backend != "numpy":
-        raise ValueError(
-            "Current Week 3 implementation supports only "
-            "backend='numpy' via NNSOM.plots.SOMPlots."
+        run_id = validate_run_id(
+            args.run_id
         )
 
-    if config.preprocessing.fit_split != "train":
+    requested_backend = str(
+        config.som.backend
+    ).lower()
+
+    if requested_backend not in {
+        "auto",
+        "cpu",
+        "gpu",
+    }:
         raise ValueError(
-            "Leakage protection violation: preprocessing.fit_split "
-            "must be 'train'."
+            "som.backend must be one of: "
+            "'auto', 'cpu', or 'gpu'."
         )
 
-    if config.evaluation.use_test_for_selection:
+    if (
+        config.preprocessing.fit_split
+        != "train"
+    ):
         raise ValueError(
-            "Leakage protection violation: test data cannot be used "
-            "for SOM hyperparameter selection."
+            "Leakage protection violation: "
+            "preprocessing.fit_split must be 'train'."
         )
 
-    # ------------------------------------------------------------------
-    # Paths
-    # ------------------------------------------------------------------
+    if (
+        config.evaluation.use_test_for_selection
+    ):
+        raise ValueError(
+            "Leakage protection violation: "
+            "test data cannot be used for selection."
+        )
 
-    input_run = config.run.input_run
+    def resolve_path(p: str | Path) -> Path:
+        path = Path(p)
+        return path if path.is_absolute() else (REPO_ROOT / path).resolve()
 
-    embeddings_dir = (
-        REPO_ROOT
-        / "outputs"
-        / input_run
-        / "embeddings"
-        / "mnist"
+    embeddings_dir = resolve_embeddings_dir(
+        config.paths.embeddings_dir,
+        REPO_ROOT,
     )
 
-    output_dir = Path(config.paths.output_dir)
-    models_dir = Path(config.paths.som_models_dir)
-    logs_dir = Path(config.paths.logs_dir)
+    output_dir = resolve_path(config.paths.output_dir)
+    models_dir = resolve_path(config.paths.som_models_dir)
+    logs_dir = resolve_path(config.paths.logs_dir)
+    figures_dir = resolve_path(config.paths.figures_dir)
+    tables_dir = resolve_path(config.paths.tables_dir)
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-    models_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir.mkdir(parents=True, exist_ok=True)
-
-    # ------------------------------------------------------------------
-    # Artifact preflight
-    # ------------------------------------------------------------------
+    for directory in (
+        output_dir,
+        models_dir,
+        logs_dir,
+        figures_dir,
+        tables_dir,
+    ):
+        directory.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
 
     if args.smoke_test:
-        metrics_path = logs_dir / "som_smoke_test_metrics.json"
+        metrics_path = (
+            logs_dir
+            / "som_smoke_test_metrics.json"
+        )
         model_path = None
     else:
-        metrics_path, model_path = preflight_scientific_outputs(
+        (
+            metrics_path,
+            model_path,
+        ) = preflight_scientific_outputs(
             run_id=run_id,
             logs_dir=logs_dir,
             models_dir=models_dir,
+            overwrite=args.overwrite,
         )
 
-    # ------------------------------------------------------------------
-    # Run information
-    # ------------------------------------------------------------------
-
     print("=" * 70)
-    print("Week 3 NNSOM Training")
+    print("MNIST v1 NNSOM Training")
     print("=" * 70)
 
-    print(f"Config:           {args.config}")
-    print(f"Embedding source: {embeddings_dir}")
-    print(f"Output directory: {output_dir}")
+    print(
+        f"Config:           {args.config}"
+    )
 
-    # ------------------------------------------------------------------
-    # Load and validate frozen Week 2 embeddings
-    # ------------------------------------------------------------------
+    print(
+        f"Embedding source: {embeddings_dir}"
+    )
+
+    print(
+        f"SOM output:       {output_dir}"
+    )
 
     data = load_som_data(
         embeddings_dir=embeddings_dir,
         expected_feature_dim=84,
     )
 
-    print("\nValidated Week 2 embeddings:")
-    print(f"  Train: {data.train.features.shape}")
-    print(f"  Val:   {data.val.features.shape}")
-    print(f"  Test:  {data.test.features.shape}")
+    print("\nValidated LeNet-5 embeddings:")
     print(
-        "  Scaler fitted on training features only: "
-        f"{data.scaler.n_features_in_} dimensions"
+        f"  Train: {data.train.features.shape}"
+    )
+    print(
+        f"  Val:   {data.val.features.shape}"
+    )
+    print(
+        f"  Test:  {data.test.features.shape}"
     )
 
     x_train = data.train.features
     x_val = data.val.features
 
-    # ------------------------------------------------------------------
-    # SOM configuration
-    # ------------------------------------------------------------------
+    grid_height = int(
+        config.som.grid_height
+    )
+    grid_width = int(
+        config.som.grid_width
+    )
+    init_neighborhood = int(
+        config.som.init_neighborhood
+    )
+    epochs = int(
+        config.som.epochs
+    )
+    steps = int(
+        config.som.steps
+    )
+    seed = int(
+        config.som.random_seed
+    )
 
-    grid_height = int(config.som.grid_height)
-    grid_width = int(config.som.grid_width)
-    init_neighborhood = int(config.som.init_neighborhood)
-    epochs = int(config.som.epochs)
-    steps = int(config.som.steps)
-    seed = int(config.som.random_seed)
+    track_history = bool(
+        config.som.track_qe_history
+    )
 
-    # ------------------------------------------------------------------
-    # Smoke-test configuration
-    # ------------------------------------------------------------------
+    history_every = int(
+        config.som.qe_history_every
+    )
 
     if args.smoke_test:
         print("\nSMOKE TEST MODE")
-        print("These values are NOT scientific experiment results.")
+        print(
+            "These values are NOT scientific results."
+        )
 
         x_train = deterministic_subset(
             x_train,
@@ -270,58 +487,106 @@ def main():
         epochs = 2
         steps = 10
 
-        print(f"  Train subset: {x_train.shape}")
-        print(f"  Val subset:   {x_val.shape}")
-        print(f"  Grid:         {grid_height}x{grid_width}")
-        print(f"  Epochs:       {epochs}")
-        print(f"  Steps:        {steps}")
-
-    # ------------------------------------------------------------------
-    # Train SOM
-    # ------------------------------------------------------------------
-
     print("\nTraining configuration:")
-    print(f"  Grid:              {grid_height}x{grid_width}")
-    print(f"  Neurons:           {grid_height * grid_width}")
-    print(f"  init_neighborhood: {init_neighborhood}")
-    print(f"  Epochs:            {epochs}")
-    print(f"  Steps:             {steps}")
-    print(f"  Seed:              {seed}")
+    print(
+        f"  Grid:              "
+        f"{grid_height}x{grid_width}"
+    )
+    print(
+        f"  Neurons:           "
+        f"{grid_height * grid_width}"
+    )
+    print(
+        f"  init_neighborhood: "
+        f"{init_neighborhood}"
+    )
+    print(
+        f"  Epochs:            {epochs}"
+    )
+    print(
+        f"  Steps:             {steps}"
+    )
+    print(
+        f"  Seed:              {seed}"
+    )
+    print(
+        f"  QE history:        {track_history}"
+    )
 
-    som = train_som(
-        x_train=x_train,
-        grid_height=grid_height,
-        grid_width=grid_width,
-        init_neighborhood=init_neighborhood,
-        epochs=epochs,
-        steps=steps,
-        norm_func=data.scaler.transform,
-        seed=seed,
+    if track_history:
+        (
+            som,
+            training_history,
+        ) = train_som_with_history(
+            x_train=x_train,
+            grid_height=grid_height,
+            grid_width=grid_width,
+            init_neighborhood=init_neighborhood,
+            epochs=epochs,
+            steps=steps,
+            norm_func=data.scaler.transform,
+            seed=seed,
+            history_every=history_every,
+        )
+    else:
+        som = train_som(
+            x_train=x_train,
+            grid_height=grid_height,
+            grid_width=grid_width,
+            init_neighborhood=init_neighborhood,
+            epochs=epochs,
+            steps=steps,
+            norm_func=data.scaler.transform,
+            seed=seed,
+            backend=requested_backend,
+        )
+
+        training_history = None
+
+    actual_backend = get_nnsom_backend(
+        som
+    )
+
+    print(
+        f"Requested SOM backend: "
+        f"{requested_backend}"
+    )
+
+    print(
+        f"Actual NNSOM backend: "
+        f"{actual_backend}"
     )
 
     print("\nSOM training completed.")
 
-    # ------------------------------------------------------------------
-    # Development evaluation
-    # ------------------------------------------------------------------
-
-    print("\nEvaluating training split...")
+    print(
+        "\nEvaluating training split..."
+    )
 
     train_metrics = evaluate_som_quality(
         som,
         x_train,
     )
 
-    print("Evaluating validation split...")
+    print(
+        "Evaluating validation split..."
+    )
 
     val_metrics = evaluate_som_quality(
         som,
         x_val,
     )
 
-    # ------------------------------------------------------------------
-    # Machine-readable experiment record
-    # ------------------------------------------------------------------
+    history_artifacts = None
+
+    if training_history is not None:
+        history_artifacts = save_qe_history(
+            history=training_history,
+            run_id=run_id,
+            logs_dir=logs_dir,
+            tables_dir=tables_dir,
+            figures_dir=figures_dir,
+        )
 
     metrics = {
         "experiment": {
@@ -329,51 +594,75 @@ def main():
             "run": config.run.name,
             "stage": config.run.stage,
             "input_run": config.run.input_run,
-            "smoke_test": bool(args.smoke_test),
+            "smoke_test": bool(
+                args.smoke_test
+            ),
         },
         "som": {
             "grid_height": grid_height,
             "grid_width": grid_width,
-            "num_neurons": grid_height * grid_width,
-            "init_neighborhood": init_neighborhood,
+            "num_neurons": (
+                grid_height
+                * grid_width
+            ),
+            "init_neighborhood": (
+                init_neighborhood
+            ),
             "epochs": epochs,
             "steps": steps,
-            "backend": config.som.backend,
+            "requested_backend": requested_backend,
+            "actual_backend": actual_backend,
             "random_seed": seed,
+            "track_qe_history": (
+                track_history
+            ),
+            "qe_history_every": (
+                history_every
+            ),
         },
         "preprocessing": {
-            "scaler": config.preprocessing.scaler,
+            "scaler": (
+                config.preprocessing.scaler
+            ),
             "feature_range": list(
                 config.preprocessing.feature_range
             ),
-            "fit_split": config.preprocessing.fit_split,
+            "fit_split": (
+                config.preprocessing.fit_split
+            ),
         },
         "data": {
-            "train_shape": list(x_train.shape),
-            "validation_shape": list(x_val.shape),
+            "train_shape": list(
+                x_train.shape
+            ),
+            "validation_shape": list(
+                x_val.shape
+            ),
             "held_out_test_shape": list(
                 data.test.features.shape
             ),
         },
-        "train_metrics": train_metrics.to_dict(),
-        "validation_metrics": val_metrics.to_dict(),
+        "train_metrics": (
+            train_metrics.to_dict()
+        ),
+        "validation_metrics": (
+            val_metrics.to_dict()
+        ),
+        "qe_history_artifacts": (
+            history_artifacts
+        ),
         "test_evaluated": False,
     }
 
-    with open(
-        metrics_path,
+    with metrics_path.open(
         "w",
         encoding="utf-8",
-    ) as f:
+    ) as handle:
         json.dump(
             metrics,
-            f,
+            handle,
             indent=2,
         )
-
-    # ------------------------------------------------------------------
-    # Console metric summary
-    # ------------------------------------------------------------------
 
     print("\nSOM quality metrics:")
 
@@ -398,12 +687,6 @@ def main():
     )
 
     print(
-        "  Train occupied neurons:    "
-        f"{train_metrics.occupied_neurons}/"
-        f"{train_metrics.total_neurons}"
-    )
-
-    print(
         "  Val QE:                    "
         f"{val_metrics.quantization_error:.6f}"
     )
@@ -424,34 +707,26 @@ def main():
     )
 
     print(
-        "  Val occupied neurons:      "
-        f"{val_metrics.occupied_neurons}/"
-        f"{val_metrics.total_neurons}"
+        f"\nMetrics saved to: {metrics_path}"
     )
 
-    print(f"\nMetrics saved to: {metrics_path}")
-
-    # ------------------------------------------------------------------
-    # Save scientific SOM model
-    # ------------------------------------------------------------------
-
-    # Smoke-test models are intentionally not saved as experiment models.
-    if not args.smoke_test:
-        model_name = run_id
-
+    if (
+        not args.smoke_test
+    ):
         if model_path is None:
             raise RuntimeError(
-                "Scientific model path was not initialized during preflight."
+                "Scientific model path was not "
+                "initialized."
             )
 
         som.save_pickle(
-            model_name,
+            run_id,
             str(models_dir) + os.sep,
         )
 
         if not model_path.is_file():
             raise RuntimeError(
-                f"NNSOM model save failed: expected artifact not found at "
+                "NNSOM model save failed: "
                 f"{model_path}"
             )
 
@@ -459,17 +734,16 @@ def main():
             f"SOM model saved to: {model_path}"
         )
 
-    # ------------------------------------------------------------------
-    # Test-set protection
-    # ------------------------------------------------------------------
-
     print("\nTest split was NOT evaluated.")
     print(
-        "It remains reserved for final unbiased evaluation "
-        "and was not used for SOM model selection."
+        "It remains reserved for final "
+        "unbiased evaluation."
     )
 
-    print("\nWeek 3 SOM pipeline completed successfully.")
+    print(
+        "\nSOM pipeline "
+        "completed successfully."
+    )
 
 
 if __name__ == "__main__":
