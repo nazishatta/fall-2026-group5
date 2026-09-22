@@ -1,11 +1,11 @@
-"""Tests for Week 3 BMU/RQ analysis helpers."""
+"""Tests for v1_mnist BMU/RQ analysis helpers."""
 
 import math
 import unittest
 
 import numpy as np
 
-from src.component.analysis.som_bmu_rq_analysis import (
+from src.v1_mnist.component.analysis.som_bmu_rq_analysis import (
     matrix_from_neuron_values,
     normalized_entropy,
     reconstruct_assignments,

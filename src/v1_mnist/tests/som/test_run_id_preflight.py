@@ -1,4 +1,4 @@
-"""Regression tests for Week 3 scientific run output isolation."""
+"""Regression tests for v1_mnist scientific run output isolation."""
 
 import importlib.util
 import tempfile
@@ -6,23 +6,24 @@ import unittest
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 PIPELINE_PATH = (
     REPO_ROOT
     / "src"
+    / "v1_mnist"
     / "component"
     / "pipeline"
     / "04_train_som.py"
 )
 
 SPEC = importlib.util.spec_from_file_location(
-    "week3_train_som_pipeline",
+    "v1_mnist_train_som_pipeline",
     PIPELINE_PATH,
 )
 
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(
-        f"Could not load Week 3 SOM pipeline from {PIPELINE_PATH}"
+        f"Could not load v1_mnist SOM pipeline from {PIPELINE_PATH}"
     )
 
 PIPELINE = importlib.util.module_from_spec(SPEC)

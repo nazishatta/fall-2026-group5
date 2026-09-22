@@ -26,42 +26,39 @@ from NNSOM.plots import SOMPlots
 from scipy.stats import spearmanr
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
-RUN_ID = "som_20x20_seed42_rq1_rq2_v1"
+from src.v1_mnist.component.som.data import resolve_embeddings_dir
 
-EMBEDDINGS_DIR = (
-    REPO_ROOT
-    / "outputs/week_2/embeddings/mnist"
+RUN_ID = "som_15x15_seed42_rq1_rq2_v1"
+
+EMBEDDINGS_DIR = resolve_embeddings_dir(
+    "outputs/v1_mnist/cnn_baseline/embeddings/mnist",
+    REPO_ROOT,
 )
 
 MODEL_PATH = (
     REPO_ROOT
-    / "outputs/week_3/som_models/"
-    "som_20x20_seed42_gridstudy"
+    / "outputs/v1_mnist/som/som_models/"
+    "som_15x15_seed42_final"
 )
 
 FROZEN_METRICS_PATH = (
     REPO_ROOT
-    / "outputs/week_3/logs/"
-    "som_20x20_seed42_gridstudy_metrics.json"
+    / "outputs/v1_mnist/som/logs/"
+    "som_15x15_seed42_final_metrics.json"
 )
 
 OUTPUT_BASE = (
     REPO_ROOT
-    / "outputs/week_3/analysis"
+    / "outputs/v1_mnist/som/analysis"
 )
 
 OUTPUT_DIR = OUTPUT_BASE / RUN_ID
 TEMP_DIR = OUTPUT_BASE / f".{RUN_ID}.tmp"
 
-EXPECTED_MODEL_SHA256 = (
-    "528bb5e11cac077c155ba42855ed1c423"
-    "aba7d0e70d86f5f42a0c7dee813c576"
-)
-
-GRID_HEIGHT = 20
-GRID_WIDTH = 20
+GRID_HEIGHT = 15
+GRID_WIDTH = 15
 NUM_NEURONS = GRID_HEIGHT * GRID_WIDTH
 FEATURE_DIM = 84
 
@@ -242,18 +239,10 @@ def load_split(split: str) -> dict[str, np.ndarray]:
 
 
 def load_selected_som():
-    """Load and validate the frozen selected 20x20 SOM."""
+    """Load and validate the fixed 15x15 SOM."""
+
     if not MODEL_PATH.is_file():
         raise FileNotFoundError(MODEL_PATH)
-
-    observed_hash = sha256_file(MODEL_PATH)
-
-    if observed_hash != EXPECTED_MODEL_SHA256:
-        raise RuntimeError(
-            "Selected SOM hash mismatch.\n"
-            f"Expected: {EXPECTED_MODEL_SHA256}\n"
-            f"Observed: {observed_hash}"
-        )
 
     som = SOMPlots(
         dimensions=(GRID_HEIGHT, GRID_WIDTH)
@@ -264,8 +253,6 @@ def load_selected_som():
         str(MODEL_PATH.parent) + os.sep,
     )
 
-    # Support either an in-place loader or a loader that returns
-    # the loaded SOM object.
     if (
         loaded is not None
         and hasattr(loaded, "cluster_data")
@@ -1517,7 +1504,7 @@ def main() -> None:
         summary = {
             "run_id": RUN_ID,
             "stage": "development",
-            "selected_grid": [
+            "som_grid": [
                 GRID_HEIGHT,
                 GRID_WIDTH,
             ],

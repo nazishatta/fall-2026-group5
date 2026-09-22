@@ -8,17 +8,18 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.component.utils.config import load_config, set_seed, get_device
-from src.component.data.mnist_dataset import get_dataloaders
-from src.component.models.lenet5 import LeNet5
-from src.component.evaluation.metrics import (
+from src.v1_mnist.component.utils.config import load_config, set_seed, get_device
+from src.v1_mnist.component.data.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.models.lenet5 import LeNet5
+from src.v1_mnist.component.evaluation.metrics import (
     evaluate_model,
     print_evaluation_summary
 )
-from src.component.visualization.plots import (
+from src.v1_mnist.component.visualization.cnn_baseline_plots import (
     plot_training_curves,
     plot_confusion_matrix
 )
@@ -28,8 +29,8 @@ def main():
     parser.add_argument(
         '--config',
         type=str,
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
-        help='Path to config file (default: week_2_baseline.yaml)'
+        default=str(PROJECT_ROOT / 'src' / 'v1_mnist' / 'component' / 'configs' / 'cnn_baseline.yaml'),
+        help='Path to config file (default: cnn_baseline.yaml)'
     )
     args = parser.parse_args()
 
@@ -121,7 +122,7 @@ def main():
     test_results = evaluate_model(model, test_loader, device)
     print_evaluation_summary(test_results, "test")
     
-    figures_dir = getattr(config.paths, 'figures_dir', './output/week_2/figures')
+    figures_dir = getattr(config.paths, 'figures_dir', './outputs/v1_mnist/cnn_baseline/figures')
     os.makedirs(figures_dir, exist_ok=True)
     plot_training_curves(train_losses, val_losses, train_accs, val_accs, os.path.join(figures_dir, 'training_curves.png'))
     plot_confusion_matrix(test_results['confusion_matrix'], [str(i) for i in range(10)], "Test Set Confusion Matrix", os.path.join(figures_dir, 'test_confusion_matrix.png'))
@@ -131,10 +132,14 @@ def main():
         'accuracy': test_results['accuracy'],
         'classification_report': test_results['classification_report_dict']
     }
-    with open(os.path.join(config.paths.output_dir, 'test_evaluation.json'), 'w') as f:
+    metrics_dir = getattr(config.paths, 'metrics_dir', os.path.join(config.paths.output_dir, 'metrics'))
+    os.makedirs(metrics_dir, exist_ok=True)
+    
+    test_eval_path = os.path.join(metrics_dir, 'test_evaluation.json')
+    with open(test_eval_path, 'w') as f:
         json.dump(eval_output, f, indent=4)
         
-    print(f"Results saved to {config.paths.output_dir}")
+    print(f"Results saved to {test_eval_path}")
 
 if __name__ == '__main__':
     main()

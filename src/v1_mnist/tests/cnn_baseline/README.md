@@ -1,8 +1,8 @@
-# Tests
+# CNN Baseline Tests
 
-This folder contains lightweight tests for the main project components.
+This folder contains lightweight tests for the CNN baseline components.
 
-Week 2 tests cover:
+Tests cover:
 
 - MNIST split and image properties
 - LeNet-5 model structure
@@ -16,12 +16,12 @@ From the project root:
 python -m pip install -r requirements.txt
 ```
 
-## Run All Week 2 Tests
+## Run All CNN Baseline Tests
 
 On local machines, EC2, or other instances:
 
 ```bash
-python -m pytest src/tests/week_2 -v
+python -m pytest src/v1_mnist/tests/cnn_baseline -v
 ```
 
 ## Run One Test File
@@ -29,7 +29,7 @@ python -m pytest src/tests/week_2 -v
 Example:
 
 ```bash
-python -m pytest src/tests/week_2/test_lenet5.py -v
+python -m pytest src/v1_mnist/tests/cnn_baseline/test_lenet5.py -v
 ```
 
 Run tests from the project root so imports and relative paths resolve consistently.

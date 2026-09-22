@@ -3,6 +3,7 @@
 from dataclasses import asdict, dataclass
 
 import numpy as np
+from scipy.spatial.distance import cdist
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,58 @@ class SOMQualityMetrics:
         return asdict(self)
 
 
+def calculate_topological_error_numpy(
+    som,
+    x: np.ndarray,
+) -> tuple[float, float]:
+    """Calculate NNSOM topological error safely on CPU.
+
+    This reproduces the same topological-error definition used by
+    NNSOM's NumPy SOM implementation while allowing the SOM itself
+    to be trained with SOMGpu/CuPy.
+    """
+
+    if x.ndim != 2:
+        raise ValueError(
+            f"Expected 2D data, got shape {x.shape}"
+        )
+
+    # Apply the same preprocessing used during SOM training.
+    if som.norm_func is not None:
+        x_scaled = som.norm_func(x)
+    else:
+        x_scaled = x
+
+    weights = np.asarray(som.w, dtype=np.float64)
+
+    neuron_dist = np.asarray(som.neuron_dist, dtype=np.float64)
+
+    # weights:   (neurons, features)
+    # x_scaled:  (samples, features)
+    # result:    (neurons, samples)
+    distance_matrix = cdist(weights, x_scaled, metric="euclidean")
+
+    # Find the two closest SOM neurons for every sample.
+    sorted_neurons = np.argsort(distance_matrix, axis=0)
+
+    first_bmu = sorted_neurons[0, :]
+    second_bmu = sorted_neurons[1, :]
+
+    # Distance between first and second BMU in SOM topology.
+    top_dist = neuron_dist[first_bmu, second_bmu]
+
+    # NNSOM first-order TE: percentage with topological distance > 1.1
+    topological_error_1st = 100.0 * np.mean(top_dist > 1.1)
+
+    # NNSOM first + second-order TE: percentage with topological distance > 2.1
+    topological_error_1st_2nd = 100.0 * np.mean(top_dist > 2.1)
+
+    return (
+        float(topological_error_1st),
+        float(topological_error_1st_2nd),
+    )
+
+
 def evaluate_som_quality(
     som,
     x: np.ndarray,
@@ -37,15 +90,9 @@ def evaluate_som_quality(
     NNSOM quantization_error() expects the cluster_distances object
     returned by cluster_data(), not the raw feature matrix.
 
-    NNSOM topological_error() returns two percentage-valued metrics:
-
-    - first-order topological error:
-      percentage of samples whose two closest SOM neurons have
-      neuron distance > 1.1.
-
-    - first+second-order topological error:
-      percentage of samples whose two closest SOM neurons have
-      neuron distance > 2.1.
+    Topological error is calculated with a NumPy/SciPy fallback
+    because the current NNSOM GPU implementation mixes CuPy and
+    NumPy during topological-error evaluation.
     """
 
     if x.ndim != 2:
@@ -77,7 +124,10 @@ def evaluate_som_quality(
     (
         topological_error_first,
         topological_error_first_second,
-    ) = som.topological_error(x)
+    ) = calculate_topological_error_numpy(
+        som,
+        x,
+    )
 
     total_neurons = int(som.numNeurons)
     occupied_neurons = int(np.count_nonzero(sizes))

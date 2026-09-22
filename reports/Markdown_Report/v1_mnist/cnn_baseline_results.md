@@ -1,4 +1,4 @@
-# Week 2 Baseline Results
+# CNN Baseline Results (v1_mnist)
 ## LeNet-5 on MNIST
 
 ### Results
@@ -26,17 +26,17 @@ The confusion matrix is strongly diagonal, showing that most test samples were c
 
 ### Main Observation
 
-LeNet-5 provides a strong MNIST baseline. The saved **84-dimensional `fc2` embeddings** will be used as input to NNSOM in Week 3 for SOM training, BMU mapping, quantization-error analysis, and class-cluster visualization.
+LeNet-5 provides a strong MNIST baseline. The saved **84-dimensional `fc2` embeddings** are used as input to NNSOM for SOM training, BMU mapping, quantization-error analysis, and class-cluster visualization.
 
 ## Figures
 
 ### Confusion Matrix
 
-![LeNet-5 Confusion Matrix](../../demo/fig/week_2/confusion_matrix.png)
+![LeNet-5 Confusion Matrix](../../../demo/fig/v1_mnist/confusion_matrix.png)
 
 ### Training Curves
 
-![LeNet-5 Training Curves](../../demo/fig/week_2/training_curves.png)
+![LeNet-5 Training Curves](../../../demo/fig/v1_mnist/training_curves.png)
 
 For additional plots and sample-level analysis, see the  
-[`Week 2 Cookbook`](../../cookbooks/week_2_baseline.ipynb).
+[`v1_mnist Cookbook`](../../../cookbooks/v1_mnist/cnn_baseline.ipynb).

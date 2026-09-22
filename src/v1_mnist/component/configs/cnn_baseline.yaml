@@ -1,10 +1,11 @@
 # ==============================================================================
-# Week 2 Milestone Configuration: Baseline Data Preparation & LeNet-5 Training
-# Outputs saved to: ./output/week_2/
+# Milestone Configuration: Baseline Data Preparation & LeNet-5 Training
+# Outputs saved to: ./outputs/v1_mnist/cnn_baseline/
 # ==============================================================================
 
 run:
-  name: week_2
+  name: cnn_baseline
+  version: v1_mnist
   stage: baseline
 
 tasks:

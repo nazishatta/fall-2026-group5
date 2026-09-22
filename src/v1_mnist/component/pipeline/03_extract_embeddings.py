@@ -9,13 +9,14 @@ from datetime import datetime, timezone
 import numpy as np
 import torch
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.component.utils.config import load_config, set_seed, get_device
-from src.component.data.mnist_dataset import get_dataloaders
-from src.component.models.lenet5 import LeNet5
-from src.component.features.extractor import (
+from src.v1_mnist.component.utils.config import load_config, set_seed, get_device
+from src.v1_mnist.component.data.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.models.lenet5 import LeNet5
+from src.v1_mnist.component.features.extractor import (
     FeatureExtractor,
     save_embeddings
 )
@@ -89,8 +90,8 @@ def main():
     )
     parser.add_argument(
         "--config",
-        default=str(PROJECT_ROOT / 'src' / 'component' / 'configs' / 'week_2_baseline.yaml'),
-        help="Path to config file (default: week_2_baseline.yaml)"
+        default=str(PROJECT_ROOT / 'src' / 'v1_mnist' / 'component' / 'configs' / 'cnn_baseline.yaml'),
+        help="Path to config file (default: cnn_baseline.yaml)"
     )
     parser.add_argument("--checkpoint", required=True, help="Best model checkpoint")
     args = parser.parse_args()
@@ -181,14 +182,22 @@ def main():
         "all_sample_ids_unique_and_complete": True,
     }
 
-    manifest_path = os.path.join(output_dir, "embedding_manifest.json")
-    validation_path = os.path.join(output_dir, "embedding_validation.json")
-    with open(manifest_path, "w", encoding="utf-8") as file_handle:
+    metrics_dir = getattr(
+        config.paths,
+        "metrics_dir",
+        os.path.join(getattr(config.paths, "output_dir", "./outputs/v1_mnist/cnn_baseline"), "metrics"),
+    )
+    os.makedirs(metrics_dir, exist_ok=True)
+
+    metrics_manifest_path = os.path.join(metrics_dir, "embedding_manifest.json")
+    metrics_validation_path = os.path.join(metrics_dir, "embedding_validation.json")
+    with open(metrics_manifest_path, "w", encoding="utf-8") as file_handle:
         json.dump(manifest, file_handle, indent=2)
-    with open(validation_path, "w", encoding="utf-8") as file_handle:
+    with open(metrics_validation_path, "w", encoding="utf-8") as file_handle:
         json.dump(validation, file_handle, indent=2)
 
     print(f"Checkpoint SHA-256: {checkpoint_hash}")
+    print(f"Metrics saved to {metrics_dir}")
     print(f"All validated embeddings saved to {output_dir}")
 
 
