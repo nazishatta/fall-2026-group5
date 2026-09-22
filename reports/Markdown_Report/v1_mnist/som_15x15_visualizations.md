@@ -28,10 +28,10 @@ The core topology visualizations help you understand the geometric layout of the
 
 | Figure | Description |
 |--------|-------------|
-| ![Topology](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/topology.png) | **SOM lattice** – a 2‑D grid where each cell corresponds to a neuron. This is the same plot shown in the *SOM Topology* section of the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#SOM-Topology)). |
-| ![Numbered Topology](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/topology_numbered.png) | **Neuron indices** – each neuron is labelled with a unique number. Useful for mapping data points back to their winning neuron (see *Extract SOM Cluster Details* in the tutorial). |
-| ![Neuron Connections](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/neuron_connection.png) | **Neighbourhood graph** – visualizes the connectivity used during training (Gaussian neighbourhood function). |
-| ![U‑Matrix (Neuron Distance)](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/u_matrix_neuron_distance.png) | **U‑Matrix** – displays inter‑neuron distances; darker regions indicate larger distances and often correspond to cluster boundaries. This is the primary tool for *Error Analysis* in the examples. |
+| ![Topology](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/topology.png) | **SOM lattice** – a 2‑D grid where each cell corresponds to a neuron. This is the same plot shown in the *SOM Topology* section of the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#SOM-Topology)). |
+| ![Numbered Topology](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/topology_numbered.png) | **Neuron indices** – each neuron is labelled with a unique number. Useful for mapping data points back to their winning neuron (see *Extract SOM Cluster Details* in the tutorial). |
+| ![Neuron Connections](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/neuron_connection.png) | **Neighbourhood graph** – visualizes the connectivity used during training (Gaussian neighbourhood function). |
+| ![U‑Matrix (Neuron Distance)](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/u_matrix_neuron_distance.png) | **U‑Matrix** – displays inter‑neuron distances; darker regions indicate larger distances and often correspond to cluster boundaries. This is the primary tool for *Error Analysis* in the examples. |
 
 ---
 
@@ -40,8 +40,8 @@ Hit histograms show how many samples (training or validation) are mapped to each
 
 | Figure | Description |
 |--------|-------------|
-| ![Training Hit Histogram](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/train_hit_histogram.png) | **Training hits** – frequency of training samples per neuron. Peaks indicate regions that attract many samples, revealing the data density on the map. |
-| ![Validation Hit Histogram](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/validation_hit_histogram.png) | **Validation hits** – analogous to the training map but for the held‑out validation set. Comparing the two helps spot over‑fitting (neurons heavily hit by training data but rarely by validation). |
+| ![Training Hit Histogram](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/train_hit_histogram.png) | **Training hits** – frequency of training samples per neuron. Peaks indicate regions that attract many samples, revealing the data density on the map. |
+| ![Validation Hit Histogram](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/core/validation_hit_histogram.png) | **Validation hits** – analogous to the training map but for the held‑out validation set. Comparing the two helps spot over‑fitting (neurons heavily hit by training data but rarely by validation). |
 
 ---
 
@@ -50,7 +50,7 @@ Component planes visualise the value of each input feature across the SOM grid. 
 
 | Figure |
 |--------|
-| ![Component Planes Overview](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/component_planes/component_planes_all84_nnsom.png) |
+| ![Component Planes Overview](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/component_planes/component_planes_all84_nnsom.png) |
 
 The overview shows a compact montage of all 84 feature planes. Individual planes are available in pages `component_planes_page_01.png` … `component_planes_page_07.png`. Each plane can be interpreted as a heat‑map: brighter colors indicate higher feature values for the neurons that map to that region of the input space.
 
@@ -64,16 +64,16 @@ Class maps illustrate the distribution of each digit class over the SOM lattice.
 
 | Digit | Colour | Grey |
 |------|--------|-----------|
-| 0 | ![0 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_0_color_hist.png) | ![0 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_0_gray_hist.png) |
-| 1 | ![1 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_1_color_hist.png) | ![1 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_1_gray_hist.png) |
-| 2 | ![2 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_2_color_hist.png) | ![2 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_2_gray_hist.png) |
-| 3 | ![3 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_3_color_hist.png) | ![3 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_3_gray_hist.png) |
-| 4 | ![4 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_4_color_hist.png) | ![4 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_4_gray_hist.png) |
-| 5 | ![5 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_5_color_hist.png) | ![5 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_5_gray_hist.png) |
-| 6 | ![6 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_6_color_hist.png) | ![6 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_6_gray_hist.png) |
-| 7 | ![7 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_7_color_hist.png) | ![7 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_7_gray_hist.png) |
-| 8 | ![8 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_8_color_hist.png) | ![8 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_8_gray_hist.png) |
-| 9 | ![9 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_9_color_hist.png) | ![9 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_9_gray_hist.png) |
+| 0 | ![0 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_0_color_hist.png) | ![0 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_0_gray_hist.png) |
+| 1 | ![1 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_1_color_hist.png) | ![1 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_1_gray_hist.png) |
+| 2 | ![2 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_2_color_hist.png) | ![2 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_2_gray_hist.png) |
+| 3 | ![3 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_3_color_hist.png) | ![3 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_3_gray_hist.png) |
+| 4 | ![4 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_4_color_hist.png) | ![4 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_4_gray_hist.png) |
+| 5 | ![5 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_5_color_hist.png) | ![5 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_5_gray_hist.png) |
+| 6 | ![6 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_6_color_hist.png) | ![6 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_6_gray_hist.png) |
+| 7 | ![7 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_7_color_hist.png) | ![7 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_7_gray_hist.png) |
+| 8 | ![8 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_8_color_hist.png) | ![8 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_8_gray_hist.png) |
+| 9 | ![9 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_9_color_hist.png) | ![9 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/class_maps/digit_9_gray_hist.png) |
 
 These maps are analogous to the *Class Plot* and *Colour Hist* shown for Iris in the tutorial. They reveal how well‑separated each digit class is on the map; e.g., digit 0 concentrates in the upper‑left region, while digit 1 appears in a distinct cluster.
 
@@ -84,12 +84,12 @@ The six most variable features from the `fc2` layer (indices 15, 19, 79, 4
 
 | Feature (index) | Colour Histogram | Grey Histogram |
 |-----------------|------------------|----------------|
-| 15 | ![fc2_15 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_15_color_hist.png) | ![fc2_15 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_15_gray_hist.png) |
-| 19 | ![fc2_19 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_19_color_hist.png) | ![fc2_19 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_19_gray_hist.png) |
-| 79 | ![fc2_79 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_79_color_hist.png) | ![fc2_79 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_79_gray_hist.png) |
-| 41 | ![fc2_41 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_41_color_hist.png) | ![fc2_41 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_41_gray_hist.png) |
-| 35 | ![fc2_35 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_35_color_hist.png) | ![fc2_35 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_35_gray_hist.png) |
-| 53 | ![fc2_53 colour](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_53_color_hist.png) | ![fc2_53 gray](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_53_gray_hist.png) |
+| 15 | ![fc2_15 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_15_color_hist.png) | ![fc2_15 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_15_gray_hist.png) |
+| 19 | ![fc2_19 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_19_color_hist.png) | ![fc2_19 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_19_gray_hist.png) |
+| 79 | ![fc2_79 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_79_color_hist.png) | ![fc2_79 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_79_gray_hist.png) |
+| 41 | ![fc2_41 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_41_color_hist.png) | ![fc2_41 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_41_gray_hist.png) |
+| 35 | ![fc2_35 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_35_color_hist.png) | ![fc2_35 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_35_gray_hist.png) |
+| 53 | ![fc2_53 colour](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_53_color_hist.png) | ![fc2_53 gray](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/feature_maps/fc2_53_gray_hist.png) |
 
 These correspond to the *Feature Maps* section of the documentation and are useful for interpreting which internal CNN activations influence the SOM layout.
 
@@ -100,9 +100,9 @@ The toolbox provides three validation‑quality visualisations that combine erro
 
 | Figure | Description |
 |--------|-------------|
-| ![Validation Error Rate](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_error_rate_support.png) | **Error rate map** – shows the quantization error for each neuron on the validation set. Lower values (lighter colours) indicate a better fit to the data. |
-| ![Validation Purity](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_purity_support.png) | **Purity map** – measures class homogeneity within each neuron (higher is better). This is analogous to the *Purity* plot used in the Iris example for error analysis. |
-| ![Complex Error Map](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_complex_error_map.png) | **Combined error‑purity** – a composite visualization that highlights neurons with both high error and low purity, making it easy to spot problematic regions. |
+| ![Validation Error Rate](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_error_rate_support.png) | **Error rate map** – shows the quantization error for each neuron on the validation set. Lower values (lighter colours) indicate a better fit to the data. |
+| ![Validation Purity](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_purity_support.png) | **Purity map** – measures class homogeneity within each neuron (higher is better). This is analogous to the *Purity* plot used in the Iris example for error analysis. |
+| ![Complex Error Map](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/analysis_maps/validation_complex_error_map.png) | **Combined error‑purity** – a composite visualization that highlights neurons with both high error and low purity, making it easy to spot problematic regions. |
 
 These maps implement the *Error Analysis* workflow described in the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#Error-Analysis)).
 
@@ -113,13 +113,13 @@ The following figures are generated for more detailed post‑training exploratio
 
 | Figure |
 |--------|
-| ![Class Pie Chart](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/class_pie.png) |
-| ![Class Stem Plot](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/class_stem.png) |
-| ![FC2 Scatter (15 vs 19)](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/scatter_fc2_15_19.png) |
-| ![Histograms of Selected FC2 Features](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/hist_fc2_15.png) |
-| ![Violin Plots of Selected FC2 Features](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/violin_top_fc2_features.png) |
-| ![Weight Line Plot](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/weights_line_plot.png) |
-| ![Component Positions (first two neurons)](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/component_positions_first_two.png) |
+| ![Class Pie Chart](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/class_pie.png) |
+| ![Class Stem Plot](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/class_stem.png) |
+| ![FC2 Scatter (15 vs 19)](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/scatter_fc2_15_19.png) |
+| ![Histograms of Selected FC2 Features](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/hist_fc2_15.png) |
+| ![Violin Plots of Selected FC2 Features](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/violin_top_fc2_features.png) |
+| ![Weight Line Plot](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/weights_line_plot.png) |
+| ![Component Positions (first two neurons)](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/extended/component_positions_first_two.png) |
 
 These correspond to the *Pie Chart*, *Stem Plot*, *Histogram*, *Violin Plot*, and *Scatter Plot* sections of the Iris post‑training analysis page.
 
@@ -131,7 +131,7 @@ For programmatic access to all generated artefacts, see the JSON manifest:
 ```json
 { ... (see `visualization_manifest.json` in the output folder) ... }
 ```
-You can download the raw file here: [visualization_manifest.json](../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/visualization_manifest.json)
+You can download the raw file here: [visualization_manifest.json](../../../outputs/v1_mnist/som/figures/som_15x15_seed42_final/visualization_manifest.json)
 
 ---
 
