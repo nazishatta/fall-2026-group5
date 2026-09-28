@@ -28,15 +28,13 @@ a model is safe to deploy, and it is what this project tries to recover.
 This is treated as a hypothesis to test, not a conclusion to prove. Components
 unsupported by evidence will be reported as unsupported.
 
-## Pipeline
+## Pipeline Architecture
 
-```
-Dataset → Baseline CNN → Baseline Evaluation → Feature Extraction → PCA (optional)
-   → SOM Training → Representation Analysis → Error Geography
-   → Novelty / OOD Detection → Baseline Comparison
-   → SOM-Guided Intervention → Retraining → Feature Re-extraction
-   → SOM Re-analysis → Before/After Comparison
-```
+<p align="center">
+  <img src="reports/figures/project_pipeline/nnsom_project_pipeline.drawio.svg"
+       alt="NNSOM Project Pipeline Architecture"
+       width="100%">
+</p>
 
 ## Research questions
 
