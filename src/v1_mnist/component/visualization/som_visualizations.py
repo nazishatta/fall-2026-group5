@@ -18,8 +18,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import numpy as np
 import matplotlib.patheffects as path_effects
+import numpy as np
 from NNSOM.utils import (
     count_classes_in_cluster,
     get_edge_widths,
@@ -30,12 +30,89 @@ from NNSOM.utils import (
 )
 
 
-def _restyle_dense_som_text(result, plot_type: str) -> None:
-    """Improve label readability on dense 15x15 SOM plots.
+def _relative_luminance(rgba) -> float:
+    """Return WCAG-style relative luminance for an RGBA/RGB color."""
 
-    NNSOM uses relatively large default text for numbered topology and hit
-    histograms.  For a 15x15 SOM, restyle those labels before the figure is
-    saved.
+    r, g, b = rgba[:3]
+
+    def _linearize(channel):
+        if channel <= 0.04045:
+            return channel / 12.92
+
+        return (
+            (channel + 0.055)
+            / 1.055
+        ) ** 2.4
+
+    return (
+        0.2126 * _linearize(r)
+        + 0.7152 * _linearize(g)
+        + 0.0722 * _linearize(b)
+    )
+
+
+def _uhi_label_style(
+    text_obj,
+    *,
+    font_size: float,
+    dark_background: bool = False,
+) -> None:
+    """Apply a UHI-map-inspired editorial label style."""
+
+    text_obj.set_fontfamily(
+        "DejaVu Sans"
+    )
+
+    text_obj.set_fontsize(
+        font_size
+    )
+
+    text_obj.set_fontweight(
+        "semibold"
+    )
+
+    if dark_background:
+        # White text with a subtle dark outline on dark fills.
+        text_obj.set_color(
+            "white"
+        )
+
+        text_obj.set_path_effects(
+            [
+                path_effects.Stroke(
+                    linewidth=1.15,
+                    foreground="#4d4d4d",
+                ),
+                path_effects.Normal(),
+            ]
+        )
+
+    else:
+        # UHI-map style: dark gray text with a white halo.
+        text_obj.set_color(
+            "#4d4d4d"
+        )
+
+        text_obj.set_path_effects(
+            [
+                path_effects.Stroke(
+                    linewidth=1.35,
+                    foreground="white",
+                ),
+                path_effects.Normal(),
+            ]
+        )
+
+
+def _restyle_dense_som_text(result, plot_type: str) -> None:
+    """Apply UHI-map-inspired typography to dense 15x15 SOM plots.
+
+    Style:
+    - clean sans-serif font
+    - semibold labels
+    - dark-gray text with a white halo on light/mid backgrounds
+    - white text with a subtle dark outline on dark backgrounds
+    - adaptive font sizes for multi-digit counts
     """
 
     if not (
@@ -49,41 +126,143 @@ def _restyle_dense_som_text(result, plot_type: str) -> None:
     if text_objects is None:
         return
 
-    # Numbered SOM topology: small black labels on white hexagons.
+    # ---------------------------------------------------------
+    # Numbered SOM topology
+    # ---------------------------------------------------------
     if plot_type == "top_num":
         for text_obj in text_objects:
-            text_obj.set_fontsize(5.5)
-            text_obj.set_color("black")
-            text_obj.set_fontweight("normal")
-            text_obj.set_path_effects([])
-
-    # Hit histograms: use adaptive size because counts vary from one digit
-    # to four or more digits.  Black text is requested; the thin white
-    # outline keeps it legible over dark inner hit hexagons.
-    elif plot_type == "hit_hist":
-        for text_obj in text_objects:
-            label = text_obj.get_text().strip()
-
-            if len(label) >= 4:
-                font_size = 3.8
-            elif len(label) == 3:
-                font_size = 4.5
-            else:
-                font_size = 5.0
-
-            text_obj.set_fontsize(font_size)
-            text_obj.set_color("black")
-            text_obj.set_fontweight("normal")
-            text_obj.set_path_effects(
-                [
-                    path_effects.Stroke(
-                        linewidth=1.0,
-                        foreground="white",
-                    ),
-                    path_effects.Normal(),
-                ]
+            _uhi_label_style(
+                text_obj,
+                font_size=6.2,
+                dark_background=False,
             )
 
+    # ---------------------------------------------------------
+    # Train / validation hit histograms
+    # ---------------------------------------------------------
+    elif plot_type == "hit_hist":
+        patches = (
+            result[2]
+            if len(result) > 2
+            else None
+        )
+
+        for neuron_id, text_obj in enumerate(
+            text_objects
+        ):
+            label = (
+                text_obj
+                .get_text()
+                .strip()
+            )
+
+            if len(label) >= 4:
+                font_size = 5.0
+            elif len(label) == 3:
+                font_size = 5.6
+            else:
+                font_size = 6.2
+
+            dark_background = False
+
+            if patches is not None:
+                try:
+                    patch_group = patches[
+                        neuron_id
+                    ]
+
+                    # NNSOM may return one patch or a list/tuple of patches.
+                    if isinstance(
+                        patch_group,
+                        (list, tuple),
+                    ):
+                        patch = patch_group[-1]
+                    else:
+                        patch = patch_group
+
+                    facecolor = (
+                        patch.get_facecolor()
+                    )
+
+                    dark_background = (
+                        _relative_luminance(
+                            facecolor
+                        )
+                        < 0.34
+                    )
+
+                except Exception:
+                    dark_background = False
+
+            _uhi_label_style(
+                text_obj,
+                font_size=font_size,
+                dark_background=dark_background,
+            )
+
+    # ---------------------------------------------------------
+    # Complex error-geography map
+    # ---------------------------------------------------------
+    elif plot_type == "complex_hist":
+        patches = (
+            result[2]
+            if len(result) > 2
+            else None
+        )
+
+        for neuron_id, text_obj in enumerate(
+            text_objects
+        ):
+            label = (
+                text_obj
+                .get_text()
+                .strip()
+            )
+
+            # Slightly larger than regular hit-hist labels because
+            # this figure is intended for close analytical reading.
+            if len(label) >= 4:
+                font_size = 5.4
+            elif len(label) == 3:
+                font_size = 6.0
+            else:
+                font_size = 6.6
+
+            dark_background = False
+
+            if patches is not None:
+                try:
+                    patch_group = patches[
+                        neuron_id
+                    ]
+
+                    if isinstance(
+                        patch_group,
+                        (list, tuple),
+                    ):
+                        patch = patch_group[-1]
+                    else:
+                        patch = patch_group
+
+                    facecolor = (
+                        patch.get_facecolor()
+                    )
+
+                    dark_background = (
+                        _relative_luminance(
+                            facecolor
+                        )
+                        < 0.34
+                    )
+
+                except Exception:
+                    dark_background = False
+
+            _uhi_label_style(
+                text_obj,
+                font_size=font_size,
+                dark_background=dark_background,
+            )
 
 def save_figure(
     fig,
@@ -214,7 +393,9 @@ def save_nnsom_plot(
 
     if title:
         title_size = (
-            13
+            12
+            if plot_type == "complex_hist"
+            else 13
             if plot_type in {
                 "top_num",
                 "hit_hist",
@@ -225,6 +406,9 @@ def save_nnsom_plot(
         fig.suptitle(
             title,
             fontsize=title_size,
+            fontfamily="DejaVu Sans",
+            fontweight="semibold",
+            color="#222222",
         )
 
     return save_figure(
@@ -264,6 +448,9 @@ def save_native_component_planes(
             f"{feature_prefix}_{feature_id}",
             fontsize=5,
             pad=1,
+            fontfamily="DejaVu Sans",
+            fontweight="medium",
+            color="#4d4d4d",
         )
 
     for ax in fig.axes[

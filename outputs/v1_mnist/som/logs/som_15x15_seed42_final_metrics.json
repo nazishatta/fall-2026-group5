@@ -10,13 +10,13 @@
     "grid_height": 15,
     "grid_width": 15,
     "num_neurons": 225,
-    "init_neighborhood": 3,
-    "epochs": 100,
-    "steps": 100,
-    "requested_backend": "auto",
+    "init_neighborhood": 11,
+    "epochs": 250,
+    "steps": 250,
+    "requested_backend": "cpu",
     "actual_backend": "gpu",
     "random_seed": 42,
-    "track_qe_history": false,
+    "track_qe_history": true,
     "qe_history_every": 1
   },
   "preprocessing": {
@@ -43,28 +43,32 @@
   },
   "train_metrics": {
     "n_samples": 49000,
-    "quantization_error": 1.1407581296535279,
-    "topological_error_1st_order_pct": 3.704081632653061,
-    "topological_error_1st_2nd_order_pct": 1.6612244897959185,
-    "occupied_neurons": 210,
-    "empty_neurons": 15,
+    "quantization_error": 1.0387206275713383,
+    "topological_error_1st_order_pct": 5.73469387755102,
+    "topological_error_1st_2nd_order_pct": 3.230612244897959,
+    "occupied_neurons": 225,
+    "empty_neurons": 0,
     "total_neurons": 225,
-    "occupancy_rate": 0.9333333333333333,
-    "mean_hits_per_occupied_neuron": 233.33333333333334,
-    "max_hits_per_neuron": 2875
+    "occupancy_rate": 1.0,
+    "mean_hits_per_occupied_neuron": 217.77777777777777,
+    "max_hits_per_neuron": 681
   },
   "validation_metrics": {
     "n_samples": 10500,
-    "quantization_error": 1.1179131570290748,
-    "topological_error_1st_order_pct": 3.980952380952381,
-    "topological_error_1st_2nd_order_pct": 1.8095238095238095,
-    "occupied_neurons": 203,
-    "empty_neurons": 22,
+    "quantization_error": 1.0412049587880645,
+    "topological_error_1st_order_pct": 6.18095238095238,
+    "topological_error_1st_2nd_order_pct": 3.361904761904762,
+    "occupied_neurons": 225,
+    "empty_neurons": 0,
     "total_neurons": 225,
-    "occupancy_rate": 0.9022222222222223,
-    "mean_hits_per_occupied_neuron": 51.724137931034484,
-    "max_hits_per_neuron": 608
+    "occupancy_rate": 1.0,
+    "mean_hits_per_occupied_neuron": 46.666666666666664,
+    "max_hits_per_neuron": 149
   },
-  "qe_history_artifacts": null,
+  "qe_history_artifacts": {
+    "json": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/logs/som_15x15_seed42_final_qe_history.json",
+    "csv": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/tables/som_15x15_seed42_final_qe_history.csv",
+    "figure": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/figures/convergence/som_15x15_seed42_final_qe_curve.png"
+  },
   "test_evaluated": false
 }

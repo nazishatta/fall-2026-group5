@@ -22,26 +22,19 @@ paths:
   tables_dir: "./outputs/v1_mnist/som/tables"
   analysis_dir: "./outputs/v1_mnist/som/analysis"
 
-# Fixed 15x15 SOM grid based on project design and visual interpretability.
+# ==============================================================================
+# SOM Milestone Configuration (15x15 Tuned)
+# ==============================================================================
+
 som:
   grid_height: 15
   grid_width: 15
-  init_neighborhood: 3
-  epochs: 100
-  steps: 100
-
-  # Valid options:
-  # auto = SOMPlots chooses SOMGpu when CuPy is available,
-  #        otherwise falls back to SOM/NumPy.
-  # cpu  = explicitly use NNSOM.som.SOM.
-  # gpu  = explicitly use NNSOM.som_gpu.SOMGpu.
-  backend: auto
-
+  init_neighborhood: 11
+  epochs: 250
+  steps: 250
+  backend: cpu
   random_seed: 42
-
-  # Keep false for the main NNSOM-native training path.
-  # The existing custom history trainer is NumPy/SciPy based.
-  track_qe_history: false
+  track_qe_history: true
   qe_history_every: 1
 
 preprocessing:
