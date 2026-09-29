@@ -6,31 +6,8 @@ import unittest
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-PIPELINE_PATH = (
-    REPO_ROOT
-    / "src"
-    / "v1_mnist"
-    / "component"
-    / "pipeline"
-    / "04_train_som.py"
-)
-
-SPEC = importlib.util.spec_from_file_location(
-    "v1_mnist_train_som_pipeline",
-    PIPELINE_PATH,
-)
-
-if SPEC is None or SPEC.loader is None:
-    raise RuntimeError(
-        f"Could not load v1_mnist SOM pipeline from {PIPELINE_PATH}"
-    )
-
-PIPELINE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(PIPELINE)
-
-preflight_scientific_outputs = (
-    PIPELINE.preflight_scientific_outputs
+from src.v1_mnist.component.pipeline.train_som import (
+    preflight_scientific_outputs,
 )
 
 

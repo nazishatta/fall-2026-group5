@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+__STYLE__
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <div class="sub" id="summary"></div>
+</header>
+
+<div class="controls">
+  <div class="ctl">
+    <label for="view">Map view</label>
+    <select id="view"></select>
+  </div>
+  <div class="ctl" id="opt-wrap">
+    <label for="opt" id="opt-label">Option</label>
+    <select id="opt"></select>
+  </div>
+  <div class="ctl" id="split-wrap">
+    <label>Map data</label>
+    <div class="seg" id="split-seg">
+      <button data-split="train">Train</button>
+      <button data-split="val">Validation</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="card">
+    <h2 id="map-title"></h2>
+    <p class="desc" id="map-desc"></p>
+    <div id="map-wrap"><svg id="map" role="img"></svg></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <section class="card" id="detail">
+    <h2 id="d-title">Neuron</h2>
+    <p class="desc" id="d-desc"></p>
+    <div class="stats" id="d-stats"></div>
+    <div class="tabs" id="d-tabs" role="tablist"></div>
+    <div id="detail-body"></div>
+  </section>
+</main>
+<div id="tip"></div>
+
+<script id="som-data" type="application/json">__SOM_PAYLOAD__</script>
+<script>
+__SCRIPT__
+</script>
+</body>
+</html>

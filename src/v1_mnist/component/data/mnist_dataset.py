@@ -1,16 +1,28 @@
-from collections import Counter
+from __future__ import annotations
 
+from collections import Counter
+from typing import Any, Mapping, Optional, Sequence, Tuple
 import numpy as np
-import torch
 from sklearn.model_selection import train_test_split
+import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision import datasets
+
+from src.v1_mnist.component.utils.logging import get_logger
+
+logger = get_logger("v1_mnist.data")
 
 
 class CustomMNISTDataset(Dataset):
     """MNIST arrays with optional stable sample identifiers."""
 
-    def __init__(self, data, labels, sample_ids=None, return_sample_id=False):
+    def __init__(
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        sample_ids: Optional[Sequence[int] | np.ndarray] = None,
+        return_sample_id: bool = False,
+    ) -> None:
         self.data = data
         self.labels = labels
         self.sample_ids = (
@@ -23,10 +35,10 @@ class CustomMNISTDataset(Dataset):
         if not (len(self.data) == len(self.labels) == len(self.sample_ids)):
             raise ValueError("data, labels, and sample_ids must have equal lengths")
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[Any, ...]:
         image = torch.as_tensor(self.data[idx], dtype=torch.float32).unsqueeze(0)
         label = torch.as_tensor(self.labels[idx], dtype=torch.long)
         if self.return_sample_id:
@@ -35,20 +47,30 @@ class CustomMNISTDataset(Dataset):
         return image, label
 
 
-def compute_class_distribution(labels, split_name):
+def compute_class_distribution(
+    labels: Sequence[int] | np.ndarray,
+    split_name: str,
+) -> dict[int, dict[str, float]]:
+    """Compute per-class counts and percentages and log summary."""
     counts = Counter(np.asarray(labels).tolist())
     total = len(labels)
-    distribution = {}
-    print(f"\nClass Distribution for {split_name} split ({total} samples):")
+    distribution: dict[int, dict[str, float]] = {}
+
+    logger.info("Class Distribution for %s split (%d samples):", split_name, total)
     for class_id in range(10):
         count = counts.get(class_id, 0)
         percentage = (count / total) * 100 if total else 0.0
-        distribution[class_id] = {"count": count, "percentage": percentage}
-        print(f"Class {class_id}: {count} samples ({percentage:.2f}%)")
+        distribution[class_id] = {"count": float(count), "percentage": percentage}
+        logger.info("  Class %d: %d samples (%.2f%%)", class_id, count, percentage)
+
     return distribution
 
 
-def get_dataloaders(config, train_shuffle=True, return_sample_ids=False):
+def get_dataloaders(
+    config: Any,
+    train_shuffle: bool = True,
+    return_sample_ids: bool = False,
+) -> Tuple[DataLoader, DataLoader, DataLoader, np.ndarray, np.ndarray, np.ndarray]:
     """Create the predefined stratified 70/15/15 split.
 
     Defaults preserve baseline-training behavior. Official embedding extraction
@@ -57,7 +79,6 @@ def get_dataloaders(config, train_shuffle=True, return_sample_ids=False):
     Stable sample IDs refer to positions in the combined array: original MNIST
     training samples are 0..59999 and original MNIST test samples 60000..69999.
     """
-
     data_root = getattr(config.paths, "data_root", "../../All_Data")
     seed = getattr(getattr(config, "training", None), "seed", 42)
 

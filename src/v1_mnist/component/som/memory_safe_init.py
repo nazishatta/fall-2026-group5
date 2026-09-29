@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Memory-safe initialization wrapper for NNSOM.
 
 Applies reduced/economy SVD to NumPy and, when installed, CuPy.
@@ -5,8 +7,7 @@ This wrapper does not select the SOM backend.
 """
 
 from contextlib import contextmanager
-from typing import Iterator
-
+from typing import Any, Iterator
 import numpy as np
 
 try:
@@ -18,27 +19,19 @@ except ImportError:
 @contextmanager
 def economy_svd_for_nnsom_init() -> Iterator[None]:
     """Use reduced SVD during NNSOM initialization."""
-
     original_numpy_svd = np.linalg.svd
 
     def economy_numpy_svd(
-        a,
-        *args,
-        **kwargs,
-    ):
+        a: np.ndarray,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
         if kwargs.get("full_matrices") is True:
             raise RuntimeError(
-                "Unexpected explicit full_matrices=True "
-                "during NNSOM initialization."
+                "Unexpected explicit full_matrices=True during NNSOM initialization."
             )
-
         kwargs["full_matrices"] = False
-
-        return original_numpy_svd(
-            a,
-            *args,
-            **kwargs,
-        )
+        return original_numpy_svd(a, *args, **kwargs)
 
     np.linalg.svd = economy_numpy_svd
 
@@ -48,34 +41,22 @@ def economy_svd_for_nnsom_init() -> Iterator[None]:
         original_cupy_svd = cp.linalg.svd
 
         def economy_cupy_svd(
-            a,
-            *args,
-            **kwargs,
-        ):
+            a: Any,
+            *args: Any,
+            **kwargs: Any,
+        ) -> Any:
             if kwargs.get("full_matrices") is True:
                 raise RuntimeError(
-                    "Unexpected explicit full_matrices=True "
-                    "during NNSOM initialization."
+                    "Unexpected explicit full_matrices=True during NNSOM initialization."
                 )
-
             kwargs["full_matrices"] = False
-
-            return original_cupy_svd(
-                a,
-                *args,
-                **kwargs,
-            )
+            return original_cupy_svd(a, *args, **kwargs)
 
         cp.linalg.svd = economy_cupy_svd
 
     try:
         yield
-
     finally:
         np.linalg.svd = original_numpy_svd
-
-        if (
-            cp is not None
-            and original_cupy_svd is not None
-        ):
+        if cp is not None and original_cupy_svd is not None:
             cp.linalg.svd = original_cupy_svd

@@ -23,6 +23,9 @@ except ImportError:
 from scipy.spatial.distance import cdist
 
 from src.v1_mnist.component.som.memory_safe_init import economy_svd_for_nnsom_init
+from src.v1_mnist.component.utils.logging import get_logger
+
+logger = get_logger("v1_mnist.som.trainer")
 
 
 def create_som(
@@ -153,16 +156,16 @@ def _one_hot_winners(
 
 
 def train_som(
-    x_train,
-    grid_height,
-    grid_width,
-    init_neighborhood,
-    epochs,
-    steps,
-    norm_func,
-    seed,
-    backend="auto",
-):
+    x_train: np.ndarray,
+    grid_height: int,
+    grid_width: int,
+    init_neighborhood: int,
+    epochs: int,
+    steps: int,
+    norm_func: Any,
+    seed: int,
+    backend: str = "auto",
+) -> Any:
     """Train NNSOM using auto, explicit CPU, or explicit GPU mode."""
 
     np.random.seed(seed)
@@ -193,16 +196,16 @@ def train_som(
 
 
 def train_som_with_history(
-    x_train,
-    grid_height,
-    grid_width,
-    init_neighborhood,
-    epochs,
-    steps,
-    norm_func,
-    seed,
-    history_every=1,
-):
+    x_train: np.ndarray,
+    grid_height: int,
+    grid_width: int,
+    init_neighborhood: int,
+    epochs: int,
+    steps: int,
+    norm_func: Any,
+    seed: int,
+    history_every: int = 1,
+) -> tuple[Any, TrainingHistory]:
     """Optional CPU diagnostic for epoch-wise QE history.
 
     This function mirrors the NumPy NNSOM batch-training loop in order
@@ -384,9 +387,10 @@ def train_som_with_history(
             )
 
         if epoch_index % 50 == 0:
-            print(
-                "Tracked NNSOM training epoch "
-                f"{epoch_index}/{epochs}"
+            logger.info(
+                "Tracked NNSOM training epoch %d/%d",
+                epoch_index,
+                epochs,
             )
 
     som.w = weights

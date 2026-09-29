@@ -4,127 +4,127 @@
     "test_samples": 10500,
     "train_dist": {
         "0": {
-            "count": 4832,
+            "count": 4832.0,
             "percentage": 9.861224489795918
         },
         "1": {
-            "count": 5514,
+            "count": 5514.0,
             "percentage": 11.253061224489796
         },
         "2": {
-            "count": 4893,
+            "count": 4893.0,
             "percentage": 9.985714285714286
         },
         "3": {
-            "count": 4999,
+            "count": 4999.0,
             "percentage": 10.202040816326532
         },
         "4": {
-            "count": 4777,
+            "count": 4777.0,
             "percentage": 9.748979591836735
         },
         "5": {
-            "count": 4419,
+            "count": 4419.0,
             "percentage": 9.018367346938776
         },
         "6": {
-            "count": 4813,
+            "count": 4813.0,
             "percentage": 9.822448979591837
         },
         "7": {
-            "count": 5105,
+            "count": 5105.0,
             "percentage": 10.418367346938776
         },
         "8": {
-            "count": 4777,
+            "count": 4777.0,
             "percentage": 9.748979591836735
         },
         "9": {
-            "count": 4871,
+            "count": 4871.0,
             "percentage": 9.940816326530612
         }
     },
     "val_dist": {
         "0": {
-            "count": 1036,
+            "count": 1036.0,
             "percentage": 9.866666666666667
         },
         "1": {
-            "count": 1182,
+            "count": 1182.0,
             "percentage": 11.257142857142858
         },
         "2": {
-            "count": 1048,
+            "count": 1048.0,
             "percentage": 9.980952380952381
         },
         "3": {
-            "count": 1071,
+            "count": 1071.0,
             "percentage": 10.2
         },
         "4": {
-            "count": 1023,
+            "count": 1023.0,
             "percentage": 9.742857142857144
         },
         "5": {
-            "count": 947,
+            "count": 947.0,
             "percentage": 9.019047619047619
         },
         "6": {
-            "count": 1031,
+            "count": 1031.0,
             "percentage": 9.81904761904762
         },
         "7": {
-            "count": 1094,
+            "count": 1094.0,
             "percentage": 10.41904761904762
         },
         "8": {
-            "count": 1024,
+            "count": 1024.0,
             "percentage": 9.752380952380953
         },
         "9": {
-            "count": 1044,
+            "count": 1044.0,
             "percentage": 9.942857142857143
         }
     },
     "test_dist": {
         "0": {
-            "count": 1035,
+            "count": 1035.0,
             "percentage": 9.857142857142858
         },
         "1": {
-            "count": 1181,
+            "count": 1181.0,
             "percentage": 11.247619047619049
         },
         "2": {
-            "count": 1049,
+            "count": 1049.0,
             "percentage": 9.99047619047619
         },
         "3": {
-            "count": 1071,
+            "count": 1071.0,
             "percentage": 10.2
         },
         "4": {
-            "count": 1024,
+            "count": 1024.0,
             "percentage": 9.752380952380953
         },
         "5": {
-            "count": 947,
+            "count": 947.0,
             "percentage": 9.019047619047619
         },
         "6": {
-            "count": 1032,
+            "count": 1032.0,
             "percentage": 9.828571428571427
         },
         "7": {
-            "count": 1094,
+            "count": 1094.0,
             "percentage": 10.41904761904762
         },
         "8": {
-            "count": 1024,
+            "count": 1024.0,
             "percentage": 9.752380952380953
         },
         "9": {
-            "count": 1043,
+            "count": 1043.0,
             "percentage": 9.933333333333334
         }
     }

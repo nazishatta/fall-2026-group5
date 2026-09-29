@@ -30,12 +30,12 @@ from NNSOM.utils import (
 )
 
 
-def _relative_luminance(rgba) -> float:
+def _relative_luminance(rgba: Sequence[float]) -> float:
     """Return WCAG-style relative luminance for an RGBA/RGB color."""
 
     r, g, b = rgba[:3]
 
-    def _linearize(channel):
+    def _linearize(channel: float) -> float:
         if channel <= 0.04045:
             return channel / 12.92
 
@@ -264,45 +264,167 @@ def _restyle_dense_som_text(result, plot_type: str) -> None:
                 dark_background=dark_background,
             )
 
+RECOGNIZED_CATEGORIES = {
+    "core",
+    "class_maps",
+    "feature_maps",
+    "component_planes",
+    "analysis_maps",
+    "extended",
+    "convergence",
+}
+
+
+def _route_dual_format_paths(output_path: Path) -> tuple[Path, Path]:
+    """Route an output path to twin SVG and PDF paths under svg/ and pdf/ folders."""
+    path = Path(output_path)
+    parts = list(path.parts)
+    dir_parts = parts[:-1]
+
+    if "svg" in dir_parts:
+        idx = dir_parts.index("svg")
+        pdf_parts = list(parts)
+        pdf_parts[idx] = "pdf"
+        svg_path = Path(*parts).with_suffix(".svg")
+        pdf_path = Path(*pdf_parts).with_suffix(".pdf")
+        return svg_path, pdf_path
+
+    if "pdf" in dir_parts:
+        idx = dir_parts.index("pdf")
+        svg_parts = list(parts)
+        svg_parts[idx] = "svg"
+        svg_path = Path(*svg_parts).with_suffix(".svg")
+        pdf_path = Path(*parts).with_suffix(".pdf")
+        return svg_path, pdf_path
+
+    parent_name = path.parent.name
+    if parent_name in RECOGNIZED_CATEGORIES:
+        root = path.parent.parent
+        stem = path.stem
+        svg_path = root / "svg" / parent_name / f"{stem}.svg"
+        pdf_path = root / "pdf" / parent_name / f"{stem}.pdf"
+        return svg_path, pdf_path
+
+    stem = path.stem
+    svg_path = path.parent / "svg" / f"{stem}.svg"
+    pdf_path = path.parent / "pdf" / f"{stem}.pdf"
+    return svg_path, pdf_path
+
+
+def _sanitize_figure_for_export(fig) -> None:
+    """Sanitize artists in a figure for strict vector (SVG/PDF) backends.
+
+    - Clamps RGBA values to [0.0, 1.0] to prevent SVG hex-conversion errors.
+    - Replaces NaN/Inf in line widths, colors, or coordinates to prevent PDF backend errors.
+    """
+    for ax in fig.axes:
+        for patch in ax.patches:
+            try:
+                fc = patch.get_facecolor()
+                if fc is not None:
+                    fc_arr = np.asarray(fc, dtype=float)
+                    if not np.all(np.isfinite(fc_arr)) or np.any(fc_arr < 0.0) or np.any(fc_arr > 1.0):
+                        patch.set_facecolor(np.clip(np.nan_to_num(fc_arr, nan=0.0), 0.0, 1.0))
+            except Exception:
+                pass
+
+            try:
+                ec = patch.get_edgecolor()
+                if ec is not None:
+                    ec_arr = np.asarray(ec, dtype=float)
+                    if not np.all(np.isfinite(ec_arr)) or np.any(ec_arr < 0.0) or np.any(ec_arr > 1.0):
+                        patch.set_edgecolor(np.clip(np.nan_to_num(ec_arr, nan=0.0), 0.0, 1.0))
+            except Exception:
+                pass
+
+            try:
+                lw = patch.get_linewidth()
+                if lw is not None and not np.isfinite(lw):
+                    patch.set_linewidth(0.0)
+            except Exception:
+                pass
+
+        for coll in ax.collections:
+            try:
+                fcs = coll.get_facecolors()
+                if fcs is not None and len(fcs) > 0:
+                    fcs_arr = np.asarray(fcs, dtype=float)
+                    if not np.all(np.isfinite(fcs_arr)) or np.any(fcs_arr < 0.0) or np.any(fcs_arr > 1.0):
+                        coll.set_facecolors(np.clip(np.nan_to_num(fcs_arr, nan=0.0), 0.0, 1.0))
+            except Exception:
+                pass
+
+            try:
+                ecs = coll.get_edgecolors()
+                if ecs is not None and len(ecs) > 0:
+                    ecs_arr = np.asarray(ecs, dtype=float)
+                    if not np.all(np.isfinite(ecs_arr)) or np.any(ecs_arr < 0.0) or np.any(ecs_arr > 1.0):
+                        coll.set_edgecolors(np.clip(np.nan_to_num(ecs_arr, nan=0.0), 0.0, 1.0))
+            except Exception:
+                pass
+
+            try:
+                lws = coll.get_linewidths()
+                if lws is not None and len(lws) > 0:
+                    lws_arr = np.asarray(lws, dtype=float)
+                    if not np.all(np.isfinite(lws_arr)):
+                        coll.set_linewidths(np.nan_to_num(lws_arr, nan=0.0))
+            except Exception:
+                pass
+
+        for line in ax.lines:
+            try:
+                color = line.get_color()
+                if isinstance(color, (list, tuple, np.ndarray)):
+                    c_arr = np.asarray(color, dtype=float)
+                    if not np.all(np.isfinite(c_arr)) or np.any(c_arr < 0.0) or np.any(c_arr > 1.0):
+                        line.set_color(np.clip(np.nan_to_num(c_arr, nan=0.0), 0.0, 1.0))
+            except Exception:
+                pass
+            try:
+                lw = line.get_linewidth()
+                if not np.isfinite(lw):
+                    line.set_linewidth(1.0)
+            except Exception:
+                pass
+
+
 def save_figure(
     fig,
     output_path: Path,
     *,
     dpi: int = 300,
-    also_pdf: bool = False,
+    also_pdf: bool = True,
+    formats: tuple[str, ...] = ("svg", "pdf"),
 ) -> list[Path]:
-    """Save a Matplotlib figure and close it."""
+    """Save a Matplotlib figure as vector SVG and PDF under dedicated directories and close it."""
 
-    output_path.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
+    _sanitize_figure_for_export(fig)
+    svg_path, pdf_path = _route_dual_format_paths(output_path)
 
-    png_path = output_path.with_suffix(
-        ".png"
-    )
+    saved: list[Path] = []
 
-    fig.savefig(
-        png_path,
-        dpi=dpi,
-        bbox_inches="tight",
-    )
-
-    saved = [png_path]
-
-    if also_pdf:
-        pdf_path = output_path.with_suffix(
-            ".pdf"
+    if "svg" in formats:
+        svg_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
         )
+        fig.savefig(
+            svg_path,
+            bbox_inches="tight",
+        )
+        saved.append(svg_path)
 
+    if "pdf" in formats or also_pdf:
+        pdf_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
         fig.savefig(
             pdf_path,
             bbox_inches="tight",
         )
-
-        saved.append(
-            pdf_path
-        )
+        saved.append(pdf_path)
 
     plt.close(fig)
 
@@ -491,11 +613,6 @@ def save_component_plane_pages(
     This reproduces the same information as NNSOM's component-plane plot:
     one map per embedding dimension, colored by the learned neuron weight.
     """
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
 
     weights = np.asarray(
         som.w,
@@ -734,11 +851,6 @@ def save_class_distribution_maps(
 ) -> list[Path]:
     """Generate one NNSOM class-distribution map per MNIST digit."""
 
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
     saved = []
 
     for digit in range(
@@ -794,11 +906,6 @@ def save_feature_hist_maps(
     include_gray: bool = True,
 ) -> list[Path]:
     """Generate professor-style hist maps for selected embedding dimensions."""
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
 
     saved = []
 

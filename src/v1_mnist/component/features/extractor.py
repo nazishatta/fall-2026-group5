@@ -1,5 +1,8 @@
-import os
+from __future__ import annotations
 
+import os
+from pathlib import Path
+from typing import Any, Optional, Sequence, Tuple, Union
 import numpy as np
 import torch
 from tqdm import tqdm
@@ -8,10 +11,10 @@ from tqdm import tqdm
 class FeatureExtractor:
     """Capture one module's output while retaining sample-level metadata."""
 
-    def __init__(self, model, layer_name):
+    def __init__(self, model: torch.nn.Module, layer_name: str) -> None:
         self.model = model
         self.layer_name = layer_name
-        self.features = []
+        self.features: list[np.ndarray] = []
         modules = dict(self.model.named_modules())
         if self.layer_name not in modules:
             raise KeyError(
@@ -20,21 +23,24 @@ class FeatureExtractor:
             )
         self._layer = modules[self.layer_name]
 
-    def extract(self, dataloader, device, return_metadata=False):
-        """Extract aligned features, labels, predictions, IDs, confidence, correctness.
-
-        The default three-array return preserves compatibility with older callers.
-        Set return_metadata=True for the official traceable extraction.
-        """
-
+    def extract(
+        self,
+        dataloader: Any,
+        device: torch.device,
+        return_metadata: bool = False,
+    ) -> Union[
+        Tuple[np.ndarray, np.ndarray, np.ndarray],
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    ]:
+        """Extract aligned features, labels, predictions, IDs, confidence, correctness."""
         self.model.eval()
         self.features = []
-        labels_all = []
-        predictions_all = []
-        sample_ids_all = []
-        confidence_all = []
+        labels_all: list[np.ndarray] = []
+        predictions_all: list[np.ndarray] = []
+        sample_ids_all: list[np.ndarray] = []
+        confidence_all: list[np.ndarray] = []
 
-        def hook(_module, _inputs, output):
+        def hook(_module: Any, _inputs: Any, output: torch.Tensor) -> None:
             self.features.append(output.detach().cpu().numpy())
 
         hook_handle = self._layer.register_forward_hook(hook)
@@ -106,16 +112,18 @@ class FeatureExtractor:
 
 
 def save_embeddings(
-    features,
-    labels,
-    preds,
-    split_name,
-    output_dir,
-    sample_ids=None,
-    confidence=None,
-    correct=None,
-):
-    os.makedirs(output_dir, exist_ok=True)
+    features: np.ndarray,
+    labels: np.ndarray,
+    preds: np.ndarray,
+    split_name: str,
+    output_dir: str | Path,
+    sample_ids: Optional[np.ndarray] = None,
+    confidence: Optional[np.ndarray] = None,
+    correct: Optional[np.ndarray] = None,
+) -> dict[str, Path]:
+    """Save extracted arrays into numpy binary format."""
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
     arrays = {
         "features": features,
         "labels": labels,
@@ -124,19 +132,32 @@ def save_embeddings(
         "confidence": confidence,
         "correct": correct,
     }
+    saved_paths: dict[str, Path] = {}
     for suffix, array in arrays.items():
         if array is not None:
-            np.save(os.path.join(output_dir, f"{split_name}_{suffix}.npy"), array)
+            p = out_dir / f"{split_name}_{suffix}.npy"
+            np.save(str(p), array)
+            saved_paths[suffix] = p
+    return saved_paths
 
 
-def load_embeddings(split_name, input_dir, include_metadata=False):
-    features = np.load(os.path.join(input_dir, f"{split_name}_features.npy"))
-    labels = np.load(os.path.join(input_dir, f"{split_name}_labels.npy"))
-    predictions = np.load(os.path.join(input_dir, f"{split_name}_preds.npy"))
+def load_embeddings(
+    split_name: str,
+    input_dir: str | Path,
+    include_metadata: bool = False,
+) -> Union[
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
+    """Load extracted embeddings and labels."""
+    in_dir = Path(input_dir)
+    features = np.load(str(in_dir / f"{split_name}_features.npy"))
+    labels = np.load(str(in_dir / f"{split_name}_labels.npy"))
+    predictions = np.load(str(in_dir / f"{split_name}_preds.npy"))
     if not include_metadata:
         return features, labels, predictions
 
-    sample_ids = np.load(os.path.join(input_dir, f"{split_name}_sample_ids.npy"))
-    confidence = np.load(os.path.join(input_dir, f"{split_name}_confidence.npy"))
-    correct = np.load(os.path.join(input_dir, f"{split_name}_correct.npy"))
+    sample_ids = np.load(str(in_dir / f"{split_name}_sample_ids.npy"))
+    confidence = np.load(str(in_dir / f"{split_name}_confidence.npy"))
+    correct = np.load(str(in_dir / f"{split_name}_correct.npy"))
     return features, labels, predictions, sample_ids, confidence, correct

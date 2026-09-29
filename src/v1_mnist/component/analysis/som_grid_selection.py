@@ -11,6 +11,10 @@ import csv
 import json
 from pathlib import Path
 
+from src.v1_mnist.component.utils.logging import get_logger, setup_logger
+
+logger = get_logger("v1_mnist.analysis.som_grid_selection")
+
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -198,7 +202,7 @@ def main() -> None:
     }
 
     # Build the winner row highlight: bold the winning grid's rank sum
-    def fmt_row(g):
+    def fmt_row(g: str) -> str:
         r = by_grid[g]
         rank_sum_str = (
             f'**{r["rank_sum"]}**' if g == selected_grid else str(r["rank_sum"])
@@ -255,30 +259,30 @@ and error-geography analyses are frozen.
         encoding="utf-8",
     )
 
-    print("\nGRID SELECTION")
-    print("=" * 60)
+    logger.info("GRID SELECTION")
+    logger.info("=" * 60)
 
     for row in sorted(
         rows,
         key=lambda r: r["rank_sum"],
     ):
-        print(
-            f'{row["grid"]:>5} | '
-            f'QE={row["validation_qe"]:.6f} '
-            f'(r{row["qe_rank"]}) | '
-            f'TE1={row["validation_te1_percent"]:.4f} '
-            f'(r{row["te1_rank"]}) | '
-            f'TE1+2={row["validation_te1_plus_2_percent"]:.4f} '
-            f'(r{row["te1_plus_2_rank"]}) | '
-            f'total={row["rank_sum"]}'
+        logger.info(
+            "%5s | QE=%.6f (r%d) | TE1=%.4f (r%d) | TE1+2=%.4f (r%d) | total=%d",
+            row["grid"],
+            row["validation_qe"],
+            row["qe_rank"],
+            row["validation_te1_percent"],
+            row["te1_rank"],
+            row["validation_te1_plus_2_percent"],
+            row["te1_plus_2_rank"],
+            row["rank_sum"],
         )
 
-    print()
-    print(f'SELECTED GRID: {selected_grid}')
-    print("TEST USED FOR SELECTION: NO")
-    print(f"CSV:  {csv_path}")
-    print(f"JSON: {json_path}")
-    print(f"DOC:  {RESULT_DOC}")
+    logger.info("SELECTED GRID: %s", selected_grid)
+    logger.info("TEST USED FOR SELECTION: NO")
+    logger.info("CSV:  %s", csv_path)
+    logger.info("JSON: %s", json_path)
+    logger.info("DOC:  %s", RESULT_DOC)
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ som:
   init_neighborhood: 11
   epochs: 250
   steps: 250
-  backend: cpu
+  backend: auto
   random_seed: 42
   track_qe_history: true
   qe_history_every: 1

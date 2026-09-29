@@ -13,7 +13,7 @@
     "init_neighborhood": 11,
     "epochs": 250,
     "steps": 250,
-    "requested_backend": "cpu",
+    "requested_backend": "auto",
     "actual_backend": "gpu",
     "random_seed": 42,
     "track_qe_history": true,
@@ -66,9 +66,10 @@
     "max_hits_per_neuron": 149
   },
   "qe_history_artifacts": {
-    "json": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/logs/som_15x15_seed42_final_qe_history.json",
-    "csv": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/tables/som_15x15_seed42_final_qe_history.csv",
-    "figure": "/home/ubuntu/Capstone/Codes/week_5_codes/outputs/v1_mnist/som/figures/convergence/som_15x15_seed42_final_qe_curve.png"
+    "json": "/home/ubuntu/Capstone/Codes/week_6_codes/outputs/v1_mnist/som/logs/som_15x15_seed42_final_qe_history.json",
+    "csv": "/home/ubuntu/Capstone/Codes/week_6_codes/outputs/v1_mnist/som/tables/som_15x15_seed42_final_qe_history.csv",
+    "figure_svg": "/home/ubuntu/Capstone/Codes/week_6_codes/outputs/v1_mnist/som/figures/svg/convergence/som_15x15_seed42_final_qe_curve.svg",
+    "figure_pdf": "/home/ubuntu/Capstone/Codes/week_6_codes/outputs/v1_mnist/som/figures/pdf/convergence/som_15x15_seed42_final_qe_curve.pdf"
   },
   "test_evaluated": false
 }
