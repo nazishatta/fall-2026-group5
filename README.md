@@ -31,7 +31,7 @@ unsupported by evidence will be reported as unsupported.
 ## Pipeline Architecture
 
 <p align="center">
-  <img src="reports/figures/project_pipeline/nnsom_project_pipeline.drawio.svg"
+  <img src="demo/fig/project_pipeline/nnsom_project_pipeline.drawio.svg"
        alt="NNSOM Project Pipeline Architecture"
        width="100%">
 </p>
