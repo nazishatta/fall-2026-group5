@@ -5,94 +5,130 @@
 
 ---
 
-## Repository Layout
+## Why this matters
+
+A model can post strong average accuracy while hiding structured weaknesses. Existing
+interpretability tools — saliency maps, SHAP, LIME — explain one prediction at a time.
+They answer *which pixels mattered for this sample*, not *where in the representation do
+this model's failures concentrate*. That population-level view is what determines whether
+a model is safe to deploy, and it is what this project tries to recover.
+
+## Central research hypothesis
+
+> SOM-based topology and quantization signals can expose structured regions of model
+> failure in learned representation space; those signals can detect distributional
+> novelty; and SOM-derived diagnostics can guide targeted interventions that measurably
+> improve predictive behavior and/or the structure of the learned representation.
+
+This is treated as a hypothesis to test, not a conclusion to prove. Components
+unsupported by evidence will be reported as unsupported.
+
+## Pipeline Architecture
+
+<p align="center">
+  <img src="demo/fig/project_pipeline/nnsom_project_pipeline.drawio.svg"
+       alt="NNSOM Project Pipeline Architecture"
+       width="100%">
+</p>
+
+## Research questions
+
+| | Question | Primary output |
+|---|---|---|
+| **RQ1** | What does the latent feature space look like under a topology-preserving projection? | Cluster structure, class overlap, density maps |
+| **RQ2** | Do misclassifications occupy identifiable regions of the representation? | Error hotspot statistics + representative samples |
+| **RQ3** | Can SOM-derived measures identify out-of-distribution observations? | AUROC / AUPR / FPR@95TPR |
+| **RQ4** | How does SOM novelty detection compare with established baselines? | Isolation Forest, One-Class SVM, autoencoder |
+| **RQ5** | Can SOM-derived error regions identify samples worth targeting in retraining? | Guided vs. **random-selection control** |
+| **RQ6** | After intervention, is the representation measurably better structured? | Before/after representation metrics |
+
+Success criteria for each RQ are fixed **before** the test set is examined
+(`docs/success_criteria.md`).
+
+## Key results
+
+`[TBD — populated from results/tables/ once experiments run]`
+
+| Metric | Baseline | SOM-guided | Random control |
+|---|---|---|---|
+| Macro-F1 | `[TBD]` | `[TBD]` | `[TBD]` |
+| Hotspot error rate | `[TBD]` | `[TBD]` | `[TBD]` |
+| OOD AUROC | `[TBD]` | `[TBD]` | — |
+
+## Repository structure
 
 ```
-Code_local/
-├── src/
-│   └── v1_mnist/
-│       ├── component/
-│       │   ├── configs/
-│       │   │   ├── base.yaml               # Shared hyperparameters
-│       │   │   ├── cnn_baseline.yaml       # CNN baseline config
-│       │   │   └── som.yaml                # NNSOM config
-│       │   ├── data/
-│       │   │   └── mnist_dataset.py        # CustomMNISTDataset + get_dataloaders()
-│       │   ├── models/
-│       │   │   └── lenet5.py               # LeNet-5 architecture
-│       │   ├── features/
-│       │   │   └── extractor.py            # FeatureExtractor (forward hooks)
-│       │   ├── evaluation/
-│       │   │   └── evaluator.py            # Accuracy, F1, confusion matrix
-│       │   ├── visualization/
-│       │   │   └── cnn_baseline_plots.py   # Training curves, confusion heatmap
-│       │   ├── som/                        # NNSOM trainer, data loader, memory-safe init
-│       │   ├── analysis/                   # SOM grid selection, BMU/RQ analysis
-│       │   ├── utils/
-│       │   │   └── config.py               # YAML loader with auto path-routing
-│       │   └── pipeline/
-│       │       ├── 01_prepare_data.py      # Split & validate MNIST
-│       │       ├── 02_train_baseline.py    # Train LeNet-5
-│       │       ├── 03_extract_embeddings.py# Extract fc2 embeddings
-│       │       ├── 04_train_som.py         # Train SOM
-│       │       └── 05_visualize_som.py     # SOM visualizations
-│       ├── tests/
-│       │   ├── conftest.py
-│       │   ├── cnn_baseline/
-│       │   │   ├── README.md
-│       │   │   ├── test_data_loader.py     # Split sizes, image shape, pixel range
-│       │   │   ├── test_lenet5.py          # Architecture, forward pass, numerics
-│       │   │   └── test_feature_extractor.py # Shape (N,84), no NaN/Inf, alignment
-│       │   └── som/
-│       │       ├── test_bmu_rq_analysis.py # BMU/RQ analysis helpers
-│       │       ├── test_memory_safe_init.py # SVD economy context
-│       │       └── test_run_id_preflight.py # Output isolation preflight
-│       ├── docs/
-│       │   ├── cnn_baseline.md             # CNN technical documentation
-│       │   └── som/
-│       │       └── SOM_GRID_SELECTION_PROTOCOL.md # Grid selection protocol
-│       └── shellscripts/
-│           ├── README.md
-│           └── run_cnn_baseline.sh         # End-to-end CNN baseline pipeline
-├── cookbooks/
-│   └── v1_mnist/
-│       └── cnn_baseline.ipynb              # Baseline walkthrough notebook
-├── demo/
-│   └── fig/
-│       └── v1_mnist/                       # Visualizations & figures
-├── reports/
-│   ├── Markdown_Report/
-│   │   └── v1_mnist/
-│   │       └── cnn_baseline_results.md
-│   └── Progress_Report/
-│       └── v1_mnist/
-│           └── som_training_progress.md
-└── outputs/
-    └── v1_mnist/
-        ├── cnn_baseline/                   # Checkpoints, embeddings, figures, logs
-        └── som/                            # SOM models, logs, tables, figures
+configs/      experiment configuration (YAML) — no settings hidden in notebooks
+data/         raw + processed data (gitignored; regenerated from code)
+src/          all reusable logic
+  data/       dataset registry and splitting
+  models/     architectures and training
+  features/   embedding extraction with provenance metadata
+  som/        NNSOM training and diagnostics
+  analysis/   representation analysis, error geography
+  ood/        novelty detection and baselines
+  retraining/ SOM-guided interventions and controls
+  evaluation/ metrics and evaluation protocols
+  visualization/ reusable plotting
+  utils/      config, seeding, paths
+scripts/      entry points for each pipeline stage
+notebooks/    exploration and narrative only — not a home for logic
+tests/        tests for reusable logic
+results/      figures, tables, metrics, per-experiment outputs
+reports/      paper and presentation
 ```
 
----
-
-## CNN Baseline Results
-
-| Metric              | Value                    |
-| ------------------- | ------------------------ |
-| Test Accuracy       | **99.18%**               |
-| Macro F1-Score      | **0.9918**               |
-| Embedding dimension | 84 (fc2 layer)           |
-| Train / Val / Test  | 49,000 / 10,500 / 10,500 |
-
-See [`reports/Markdown_Report/v1_mnist/cnn_baseline_results.md`](reports/Markdown_Report/v1_mnist/cnn_baseline_results.md)
-and [`src/v1_mnist/docs/cnn_baseline.md`](src/v1_mnist/docs/cnn_baseline.md) for full details.
-
----
-
-## Running Tests
-
-From the project root (`Codes/Code_local`):
+## Installation
 
 ```bash
-python -m pytest src/v1_mnist/tests -v
+git clone https://github.com/<org-or-user>/<repo-name>.git
+cd <repo-name>
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
+
+## Quick start
+
+```bash
+# Run the test suite
+pytest -q
+
+# Train the baseline (once scripts/train_baseline.py is implemented)
+python scripts/train_baseline.py --config configs/base.yaml
+
+# Switch datasets without touching code
+python scripts/train_baseline.py --config configs/base.yaml \
+    --override configs/dataset/fashion_mnist.yaml
+```
+
+## Reproduction
+
+Every reported number traces back through
+**config → raw result → processed metric → table/figure → conclusion**.
+Experiment names encode their configuration, e.g.
+`fashion_mnist_lenet5_penultimate_som15x15_seed42`.
+
+## Data
+
+MNIST, Fashion-MNIST and CIFAR-10 download automatically via torchvision on first run.
+See `data/README.md` for the embedding metadata schema.
+
+## Technologies
+
+PyTorch · [NNSOM](https://amir-jafari.github.io/SOM/) · scikit-learn · NumPy · Matplotlib · MLflow · pytest
+
+## Limitations
+
+`[TBD — written from actual findings, not anticipated ones]`
+
+## Team
+
+- `[Name]` — `[role]`
+- `[Name]` — `[role]`
+
+Advisor: Dr. Amir Jafari, The George Washington University, Data Science Program.
+Developed as a capstone project in the GWU MS Data Science program.
+
+## License
+
+See [LICENSE](LICENSE).
