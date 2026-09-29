@@ -1,7 +1,7 @@
 """Build the interactive SOM report (single self-contained HTML page).
 
 This is the only file you need to run. It wires together the modules in
-``src/v1_mnist/component/visualization/som_interactive_plots/``:
+``src/v1_mnist/component/interactive/som_interactive_plots/``:
 
     load config + data  ->  load SOM  ->  per-neuron stats  ->  payload
     ->  fill HTML template  ->  write interactive_report.html
@@ -34,12 +34,12 @@ if str(REPO_ROOT) not in sys.path:
 from src.v1_mnist.component.som.data import load_som_data
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import setup_logger
-from src.v1_mnist.component.visualization.som_interactive_plots import (
+from src.v1_mnist.component.interactive.som_interactive_plots import (
     build_payload,
     load_model_and_grid,
     write_report,
 )
-from src.v1_mnist.component.visualization.som_interactive_plots.settings import (
+from src.v1_mnist.component.interactive.som_interactive_plots.settings import (
     REPORT_FILENAME,
 )
 from src.v1_mnist.component.visualization.som_visualizations import (

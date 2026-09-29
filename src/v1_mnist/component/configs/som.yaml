@@ -82,6 +82,7 @@ visualization:
   generate_simple_grid_purity_support: true
   generate_complex_error_map: true
 
-  # These are valid NNSOM plots, but a 15x15 map with 84 abstract embedding
-  # features can still make them visually dense. Keep disabled unless explicitly needed.
-  generate_extended_dense_plots: false
+  # Extra NNSOM plots (pie, stem, histogram, box, violin, scatter, weights) saved in
+  # the "extended" folder. On a 15x15 map with 84 embedding features they can look
+  # dense. Set to false to skip them; visualize_som.py --extended also turns them on.
+  generate_extended_dense_plots: true
