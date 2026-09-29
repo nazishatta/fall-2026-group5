@@ -11,9 +11,9 @@ CHECKPOINT="outputs/v1_mnist/cnn_baseline/checkpoints/lenet5_best.pth"
 
 echo "Running v1_mnist CNN baseline..."
 
-python src/v1_mnist/component/pipeline/01_prepare_data.py --config "$CONFIG"
-python src/v1_mnist/component/pipeline/02_train_baseline.py --config "$CONFIG"
-python src/v1_mnist/component/pipeline/03_extract_embeddings.py \
+python src/v1_mnist/component/pipeline/prepare_data.py --config "$CONFIG"
+python src/v1_mnist/component/pipeline/train_baseline.py --config "$CONFIG"
+python src/v1_mnist/component/pipeline/extract_embeddings.py \
     --config "$CONFIG" \
     --checkpoint "$CHECKPOINT"
 
