@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torchvision import datasets
 
+from src.v1_mnist.component.utils.logging import get_logger
+
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -33,6 +35,8 @@ OUTPUT_DIR = (
 DATA_ROOT = Path.home() / "All_Data"
 
 MAX_PER_HOTSPOT = 6
+
+logger = get_logger("v1_mnist.analysis.error_patterns.hotspot_samples")
 
 
 def load_rows() -> list[dict]:
@@ -240,7 +244,7 @@ def main() -> None:
     if not hotspot_rows:
         raise RuntimeError("No hotspot validation errors were found.")
 
-    print("Loading original MNIST for sample-ID reconstruction...")
+    logger.info("Loading original MNIST for sample-ID reconstruction...")
     train, test = load_original_mnist()
 
     # Verify every hotspot error before producing any figure.
@@ -249,8 +253,8 @@ def main() -> None:
 
     neurons = sorted({row["bmu"] for row in hotspot_rows})
 
-    print(f"Verified hotspot error samples: {len(hotspot_rows)}")
-    print(f"Hotspot neurons: {neurons}")
+    logger.info("Verified hotspot error samples: %d", len(hotspot_rows))
+    logger.info("Hotspot neurons: %s", neurons)
 
     for neuron in neurons:
         neuron_rows = [
@@ -268,11 +272,10 @@ def main() -> None:
 
     plot_overall(hotspot_rows, train, test)
 
-    print()
-    print("Representative-image generation COMPLETE.")
-    print(f"Hotspot neurons represented: {len(neurons)}")
-    print(f"Hotspot error samples available: {len(hotspot_rows)}")
-    print(f"Output: {OUTPUT_DIR}")
+    logger.info("Representative-image generation COMPLETE.")
+    logger.info("Hotspot neurons represented: %d", len(neurons))
+    logger.info("Hotspot error samples available: %d", len(hotspot_rows))
+    logger.info("Output: %s", OUTPUT_DIR)
 
 
 if __name__ == "__main__":

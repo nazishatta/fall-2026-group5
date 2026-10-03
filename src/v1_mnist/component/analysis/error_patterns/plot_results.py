@@ -6,6 +6,8 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 
+from src.v1_mnist.component.utils.logging import get_logger
+
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 BASE = REPO_ROOT / "outputs/v1_mnist/cluster_analysis"
@@ -15,6 +17,8 @@ WEEK4 = BASE / "week4_cluster_analysis"
 WEEK5 = BASE / "week5_error_patterns"
 
 GRID = 15
+
+logger = get_logger("v1_mnist.analysis.error_patterns.plot_results")
 
 
 def read_csv(path):
@@ -141,9 +145,9 @@ def main():
     week4()
     week5()
 
-    print("Week 4 and Week 5 figures generated.")
-    print(f"Week 4 figures: {WEEK4 / 'figures'}")
-    print(f"Week 5 figures: {WEEK5 / 'figures'}")
+    logger.info("Week 4 and Week 5 figures generated.")
+    logger.info("Week 4 figures: %s", WEEK4 / "figures")
+    logger.info("Week 5 figures: %s", WEEK5 / "figures")
 
 
 if __name__ == "__main__":
