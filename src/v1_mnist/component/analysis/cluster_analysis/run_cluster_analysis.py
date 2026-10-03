@@ -22,6 +22,7 @@ from src.v1_mnist.component.cluster_analysis.cluster_metrics import (
     compute_cluster_metrics,
     weighted_cluster_purity,
 )
+from src.v1_mnist.component.utils.logging import get_logger
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -40,6 +41,8 @@ OUTPUT_DIR = REPO_ROOT / "outputs/v1_mnist/cluster_analysis"
 
 NUM_NEURONS = 225
 NUM_CLASSES = 10
+
+logger = get_logger("v1_mnist.analysis.cluster_analysis.run_cluster_analysis")
 
 
 def write_cluster_table(path: Path, metrics) -> None:
@@ -75,7 +78,7 @@ def write_cluster_table(path: Path, metrics) -> None:
 
 
 def analyze_split(split: str, som) -> dict:
-    print(f"\nAnalyzing {split}...")
+    logger.info("Analyzing %s...", split)
 
     arrays = load_split(split, embeddings_dir=EMBEDDINGS_DIR)
 
@@ -143,10 +146,10 @@ def analyze_split(split: str, som) -> dict:
         "weighted_cluster_purity": weighted_purity,
     }
 
-    print(f"Samples:             {summary['samples']}")
-    print(f"Occupied neurons:    {occupied}/{NUM_NEURONS}")
-    print(f"Quantization error:  {qe:.12f}")
-    print(f"Weighted purity:     {weighted_purity:.6f}")
+    logger.info("Samples:             %d", summary["samples"])
+    logger.info("Occupied neurons:    %d/%d", occupied, NUM_NEURONS)
+    logger.info("Quantization error:  %.12f", qe)
+    logger.info("Weighted purity:     %.6f", weighted_purity)
 
     return summary
 
@@ -154,7 +157,7 @@ def analyze_split(split: str, som) -> dict:
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Loading frozen SOM...")
+    logger.info("Loading frozen SOM...")
     som = load_selected_som(MODEL_PATH)
 
     results = {
@@ -173,9 +176,9 @@ def main() -> None:
     ) as handle:
         json.dump(results, handle, indent=2)
 
-    print("\nWeek 4 cluster analysis COMPLETE.")
-    print(f"Results: {OUTPUT_DIR}")
-    print("Held-out test split was NOT used.")
+    logger.info("Week 4 cluster analysis COMPLETE.")
+    logger.info("Results: %s", OUTPUT_DIR)
+    logger.info("Held-out test split was NOT used.")
 
 
 if __name__ == "__main__":
