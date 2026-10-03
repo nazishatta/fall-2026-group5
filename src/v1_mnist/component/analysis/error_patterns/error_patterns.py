@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 
 from src.v1_mnist.component.analysis.io import load_split
+from src.v1_mnist.component.utils.logging import get_logger
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -34,6 +35,8 @@ NUM_CLASSES = 10
 # A neuron must have adequate validation support and elevated error evidence.
 MIN_SUPPORT = 20
 WILSON_Z = 1.959963984540054
+
+logger = get_logger("v1_mnist.analysis.error_patterns.error_patterns")
 
 
 def wilson_lower_bound(errors: int, total: int) -> float:
@@ -318,31 +321,32 @@ def main() -> None:
     ) as handle:
         json.dump(summary, handle, indent=2)
 
-    print("\nWeek 5 Error Geography COMPLETE")
-    print(f"Validation samples: {n}")
-    print(f"Validation errors: {global_errors}")
-    print(f"Global error rate: {global_error_rate:.6f}")
-    print(f"Hotspot neurons: {len(hotspot_rows)}")
-    print(f"Errors inside hotspots: {hotspot_error_total}")
+    logger.info("Week 5 Error Geography COMPLETE")
+    logger.info("Validation samples: %d", n)
+    logger.info("Validation errors: %d", global_errors)
+    logger.info("Global error rate: %.6f", global_error_rate)
+    logger.info("Hotspot neurons: %d", len(hotspot_rows))
+    logger.info("Errors inside hotspots: %d", hotspot_error_total)
 
     if global_errors:
-        print(
-            "Fraction of errors captured by hotspots: "
-            f"{hotspot_error_total / global_errors:.4f}"
+        logger.info(
+            "Fraction of errors captured by hotspots: %.4f",
+            hotspot_error_total / global_errors,
         )
 
-    print("\nTop hotspots:")
+    logger.info("Top hotspots:")
 
     for row in hotspot_rows[:10]:
-        print(
-            f"  neuron={row['neuron_id']:3d} "
-            f"support={row['support']:3d} "
-            f"errors={row['error_count']:2d} "
-            f"rate={row['error_rate']:.3f} "
-            f"wilson={row['wilson_lower_95']:.3f}"
+        logger.info(
+            "neuron=%3d support=%3d errors=%2d rate=%.3f wilson=%.3f",
+            row["neuron_id"],
+            row["support"],
+            row["error_count"],
+            row["error_rate"],
+            row["wilson_lower_95"],
         )
 
-    print("\nHeld-out test split was NOT used.")
+    logger.info("Held-out test split was NOT used.")
 
 
 if __name__ == "__main__":
