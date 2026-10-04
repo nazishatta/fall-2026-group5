@@ -1,0 +1,27 @@
+Place these PDFs in fig/ before compiling in Prism.
+
+Already included:
+- gwu_logo.pdf
+- som_15x15_seed42_final_qe_curve.pdf
+
+From Drive / core:
+- topology.pdf
+- u_matrix_neuron_distance.pdf
+- train_hit_histogram.pdf
+- validation_hit_histogram.pdf
+
+From Drive / component_planes:
+- component_planes_all84_nnsom.pdf
+
+From Drive / feature_maps:
+- fc2_15_color_hist.pdf
+- fc2_19_color_hist.pdf
+
+From Drive / class_maps:
+- digit_0_color_hist.pdf
+- digit_1_color_hist.pdf
+
+From Drive / analysis_maps:
+- validation_purity_support.pdf
+- validation_error_rate_support.pdf
+- validation_complex_error_map.pdf
