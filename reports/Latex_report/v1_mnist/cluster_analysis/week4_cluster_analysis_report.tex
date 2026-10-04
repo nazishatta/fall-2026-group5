@@ -1,0 +1,147 @@
+\documentclass[11pt]{article}
+\input{file_setup.tex}
+
+\begin{document}
+
+% ============================================================
+% TITLE PAGE -- same approved pattern as Weeks 2 and 3
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{0.15cm}
+    \includegraphics[width=0.29\textwidth]{gwu_logo.pdf}\par
+    \vspace{0.55cm}
+
+    {\small\bfseries Data Science Program\par}
+    {\small\bfseries Department of Data Science\par}
+    {\small DATS 6501 - Capstone Project - Fall 2026\par}
+
+    \vspace{1.25cm}
+    {\large\bfseries\color{GWBlue} Post-Training Analysis \& Novelty Detection Using\par}
+    {\large\bfseries\color{GWBlue} Neural Network Self-Organizing Maps (NNSOM)\par}
+
+    \vspace{0.95cm}
+    {\normalsize\bfseries\color{GWBlue} Week 4 Report\par}
+    \vspace{0.35cm}
+    {\normalsize\bfseries\color{GWBlue} SOM Cluster Analysis (MNIST)\par}
+
+    \vspace{1.25cm}
+    {\small\bfseries Capstone - Group 5\par}
+    \vspace{0.30cm}
+    {\small\bfseries Fyrooz Khan\par}
+    {\small\bfseries Nazish Atta\par}
+
+    \vspace{1.15cm}
+    {\small The George Washington University\par}
+    {\small Washington, DC\par}
+
+    \vspace{0.80cm}
+    {\small\itshape Supervised by\par}
+    {\small\itshape Dr. Amir Jafari\par}
+    {\small\itshape Associate Professor of Data Science\par}
+    \vfill
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\section{Week 4 Overview}
+Week 4 extends the trained MNIST Self-Organizing Map from visualization to quantitative cluster analysis. The analysis uses the frozen 15$\times$15 SOM and the frozen 84-dimensional \texttt{fc2} embeddings produced by the LeNet-5 baseline. No CNN retraining or SOM retraining was performed. Training and validation embeddings were analyzed, while the held-out test split remained excluded from development decisions.
+
+The purpose of this stage is to characterize how strongly the learned SOM preserves class structure. Best Matching Unit (BMU) assignments are summarized through neuron occupancy, hit counts, dominant class, cluster purity, normalized class entropy, and class-by-neuron intersections.
+
+\section{Analysis Setup}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.31\textwidth}|p{0.59\textwidth}|}
+\hline
+\rowcolor{TableHeader}
+\textcolor{white}{\textbf{Item}} & \textcolor{white}{\textbf{Week 4 Setup}} \\
+\hline
+Dataset & MNIST \\
+\hline
+Training embeddings & 49,000 samples \\
+\hline
+Validation embeddings & 10,500 samples \\
+\hline
+Feature representation & LeNet-5 \texttt{fc2}, 84 dimensions \\
+\hline
+SOM & Frozen 15$\times$15 grid, 225 neurons, seed 42 \\
+\hline
+Development data & Training and validation only \\
+\hline
+Held-out test split & Not used \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Overall Cluster Results}
+Both data splits occupied all 225 SOM neurons. The sample-weighted majority-class purity was \textbf{98.94\%} on the training embeddings and \textbf{98.19\%} on validation embeddings. Quantization error was 1.0387 on training and 1.0412 on validation. The close train/validation quantization errors indicate similar prototype-distance behavior across the two development splits, while the small reduction in validation purity reflects modest additional class mixing on unseen in-distribution samples.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\rowcolor{TableHeader}
+\textcolor{white}{\textbf{Split}} & \textcolor{white}{\textbf{Samples}} & \textcolor{white}{\textbf{Occupied}} & \textcolor{white}{\textbf{Quant. Error}} & \textcolor{white}{\textbf{Weighted Purity}} \\
+\hline
+Train & 49,000 & 225/225 & 1.0387 & 98.94\% \\
+\hline
+Validation & 10,500 & 225/225 & 1.0412 & 98.19\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Cluster Analysis Visualizations}
+The four figures below summarize validation-set cluster structure. The presentation follows the same image-left, interpretation-right format used in the previous weekly report.
+
+\resulttablebegin
+\singleimg{figures/week4_val_hit_count.pdf} &
+\textbf{Validation SOM hit count} -- All 225 neurons receive validation samples, confirming complete occupancy of the map. Density is nonuniform: several neurons contain well over 100 samples, while other neurons contain relatively few. The highest-support validation neuron is neuron 60 with 149 samples, showing that some learned prototype regions attract substantially more observations than others. \\
+\hline
+\singleimg{figures/week4_val_cluster_purity.pdf} &
+\textbf{Validation SOM cluster purity} -- Most neurons are near the maximum purity value of 1.0, indicating that a single digit class dominates much of the SOM. A smaller set of lower-purity neurons forms localized mixed-class regions. The lowest observed validation purity is neuron 130 at 0.444 with support 9; neuron 219 has purity 0.464 with support 28. These locations are natural candidates for later error-pattern analysis. \\
+\hline
+\singleimg{figures/week4_val_class_entropy.pdf} &
+\textbf{Normalized class entropy} -- Low entropy dominates most of the map, which is consistent with the high overall cluster purity. Localized higher-entropy neurons identify regions containing a more diverse class mixture. Neuron 154 has the highest normalized entropy (0.641) with support 17, followed by neuron 130 (0.553), highlighting specific boundary-like regions rather than uniform class mixing across the SOM. \\
+\hline
+\singleimg{figures/week4_val_dominant_class.pdf} &
+\textbf{Dominant true class} -- The map forms large contiguous regions associated with individual MNIST digit classes. Neighboring neurons often share the same dominant class, showing that the 84-dimensional CNN representation has been organized into coherent class-specific territories while retaining smaller transition regions at class boundaries. \\
+\hline
+\resulttableend
+
+\section{Interpretation}
+The Week 4 results provide descriptive evidence that the trained SOM contains strong class structure. Every SOM neuron is occupied on both training and validation data, so the 15$\times$15 map is being used throughout rather than leaving large inactive regions. The validation weighted purity of 98.19\% indicates that most samples share neurons predominantly with examples from the same true class.
+
+However, weighted cluster purity is not classifier accuracy and does not imply that every neuron is homogeneous. The purity and entropy maps identify a limited number of mixed regions where multiple digit classes share nearby prototypes. These local regions are especially important because global averages can hide the locations where classification ambiguity is concentrated. The Week 4 cluster analysis therefore provides the spatial basis for Week 5, where classifier errors are mapped onto the same SOM topology.
+
+\section{Leakage Control}
+This analysis is development-stage only. The frozen CNN, embeddings, and SOM were consumed read-only. Training and validation embeddings were used to calculate cluster statistics, but the held-out test split was not used to choose cluster-analysis rules, interpret validation regions, or change the model. This preserves the final test split for later evaluation after the analysis procedure is frozen.
+
+\section{Conclusion}
+Week 4 converted the qualitative SOM visualizations from Week 3 into quantitative cluster-structure measurements. The 15$\times$15 SOM achieved complete neuron occupancy on both development splits, with validation quantization error of 1.0412 and sample-weighted cluster purity of 98.19\%. The dominant-class map shows broad class-specific territories, while the purity and entropy maps isolate a smaller set of mixed-class neurons that warrant closer inspection.
+
+These results establish the transition from representation visualization to model-diagnostic analysis. Week 5 uses the same frozen SOM and validation assignments to determine whether classifier mistakes are uniformly distributed or concentrated within particular SOM regions and to retrieve representative hard examples from those regions.
+
+\begin{thebibliography}{9}
+\bibitem[LeCun et~al.(1998)]{lecun1998gradient}
+Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner.
+\newblock Gradient-based learning applied to document recognition.
+\newblock \emph{Proceedings of the IEEE}, 86(11):2278--2324, 1998.
+
+\bibitem[Kohonen(1990)]{kohonen1990som}
+T. Kohonen.
+\newblock The self-organizing map.
+\newblock \emph{Proceedings of the IEEE}, 78(9):1464--1480, 1990.
+
+\bibitem[Vesanto and Alhoniemi(2000)]{vesanto2000clustering}
+J. Vesanto and E. Alhoniemi.
+\newblock Clustering of the self-organizing map.
+\newblock \emph{IEEE Transactions on Neural Networks}, 11(3):586--600, 2000.
+
+\bibitem[Jafari(n.d.)]{jafari_nnsom}
+A. Jafari.
+\newblock NNSOM: Neural Network Self-Organizing Maps in Python.
+\newblock The George Washington University. \url{https://amir-jafari.github.io/SOM/}.
+\end{thebibliography}
+
+\end{document}
