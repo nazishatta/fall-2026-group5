@@ -1,0 +1,70 @@
+\usepackage[
+    letterpaper,
+    top=0.65in,
+    bottom=0.65in,
+    left=0.70in,
+    right=0.70in
+]{geometry}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{microtype}
+
+\graphicspath{{fig/}}
+
+\usepackage[
+    backend=biber,
+    style=authoryear,
+    sorting=none,
+    giveninits=true,
+    maxbibnames=99,
+    dashed=false
+]{biblatex}
+\addbibresource{references.bib}
+
+\DeclareNameAlias{sortname}{family-given}
+\DeclareNameAlias{default}{family-given}
+\DeclareFieldFormat[article]{title}{#1}
+\DeclareFieldFormat[misc]{title}{#1}
+\renewbibmacro{in:}{}
+\AtEveryBibitem{\clearfield{doi}\clearfield{urldate}}
+\AtBeginBibliography{\small}
+\setlength{\bibitemsep}{0.35em}
+
+\definecolor{GWBlue}{HTML}{1E4E79}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=GWBlue,
+    citecolor=GWBlue,
+    urlcolor=GWBlue
+}
+
+\titleformat{\section}
+{\Large\bfseries\color{GWBlue}}
+{\thesection.}
+{0.40em}
+{}
+
+\titlespacing*{\section}{0pt}{0.70em}{0.28em}
+
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    textfont=it,
+    labelsep=period,
+    skip=4pt
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.30em}
