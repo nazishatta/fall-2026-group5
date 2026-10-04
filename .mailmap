@@ -1,0 +1,6 @@
+# Map every commit identity to one canonical name and email per person.
+# Format: Proper Name <canonical email> Commit Name <commit email>
+Fyrooz Khan <fyrooz.16@gmail.com>
+Fyrooz Khan <fyrooz.16@gmail.com> Ubuntu <ubuntu@ip-10-0-2-103.ec2.internal>
+Nazish Atta <nazish.atta@gwmail.gwu.edu>
+Nazish Atta <nazish.atta@gwmail.gwu.edu> <228982611+nazishatta@users.noreply.github.com>

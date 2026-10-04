@@ -1,0 +1,358 @@
+\documentclass[11pt]{article}
+
+\usepackage[
+    letterpaper,
+    top=0.65in,
+    bottom=0.65in,
+    left=0.70in,
+    right=0.70in
+]{geometry}
+
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{microtype}
+
+\usepackage[
+    backend=biber,
+    style=authoryear,
+    sorting=none,
+    giveninits=true,
+    maxbibnames=99,
+    dashed=false
+]{biblatex}
+
+\addbibresource{references.bib}
+
+\DeclareNameAlias{sortname}{family-given}
+\DeclareNameAlias{default}{family-given}
+\DeclareFieldFormat[article]{title}{#1}
+\DeclareFieldFormat[misc]{title}{#1}
+\renewbibmacro{in:}{}
+
+\AtEveryBibitem{%
+    \clearfield{doi}%
+    \clearfield{urldate}%
+}
+
+\AtBeginBibliography{\small}
+\setlength{\bibitemsep}{0.35em}
+
+\definecolor{GWBlue}{HTML}{1E4E79}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=GWBlue,
+    citecolor=GWBlue,
+    urlcolor=GWBlue
+}
+
+\titleformat{\section}
+{\Large\bfseries\color{GWBlue}}
+{\thesection.}
+{0.40em}
+{}
+
+\titlespacing*{\section}
+{0pt}
+{0.70em}
+{0.28em}
+
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    textfont=it,
+    labelsep=period,
+    skip=4pt
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.30em}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\thispagestyle{empty}
+
+\vspace*{0.02in}
+
+\includegraphics[
+    width=0.28\textwidth
+]{figures/gwu_logo.pdf}
+
+\vspace{0.14in}
+
+{\small\bfseries Data Science Program\par}
+{\small\bfseries Department of Data Science\par}
+{\small DATS 6501 - Capstone Project - Fall 2026\par}
+
+\vspace{0.20in}
+
+{\large\bfseries\color{GWBlue}
+Post-Training Analysis \& Novelty Detection Using\par}
+
+\vspace{0.02in}
+
+{\large\bfseries\color{GWBlue}
+Neural Network Self-Organizing Maps (NNSOM)\par}
+
+\vspace{0.18in}
+
+{\normalsize\bfseries\color{GWBlue}
+Week 2 Report\par}
+
+\vspace{0.16in}
+
+{\normalsize\bfseries\color{GWBlue}
+Baseline Model Training \& Latent Feature Extraction\par}
+
+\vspace{0.22in}
+
+{\small\bfseries Capstone - Group 5\par}
+{\small\bfseries Fyrooz Khan\par}
+{\small\bfseries Nazish Atta\par}
+
+\vspace{0.18in}
+
+{\small The George Washington University\par}
+{\small Washington, DC\par}
+
+\vspace{0.18in}
+
+{\small\itshape Supervised by\par}
+{\small\itshape Dr. Amir Jafari\par}
+{\small\itshape Associate Professor of Data Science\par}
+
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\section{Week 2 Overview}
+
+Week 2 completed the baseline modeling stage of the capstone. The MNIST
+dataset was prepared using a stratified 70/15/15 train-validation-test
+split, a LeNet-5 convolutional neural network was trained and evaluated,
+and 84-dimensional feature embeddings were extracted from the
+penultimate \texttt{fc2} layer for later Self-Organizing Map analysis.
+
+\section{Related Work}
+
+Convolutional neural networks provide the supervised representation-learning
+foundation for this project. LeCun et al.~\cite{lecun1998gradient} showed that
+CNNs can learn effective hierarchical features for handwritten character
+recognition. Our work does not propose a new classifier architecture; instead,
+it treats a trained CNN as a source of latent representations whose organization
+and failures can be studied after training.
+
+Self-Organizing Maps offer a complementary way to inspect high-dimensional
+structure. Kohonen's original SOM~\cite{kohonen1990som} preserves neighborhood
+relationships on a low-dimensional grid, while Vesanto and
+Alhoniemi~\cite{vesanto2000clustering} showed how trained SOM prototypes can
+support quantitative clustering. More recent methods integrate neural
+representation learning directly with SOM organization, including
+SOM-VAE~\cite{fortuin2019somvae} and Deep Embedded Self-Organizing
+Maps~\cite{forest2021desom}. In contrast, this capstone keeps the supervised
+CNN fixed during the initial NNSOM analysis so that SOM-derived diagnostic
+signals can be evaluated separately from representation learning.
+
+A second relevant line of work concerns novelty and out-of-distribution (OOD)
+detection. Maximum softmax probability provides a simple post-hoc baseline
+\cite{hendrycks2017baseline}, while ODIN modifies inference using temperature
+scaling and input perturbations~\cite{liang2018odin}. Lee et
+al.~\cite{lee2018mahalanobis} use Mahalanobis distance in deep feature space,
+Deep SVDD learns a compact one-class representation~\cite{ruff2018deep}, and
+energy-based scoring provides another strong output-space OOD signal
+\cite{liu2020energy}. These studies motivate rigorous comparison because they
+show that useful novelty information can appear in either classifier outputs
+or latent features.
+
+The distinguishing hypothesis of this project is therefore not that SOMs are
+automatically superior to these methods. Rather, we test whether NNSOM
+quantization and topology applied to fixed CNN embeddings expose structured
+error regions and provide useful novelty signals. This post-training framing
+connects SOM representation analysis with classifier failure geography while
+keeping the contribution empirically testable against established baselines.
+
+\section{Methodology}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.10}
+
+\begin{tabularx}{\textwidth}{
+    |>{\bfseries}p{0.48\textwidth}|
+    X|
+}
+
+\hline
+\rowcolor{GWBlue}
+\color{white}\textbf{Item}
+&
+\color{white}\textbf{Week 2 Setup}
+\\
+\hline
+
+Dataset
+&
+MNIST, 70,000 grayscale images ($28 \times 28$)
+\\
+\hline
+
+Split
+&
+49,000 train / 10,500 validation / 10,500 test
+\\
+\hline
+
+Model
+&
+LeNet-5 CNN
+\\
+\hline
+
+Training
+&
+20 epochs, Adam optimizer, cross-entropy loss
+\\
+\hline
+
+Feature layer
+&
+\texttt{fc2} penultimate layer, 84 dimensions
+\\
+\hline
+
+\end{tabularx}
+\end{table}
+
+The best validation checkpoint was used for final test evaluation and
+feature extraction. The saved \texttt{fc2} embeddings from all three
+splits provide the input for NNSOM in Week 3.
+
+\begin{figure}[H]
+\centering
+\includegraphics[
+    width=0.88\textwidth,
+    keepaspectratio
+]{figures/training_curves.pdf}
+\caption{Training and validation loss/accuracy across 20 epochs.}
+\label{fig:training-curves}
+\end{figure}
+
+\section{Results}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.10}
+
+\begin{tabularx}{\textwidth}{
+    |>{\bfseries}p{0.48\textwidth}|
+    X|
+}
+
+\hline
+\rowcolor{GWBlue}
+\color{white}\textbf{Metric}
+&
+\color{white}\textbf{Result}
+\\
+\hline
+
+Test accuracy
+&
+99.18\% (10,414 / 10,500)
+\\
+\hline
+
+Macro F1-score
+&
+0.9918
+\\
+\hline
+
+Misclassified samples
+&
+86 (0.82\%)
+\\
+\hline
+
+Embedding output
+&
+84-dimensional \texttt{fc2} vectors
+\\
+\hline
+
+\end{tabularx}
+\end{table}
+
+The baseline generalized well to the held-out test set. Errors were
+sparse and concentrated among a small number of class pairs; the most
+frequent individual confusions included $7\rightarrow1$,
+$5\rightarrow8$, and $2\rightarrow8$, with four cases each.
+Digit 0 had only one misclassification.
+
+\clearpage
+
+\begin{figure}[H]
+\centering
+\includegraphics[
+    width=0.72\textwidth,
+    keepaspectratio
+]{figures/test_confusion_matrix.pdf}
+\caption{
+Test-set confusion matrix. The strong diagonal indicates high
+class-level accuracy.
+}
+\label{fig:confusion}
+\end{figure}
+
+\section{Latent Feature Representation}
+
+For every sample, the 84-dimensional activation from the
+\texttt{fc2} layer was extracted and saved. This representation
+captures the learned features immediately before the final
+classification layer and is the feature space that will be analyzed
+with NNSOM.
+
+\clearpage
+
+\begin{figure}[H]
+\centering
+\includegraphics[
+    width=0.70\textwidth,
+    keepaspectratio
+]{figures/fc2_pca.pdf}
+\caption{
+PCA projection of the 84-dimensional \texttt{fc2} test embeddings
+for visualization only.
+}
+\label{fig:pca}
+\end{figure}
+
+The PCA view is only a preliminary 2D visualization; Week 3 will use
+the full 84-dimensional training embeddings as the actual input to
+NNSOM.
+
+\section{Conclusion and Week 3 Transition}
+
+Week 2 established a reproducible MNIST baseline and produced the
+feature embeddings required for the next phase. In Week 3, NNSOM will
+be configured and trained on the 49,000 training embeddings to map
+samples to Best Matching Units, monitor quantization error, and
+visualize class organization using SOM-based plots such as hit maps
+and the U-Matrix.
+
+\nocite{lecun1998gradient}
+\nocite{kohonen1990som}
+\nocite{jafari_nnsom}
+
+\printbibliography[title={References}]
+
+\end{document}
