@@ -1,0 +1,220 @@
+\documentclass[11pt]{article}
+\input{file_setup.tex}
+
+\begin{document}
+
+% ============================================================
+% TITLE PAGE -- same approved pattern as Weeks 2, 3, and 4
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{0.15cm}
+    \includegraphics[width=0.29\textwidth]{gwu_logo.pdf}\par
+    \vspace{0.55cm}
+
+    {\small\bfseries Data Science Program\par}
+    {\small\bfseries Department of Data Science\par}
+    {\small DATS 6501 - Capstone Project - Fall 2026\par}
+
+    \vspace{1.25cm}
+    {\large\bfseries\color{GWBlue} Post-Training Analysis \& Novelty Detection Using\par}
+    {\large\bfseries\color{GWBlue} Neural Network Self-Organizing Maps (NNSOM)\par}
+
+    \vspace{0.95cm}
+    {\normalsize\bfseries\color{GWBlue} Week 5 Report\par}
+    \vspace{0.35cm}
+    {\normalsize\bfseries\color{GWBlue} SOM Error Pattern Analysis (MNIST)\par}
+
+    \vspace{1.25cm}
+    {\small\bfseries Capstone - Group 5\par}
+    \vspace{0.30cm}
+    {\small\bfseries Fyrooz Khan\par}
+    {\small\bfseries Nazish Atta\par}
+
+    \vspace{1.15cm}
+    {\small The George Washington University\par}
+    {\small Washington, DC\par}
+
+    \vspace{0.80cm}
+    {\small\itshape Supervised by\par}
+    {\small\itshape Dr. Amir Jafari\par}
+    {\small\itshape Associate Professor of Data Science\par}
+    \vfill
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\section{Week 5 Overview}
+Week 5 analyzes classifier error geography on the frozen 15$\times$15 SOM. The analysis uses the frozen validation embeddings and the BMU assignments produced during Week 4. No CNN retraining or SOM retraining was performed. The held-out test split was intentionally excluded from hotspot discovery.
+
+The goal is to determine whether validation mistakes are distributed uniformly across the representation space or whether they concentrate in specific SOM neurons. The analysis combines local error rate, raw error count, support-aware Wilson confidence bounds, hotspot detection, confusion-pair summaries, and representative MNIST images recovered from the original data.
+
+\section{Validation Error Summary}
+The validation split contains 10,500 samples. The baseline produces 10,408 correct predictions and 92 misclassifications, corresponding to a global validation error rate of approximately \textbf{0.876\%}. Error hotspots are defined using a support-aware development rule: a neuron must contain at least 20 validation samples and the 95\% Wilson lower bound of its local error rate must exceed the global validation error rate.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.46\textwidth}|p{0.40\textwidth}|}
+\hline
+\rowcolor{TableHeader}
+\textcolor{white}{\textbf{Metric}} & \textcolor{white}{\textbf{Week 5 Result}} \\
+\hline
+Validation samples & 10,500 \\
+\hline
+Correct predictions & 10,408 \\
+\hline
+Validation errors & 92 \\
+\hline
+Global validation error rate & 0.876\% \\
+\hline
+Minimum hotspot support & 20 samples \\
+\hline
+Detected hotspot neurons & 9 / 225 \\
+\hline
+Errors inside hotspots & 27 / 92 \\
+\hline
+Fraction of all validation errors in hotspots & 29.35\% \\
+\hline
+Held-out test split & Not used \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Error Geography Visualizations}
+\resulttablebegin
+\singleimg{figures/main/week5_val_error_rate.pdf} &
+\textbf{Validation error rate across the SOM} -- Most neurons have zero or very low local error rate, while a small number of cells show substantially elevated rates. This demonstrates that errors are spatially nonuniform in SOM space. The strongest detected concentration occurs at neuron 67, with 6 errors among 35 validation samples and a local error rate of 17.14\%. \\
+\hline
+\singleimg{figures/main/week5_val_error_count.pdf} &
+\textbf{Validation error count across the SOM} -- The count map separates high local error rates caused by small denominators from neurons that actually contain multiple mistakes. Neuron 67 contains the largest hotspot error count (6), followed by neuron 86 with 4 errors; several other detected hotspots contain 2--3 errors. \\
+\hline
+\singleimg{figures/main/week5_val_error_wilson_lower.pdf} &
+\textbf{95\% Wilson lower-bound map} -- The Wilson lower bound introduces support awareness into hotspot selection. A neuron is not treated as a hotspot merely because of a large raw error percentage; the lower confidence bound must remain above the global validation error rate and the neuron must have support of at least 20 samples. \\
+\hline
+\singleimg{figures/main/week5_val_hotspot_map.pdf} &
+\textbf{Support-aware validation hotspots} -- Nine neurons satisfy the development-stage hotspot rule: 22, 67, 73, 86, 101, 137, 139, 145, and 220. Together they contain 27 of the 92 validation errors, or 29.35\% of all observed validation mistakes, despite representing only 9 of the 225 SOM neurons. \\
+\hline
+\resulttableend
+
+\section{Hotspot Detail}
+The table below summarizes the detected neurons. The strongest error concentration is neuron 67: support 35, 6 errors, 17.14\% local error rate, and a 95\% Wilson lower bound of 8.10\%. Its local error rate is approximately 19.6 times the global validation error rate.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+\rowcolor{TableHeader}
+\textcolor{white}{\textbf{Neuron}} & \textcolor{white}{\textbf{Support}} & \textcolor{white}{\textbf{Errors}} & \textcolor{white}{\textbf{Error Rate}} & \textcolor{white}{\textbf{Wilson LB}} \\
+\hline
+67 & 35 & 6 & 17.14\% & 8.10\% \\
+86 & 27 & 4 & 14.81\% & 5.92\% \\
+145 & 33 & 3 & 9.09\% & 3.14\% \\
+22 & 44 & 3 & 6.82\% & 2.35\% \\
+73 & 45 & 3 & 6.67\% & 2.29\% \\
+220 & 69 & 3 & 4.35\% & 1.49\% \\
+101 & 40 & 2 & 5.00\% & 1.38\% \\
+139 & 53 & 2 & 3.77\% & 1.04\% \\
+137 & 20 & 1 & 5.00\% & 0.89\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Representative Misclassifications}
+All 27 hotspot errors were mapped back to their original MNIST images using stable sample identifiers. The original source labels were checked before figure generation. The combined panel below shows one deliberately difficult example from each hotspot, selected as the error with the largest BMU distance within that neuron. Therefore, these examples illustrate difficult cases and should not be interpreted as the typical sample in each neuron.
+
+\resulttablebegin
+\singleimg[0.99\linewidth]{figures/hotspots/week5_hotspot_representatives.pdf} &
+\textbf{One representative error from each hotspot} -- The nine examples expose several visually ambiguous digit shapes. Examples include 4$\rightarrow$9 in neuron 22, 9$\rightarrow$1 in neuron 67, 7$\rightarrow$5 in neuron 73, 7$\rightarrow$2 in neuron 86, 9$\rightarrow$7 in neuron 101, 5$\rightarrow$0 in neuron 137, 5$\rightarrow$8 in neuron 139, 7$\rightarrow$1 in neuron 145, and 8$\rightarrow$3 in neuron 220. The concentration of recognizable but atypical shapes supports the interpretation that some SOM regions contain systematically difficult representations. \\
+\hline
+\resulttableend
+
+\section{Neuron-Specific Hotspot Examples}
+Each row below shows the full representative sample panel generated for one detected hotspot. These panels provide the image-level evidence behind the aggregate hotspot statistics.
+
+\resulttablebegin
+\singleimg{figures/hotspots/hotspot_neuron_022.pdf} &
+\textbf{Neuron 22} -- Support 44 with 3 validation errors (6.82\%). The panel shows the actual misclassified samples mapped to this hotspot, allowing the local error statistics to be inspected at the image level. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_067.pdf} &
+\textbf{Neuron 67} -- This is the strongest detected hotspot: 35 samples, 6 errors, and a 17.14\% local error rate. Its Wilson lower bound remains far above the global validation error rate. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_073.pdf} &
+\textbf{Neuron 73} -- Support 45 with 3 errors (6.67\%). The displayed samples provide a direct view of the handwriting forms associated with this elevated-error region. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_086.pdf} &
+\textbf{Neuron 86} -- Support 27 with 4 errors (14.81\%), the second-highest local error rate among the detected hotspots. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_101.pdf} &
+\textbf{Neuron 101} -- Support 40 with 2 errors (5.00\%). This neuron meets the support-aware criterion even though its absolute error count is modest. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_137.pdf} &
+\textbf{Neuron 137} -- Support 20 with 1 error (5.00\%). This neuron lies exactly at the minimum support threshold and illustrates why the Wilson criterion is used together with raw error rate. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_139.pdf} &
+\textbf{Neuron 139} -- Support 53 with 2 errors (3.77\%). Despite a lower raw rate than the strongest hotspots, its confidence-adjusted lower bound remains above the global validation error rate. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_145.pdf} &
+\textbf{Neuron 145} -- Support 33 with 3 errors (9.09\%). The hotspot includes high-confidence mistakes, showing that difficult SOM regions are not limited to low-confidence classifier outputs. \\
+\hline
+\singleimg{figures/hotspots/hotspot_neuron_220.pdf} &
+\textbf{Neuron 220} -- Support 69 with 3 errors (4.35\%). This is the largest-support hotspot and its misclassified examples show that error concentration can persist even in relatively well-populated neurons. \\
+\hline
+\resulttableend
+
+\section{Confusion Geography}
+The most frequent validation confusion pairs were 5$\rightarrow$0, 9$\rightarrow$4, and 4$\rightarrow$9, each with six errors overall, followed by 9$\rightarrow$8 and 5$\rightarrow$3 with five errors each. Hotspot localization adds an important spatial dimension: all four observed 9$\rightarrow$7 errors occur inside detected hotspot neurons, while three of six 4$\rightarrow$9 errors and three of five 5$\rightarrow$3 errors occur inside hotspots. This indicates that some confusion types are substantially more concentrated in SOM space than others.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|r|r|}
+\hline
+\rowcolor{TableHeader}
+\textcolor{white}{\textbf{True}} & \textcolor{white}{\textbf{Predicted}} & \textcolor{white}{\textbf{Validation Errors}} & \textcolor{white}{\textbf{In Hotspots}} \\
+\hline
+5 & 0 & 6 & 1 \\
+9 & 4 & 6 & 2 \\
+4 & 9 & 6 & 3 \\
+9 & 8 & 5 & 1 \\
+5 & 3 & 5 & 3 \\
+2 & 7 & 4 & 1 \\
+9 & 7 & 4 & 4 \\
+1 & 7 & 3 & 2 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Interpretation and Leakage Control}
+The results show that validation errors are not uniformly distributed across the SOM. Under the predefined development rule, 9 of 225 neurons contain 27 of the 92 validation errors. This concentration supports the capstone hypothesis that SOM topology can expose structured failure geography that is not visible in a single global accuracy value.
+
+The hotspot criterion remains descriptive and development-stage. It does not establish statistical significance, causality, out-of-distribution detection performance, or improvement from SOM-guided retraining. The hotspot rule was developed and applied using validation data only. The held-out test split remains untouched and should only be used after the criterion and downstream evaluation procedure are frozen.
+
+\section{Conclusion}
+Week 5 localized classifier failures within the representation geometry established by the frozen SOM. Although the global validation error rate is only 0.876\%, a small subset of nine neurons captures 29.35\% of all validation mistakes. Neuron 67 is the strongest concentration, with six errors among 35 samples and a local error rate of 17.14\%. The representative-image panels further show that these hotspots contain difficult or ambiguous handwriting patterns, connecting neuron-level statistics back to concrete input examples.
+
+This analysis moves the project beyond aggregate accuracy toward structured diagnosis of where and how the classifier fails. The next phase can use these frozen development findings to study novelty scoring, boundary behavior, or carefully controlled retraining strategies without using the held-out test split for model-development decisions.
+
+\begin{thebibliography}{9}
+\bibitem[LeCun et~al.(1998)]{lecun1998gradient}
+Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner.
+\newblock Gradient-based learning applied to document recognition.
+\newblock \emph{Proceedings of the IEEE}, 86(11):2278--2324, 1998.
+
+\bibitem[Kohonen(1990)]{kohonen1990som}
+T. Kohonen.
+\newblock The self-organizing map.
+\newblock \emph{Proceedings of the IEEE}, 78(9):1464--1480, 1990.
+
+\bibitem[Vesanto and Alhoniemi(2000)]{vesanto2000clustering}
+J. Vesanto and E. Alhoniemi.
+\newblock Clustering of the self-organizing map.
+\newblock \emph{IEEE Transactions on Neural Networks}, 11(3):586--600, 2000.
+
+\bibitem[Jafari(n.d.)]{jafari_nnsom}
+A. Jafari.
+\newblock NNSOM: Neural Network Self-Organizing Maps in Python.
+\newblock The George Washington University. \url{https://amir-jafari.github.io/SOM/}.
+\end{thebibliography}
+
+\end{document}
