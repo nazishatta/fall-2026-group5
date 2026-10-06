@@ -202,6 +202,44 @@ After completion, record:
 - any metric disagreement;
 - reproducibility status.
 
+### Recorded outcome (written 2026-10-06)
+
+The rules above are unchanged. This record was written after the events below, and states them as they happened.
+
+**1. Result of this protocol (2026-09-15, commit a4c4b0f).**
+Applying the rank-sum rule selected **20x20**. Original table (from the deleted `docs/week_3/SOM_GRID_SELECTION_RESULT.md`, restored from git):
+
+| Grid | Validation QE | QE rank | Validation TE1 (%) | TE1 rank | Validation TE1+2 (%) | TE1+2 rank | Validation occupancy | Rank sum |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10x10 | 1.342208 | 3 | 7.4381 | 2 | 1.1905 | 1 | 0.9900 | 6 |
+| 15x15 | 1.132639 | 2 | 9.2476 | 3 | 1.6095 | 3 | 0.8889 | 8 |
+| 20x20 | 0.968939 | 1 | 5.5333 | 1 | 1.3810 | 2 | 0.8150 | **4** |
+
+**2. The candidate runs were overwritten.**
+Later the same day (commit ed8c4a8), the three candidate runs were retrained under the **same run IDs** with the batch-SOM trainer, replacing the artifacts behind the table above. This broke the rule "existing scientific artifacts must never be silently overwritten". On the surviving files the same rule selects **10x10**:
+
+| Grid | Validation QE | Validation TE1 (%) | Validation TE1+2 (%) | Validation occupancy | Rank sum |
+|---|---:|---:|---:|---:|---:|
+| 10x10 | 1.193277 | 4.8762 | 2.1619 | 1.0000 | **5** |
+| 15x15 | 1.047913 | 7.5238 | 4.8000 | 0.9956 | 6 |
+| 20x20 | 0.955526 | 8.9619 | 6.6762 | 0.9925 | 7 |
+
+The surviving 20x20 model's SHA-256 (`d3bf26cc...bb6c`) does not match the hash recorded when 20x20 was selected (`528bb5e1...c576`). We report both tables rather than choose between them after the fact.
+
+**3. 15x15 is used as the instructor-requested experiment.**
+In the 2026-09-15 working session the instructor asked the team to use a 15x15 SOM as an experiment; the instructor confirmed this on issue #3 (2026-10-04). Commit 18b5ae8 (2026-09-21) switched the analysis to 15x15 but did not record the reason, deleted the result document above, and removed the model hash check. These are listed in `DEVIATIONS.md`.
+
+**4. Pre-registered check that 15x15 does not disadvantage the analysis.**
+A new comparison was pre-registered before any run (`PREREGISTRATION_grid_comparison.md`, commit abef97d) and run with an equal tuning budget for every grid (results: `GRID_COMPARISON_RESULTS.md`, commit cb48b99). Each map's cells were used to predict which held-out validation images the CNN gets wrong:
+20x20 AUROC 0.630 vs 15x15 0.629; difference +0.001, 95% interval -0.100 to +0.089 (**inconclusive**; with 92 validation errors, differences below about 0.1 cannot be resolved).
+20x20 gave lower quantization error and purer cells; 15x15 gave lower topological error. Neither predicted CNN errors better.
+
+**5. Grids used for reporting.**
+- **Headline results (RQ1, RQ2): 15x15** (init_neighborhood 11, 250 epochs), the instructor-requested configuration.
+- **Robustness check: 20x20** (init_neighborhood 15, 250 epochs), the grid originally selected by this protocol. RQ2 is repeated on it and we state whether the conclusion holds.
+
+Reproducibility: results above use seed 42 for the protocol tables and 10 bootstrap-resampled maps per grid for the pre-registered comparison. All new runs use new run IDs with model SHA-256 recorded in a run manifest.
+
 ---
 
 ## Scientific Integrity Rule
