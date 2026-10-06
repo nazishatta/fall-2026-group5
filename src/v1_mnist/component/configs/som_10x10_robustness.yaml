@@ -27,11 +27,11 @@ paths:
   analysis_dir: "./outputs/v1_mnist/som/analysis"
 
 # ==============================================================================
-# SOM configuration: 15x15 (headline model, instructor-requested)
+# SOM configuration: 10x10 (robustness: grid the frozen rule selects on the surviving files)
 # Settings from the pre-registered equal-budget comparison
 # (docs/som/PREREGISTRATION_grid_comparison.md): each grid tried
-# init_neighborhood at 0.20 / 0.47 / 0.73 x side, 250 epochs; 11 was chosen
-# for 15x15 by the within-grid rank sum (validation features only).
+# init_neighborhood at 0.20 / 0.47 / 0.73 x side, 250 epochs; 7 was chosen
+# for 10x10 by the within-grid rank sum (validation features only).
 # ==============================================================================
 
 # Frozen LeNet-5 embeddings used by the grid study and the pre-registered
@@ -41,9 +41,9 @@ expected_inputs:
   val_features_sha256: "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
 
 som:
-  grid_height: 15
-  grid_width: 15
-  init_neighborhood: 11
+  grid_height: 10
+  grid_width: 10
+  init_neighborhood: 7
   epochs: 250
   steps: 250
   backend: auto
@@ -67,7 +67,7 @@ analysis:
   purity_metric: majority_vote
 
 visualization:
-  selected_model: "som_15x15_nb11_ep250_s42_v2"
+  selected_model: "som_10x10_nb7_ep250_s42_v2"
 
   # Use validation labels for class-distribution maps so the visualization
   # reflects generalization rather than only training assignments.
