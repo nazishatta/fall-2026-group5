@@ -100,3 +100,12 @@ Kept in the working folder `Codes/mnist_codes/week_7_codes_local/grid_comparison
 
 Reproduce: `python train_run.py tune ...` (Stage 1, see `stage1.txt`), `python choose.py`, `python train_run.py boot ...` (Stage 2, see `stage2.txt`), `python analyze.py`, `python figure.py`.
 Before running, change the embeddings path at the top of `evaluate.py` to your copy.
+
+---
+
+## Note added 2026-10-06 (after the official models were trained)
+
+The official models were retrained through the project pipeline (`train_som.py`) on EC2 under new run IDs (`*_v2`).
+- 15x15 (nb 11) and 10x10 (nb 7) reproduce this comparison's Stage 1 runs exactly.
+- 20x20 (nb 15) differs slightly: pipeline val QE 0.969655, TE1 6.2762% vs 0.967245, 6.3905% here. An independent rerun of the pipeline gave the same 0.969655, so the pipeline value is the reference. The fast re-implementation used in this comparison drifts slightly from the pipeline on the 20x20 grid (small floating-point differences that grow over 250 epochs); it is exact on 15x15 and 10x10.
+- This does not change the comparison: the pre-registration specified the fast trainer for every run, and all grids were trained with it. The Stage 1 choice of nb 15 for 20x20 was made under those pre-registered rules and stands.
