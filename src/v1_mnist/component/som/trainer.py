@@ -1,11 +1,15 @@
 """Training helpers for Week 3 NNSOM experiments.
 
-The standard ``train_som`` wrapper delegates training to NNSOM unchanged.
+``train_som`` delegates training to NNSOM's native ``som.train``.
+NOTE: NNSOM 1.8.x picks winners from the *initial* weights in every epoch,
+because ``sim_som`` reads ``self.w``, which is only updated after the last
+epoch.
 
-``train_som_with_history`` mirrors the NumPy batch-training loop used by
-NNSOM 1.8.x, while recording NNSOM-style quantization error after each epoch.
-It exists because NNSOM's public ``train`` method does not expose an
-epoch callback/history object.
+``train_som_with_history`` is a standard batch SOM: it recomputes winners
+from the updated weights every epoch and records NNSOM-style quantization
+error after each epoch. It matches NNSOM after epoch 1 and intentionally
+differs afterwards. It is the implementation used for the final saved model
+when ``som.track_qe_history`` is true (as in som.yaml).
 """
 
 from __future__ import annotations
@@ -206,13 +210,13 @@ def train_som_with_history(
     seed: int,
     history_every: int = 1,
 ) -> tuple[Any, TrainingHistory]:
-    """Optional CPU diagnostic for epoch-wise QE history.
+    """Standard batch SOM with epoch-wise QE history (CPU, NumPy).
 
-    This function mirrors the NumPy NNSOM batch-training loop in order
-    to record epoch-wise quantization error.
-
-    It is not used for the main saved SOM. The main pipeline uses
-    NNSOM's native SOM / SOMGpu / SOMPlots training implementation.
+    Winners are recomputed from the updated weights at every epoch. This
+    matches NNSOM's ``som.train`` after epoch 1 but intentionally differs
+    afterwards, because NNSOM 1.8.x computes winners from the initial weights
+    for all epochs. Used for the final saved SOM when
+    ``som.track_qe_history`` is true.
     """
 
     if epochs <= 0:

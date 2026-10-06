@@ -360,7 +360,16 @@ def train_som_pipeline(
             "epochs": epochs,
             "steps": steps,
             "requested_backend": requested_backend,
-            "actual_backend": actual_backend,
+            "actual_backend": (
+                f"cpu (NumPy loop; NNSOM class: {actual_backend})"
+                if track_history
+                else actual_backend
+            ),
+            "training_implementation": (
+                "train_som_with_history: NumPy batch SOM, winners recomputed every epoch"
+                if track_history
+                else "NNSOM native som.train (winners from initial weights)"
+            ),
             "random_seed": seed,
             "track_qe_history": track_history,
             "qe_history_every": history_every,
