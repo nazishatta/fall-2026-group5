@@ -236,7 +236,7 @@ A new comparison was pre-registered before any run (`PREREGISTRATION_grid_compar
 
 **5. Grids used for reporting.**
 - **Headline results (RQ1, RQ2): 15x15** (init_neighborhood 11, 250 epochs), the instructor-requested configuration.
-- **Robustness check: 20x20** (init_neighborhood 15, 250 epochs), the grid originally selected by this protocol. RQ2 is repeated on it and we state whether the conclusion holds.
+- **Robustness checks: 20x20** (init_neighborhood 15, 250 epochs), the grid originally selected by this protocol, **and 10x10** (init_neighborhood 7, 250 epochs), the grid the rule selects on the surviving files. Together with 15x15 these complete the original 10x10 / 15x15 / 20x20 ablation. RQ2 is repeated on both, and we state whether the conclusion holds on each.
 
 Reproducibility: results above use seed 42 for the protocol tables and 10 bootstrap-resampled maps per grid for the pre-registered comparison. All new runs use new run IDs with model SHA-256 recorded in a run manifest.
 
