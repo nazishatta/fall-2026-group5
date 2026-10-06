@@ -70,6 +70,13 @@ classification head (`fc3`). It has the following properties:
 - **Standard**: the 84-dim fc2 embedding is the de-facto MNIST feature vector used in
   post-training analysis research.
 
+**Pre-ReLU embedding.** The forward hook captures the output of the `fc2` linear layer,
+i.e. *before* the ReLU that `LeNet5.forward()` applies after `fc2`. The stored 84-dim
+embeddings can therefore contain negative values, and they are not exactly the activations
+that `fc3` receives (those are the post-ReLU values). We keep the pre-ReLU output on purpose
+so that units the ReLU would zero out still vary across samples. This choice should be
+stated in the paper's Methods section.
+
 Extracting it with a _forward hook_ (rather than modifying `forward()`) means the model
 code is not touched during inference — a clean separation of concerns.
 
