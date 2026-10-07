@@ -9,8 +9,8 @@
 
 A model can post strong average accuracy while hiding structured weaknesses. Existing
 interpretability tools — saliency maps, SHAP, LIME — explain one prediction at a time.
-They answer *which pixels mattered for this sample*, not *where in the representation do
-this model's failures concentrate*. That population-level view is what determines whether
+They answer _which pixels mattered for this sample_, not _where in the representation do
+this model's failures concentrate_. That population-level view is what determines whether
 a model is safe to deploy, and it is what this project tries to recover.
 
 ## Central research hypothesis
@@ -33,14 +33,14 @@ unsupported by evidence will be reported as unsupported.
 
 ## Research questions
 
-| | Question | Primary output |
-|---|---|---|
-| **RQ1** | What does the latent feature space look like under a topology-preserving projection? | Cluster structure, class overlap, density maps |
-| **RQ2** | Do misclassifications occupy identifiable regions of the representation? | Error hotspot statistics + representative samples |
-| **RQ3** | Can SOM-derived measures identify out-of-distribution observations? | AUROC / AUPR / FPR@95TPR |
-| **RQ4** | How does SOM novelty detection compare with established baselines? | Isolation Forest, One-Class SVM, autoencoder |
-| **RQ5** | Can SOM-derived error regions identify samples worth targeting in retraining? | Guided vs. **random-selection control** |
-| **RQ6** | After intervention, is the representation measurably better structured? | Before/after representation metrics |
+|         | Question                                                                             | Primary output                                    |
+| ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| **RQ1** | What does the latent feature space look like under a topology-preserving projection? | Cluster structure, class overlap, density maps    |
+| **RQ2** | Do misclassifications occupy identifiable regions of the representation?             | Error hotspot statistics + representative samples |
+| **RQ3** | Can SOM-derived measures identify out-of-distribution observations?                  | AUROC / AUPR / FPR@95TPR                          |
+| **RQ4** | How does SOM novelty detection compare with established baselines?                   | Isolation Forest, One-Class SVM, autoencoder      |
+| **RQ5** | Can SOM-derived error regions identify samples worth targeting in retraining?        | Guided vs. **random-selection control**           |
+| **RQ6** | After intervention, is the representation measurably better structured?              | Before/after representation metrics               |
 
 Success criteria for each RQ are fixed **before** the test set is examined
 (to be written in `reports/`, see the proposal).
@@ -56,9 +56,14 @@ Success criteria for each RQ are fixed **before** the test set is examined
 | Embedding dimension | 84 (fc2 layer)           |
 | Train / Val / Test  | 49,000 / 10,500 / 10,500 |
 
-A 15x15 SOM has been trained on the fc2 embeddings (run `som_15x15_seed42_final`).
-Results for RQ2-RQ6 (error geography, OOD detection, SOM-guided retraining) are
-`[TBD]` until the experiments are run. Nothing is reported before it is measured.
+A 15x15 SOM has been trained on the fc2 embeddings (official model `som_15x15_nb11_ep250_s42_v2`).
+Why 15x15, and how the grid choice was checked: [`src/v1_mnist/docs/som/README.md`](src/v1_mnist/docs/som/README.md).
+
+**RQ2 (error geography):** CNN errors concentrate in a few hotspot cells (about 11 times their share of images)
+and in cells where digit classes mix. Both findings also hold on 10x10 and 20x20 SOMs
+([`RQ2_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/som/RQ2_ROBUSTNESS_RESULTS.md)).
+Results for RQ3-RQ6 (OOD detection, SOM-guided retraining) are `[TBD]` until the experiments are run.
+Nothing is reported before it is measured.
 
 Details: [`reports/Markdown_Report/v1_mnist/cnn_baseline_results.md`](reports/Markdown_Report/v1_mnist/cnn_baseline_results.md),
 [`reports/Markdown_Report/v1_mnist/som_15x15_visualizations.md`](reports/Markdown_Report/v1_mnist/som_15x15_visualizations.md)
@@ -112,12 +117,14 @@ Run from the project root.
 # Run the test suite
 python -m pytest src/v1_mnist/tests -q
 
-# Run all six stages (data -> baseline -> embeddings -> SOM -> figures -> interactive report)
-python src/v1_mnist/component/pipeline/runner.py --stage all --run-id som_15x15_seed42_final
+# Make the figures and interactive report for the official 15x15 SOM
+python src/v1_mnist/component/pipeline/visualize_som.py
+python src/v1_mnist/component/pipeline/visualize_som_interactive.py
 ```
 
-To run one stage, use for example `--stage train_som`. Stage order and options are in
-[`src/v1_mnist/component/pipeline/README.md`](src/v1_mnist/component/pipeline/README.md).
+Do not run `runner.py --stage all` (or `runner.py` with no `--stage`): it reruns the data,
+CNN and embedding stages, which would replace the frozen embeddings and change every result.
+Which scripts to run, and which not to: [`src/v1_mnist/component/pipeline/README.md`](src/v1_mnist/component/pipeline/README.md).
 
 ## Reproduction
 
@@ -142,8 +149,8 @@ PyTorch, [NNSOM](https://amir-jafari.github.io/SOM/), scikit-learn, NumPy, Matpl
 
 ## Team
 
-- **Fyrooz Khan** - CNN baseline, NNSOM training and visualization
-- **Nazish Atta** - project setup, documentation and cluster analysis
+- **Fyrooz Khan** - Project set up, CNN baseline, NNSOM training and visualization, documentation
+- **Nazish Atta** - NNSOM training, cluster analysis, error analysis and documentation
 
 Advisor: Dr. Amir Jafari, The George Washington University, Data Science Program.
 Developed as a capstone project in the GWU MS Data Science program.
