@@ -1,0 +1,22 @@
+{
+  "alpha": 0.05,
+  "headline": {
+    "run_id": "som_15x15_nb11_ep250_s42_v2",
+    "claim_a": true,
+    "claim_b": true
+  },
+  "robustness": [
+    {
+      "run_id": "som_20x20_nb15_ep250_s42_v2",
+      "claim_a": true,
+      "claim_b": true,
+      "verdict": "holds"
+    },
+    {
+      "run_id": "som_10x10_nb7_ep250_s42_v2",
+      "claim_a": true,
+      "claim_b": true,
+      "verdict": "holds"
+    }
+  ]
+}
