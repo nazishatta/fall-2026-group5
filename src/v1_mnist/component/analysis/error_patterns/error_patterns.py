@@ -5,30 +5,38 @@ The held-out test split is intentionally excluded.
 
 This module consumes frozen embeddings and previously generated BMU
 assignments. It does not modify or retrain the CNN or SOM.
+
+Reads the Week 4 outputs for the SOM named in a config (default som.yaml):
+outputs/v1_mnist/cluster_analysis/<selected_model>/ (run run_cluster_analysis.py first).
+
+Usage (from the code root):
+  python src/v1_mnist/component/analysis/error_patterns/error_patterns.py [--config CONFIG]
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 
+REPO_ROOT = Path(__file__).resolve().parents[5]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from src.v1_mnist.component.analysis.io import load_split
+from src.v1_mnist.component.analysis.run_settings import (
+    DEFAULT_CONFIG,
+    cluster_output_dir,
+    load_rq_settings,
+    verify_selected_model,
+)
 from src.v1_mnist.component.utils.logging import get_logger
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-
-EMBEDDINGS_DIR = (
-    REPO_ROOT / "outputs/v1_mnist/cnn_baseline/embeddings/mnist"
-)
-
-CLUSTER_DIR = REPO_ROOT / "outputs/v1_mnist/cluster_analysis"
-TABLES_DIR = CLUSTER_DIR / "tables"
-
-NUM_NEURONS = 225
 NUM_CLASSES = 10
 
 # Development-stage hotspot definition.
@@ -74,6 +82,7 @@ def build_error_rows(
     confidence: np.ndarray,
     bmu: np.ndarray,
     distance: np.ndarray,
+    num_neurons: int,
 ) -> list[dict]:
     """Calculate error-geography statistics for every SOM neuron."""
 
@@ -81,7 +90,7 @@ def build_error_rows(
 
     global_error_rate = float(np.mean(~correct))
 
-    for neuron_id in range(NUM_NEURONS):
+    for neuron_id in range(num_neurons):
         idx = np.flatnonzero(bmu == neuron_id)
         support = int(idx.size)
 
@@ -206,10 +215,32 @@ def confusion_pairs(
 
 
 def main() -> None:
-    arrays = load_split("val", embeddings_dir=EMBEDDINGS_DIR)
+    parser = argparse.ArgumentParser(description="Week 5 SOM error-geography analysis.")
+    parser.add_argument("--config", default=DEFAULT_CONFIG,
+                        help="SOM config naming the grid and selected model.")
+    args = parser.parse_args()
 
-    bmu = np.load(CLUSTER_DIR / "val_bmu.npy")
-    distance = np.load(CLUSTER_DIR / "val_bmu_distance.npy")
+    settings = load_rq_settings(args.config, REPO_ROOT)
+    model_hash = verify_selected_model(settings)
+    cluster_dir = cluster_output_dir(REPO_ROOT, settings.selected_model)
+    tables_dir = cluster_dir / "tables"
+
+    summary_path = cluster_dir / "cluster_summary.json"
+    if not summary_path.is_file():
+        raise FileNotFoundError(
+            f"{summary_path} not found: run run_cluster_analysis.py with the same config first."
+        )
+    week4 = json.loads(summary_path.read_text(encoding="utf-8"))
+    if week4.get("model_sha256") != model_hash:
+        raise RuntimeError(
+            f"Week 4 outputs in {cluster_dir} were made from a different model "
+            f"({week4.get('model_sha256')}) than {settings.selected_model} ({model_hash})."
+        )
+
+    arrays = load_split("val", embeddings_dir=settings.embeddings_dir)
+
+    bmu = np.load(cluster_dir / "val_bmu.npy")
+    distance = np.load(cluster_dir / "val_bmu_distance.npy")
 
     n = len(arrays["labels"])
 
@@ -223,9 +254,10 @@ def main() -> None:
         confidence=arrays["confidence"],
         bmu=bmu,
         distance=distance,
+        num_neurons=settings.num_neurons,
     )
 
-    write_rows(TABLES_DIR / "val_error_geography.csv", rows)
+    write_rows(tables_dir / "val_error_geography.csv", rows)
 
     hotspot_rows = [row for row in rows if row["hotspot"]]
 
@@ -239,7 +271,7 @@ def main() -> None:
     )
 
     if hotspot_rows:
-        write_rows(TABLES_DIR / "val_hotspots.csv", hotspot_rows)
+        write_rows(tables_dir / "val_hotspots.csv", hotspot_rows)
 
     hotspot_neurons = {
         int(row["neuron_id"])
@@ -256,7 +288,7 @@ def main() -> None:
 
     if pair_rows:
         write_rows(
-            TABLES_DIR / "val_confusion_pairs.csv",
+            tables_dir / "val_confusion_pairs.csv",
             pair_rows,
         )
 
@@ -282,7 +314,7 @@ def main() -> None:
 
     if sample_rows:
         write_rows(
-            TABLES_DIR / "val_misclassified_samples.csv",
+            tables_dir / "val_misclassified_samples.csv",
             sample_rows,
         )
 
@@ -296,6 +328,9 @@ def main() -> None:
 
     summary = {
         "analysis": "week5_error_geography",
+        "som": settings.selected_model,
+        "model_sha256": model_hash,
+        "som_grid": [settings.grid_height, settings.grid_width],
         "development_split": "val",
         "test_used": False,
         "validation_samples": n,
@@ -315,7 +350,7 @@ def main() -> None:
         ),
     }
 
-    with (CLUSTER_DIR / "error_summary.json").open(
+    with (cluster_dir / "error_summary.json").open(
         "w",
         encoding="utf-8",
     ) as handle:

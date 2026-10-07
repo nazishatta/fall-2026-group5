@@ -131,3 +131,14 @@ def verify_inputs(settings: RQSettings, observed: dict[str, str]) -> None:
             raise RuntimeError(
                 f"Embedding check failed for {file_key}: expected {expected}, got {got}."
             )
+
+
+def selected_model_from_config(config_path: str | Path | None, repo_root: Path) -> str:
+    """Run ID of the selected SOM named in a config (no integrity checks)."""
+    config = load_config(str(_resolve(repo_root, config_path or DEFAULT_CONFIG)))
+    return str(config.visualization.selected_model)
+
+
+def cluster_output_dir(repo_root: Path, selected_model: str) -> Path:
+    """Week 4/5 outputs for one SOM: outputs/v1_mnist/cluster_analysis/<run_id>/."""
+    return repo_root / "outputs/v1_mnist/cluster_analysis" / selected_model

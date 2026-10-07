@@ -3,26 +3,36 @@
 from __future__ import annotations
 
 import json
+import argparse
 from pathlib import Path
+import sys
 from typing import Any
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[5]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-METRICS_PATH = (
-    REPO_ROOT
-    / "outputs/v1_mnist/som/logs/"
-    "som_15x15_seed42_final_metrics.json"
+from src.v1_mnist.component.analysis.run_settings import (  # noqa: E402
+    DEFAULT_CONFIG,
+    selected_model_from_config,
 )
 
-OUTPUT_PATH = (
-    REPO_ROOT
-    / "demo/fig/v1_mnist/som_interactive_plots/"
-    "som_train_validation_quality.html"
-)
+# Set in configure() from the SOM config (default: the 15x15 headline model).
+METRICS_PATH: Path = Path()
+OUTPUT_PATH: Path = Path()
+OUTPUT_NAME = "som_train_validation_quality.html"
+
+
+def configure(config_path=None) -> None:
+    """Point this script at the selected SOM's metrics."""
+    global METRICS_PATH, OUTPUT_PATH
+    run_id = selected_model_from_config(config_path, REPO_ROOT)
+    METRICS_PATH = REPO_ROOT / "outputs/v1_mnist/som/logs" / f"{run_id}_metrics.json"
+    OUTPUT_PATH = REPO_ROOT / "demo/fig/v1_mnist/som_interactive_plots" / f"{run_id}_{OUTPUT_NAME}"
 
 
 def load_metrics() -> dict[str, Any]:
@@ -182,6 +192,11 @@ def build_quality_figure() -> go.Figure:
 
 def main() -> None:
     """Generate and save the interactive HTML visualization."""
+
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--config", default=DEFAULT_CONFIG,
+                        help="SOM config naming the selected model.")
+    configure(parser.parse_args().config)
 
     OUTPUT_PATH.parent.mkdir(
         parents=True,
