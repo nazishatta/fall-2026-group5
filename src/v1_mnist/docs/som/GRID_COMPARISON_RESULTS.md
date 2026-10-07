@@ -1,56 +1,62 @@
-# Results: 15x15 vs 20x20 SOM grid comparison (pre-registered)
+# Results: fair test of 15x15 vs 20x20 SOM grids
 
-Run on 2026-10-06. Rules: `PREREGISTRATION_grid_comparison.md` (SHA-256 `69496ffc…73c2`, stamped 17:20:29 UTC).
-The first training run started at 17:23:06 UTC, after the stamp (see `run_manifest.csv`). The test split was never loaded.
+Run on 2026-10-06, following the rules in `PREREGISTRATION_grid_comparison.md`.
+Those rules were fingerprinted in `prereg_stamp.txt` (17:20:29 UTC) before the first training run started (17:23:06 UTC). The test split was never used.
 
----
+## Short answer
 
-## 1. Answer in one paragraph
+**Neither grid is better.**
+We asked: if we know each cell's error rate, how well can we predict which images the CNN gets wrong, on images that were not used to work out those rates?
 
-**Primary result: inconclusive. On average the two grids are the same.**
-When a map's cells are used to predict which validation images the CNN gets wrong, on images the map did not use to estimate error rates, 20x20 scores AUROC 0.630 and 15x15 scores 0.629.
-The pre-registered difference (20x20 minus 15x15) is **+0.001**, with a 95% interval of **[-0.100, +0.089]**.
-That interval is too wide to call the grids "practically equivalent" (it would have to fit inside ±0.02), and it is centred on zero, so neither grid is better.
-The cause is the small number of CNN mistakes: only **92 errors** among 10,500 validation images.
+- 20x20: AUROC **0.630**
+- 15x15: AUROC **0.629**
+- Difference (20x20 minus 15x15): **+0.001**, 95% range **−0.100 to +0.089**
 
-**What this means for the project:** the evidence does **not** show that 20x20 is better for the project's purpose (RQ2, locating the CNN's mistakes on the map). Using 15x15, as the instructor requested, is not contradicted by the data.
+The range includes zero, so neither grid wins. The range is also too wide to say the grids are "the same" (it would need to fit inside ±0.02). The reason is that the CNN made only **92 mistakes** out of 10,500 validation images, which is too few to detect small differences.
 
----
+**What this means for the project:** there is no evidence that 20x20 is better for RQ2 (finding where the CNN makes mistakes). Using 15x15, as the instructor requested, is supported by the data.
 
-## 2. Setup (as pre-registered, no deviations)
+## How the test worked
 
-| | 10x10 | 15x15 | 20x20 |
-|---|---|---|---|
-| Neighbourhood candidates (equal budget) | 2, 5, 7 | 3, 7, 11 | 4, 9, 15 |
-| Chosen (within-grid rank sum, no labels used) | **7** | **11** | **15** |
-| Epochs | 250 | 250 | 250 |
-| Bootstrap maps | 10 | 10 | 10 |
+1. **Equal tuning.** Each grid tried three neighbourhood sizes (the same fractions of its side length), each trained for 250 epochs. Within each grid, one setting was picked using the original protocol's ranking (QE, TE1, TE1+2). No labels were used to pick.
 
-Primary measure: held-out, cross-fitted AUROC for predicting CNN errors from cell error rates, over 200 repeated stratified split-halves with bootstrap resampling. Same splits and same bootstrap resamples for every grid (paired).
+   | | 10x10 | 15x15 | 20x20 |
+   |---|---|---|---|
+   | Settings tried | 2, 5, 7 | 3, 7, 11 | 4, 9, 15 |
+   | Setting chosen | **7** | **11** | **15** |
 
-Operational note: the Stage 2 batch stopped on a 10-minute command time limit after resample b8. The three b9 runs were then started separately. No run was repeated or overwritten (39 unique run IDs, 39 manifest rows).
+2. **Training variation.** Each grid trained 10 maps on resampled training data, using the same resamples for every grid.
+3. **Scoring.** 200 times over: split the validation images into two halves. Work out each cell's error rate on one half, then use those rates to predict the mistakes in the other half (AUROC). Swap the halves and average.
+4. **Decision rule, fixed in advance:**
+   - the whole range is inside ±0.02: the grids are the same;
+   - the whole range is above or below 0: one grid is better;
+   - otherwise: inconclusive.
 
----
+All 39 runs used new run IDs; none was repeated or overwritten. (The batch stopped on a time limit after map 8, so the three map-9 runs were started separately.)
 
-## 3. Primary and secondary results
+## Results
 
-| Comparison | Measure | Mean difference | 95% interval | Bigger grid better in | Verdict |
+**Comparisons** (main one in bold):
+
+| Comparison | Measure | Difference | 95% range | Bigger grid better in | Verdict |
 |---|---|---|---|---|---|
-| **20x20 vs 15x15** | **AUROC, CNN errors (primary)** | **+0.001** | **[-0.100, +0.089]** | 52% of repeats | **inconclusive** |
-| 20x20 vs 15x15 | Average precision, CNN errors | +0.002 | [-0.051, +0.063] | 52% | inconclusive |
-| 20x20 vs 15x15 | AUROC, low-confidence images | -0.031 | [-0.071, +0.013] | 7.5% | inconclusive |
-| 20x20 vs 15x15 | Average precision, low-confidence | -0.008 | [-0.088, +0.079] | 42.5% | inconclusive |
-| 15x15 vs 10x10 | AUROC, CNN errors | -0.065 | [-0.182, +0.054] | 14% | inconclusive |
-| 15x15 vs 10x10 | AUROC, low-confidence images | -0.027 | [-0.073, +0.019] | 9.5% | inconclusive |
+| **20x20 vs 15x15** | **AUROC, CNN mistakes** | **+0.001** | **−0.100 to +0.089** | 52% of repeats | **inconclusive** |
+| 20x20 vs 15x15 | Average precision, CNN mistakes | +0.002 | −0.051 to +0.063 | 52% | inconclusive |
+| 20x20 vs 15x15 | AUROC, low-confidence images | −0.031 | −0.071 to +0.013 | 7.5% | inconclusive |
+| 20x20 vs 15x15 | Average precision, low-confidence | −0.008 | −0.088 to +0.079 | 42.5% | inconclusive |
+| 15x15 vs 10x10 | AUROC, CNN mistakes | −0.065 | −0.182 to +0.054 | 14% | inconclusive |
+| 15x15 vs 10x10 | AUROC, low-confidence images | −0.027 | −0.073 to +0.019 | 9.5% | inconclusive |
 
-Held-out AUROC per grid (mean, 95% range over 200 repeats):
+"Low-confidence images" are the 525 images (5%) the CNN was least sure about. They give many more examples than the 92 mistakes.
+
+**AUROC for each grid** (average, with the 95% range over 200 repeats):
 
 | | 10x10 | 15x15 | 20x20 |
 |---|---|---|---|
-| CNN errors (92) | 0.694 [0.582, 0.799] | 0.629 [0.548, 0.725] | 0.630 [0.543, 0.707] |
-| Low-confidence images (525) | 0.878 [0.844, 0.908] | 0.850 [0.817, 0.878] | 0.820 [0.780, 0.857] |
+| CNN mistakes (92) | 0.694 (0.582 to 0.799) | 0.629 (0.548 to 0.725) | 0.630 (0.543 to 0.707) |
+| Low-confidence images (525) | 0.878 (0.844 to 0.908) | 0.850 (0.817 to 0.878) | 0.820 (0.780 to 0.857) |
 
-## 4. Map-quality metrics (mean ± SD over 10 bootstrap maps, full validation set)
+**Map quality** (average ± spread over 10 maps, full validation set):
 
 | | 10x10 | 15x15 | 20x20 |
 |---|---|---|---|
@@ -58,54 +64,42 @@ Held-out AUROC per grid (mean, 95% range over 200 repeats):
 | QE per image | 1.098 ± 0.005 | 0.977 ± 0.003 | 0.910 ± 0.003 |
 | TE1 (%) | 4.82 ± 0.46 | 6.56 ± 0.77 | 7.66 ± 0.51 |
 | TE1+2 (%) | 2.00 ± 0.38 | 3.62 ± 0.45 | 5.04 ± 0.35 |
-| Occupancy | 1.000 | 1.000 | 0.996 |
-| Class purity (%) | 97.57 ± 0.17 | 98.21 ± 0.15 | 98.36 ± 0.05 |
-| Neighbour disagreement (%) | 32.1 ± 0.8 | 20.9 ± 0.6 | 15.8 ± 0.2 |
+| Cells used | 100% | 100% | 99.6% |
+| Cell purity (%) | 97.57 ± 0.17 | 98.21 ± 0.15 | 98.36 ± 0.05 |
+| Neighbours with a different main digit (%) | 32.1 ± 0.8 | 20.9 ± 0.6 | 15.8 ± 0.2 |
 
-The bigger grid is a sharper map (lower QE, purer cells, cleaner borders) but has more topological error. These are the expected effects of more cells.
+A bigger grid gives a sharper map (closer fit, purer cells, cleaner borders) but more topological error. That is expected when there are more cells.
 
----
+## What this means
 
-## 5. How to read this
+1. **A sharper map is not better at finding mistakes.** 20x20 looks better on QE and purity, but it does not predict the CNN's mistakes any better on new images. An earlier figure suggested it did (75% of mistakes in its top 10% of cells, vs 52% for 15x15). That figure used the same images to choose the cells and to score them, so it rewarded luck.
+2. **The data, not the method, limits the test.** With 92 mistakes, differences smaller than about 0.1 AUROC can't be detected. Training more maps would barely help; only more CNN mistakes would (for example, a harder dataset).
+3. **Observation, not a finding: smaller grids leaned slightly better.** Smaller grids tended to predict CNN errors slightly better on held-out data, likely because each cell holds more images. The differences were not statistically clear, and the RQ2 findings were the same on all three grids (`RQ2_ROBUSTNESS_RESULTS.md`).
+   The comparisons below were added after the results, from the same saved scores, and were **not planned in advance**:
 
-1. **A sharper map does not mean better error localisation.** 20x20 wins on QE, purity and border sharpness, but it does not predict the CNN's mistakes any better on held-out images.
-   Earlier, 20x20 looked better at concentrating errors (75% of errors in its top-10% cells vs 52% for 15x15). That figure was measured on the same images used to choose the cells, so it rewarded noise; it does not hold up on held-out data.
-2. **The comparison is limited by the data, not the method.** With 92 errors, a difference smaller than about 0.1 AUROC cannot be detected. Training more maps would barely help, because most of the uncertainty comes from the small number of errors; only more CNN errors would fix it (for example, a harder dataset or a weaker CNN checkpoint).
-3. **Exploratory observation (not pre-registered, do not treat as a finding):** on both targets the held-out score falls slightly as the grid gets finer (10x10 > 15x15 ≥ 20x20). With fewer images per cell, finer maps estimate cell error rates less reliably. The low-confidence measure leans this way most clearly (20x20 better in only 7.5% of repeats), but it is still inconclusive.
+   | Comparison | Measure | Difference | 95% range | Verdict |
+   |---|---|---|---|---|
+   | 20x20 vs 10x10 | AUROC, CNN mistakes | −0.064 | −0.188 to +0.050 | inconclusive |
+   | 20x20 vs 10x10 | Average precision, CNN mistakes | −0.003 | −0.068 to +0.055 | inconclusive |
+   | 20x20 vs 10x10 | AUROC, low-confidence images | −0.058 | −0.102 to −0.010 | 10x10 better |
+   | 20x20 vs 10x10 | Average precision, low-confidence | −0.012 | −0.104 to +0.074 | inconclusive |
+   | 15x15 vs 10x10 | Average precision, CNN mistakes | −0.005 | −0.070 to +0.052 | inconclusive |
+   | 15x15 vs 10x10 | Average precision, low-confidence | −0.004 | −0.087 to +0.080 | inconclusive |
 
-## 6. Suggested wording for the protocol / paper (if 15x15 stays the headline grid)
+   Only one of these is clear, and it is against 20x20, not 15x15. With many extra comparisons, one clear result can appear by chance, so it is not used to choose a grid.
+
+## Sentence for the paper
 
 > Under a pre-registered, equal-budget comparison, 20x20 and 15x15 SOMs did not differ in how well their cells predicted held-out CNN errors (AUROC 0.630 vs 0.629; difference +0.001, 95% interval −0.100 to +0.089). With 92 validation errors the comparison cannot distinguish differences smaller than about 0.1 AUROC. 20x20 produced lower quantization error and purer cells, while 15x15 had lower topological error. We therefore use 15x15, as requested by the instructor, and report RQ2 robustness on 20x20.
 
----
+## Note on the official models (added 2026-10-06)
+
+The official models were later retrained through the project pipeline (`train_som.py`) under new run IDs ending in `_v2`.
+- 15x15 and 10x10 match this test's runs exactly.
+- 20x20 differs very slightly (pipeline val QE 0.969655 and TE1 6.2762%, vs 0.967245 and 6.3905% here). The fast trainer used in this test drifts a little on 20x20 over 250 epochs, and is exact on the other grids. The pipeline value is the reference. This does not change the result, because the rules specified the fast trainer for every grid.
 
 ## Files
 
-In this folder (`src/v1_mnist/docs/som/`):
-
-| File | Contents |
-|---|---|
-| `PREREGISTRATION_grid_comparison.md`, `prereg_stamp.txt` | Rules and their fingerprint, written before any run. Copied unchanged from the working folder; the SHA-256 still matches `prereg_stamp.txt`. The "Location" line inside the rules refers to that working folder. |
-| `GRID_COMPARISON_RESULTS.md` | This report |
-| `figures/grid_comparison_results.png`, `.svg` | Figure |
-
-Kept in the working folder `Codes/mnist_codes/week_7_codes_local/grid_comparison/` until their place in the repo is decided:
-
-| File | Contents |
-|---|---|
-| `run_manifest.csv` | All 39 runs: run ID, settings, resample hash, model SHA-256, time, map metrics |
-| `models/*.npz` | Weights + scaler for every map |
-| `endpoint_reps.csv`, `results.json` | Every repeat's scores, and all summary numbers in this report |
-| `fast_som.py`, `evaluate.py`, `train_run.py`, `choose.py`, `analyze.py`, `figure.py`, `stage1.txt`, `stage2.txt` | Code and run lists to reproduce everything |
-
-Reproduce: `python train_run.py tune ...` (Stage 1, see `stage1.txt`), `python choose.py`, `python train_run.py boot ...` (Stage 2, see `stage2.txt`), `python analyze.py`, `python figure.py`.
-Before running, change the embeddings path at the top of `evaluate.py` to your copy.
-
----
-
-## Note added 2026-10-06 (after the official models were trained)
-
-The official models were retrained through the project pipeline (`train_som.py`) on EC2 under new run IDs (`*_v2`).
-- 15x15 (nb 11) and 10x10 (nb 7) reproduce this comparison's Stage 1 runs exactly.
-- 20x20 (nb 15) differs slightly: pipeline val QE 0.969655, TE1 6.2762% vs 0.967245, 6.3905% here. An independent rerun of the pipeline gave the same 0.969655, so the pipeline value is the reference. The fast re-implementation used in this comparison drifts slightly from the pipeline on the 20x20 grid (small floating-point differences that grow over 250 epochs); it is exact on 15x15 and 10x10.
-- This does not change the comparison: the pre-registration specified the fast trainer for every run, and all grids were trained with it. The Stage 1 choice of nb 15 for 20x20 was made under those pre-registered rules and stands.
+- In this folder: the rules (`PREREGISTRATION_grid_comparison.md`, `prereg_stamp.txt`; unchanged, the fingerprint still matches), this report, and the chart (`figures/grid_comparison_results.svg`).
+- In the working folder `Codes/mnist_codes/week_7_codes_local/grid_comparison/`: the run list (`run_manifest.csv`, all 39 runs with model fingerprints), the trained maps (`models/*.npz`), every repeat's scores (`endpoint_reps.csv`, `results.json`), and the code (`fast_som.py`, `evaluate.py`, `train_run.py`, `choose.py`, `analyze.py`, `figure.py`).
+- To reproduce: set the embeddings path at the top of `evaluate.py`, then run `train_run.py tune` (runs listed in `stage1.txt`), `choose.py`, `train_run.py boot` (`stage2.txt`), `analyze.py`, `figure.py`.

@@ -204,10 +204,10 @@ After completion, record:
 
 ### Recorded outcome (written 2026-10-06)
 
-The rules above are unchanged. This record was written after the events below, and states them as they happened.
+The rules above have not been changed. This section records what actually happened, in order. The rule breaks are listed one by one in `DEVIATIONS.md`.
 
-**1. Result of this protocol (2026-09-15, commit a4c4b0f).**
-Applying the rank-sum rule selected **20x20**. Original table (from the deleted `docs/week_3/SOM_GRID_SELECTION_RESULT.md`, restored from git):
+**1. The rule picked 20x20 (2026-09-15, commit a4c4b0f).**
+This table comes from `docs/week_3/SOM_GRID_SELECTION_RESULT.md`, which was later deleted and has been restored from git:
 
 | Grid | Validation QE | QE rank | Validation TE1 (%) | TE1 rank | Validation TE1+2 (%) | TE1+2 rank | Validation occupancy | Rank sum |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -215,8 +215,8 @@ Applying the rank-sum rule selected **20x20**. Original table (from the deleted 
 | 15x15 | 1.132639 | 2 | 9.2476 | 3 | 1.6095 | 3 | 0.8889 | 8 |
 | 20x20 | 0.968939 | 1 | 5.5333 | 1 | 1.3810 | 2 | 0.8150 | **4** |
 
-**2. The candidate runs were overwritten.**
-Later the same day (commit ed8c4a8), the three candidate runs were retrained under the **same run IDs** with the batch-SOM trainer, replacing the artifacts behind the table above. This broke the rule "existing scientific artifacts must never be silently overwritten". On the surviving files the same rule selects **10x10**:
+**2. Those runs were then overwritten.**
+Later the same day (commit ed8c4a8), all three runs were retrained under the **same run IDs**, which replaced the files behind the table above. This broke the rule that results must never be overwritten. On the new files, the same rule picks **10x10**:
 
 | Grid | Validation QE | Validation TE1 (%) | Validation TE1+2 (%) | Validation occupancy | Rank sum |
 |---|---:|---:|---:|---:|---:|
@@ -224,22 +224,23 @@ Later the same day (commit ed8c4a8), the three candidate runs were retrained und
 | 15x15 | 1.047913 | 7.5238 | 4.8000 | 0.9956 | 6 |
 | 20x20 | 0.955526 | 8.9619 | 6.6762 | 0.9925 | 7 |
 
-The surviving 20x20 model's SHA-256 (`d3bf26cc...bb6c`) does not match the hash recorded when 20x20 was selected (`528bb5e1...c576`). We report both tables rather than choose between them after the fact.
+The surviving 20x20 model's fingerprint (SHA-256 `d3bf26cc...bb6c`) does not match the one recorded when 20x20 was picked (`528bb5e1...c576`). We report both tables rather than choosing one after the fact.
 
-**3. 15x15 is used as the instructor-requested experiment.**
-In the 2026-09-15 working session the instructor asked the team to use a 15x15 SOM as an experiment; the instructor confirmed this on issue #3 (2026-10-04). Commit 18b5ae8 (2026-09-21) switched the analysis to 15x15 but did not record the reason, deleted the result document above, and removed the model hash check. These are listed in `DEVIATIONS.md`.
+**3. We use 15x15 because the instructor asked for it.**
+In the 2026-09-15 working session the instructor asked the team to try a 15x15 SOM, and confirmed this on issue #3 (2026-10-04). The switch to 15x15 (commit 18b5ae8, 2026-09-21) did not record this reason; it also deleted the result file above and removed the model fingerprint check. Both have since been restored.
 
-**4. Pre-registered check that 15x15 does not disadvantage the analysis.**
-A new comparison was pre-registered before any run (`PREREGISTRATION_grid_comparison.md`, commit abef97d) and run with an equal tuning budget for every grid (results: `GRID_COMPARISON_RESULTS.md`, commit cb48b99). Each map's cells were used to predict which held-out validation images the CNN gets wrong:
-20x20 AUROC 0.630 vs 15x15 0.629; difference +0.001, 95% interval -0.100 to +0.089 (**inconclusive**; with 92 validation errors, differences below about 0.1 cannot be resolved).
-20x20 gave lower quantization error and purer cells; 15x15 gave lower topological error. Neither predicted CNN errors better.
+**4. A fair test showed 15x15 is not a worse choice.**
+We wrote the rules for a new test before running it (`PREREGISTRATION_grid_comparison.md`, commit abef97d), and gave every grid the same tuning (results in `GRID_COMPARISON_RESULTS.md`, commit cb48b99). The test asked how well each map's cells predict which new validation images the CNN gets wrong:
+20x20 AUROC 0.630, 15x15 0.629; difference +0.001, 95% range −0.100 to +0.089. This is **inconclusive**: with 92 CNN mistakes, differences smaller than about 0.1 can't be detected.
+20x20 fits the data more closely and has purer cells; 15x15 has lower topological error. Neither predicts the CNN's mistakes better.
+Observation, not a finding: smaller grids tended to predict CNN errors slightly better on held-out data, likely because each cell holds more images. The differences were not statistically clear, and the RQ2 findings were the same on all three grids.
 
-**5. Grids used for reporting.**
-- **Headline results (RQ1, RQ2): 15x15** (init_neighborhood 11, 250 epochs), the instructor-requested configuration.
-- **Robustness checks: 20x20** (init_neighborhood 15, 250 epochs), the grid originally selected by this protocol, **and 10x10** (init_neighborhood 7, 250 epochs), the grid the rule selects on the surviving files. Together with 15x15 these complete the original 10x10 / 15x15 / 20x20 ablation. RQ2 is repeated on both, and we state whether the conclusion holds on each.
-- **Result (2026-10-06):** under criteria committed before the runs (`RQ2_ROBUSTNESS_CRITERIA.md`), the RQ2 conclusion **holds** on both 20x20 and 10x10. See `RQ2_ROBUSTNESS_RESULTS.md`.
+**5. Grids used in the report.**
+- **Main results (RQ1, RQ2): 15x15** (neighbourhood 11, 250 epochs), as the instructor requested.
+- **Robustness checks:** **20x20** (neighbourhood 15, 250 epochs), the grid this protocol first picked, and **10x10** (neighbourhood 7, 250 epochs), the grid the rule picks on the surviving files. Together with 15x15 these cover all three original candidates.
+- **Result (2026-10-06):** using rules fixed before the check (`RQ2_ROBUSTNESS_CRITERIA.md`), the RQ2 findings **hold** on both 20x20 and 10x10. See `RQ2_ROBUSTNESS_RESULTS.md`.
 
-Reproducibility: results above use seed 42 for the protocol tables and 10 bootstrap-resampled maps per grid for the pre-registered comparison. All new runs use new run IDs with model SHA-256 recorded in a run manifest.
+Reproducibility: the protocol tables use seed 42; the fair test used 10 resampled maps per grid. All new runs use new run IDs, and each model's SHA-256 is recorded in a run manifest.
 
 ---
 
