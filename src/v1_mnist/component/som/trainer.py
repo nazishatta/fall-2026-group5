@@ -15,6 +15,7 @@ when ``som.track_qe_history`` is true (as in som.yaml).
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from typing import Any
 
 import numpy as np
 from NNSOM.plots import SOMPlots
@@ -209,7 +210,7 @@ def train_som_with_history(
     norm_func: Any,
     seed: int,
     history_every: int = 1,
-) -> tuple[Any, TrainingHistory]:
+) -> tuple[Any, "SOMTrainingHistory"]:
     """Standard batch SOM with epoch-wise QE history (CPU, NumPy).
 
     Winners are recomputed from the updated weights at every epoch. This
