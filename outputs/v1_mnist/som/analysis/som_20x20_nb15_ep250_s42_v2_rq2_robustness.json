@@ -1,0 +1,47 @@
+{
+  "selected_model": "som_20x20_nb15_ep250_s42_v2",
+  "model_sha256": "d77375b5d2220c8c1d9cda9bdc87e28daeec93ef3ce578321123883d0c03da86",
+  "config": "som_20x20_robustness.yaml",
+  "som_grid": [
+    20,
+    20
+  ],
+  "split": "val",
+  "validation_samples": 10500,
+  "validation_errors": 92,
+  "test_evaluated": false,
+  "testable": true,
+  "secondary_distance": {
+    "mean_bmu_distance_error": 1.2790839766618487,
+    "mean_bmu_distance_correct": 0.8948732292692505,
+    "median_bmu_distance_error": 1.2580726925614427,
+    "median_bmu_distance_correct": 0.8636855846278706
+  },
+  "claim_a_hotspots_held_out": {
+    "n_hotspots": 20,
+    "n_ratios": 200,
+    "median_ratio": 13.391399575556402,
+    "ratio_p2_5": 7.9589525880576755,
+    "ratio_p97_5": 19.272716760575225,
+    "chance_median_ratio": 0.9316847795043472,
+    "chance_p95_ratio": 1.694599693566117,
+    "p_value_vs_chance": 0.004975124378109453
+  },
+  "claim_b_overlap_regions": {
+    "occupied_neurons": 399,
+    "spearman_error_rate_vs_purity": -0.7659134920524729,
+    "p_value_purity_negative": 0.004975124378109453,
+    "spearman_error_rate_vs_entropy": 0.7677921286622243,
+    "p_value_entropy_positive": 0.004975124378109453,
+    "chance_purity_rho_p5": 0.012455001485142928,
+    "chance_entropy_rho_p95": -0.01232734418703093
+  },
+  "settings": {
+    "n_splits": 100,
+    "n_permutations": 200,
+    "hotspot_fraction": 0.05,
+    "min_hotspots": 5,
+    "split_seed_base": 7000,
+    "perm_seed_base": 9000
+  }
+}

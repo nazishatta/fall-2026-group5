@@ -12,7 +12,7 @@ This directory contains the core source code, pipelines, and tests for the MNIST
   - `visualization/`: Training curves and confusion heatmap plotting
   - `som/`: NNSOM trainer, dataset adapters, and memory-safe initialization
   - `analysis/`: SOM grid selection protocol and BMU/quantization analysis
-  - `pipeline/`: Sequentially executable CLI pipelines (`01_prepare_data.py` through `05_visualize_som.py`)
+  - `pipeline/`: Sequentially executable CLI pipelines (`prepare_data.py`, `train_baseline.py`, `extract_embeddings.py`, `train_som.py`, `visualize_som.py`, `visualize_som_interactive.py`, plus `runner.py`)
   - `configs/`: YAML configurations (`base.yaml`, `cnn_baseline.yaml`, `som.yaml`)
   - `utils/`: Configuration loader and output path resolver
 - **`tests/`**: Unit and regression tests

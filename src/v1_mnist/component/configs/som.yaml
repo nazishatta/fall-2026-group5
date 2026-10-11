@@ -13,7 +13,11 @@ run:
 
 # Keep SOM artifacts together and predictable.
 paths:
-  embeddings_dir: "./outputs/v1_mnist/cnn_baseline/embeddings/mnist"
+  # Frozen LeNet-5 embeddings, inside this code folder (on EC2:
+  # ~/Capstone/Codes/week_7_codes/outputs/v1_mnist/cnn_baseline/embeddings).
+  # train_som.py stops if this folder is missing instead of falling back to another copy.
+  embeddings_dir: "./outputs/v1_mnist/cnn_baseline/embeddings"
+  strict_embeddings_dir: true
 
   output_dir: "./outputs/v1_mnist/som"
   som_models_dir: "./outputs/v1_mnist/som/som_models"
@@ -23,8 +27,18 @@ paths:
   analysis_dir: "./outputs/v1_mnist/som/analysis"
 
 # ==============================================================================
-# SOM Milestone Configuration (15x15 Tuned)
+# SOM configuration: 15x15 (headline model, instructor-requested)
+# Settings from the pre-registered equal-budget comparison
+# (docs/som/PREREGISTRATION_grid_comparison.md): each grid tried
+# init_neighborhood at 0.20 / 0.47 / 0.73 x side, 250 epochs; 11 was chosen
+# for 15x15 by the within-grid rank sum (validation features only).
 # ==============================================================================
+
+# Frozen LeNet-5 embeddings used by the grid study and the pre-registered
+# grid comparison. train_som.py refuses to run if the files differ.
+expected_inputs:
+  train_features_sha256: "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65"
+  val_features_sha256: "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
 
 som:
   grid_height: 15
@@ -53,7 +67,7 @@ analysis:
   purity_metric: majority_vote
 
 visualization:
-  selected_model: "som_15x15_seed42_final"
+  selected_model: "som_15x15_nb11_ep250_s42_v2"
 
   # Use validation labels for class-distribution maps so the visualization
   # reflects generalization rather than only training assignments.

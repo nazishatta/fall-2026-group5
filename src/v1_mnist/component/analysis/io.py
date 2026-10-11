@@ -135,7 +135,7 @@ def load_selected_som(
     """Load and validate the trained SOM model.
 
     Args:
-        model_path: Optional path to pickled SOM model file.
+        model_path: Path to the pickled SOM model file (required).
         grid_height: Height of the SOM grid.
         grid_width: Width of the SOM grid.
 
@@ -143,14 +143,11 @@ def load_selected_som(
         Loaded SOMPlots model object.
     """
     if model_path is None:
-        repo_root = Path(__file__).resolve().parents[4]
-        m_path = (
-            repo_root
-            / "outputs/v1_mnist/som/som_models"
-            / "som_15x15_seed42_final"
+        raise ValueError(
+            "model_path is required; take it from the SOM config "
+            "(see analysis/run_settings.py)."
         )
-    else:
-        m_path = Path(model_path)
+    m_path = Path(model_path)
 
     if not m_path.is_file():
         raise FileNotFoundError(f"SOM model file not found: {m_path}")

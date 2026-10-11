@@ -14,7 +14,7 @@ Usage (from the repo root):
     python src/v1_mnist/component/pipeline/visualize_som_interactive.py
     python src/v1_mnist/component/pipeline/visualize_som_interactive.py \
         --config src/v1_mnist/component/configs/som.yaml \
-        --model-name som_15x15_seed42_final --split val
+        --model-name som_15x15_nb11_ep250_s42_v2 --split val
 
 Uses train + validation only; the test split is never touched.
 """

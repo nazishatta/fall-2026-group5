@@ -11,9 +11,6 @@ import numpy as np
 
 from src.v1_mnist.component.analysis.io import (
     FEATURE_DIM,
-    GRID_HEIGHT,
-    GRID_WIDTH,
-    NUM_NEURONS,
     SPLIT_FILES,
     json_float,
     load_selected_som,
@@ -36,7 +33,11 @@ from src.v1_mnist.component.analysis.plotting import (
     matrix_from_neuron_values,
     save_heatmap,
 )
-from src.v1_mnist.component.som.data import resolve_embeddings_dir
+from src.v1_mnist.component.analysis.run_settings import (
+    load_rq_settings,
+    verify_inputs,
+    verify_selected_model,
+)
 from src.v1_mnist.component.utils.logging import get_logger
 
 logger = get_logger("v1_mnist.analysis.rq1")
@@ -186,6 +187,7 @@ def run_rq1_analysis(
     output_dir: Optional[Path | str] = None,
     overwrite: bool = False,
     repo_root: Optional[Path] = None,
+    config_path: Optional[Path | str] = None,
 ) -> dict[str, Any]:
     """Execute the full frozen development-stage RQ1/RQ2 analysis pipeline.
 
@@ -193,6 +195,9 @@ def run_rq1_analysis(
         output_dir: Destination directory for analysis output.
         overwrite: Whether to overwrite existing analysis results.
         repo_root: Optional project repository root path.
+        config_path: SOM config naming the grid and the selected model
+            (default: configs/som.yaml, the 15x15 headline model; use a
+            robustness config for 20x20 or 10x10).
 
     Returns:
         Dictionary summary of the RQ1/RQ2 results.
@@ -200,21 +205,21 @@ def run_rq1_analysis(
     if repo_root is None:
         repo_root = Path(__file__).resolve().parents[4]
 
-    run_id = "som_15x15_seed42_rq1_rq2_v1"
-    embeddings_dir = resolve_embeddings_dir(
-        "outputs/v1_mnist/cnn_baseline/embeddings/mnist",
-        repo_root,
+    settings = load_rq_settings(config_path, repo_root)
+    run_id = settings.analysis_run_id
+    embeddings_dir = settings.embeddings_dir
+    model_path = settings.model_path
+    frozen_metrics_path = settings.metrics_path
+    logger.info(
+        "RQ analysis for %s (%dx%d) from config %s",
+        settings.selected_model,
+        settings.grid_height,
+        settings.grid_width,
+        settings.config_path,
     )
-    model_path = (
-        repo_root
-        / "outputs/v1_mnist/som/som_models"
-        / "som_15x15_seed42_final"
-    )
-    frozen_metrics_path = (
-        repo_root
-        / "outputs/v1_mnist/som/logs"
-        / "som_15x15_seed42_final_metrics.json"
-    )
+    # Check the model before touching any existing output folder.
+    model_hash = verify_selected_model(settings)
+    logger.info("Model integrity check passed (SHA-256 %s)", model_hash)
 
     if output_dir is None:
         output_base = repo_root / "outputs/v1_mnist/som/analysis"
@@ -252,8 +257,11 @@ def run_rq1_analysis(
 
     try:
         logger.info("Loading SOM model from %s", model_path)
-        model_hash = sha256_file(model_path)
-        som = load_selected_som(model_path)
+        som = load_selected_som(
+            model_path,
+            grid_height=settings.grid_height,
+            grid_width=settings.grid_width,
+        )
         coordinates = som_coordinates(som)
 
         frozen = json.loads(frozen_metrics_path.read_text(encoding="utf-8"))
@@ -281,6 +289,7 @@ def run_rq1_analysis(
                 input_hashes[f"{split}_{suffix}"] = sha256_file(
                     embeddings_dir / f"{split}_{suffix}.npy"
                 )
+            verify_inputs(settings, input_hashes)
 
             (
                 clusters,
@@ -507,7 +516,8 @@ def run_rq1_analysis(
         summary = {
             "run_id": run_id,
             "stage": "development",
-            "som_grid": [GRID_HEIGHT, GRID_WIDTH],
+            "som_grid": [settings.grid_height, settings.grid_width],
+            "config": settings.config_path.name,
             "seed": 42,
             "selected_model": str(model_path.relative_to(repo_root)),
             "selected_model_sha256": model_hash,
