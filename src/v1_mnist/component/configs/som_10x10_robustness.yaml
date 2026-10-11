@@ -2,7 +2,8 @@
 # SOM Milestone Configuration
 # NNSOM Training, Model Selection, Convergence Tracking, and Visualization
 #
-# All SOM artifacts are written under ./outputs/v1_mnist/som/
+# SOM artifacts are written under ./outputs/v1_mnist/p2_som_training_visualization/
+# (som_nnsom_training/, cluster_analysis/, error_pattern_analysis/, interactive_report/)
 # ==============================================================================
 
 run:
@@ -13,23 +14,30 @@ run:
 
 # Keep SOM artifacts together and predictable.
 paths:
-  # Frozen LeNet-5 embeddings, inside this code folder (on EC2:
-  # ~/Capstone/Codes/week_7_codes/outputs/v1_mnist/cnn_baseline/embeddings).
-  # train_som.py stops if this folder is missing instead of falling back to another copy.
-  embeddings_dir: "./outputs/v1_mnist/cnn_baseline/embeddings"
-  strict_embeddings_dir: true
+  # Frozen LeNet-5 embeddings. Relative paths start at the code folder, the one that
+  # holds src/ (code in src/v1_mnist/component) and outputs/. The layout is the same
+  # on EC2 and on a local computer.
+  # Every script uses exactly this folder and stops if it is missing (no fallback to another copy).
+  embeddings_dir: "./outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings"
 
-  output_dir: "./outputs/v1_mnist/som"
-  som_models_dir: "./outputs/v1_mnist/som/som_models"
-  logs_dir: "./outputs/v1_mnist/som/logs"
-  figures_dir: "./outputs/v1_mnist/som/figures"
-  tables_dir: "./outputs/v1_mnist/som/tables"
-  analysis_dir: "./outputs/v1_mnist/som/analysis"
+  output_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training"
+  som_models_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/som_models"
+  logs_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/logs"
+  figures_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures"
+  tables_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/tables"
+  analysis_dir: "./outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/robustness"
+  # Cluster analysis, error pattern analysis and interactive-report outputs (other p2 folders)
+  cluster_dir: "./outputs/v1_mnist/p2_som_training_visualization/cluster_analysis"
+  error_dir: "./outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis"
+  interactive_report_dir: "./outputs/v1_mnist/p2_som_training_visualization/interactive_report"
+  # SOM convergence charts (Plotly HTML). Generated, so not in git; demo/ is a hand-picked
+  # showcase, so copy the charts you want to show there yourself.
+  convergence_plots_dir: "./outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/convergence_plots"
 
 # ==============================================================================
 # SOM configuration: 10x10 (robustness: grid the frozen rule selects on the surviving files)
 # Settings from the pre-registered equal-budget comparison
-# (docs/som/PREREGISTRATION_grid_comparison.md): each grid tried
+# (docs/p2_som_training_visualization/som_nnsom_training/PREREGISTRATION_grid_comparison.md): each grid tried
 # init_neighborhood at 0.20 / 0.47 / 0.73 x side, 250 epochs; 7 was chosen
 # for 10x10 by the within-grid rank sum (validation features only).
 # ==============================================================================
@@ -65,6 +73,27 @@ evaluation:
 analysis:
   hotspot_error_threshold: 0.35
   purity_metric: majority_vote
+  # Week 4 label-shuffle comparison for the validation weighted purity: labels are
+  # shuffled across images (each keeps its neuron). Added 2026-10-10 (docs/DEVIATIONS.md).
+  purity_null_shuffles: 1000
+  purity_null_seed: 20261010
+  # Week 4 model check: largest allowed relative difference between the recomputed
+  # quantization error and the training run's value (docs/DEVIATIONS.md, 2026-10-10).
+  qe_relative_tolerance: 1.0e-6
+  # The one error-hotspot rule: top k = max(min_hotspots, round(hotspot_fraction x
+  # neurons)) by Wilson lower bound. Fixed in advance (error_pattern_analysis/
+  # HOTSPOT_RULE.md, ERROR_PATTERN_ROBUSTNESS_CRITERIA.md): do not change.
+  hotspot_fraction: 0.05
+  min_hotspots: 5
+  # Error-pattern robustness check. Fixed in advance in
+  # ERROR_PATTERN_ROBUSTNESS_CRITERIA.md: do not change.
+  robustness:
+    split_repeats: 100        # random stratified half-splits of the validation errors
+    shuffles: 200             # label-shuffle (permutation) repeats for the chance baseline
+    min_errors: 20            # fewer validation errors than this: claims not testable
+    split_seed_base: 7000
+    shuffle_seed_base: 9000
+    alpha: 0.05
 
 visualization:
   selected_model: "som_10x10_nb7_ep250_s42_v2"
@@ -72,6 +101,12 @@ visualization:
   # Use validation labels for class-distribution maps so the visualization
   # reflects generalization rather than only training assignments.
   class_map_split: val
+
+  # Interactive HTML report: at most this many samples of the detail split are
+  # embedded for the click-to-inspect panel. A larger split is randomly
+  # subsampled with this seed; a smaller one is used whole.
+  interactive_max_detail_points: 25000
+  interactive_sample_seed: 0
 
   # For 84 abstract fc2 embedding dimensions, generate detailed histograms
   # only for the most variable dimensions. All 84 dimensions still appear
@@ -98,5 +133,6 @@ visualization:
 
   # Extra NNSOM plots (pie, stem, histogram, box, violin, scatter, weights) saved in
   # the "extended" folder. On a 15x15 map with 84 embedding features they can look
-  # dense. Set to false to skip them; visualize_som.py --extended also turns them on.
+  # dense. Set to false to skip them; visualize_som.py --extended (Week 3) and
+  # cluster_figures.py --extended (Week 4: pie, stem) also turn them on.
   generate_extended_dense_plots: true

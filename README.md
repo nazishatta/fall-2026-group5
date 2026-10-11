@@ -31,19 +31,20 @@ unsupported by evidence will be reported as unsupported.
        width="100%">
 </p>
 
-## Research questions
+## Project phases
 
-|         | Question                                                                             | Primary output                                    |
-| ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| **RQ1** | What does the latent feature space look like under a topology-preserving projection? | Cluster structure, class overlap, density maps    |
-| **RQ2** | Do misclassifications occupy identifiable regions of the representation?             | Error hotspot statistics + representative samples |
-| **RQ3** | Can SOM-derived measures identify out-of-distribution observations?                  | AUROC / AUPR / FPR@95TPR                          |
-| **RQ4** | How does SOM novelty detection compare with established baselines?                   | Isolation Forest, One-Class SVM, autoencoder      |
-| **RQ5** | Can SOM-derived error regions identify samples worth targeting in retraining?        | Guided vs. **random-selection control**           |
-| **RQ6** | After intervention, is the representation measurably better structured?              | Before/after representation metrics               |
+The phases and weeks follow the project proposal ([`reports/Project_proposal.md`](reports/Project_proposal.md)).
 
-Success criteria for each RQ are fixed **before** the test set is examined
-(to be written in `reports/`, see the proposal).
+| Phase | Weeks | What is done | Main outputs |
+| --- | --- | --- | --- |
+| **1: Model Training Baseline** | 1–2 | Data pipeline; train a baseline CNN; extract feature embeddings for every split | Accuracy, precision, recall, F1; 84-D fc2 embeddings |
+| **2: SOM Training & Visualization** | 3–5 | Week 3: train the SOM with NNSOM. Week 4: Cluster Analysis. Week 5: Error Pattern Analysis | SOM maps, cluster purity, class–cluster intersection, error hotspots and their images |
+| **3: Novelty Detection** | 6–8 | Week 6: novelty detection via quantization error. Week 7: U-Matrix analysis. Week 8: Comparative Evaluation | AUROC, AUPR, FPR at 95% TPR against Isolation Forest, One-Class SVM and an autoencoder |
+| **4: Guided Retraining** | 9–11 | Week 9: hard example mining. Week 10: targeted data augmentation. Week 11: iterative SOM re-analysis | Retrained model vs. baseline; old vs. new SOM maps |
+| **5: Paper Writing & Code Release** | 12–14 | Final results and figures, paper draft, code release | Paper, documented code |
+
+Success criteria are fixed **before** the test set is examined
+(to be written in `reports/`).
 
 ## Key results
 
@@ -57,47 +58,49 @@ Success criteria for each RQ are fixed **before** the test set is examined
 | Train / Val / Test  | 49,000 / 10,500 / 10,500 |
 
 A 15x15 SOM has been trained on the fc2 embeddings (official model `som_15x15_nb11_ep250_s42_v2`).
-Why 15x15, and how the grid choice was checked: [`src/v1_mnist/docs/som/README.md`](src/v1_mnist/docs/som/README.md).
+Why 15x15, and how the grid choice was checked: [`src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md`](src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md).
 
-**RQ2 (error geography):** CNN errors concentrate in a few hotspot cells (about 11 times their share of images)
+**Week 5, Error Pattern Analysis (error geography):** CNN errors concentrate in a few hotspot cells (about 11 times their share of images)
 and in cells where digit classes mix. Both findings also hold on 10x10 and 20x20 SOMs
-([`RQ2_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/som/RQ2_ROBUSTNESS_RESULTS.md)).
-Results for RQ3-RQ6 (OOD detection, SOM-guided retraining) are `[TBD]` until the experiments are run.
+([`ERROR_PATTERN_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/p2_som_training_visualization/error_pattern_analysis/ERROR_PATTERN_ROBUSTNESS_RESULTS.md)).
+Results for Phases 3–4 (novelty detection, guided retraining) are `[TBD]` until the experiments are run.
 Nothing is reported before it is measured.
 
 Details: [`reports/Markdown_Report/v1_mnist/cnn_baseline_results.md`](reports/Markdown_Report/v1_mnist/cnn_baseline_results.md),
 [`reports/Markdown_Report/v1_mnist/som_15x15_visualizations.md`](reports/Markdown_Report/v1_mnist/som_15x15_visualizations.md)
-and [`src/v1_mnist/docs/cnn_baseline.md`](src/v1_mnist/docs/cnn_baseline.md).
+and [`src/v1_mnist/docs/p1_model_training_baseline/cnn_baseline_training/cnn_baseline.md`](src/v1_mnist/docs/p1_model_training_baseline/cnn_baseline_training/cnn_baseline.md).
 
 ## Repository structure
 
 ```
 src/v1_mnist/
-  component/
-    configs/         YAML settings (base, cnn_baseline, som, dataset/)
-    data/            MNIST dataset and dataloaders
-    models/          LeNet-5
-    features/        fc2 embedding extraction
-    som/             NNSOM training, data loading, memory-safe init
-    analysis/        BMU / RQ1 analysis (io, metrics, plotting, rq1)
-    evaluation/      accuracy, F1, confusion matrix
-    visualization/   CNN and SOM figures (SVG + PDF)
-    interactive/     interactive SOM HTML report
-    pipeline/        runner.py plus one script per stage
-    ood/, retraining/  planned (RQ3-RQ6)
-    utils/           config loading, logging
-  docs/              technical notes and SOM grid-selection protocol
-  shellscripts/      run scripts
-  tests/             pytest tests
+  component/                         code, by project phase and week (p = phase)
+    configs/                         YAML settings (base, cnn_baseline, som, dataset/)
+    pipeline/                        one runner per week + run_all.py
+    p1_model_training_baseline/
+      data_pipeline/                 Week 1: MNIST split, class distributions
+      cnn_baseline_training/         Week 2: LeNet-5, evaluation, fc2 embeddings
+    p2_som_training_visualization/
+      som_nnsom_training/            Week 3: NNSOM training, quality metrics, SOM figures
+      cluster_analysis/              Week 4: BMUs, purity, cluster maps
+      error_pattern_analysis/        Week 5: error hotspots, robustness check
+      interactive_report/            Weeks 3-5: interactive SOM HTML report
+    p3_novelty_detection/            Weeks 6-8 (planned)
+    p4_guided_retraining/            Weeks 9-11 (planned)
+    utils/                           config, logging, run settings, shared I/O, stats, heatmaps
+  docs/                              technical notes and SOM grid-selection protocol
+  shellscripts/                      run scripts
+  tests/                             pytest tests, same phase/week folders as component/
 cookbooks/           walkthrough notebook
 demo/                figures and interactive plots used in reports
-outputs/v1_mnist/    metrics, tables, logs and figures (large arrays are not stored in git)
+outputs/v1_mnist/    results, in the same phase/week folders (git keeps only small .json/.csv
+                     metrics and .dvc pointers; data is tracked with DVC, figures are regenerated)
 reports/             Markdown, Word and LaTeX reports, progress reports, proposal
 presentation/        slides
 research_paper/      paper drafts
 ```
 
-Figures are saved as vector files (SVG and PDF).
+Figures are saved as PDF only, with fonts embedded as TrueType (`pdf.fonttype` 42), by `utils/figures.py`.
 
 ## Installation
 
@@ -117,14 +120,19 @@ Run from the project root.
 # Run the test suite
 python -m pytest src/v1_mnist/tests -q
 
-# Make the figures and interactive report for the official 15x15 SOM
-python src/v1_mnist/component/pipeline/visualize_som.py
-python src/v1_mnist/component/pipeline/visualize_som_interactive.py
+# See every step without running anything
+python src/v1_mnist/component/pipeline/run_all.py --from data_pipeline --dry-run
+
+# Redraw the SOM figures from the official 15x15 SOM, then run the cluster and
+# error-pattern analyses and the report (a step whose results already exist stops
+# the run; results are never overwritten, so move or delete them to redo a step)
+python src/v1_mnist/component/pipeline/run_all.py --skip-training
 ```
 
-Do not run `runner.py --stage all` (or `runner.py` with no `--stage`): it reruns the data,
-CNN and embedding stages, which would replace the frozen embeddings and change every result.
-Which scripts to run, and which not to: [`src/v1_mnist/component/pipeline/README.md`](src/v1_mnist/component/pipeline/README.md).
+There is one runner per proposal step in `src/v1_mnist/component/pipeline/`. The `data_pipeline` and
+`cnn_baseline_training` runners refuse to run while their results exist: running them again would replace
+the frozen embeddings and change every result.
+Which runners to use, and which not to: [`src/v1_mnist/component/pipeline/README.md`](src/v1_mnist/component/pipeline/README.md).
 
 ## Reproduction
 

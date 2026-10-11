@@ -25,7 +25,7 @@
   - Prepared MNIST with a 70/15/15 stratified train/validation/test split.
   - Trained the LeNet-5 baseline CNN and achieved approximately **99.18% test accuracy**.
   - Extracted and saved the **84-dimensional `fc2` embeddings** for train, validation, and test sets.
-  - Saved checkpoints, embeddings, training curves, and confusion matrix under `outputs/v1_mnist/cnn_baseline/`.
+  - Saved checkpoints, embeddings, training curves, and confusion matrix under `outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/`.
   - Studied Chapter 16 on Competitive Networks to understand SOM, BMU, competitive learning, neighborhood updates, and topology preservation.
 
 - Action Items:

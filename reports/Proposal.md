@@ -43,7 +43,7 @@ reported as unsupported.
 
 - LeNet-5 baseline on MNIST: **99.18% test accuracy**, macro-F1 0.9918.
 - 84-dimensional embeddings extracted from the CNN's second fully connected layer (fc2).
-- A 15x15 SOM trained on those embeddings (run `som_15x15_seed42_final`), with static and
+- A 15x15 SOM trained on those embeddings (run `som_15x15_seed42_v1`), with static and
   interactive figures.
 - Cluster analysis and error-pattern analysis code, and a first LaTeX report with a related-work
   section, are written and under review.

@@ -1,0 +1,6 @@
+outs:
+- md5: 974eca04bdbb2d96625820140626ceb4.dir
+  size: 1220043
+  nfiles: 1
+  hash: md5
+  path: interactive_report

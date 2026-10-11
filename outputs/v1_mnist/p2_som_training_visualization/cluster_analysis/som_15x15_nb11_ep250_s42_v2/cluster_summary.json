@@ -1,0 +1,81 @@
+{
+  "analysis": "cluster_analysis",
+  "som": "som_15x15_nb11_ep250_s42_v2",
+  "model_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+  "som_grid": [
+    15,
+    15
+  ],
+  "config": "som.yaml",
+  "development_only": true,
+  "test_used": false,
+  "nnsom_version": "1.8.3",
+  "library_versions": {
+    "NNSOM": "1.8.3",
+    "numpy": "2.4.4",
+    "scikit-learn": "1.9.0"
+  },
+  "git_commit": "unknown",
+  "class_counts_from": "NNSOM.utils.cal_class_cluster_intersect",
+  "model_check": {
+    "embeddings_match_config": "PASS",
+    "quantization_error_matches_training_run": "PASS (relative tolerance 1e-06; values per split)",
+    "occupied_neurons_match_training_run": "PASS"
+  },
+  "splits": {
+    "train": {
+      "samples": 49000,
+      "occupied_neurons": 225,
+      "total_neurons": 225,
+      "occupancy_rate": 1.0,
+      "sample_weighted_purity": 0.9893877551020408,
+      "sample_weighted_mean_normalized_entropy": 0.015681474812042465,
+      "model_check": {
+        "quantization_error": {
+          "training_run": 1.0387206275713383,
+          "recomputed": 1.0387206275713383,
+          "relative_difference": 0.0,
+          "relative_tolerance": 1e-06
+        },
+        "occupied_neurons": {
+          "training_run": 225,
+          "recomputed": 225
+        }
+      }
+    },
+    "val": {
+      "samples": 10500,
+      "occupied_neurons": 225,
+      "total_neurons": 225,
+      "occupancy_rate": 1.0,
+      "sample_weighted_purity": 0.981904761904762,
+      "sample_weighted_mean_normalized_entropy": 0.024837037727542224,
+      "model_check": {
+        "quantization_error": {
+          "training_run": 1.0412049587880645,
+          "recomputed": 1.0412049587880645,
+          "relative_difference": 0.0,
+          "relative_tolerance": 1e-06
+        },
+        "occupied_neurons": {
+          "training_run": 225,
+          "recomputed": 225
+        }
+      },
+      "purity_label_shuffle": {
+        "method": "class labels shuffled across images; each image keeps its BMU",
+        "shuffles": 1000,
+        "seed": 20261010,
+        "observed_purity": 0.981904761904762,
+        "null_mean": 0.17376247619047622,
+        "null_sd": 0.0018135258065182303,
+        "null_95_range": [
+          0.1702857142857143,
+          0.17742857142857144
+        ],
+        "null_max": 0.18066666666666667,
+        "p_value": 0.000999000999000999
+      }
+    }
+  }
+}
