@@ -113,7 +113,7 @@ results**, and will decide by 2026-10-20 whether to add EuroSAT as a more realis
 data -> CNN baseline -> embeddings (fc2) -> SOM (NNSOM) -> analysis -> novelty detection -> guided retraining
 ```
 
-The diagram is in the README (`demo/fig/project_pipeline/nnsom_project_pipeline.drawio.svg`).
+The diagram is in the README (`demo/project_pipeline/nnsom_project_pipeline.drawio.svg`).
 
 1. **Baseline.** Train LeNet-5 (MNIST, Fashion-MNIST) and ResNet-18 (CIFAR-10) with fixed seeds.
    Report accuracy, per-class F1, and the confusion matrix.

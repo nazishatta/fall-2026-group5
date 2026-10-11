@@ -30,10 +30,10 @@ The core topology visualizations help you understand the geometric layout of the
 
 | Figure | Description |
 |--------|-------------|
-| [Topology (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/topology.pdf) | **SOM lattice** – a 2‑D grid where each cell corresponds to a neuron. This is the same plot shown in the **SOM Topology** section of the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#SOM-Topology)). |
-| [Numbered Topology (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/topology_numbered.pdf) | **Neuron indices** – each neuron is labelled with a unique number. Useful for mapping data points back to their winning neuron (see **Extract SOM Cluster Details** in the tutorial). |
-| [Neuron Connections (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/neuron_connection.pdf) | **Neighbourhood graph** – shows which neurons are direct neighbours on the hexagonal grid. During training, a winning neuron also updates all neurons within the current neighbourhood radius (NNSOM's bubble neighbourhood). |
-| [U‑Matrix (Neuron Distance) (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/u_matrix_neuron_distance.pdf) | **U‑Matrix** – displays inter‑neuron distances; darker regions indicate larger distances and often correspond to cluster boundaries. This is the primary tool for **Error Analysis** in the examples. |
+| [Topology (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/topology.pdf) | **SOM lattice** – a 2‑D grid where each cell corresponds to a neuron. This is the same plot shown in the **SOM Topology** section of the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#SOM-Topology)). |
+| [Numbered Topology (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/topology_numbered.pdf) | **Neuron indices** – each neuron is labelled with a unique number. Useful for mapping data points back to their winning neuron (see **Extract SOM Cluster Details** in the tutorial). |
+| [Neuron Connections (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/neuron_connection.pdf) | **Neighbourhood graph** – shows which neurons are direct neighbours on the hexagonal grid. During training, a winning neuron also updates all neurons within the current neighbourhood radius (NNSOM's bubble neighbourhood). |
+| [U‑Matrix (Neuron Distance) (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/u_matrix_neuron_distance.pdf) | **U‑Matrix** – displays inter‑neuron distances; darker regions indicate larger distances and often correspond to cluster boundaries. This is the primary tool for **Error Analysis** in the examples. |
 
 ---
 
@@ -42,8 +42,8 @@ Hit histograms show how many samples (training or validation) are mapped to each
 
 | Figure | Description |
 |--------|-------------|
-| [Training Hit Histogram (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/train_hit_histogram.pdf) | **Training hits** – frequency of training samples per neuron. Peaks indicate regions that attract many samples, revealing the data density on the map. |
-| [Validation Hit Histogram (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/core/validation_hit_histogram.pdf) | **Validation hits** – analogous to the training map but for the held‑out validation set. Comparing the two helps spot over‑fitting (neurons heavily hit by training data but rarely by validation). |
+| [Training Hit Histogram (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/train_hit_histogram.pdf) | **Training hits** – frequency of training samples per neuron. Peaks indicate regions that attract many samples, revealing the data density on the map. |
+| [Validation Hit Histogram (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/core/validation_hit_histogram.pdf) | **Validation hits** – analogous to the training map but for the held‑out validation set. Comparing the two helps spot over‑fitting (neurons heavily hit by training data but rarely by validation). |
 
 ---
 
@@ -52,7 +52,7 @@ Component planes visualise the value of each input feature across the SOM grid. 
 
 | Figure |
 |--------|
-| [Component Planes Overview (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/component_planes/component_planes_all84_nnsom.pdf) |
+| [Component Planes Overview (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/component_planes/component_planes_all84_nnsom.pdf) |
 
 The overview shows a compact montage of all 84 feature planes. Individual planes are available in pages `pdf/component_planes/component_planes_page_01.pdf` … `pdf/component_planes/component_planes_page_07.pdf`. Each plane can be interpreted as a heat‑map: brighter colors indicate higher feature values for the neurons that map to that region of the input space.
 
@@ -67,16 +67,16 @@ Class maps illustrate the distribution of each digit class over the SOM lattice.
 
 | Digit | Colour | Grey |
 |------|--------|-----------|
-| 0 | [0 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_0_color_hist.pdf) | [0 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_0_gray_hist.pdf) |
-| 1 | [1 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_1_color_hist.pdf) | [1 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_1_gray_hist.pdf) |
-| 2 | [2 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_2_color_hist.pdf) | [2 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_2_gray_hist.pdf) |
-| 3 | [3 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_3_color_hist.pdf) | [3 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_3_gray_hist.pdf) |
-| 4 | [4 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_4_color_hist.pdf) | [4 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_4_gray_hist.pdf) |
-| 5 | [5 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_5_color_hist.pdf) | [5 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_5_gray_hist.pdf) |
-| 6 | [6 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_6_color_hist.pdf) | [6 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_6_gray_hist.pdf) |
-| 7 | [7 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_7_color_hist.pdf) | [7 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_7_gray_hist.pdf) |
-| 8 | [8 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_8_color_hist.pdf) | [8 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_8_gray_hist.pdf) |
-| 9 | [9 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_9_color_hist.pdf) | [9 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/class_maps/digit_9_gray_hist.pdf) |
+| 0 | [0 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_0_color_hist.pdf) | [0 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_0_gray_hist.pdf) |
+| 1 | [1 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_1_color_hist.pdf) | [1 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_1_gray_hist.pdf) |
+| 2 | [2 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_2_color_hist.pdf) | [2 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_2_gray_hist.pdf) |
+| 3 | [3 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_3_color_hist.pdf) | [3 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_3_gray_hist.pdf) |
+| 4 | [4 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_4_color_hist.pdf) | [4 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_4_gray_hist.pdf) |
+| 5 | [5 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_5_color_hist.pdf) | [5 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_5_gray_hist.pdf) |
+| 6 | [6 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_6_color_hist.pdf) | [6 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_6_gray_hist.pdf) |
+| 7 | [7 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_7_color_hist.pdf) | [7 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_7_gray_hist.pdf) |
+| 8 | [8 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_8_color_hist.pdf) | [8 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_8_gray_hist.pdf) |
+| 9 | [9 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_9_color_hist.pdf) | [9 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/class_maps/digit_9_gray_hist.pdf) |
 
 These maps are analogous to the **Class Plot** and **Colour Hist** shown for Iris in the tutorial. They reveal how well‑separated each digit class is on the map: each digit should occupy its own compact region, and digits that share neurons point to class overlap.
 
@@ -87,12 +87,12 @@ The six most variable features from the `fc2` layer (indices 15, 19, 79, 4
 
 | Feature (index) | Colour Histogram | Grey Histogram |
 |-----------------|------------------|----------------|
-| 15 | [fc2_15 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_15_color_hist.pdf) | [fc2_15 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_15_gray_hist.pdf) |
-| 19 | [fc2_19 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_19_color_hist.pdf) | [fc2_19 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_19_gray_hist.pdf) |
-| 79 | [fc2_79 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_79_color_hist.pdf) | [fc2_79 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_79_gray_hist.pdf) |
-| 41 | [fc2_41 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_41_color_hist.pdf) | [fc2_41 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_41_gray_hist.pdf) |
-| 35 | [fc2_35 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_35_color_hist.pdf) | [fc2_35 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_35_gray_hist.pdf) |
-| 53 | [fc2_53 colour (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_53_color_hist.pdf) | [fc2_53 gray (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/feature_maps/fc2_53_gray_hist.pdf) |
+| 15 | [fc2_15 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_15_color_hist.pdf) | [fc2_15 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_15_gray_hist.pdf) |
+| 19 | [fc2_19 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_19_color_hist.pdf) | [fc2_19 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_19_gray_hist.pdf) |
+| 79 | [fc2_79 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_79_color_hist.pdf) | [fc2_79 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_79_gray_hist.pdf) |
+| 41 | [fc2_41 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_41_color_hist.pdf) | [fc2_41 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_41_gray_hist.pdf) |
+| 35 | [fc2_35 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_35_color_hist.pdf) | [fc2_35 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_35_gray_hist.pdf) |
+| 53 | [fc2_53 colour (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_53_color_hist.pdf) | [fc2_53 gray (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/feature_maps/fc2_53_gray_hist.pdf) |
 
 These correspond to the **Feature Maps** section of the documentation and are useful for interpreting which internal CNN activations influence the SOM layout.
 
@@ -103,9 +103,9 @@ The toolbox provides three validation‑quality visualisations that combine erro
 
 | Figure | Description |
 |--------|-------------|
-| [Validation Error Rate (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/analysis_maps/validation_error_rate_support.pdf) | **Error rate map** – shows the CNN's misclassification rate for the validation images in each neuron; marker size shows how many images the neuron holds. High values mark possible error hotspots. |
-| [Validation Purity (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/analysis_maps/validation_purity_support.pdf) | **Purity map** – measures class homogeneity within each neuron (higher is better). This is analogous to the **Purity** plot used in the Iris example for error analysis. |
-| [Complex Error Map (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/analysis_maps/validation_complex_error_map.pdf) | **Combined error‑purity** – a composite visualization that highlights neurons with both high error and low purity, making it easy to spot problematic regions. |
+| [Validation Error Rate (PDF)](../../../demo/figures/v1_mnist/phase_2_files/error_pattern_analysis/analysis_maps/validation_error_rate_support.pdf) | **Error rate map** – shows the CNN's misclassification rate for the validation images in each neuron; marker size shows how many images the neuron holds. High values mark possible error hotspots. |
+| [Validation Purity (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/analysis_maps/validation_purity_support.pdf) | **Purity map** – measures class homogeneity within each neuron (higher is better). This is analogous to the **Purity** plot used in the Iris example for error analysis. |
+| [Complex Error Map (PDF)](../../../demo/figures/v1_mnist/phase_2_files/error_pattern_analysis/analysis_maps/validation_complex_error_map.pdf) | **Combined error‑purity** – a composite visualization that highlights neurons with both high error and low purity, making it easy to spot problematic regions. |
 
 These maps implement the **Error Analysis** workflow described in the tutorial ([link](https://amir-jafari.github.io/SOM/iris_training.html#Error-Analysis)).
 
@@ -116,13 +116,13 @@ The following figures are generated for more detailed post‑training exploratio
 
 | Figure |
 |--------|
-| [Class Pie Chart (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/class_pie.pdf) |
-| [Class Stem Plot (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/class_stem.pdf) |
-| [FC2 Scatter (15 vs 19) (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/scatter_fc2_15_19.pdf) |
-| [Histograms of Selected FC2 Features (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/hist_fc2_15.pdf) |
-| [Violin Plots of Selected FC2 Features (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/violin_top_fc2_features.pdf) |
-| [Weight Line Plot (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/weights_line_plot.pdf) |
-| [Component Positions (first two neurons) (PDF)](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/pdf/extended/component_positions_first_two.pdf) |
+| [Class Pie Chart (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/extended/class_pie.pdf) |
+| [Class Stem Plot (PDF)](../../../demo/figures/v1_mnist/phase_2_files/cluster_analysis/extended/class_stem.pdf) |
+| [FC2 Scatter (15 vs 19) (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/extended/scatter_fc2_15_19.pdf) |
+| [Histograms of Selected FC2 Features (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/extended/hist_fc2_15.pdf) |
+| [Violin Plots of Selected FC2 Features (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/extended/violin_top_fc2_features.pdf) |
+| [Weight Line Plot (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/extended/weights_line_plot.pdf) |
+| [Component Positions (first two neurons) (PDF)](../../../demo/figures/v1_mnist/phase_2_files/som_nnsom_training/extended/component_positions_first_two.pdf) |
 
 These correspond to the *Pie Chart*, *Stem Plot*, *Histogram*, *Violin Plot*, and *Scatter Plot* sections of the Iris post‑training analysis page.
 
@@ -134,6 +134,5 @@ For programmatic access to all generated artefacts, see the JSON manifest:
 ```json
 { ... (see `visualization_manifest.json` in the output folder) ... }
 ```
-You can download the raw file here: [visualization_manifest.json](../../../outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/figures/som_15x15_nb11_ep250_s42_v2/visualization_manifest.json)
 
 ---

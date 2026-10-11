@@ -1,6 +1,6 @@
-# MNIST v1 Demo Figures (`demo/fig/v1_mnist/cnn_baseline/`)
+# MNIST v1 Demo Figures (`demo/figures/v1_mnist/phase_1_files/cnn_baseline/`)
 
-Key CNN-baseline figures used in presentations and cookbooks, saved as PDF (`pdf/`):
+Key CNN-baseline figures used in presentations and cookbooks, saved as PDF:
 
 - `confusion_matrix.pdf`: Confusion matrix heatmap for LeNet-5 predictions on the test set.
 - `training_curves.pdf`: Training/validation loss and accuracy curves across epochs.

@@ -34,11 +34,11 @@ LeNet-5 provides a strong MNIST baseline. The saved **84-dimensional `fc2` embed
 
 ### Confusion Matrix
 
-[LeNet-5 Confusion Matrix (PDF)](../../../demo/fig/v1_mnist/cnn_baseline/pdf/confusion_matrix.pdf)
+[LeNet-5 Confusion Matrix (PDF)](../../../demo/figures/v1_mnist/phase_1_files/cnn_baseline/confusion_matrix.pdf)
 
 ### Training Curves
 
-[LeNet-5 Training Curves (PDF)](../../../demo/fig/v1_mnist/cnn_baseline/pdf/training_curves.pdf)
+[LeNet-5 Training Curves (PDF)](../../../demo/figures/v1_mnist/phase_1_files/cnn_baseline/training_curves.pdf)
 
 For additional plots and sample-level analysis, see the  
 [`v1_mnist Cookbook`](../../../cookbooks/v1_mnist/cnn_baseline.ipynb).
