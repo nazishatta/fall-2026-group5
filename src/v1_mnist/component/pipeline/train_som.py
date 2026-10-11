@@ -8,6 +8,7 @@ paths declared in som.yaml.
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -89,6 +90,25 @@ def validate_run_id(run_id: str) -> str:
         )
 
     return run_id
+
+
+def sha256_file(path: Path) -> str:
+    """SHA-256 of a file, read in chunks."""
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def append_run_manifest(manifest_path: Path, row: dict[str, Any]) -> None:
+    """Append one run to the SOM run manifest (CSV), writing a header if new."""
+    is_new = not manifest_path.exists()
+    with manifest_path.open("a", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row.keys()))
+        if is_new:
+            writer.writeheader()
+        writer.writerow(row)
 
 
 def preflight_scientific_outputs(
@@ -230,7 +250,16 @@ def train_som_pipeline(
         path = Path(p)
         return path if path.is_absolute() else (REPO_ROOT / path).resolve()
 
-    embeddings_dir = resolve_embeddings_dir(config.paths.embeddings_dir, REPO_ROOT)
+    if getattr(config.paths, "strict_embeddings_dir", False):
+        # Use exactly the configured folder; never fall back to another copy.
+        embeddings_dir = resolve_path(config.paths.embeddings_dir)
+        if not (embeddings_dir / "train_features.npy").is_file():
+            raise FileNotFoundError(
+                f"Embeddings not found in the configured folder: {embeddings_dir}. "
+                "Fix paths.embeddings_dir in the config (strict_embeddings_dir is on)."
+            )
+    else:
+        embeddings_dir = resolve_embeddings_dir(config.paths.embeddings_dir, REPO_ROOT)
     output_dir = resolve_path(config.paths.output_dir)
     models_dir = resolve_path(config.paths.som_models_dir)
     logs_dir = resolve_path(config.paths.logs_dir)
@@ -271,6 +300,24 @@ def train_som_pipeline(
 
     x_train = data.train.features
     x_val = data.val.features
+
+    # Record (and optionally enforce) the exact embeddings used for this run.
+    train_features_sha256 = sha256_file(Path(embeddings_dir) / "train_features.npy")
+    val_features_sha256 = sha256_file(Path(embeddings_dir) / "val_features.npy")
+    logger.info("  train_features.npy SHA-256: %s", train_features_sha256)
+    logger.info("  val_features.npy SHA-256:   %s", val_features_sha256)
+    expected_inputs = getattr(config, "expected_inputs", None)
+    if expected_inputs is not None:
+        for name, observed in (
+            ("train_features_sha256", train_features_sha256),
+            ("val_features_sha256", val_features_sha256),
+        ):
+            expected = getattr(expected_inputs, name, None)
+            if expected and observed != expected:
+                raise RuntimeError(
+                    f"Embedding check failed for {name}: expected {expected}, got {observed}. "
+                    "These are not the frozen embeddings used by the grid study."
+                )
 
     grid_height = int(config.som.grid_height)
     grid_width = int(config.som.grid_width)
@@ -360,7 +407,16 @@ def train_som_pipeline(
             "epochs": epochs,
             "steps": steps,
             "requested_backend": requested_backend,
-            "actual_backend": actual_backend,
+            "actual_backend": (
+                f"cpu (NumPy loop; NNSOM class: {actual_backend})"
+                if track_history
+                else actual_backend
+            ),
+            "training_implementation": (
+                "train_som_with_history: NumPy batch SOM, winners recomputed every epoch"
+                if track_history
+                else "NNSOM native som.train (winners from initial weights)"
+            ),
             "random_seed": seed,
             "track_qe_history": track_history,
             "qe_history_every": history_every,
@@ -374,6 +430,9 @@ def train_som_pipeline(
             "train_shape": list(x_train.shape),
             "validation_shape": list(x_val.shape),
             "held_out_test_shape": list(data.test.features.shape),
+            "embeddings_dir": str(embeddings_dir),
+            "train_features_sha256": train_features_sha256,
+            "val_features_sha256": val_features_sha256,
         },
         "train_metrics": train_metrics.to_dict(),
         "validation_metrics": val_metrics.to_dict(),
@@ -381,8 +440,40 @@ def train_som_pipeline(
         "test_evaluated": False,
     }
 
+    if not smoke_test:
+        if model_path is None:
+            raise RuntimeError("Scientific model path was not initialized.")
+        som.save_pickle(effective_run_id, str(models_dir) + os.sep)
+        if not model_path.is_file():
+            raise RuntimeError(f"NNSOM model save failed: {model_path}")
+        model_sha256 = sha256_file(model_path)
+        metrics["model"] = {"path": str(model_path), "sha256": model_sha256}
+        logger.info("SOM model saved to: %s", model_path)
+        logger.info("SOM model SHA-256: %s", model_sha256)
+
     with metrics_path.open("w", encoding="utf-8") as handle:
         json.dump(metrics, handle, indent=2)
+
+    if not smoke_test:
+        append_run_manifest(
+            logs_dir / "run_manifest.csv",
+            {
+                "run_id": effective_run_id,
+                "config": str(cfg_path.name),
+                "grid": f"{grid_height}x{grid_width}",
+                "init_neighborhood": init_neighborhood,
+                "epochs": epochs,
+                "seed": seed,
+                "training_implementation": metrics["som"]["training_implementation"],
+                "train_features_sha256": train_features_sha256,
+                "model_sha256": model_sha256,
+                "val_qe": val_metrics.quantization_error,
+                "val_te1_pct": val_metrics.topological_error_1st_order_pct,
+                "val_te12_pct": val_metrics.topological_error_1st_2nd_order_pct,
+                "val_occupancy": val_metrics.occupancy_rate,
+                "metrics_file": metrics_path.name,
+            },
+        )
 
     logger.info("SOM quality metrics:")
     logger.info("  Train QE:                  %.6f", train_metrics.quantization_error)
@@ -394,14 +485,6 @@ def train_som_pipeline(
     logger.info("  Val TE 1st+2nd (%%):        %.4f", val_metrics.topological_error_1st_2nd_order_pct)
     logger.info("  Val occupancy:             %.4f", val_metrics.occupancy_rate)
     logger.info("Metrics written to: %s", metrics_path)
-
-    if not smoke_test:
-        if model_path is None:
-            raise RuntimeError("Scientific model path was not initialized.")
-        som.save_pickle(effective_run_id, str(models_dir) + os.sep)
-        if not model_path.is_file():
-            raise RuntimeError(f"NNSOM model save failed: {model_path}")
-        logger.info("SOM model saved to: %s", model_path)
 
     logger.info("Test split was NOT evaluated. SOM pipeline completed successfully.")
     return metrics

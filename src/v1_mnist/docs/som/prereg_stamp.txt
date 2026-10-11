@@ -1,0 +1,13 @@
+prereg_file: PREREGISTRATION_grid_comparison.md
+prereg_sha256: 69496ffccefe7012c895385493c96ea46b6738170db949ba4bf2fba8bee373c2
+stamped_utc: 2026-10-06T17:20:29Z
+status: written before any Stage 1 or Stage 2 training and before the primary endpoint was computed
+inputs_sha256:
+  26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65  train_features.npy
+  34459b6379469ff1d1c8b542c8d2e0b5123e31e38f5f2438b988d36c04a4fae6  train_labels.npy
+  e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d  val_features.npy
+  71b77973655a26f2b69b47a2c5f2234986f144deab02d45b623de44fe5d788ac  val_labels.npy
+  708271197be47a028bb3b87cd5afaa813fbec83c68ad13553c2b142e11147edf  val_correct.npy
+  bef98e4a9cdb9e7bbc2b12c775b0db4562e5954a250db3ae3e86b230d3db9b04  val_confidence.npy
+trainer_sha256: 9cefc53c325f818599b397074a44889ecfc227593748a2869599c3ab7794a6b6  fast_som.py
+software: numpy 2.5.3 scipy 1.18.1 sklearn 1.9.1 NNSOM 1.8.3

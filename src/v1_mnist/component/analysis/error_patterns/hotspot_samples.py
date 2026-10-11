@@ -5,33 +5,42 @@ Uses stable global MNIST sample IDs:
     60000..69999 -> original MNIST test set
 
 Development validation samples only.
+
+Reads the Week 5 table for the SOM named in a config (default som.yaml) and
+writes images to outputs/v1_mnist/cluster_analysis/<selected_model>/
+week5_error_patterns/representative_samples/.
+
+Usage (from the code root):
+  python src/v1_mnist/component/analysis/error_patterns/hotspot_samples.py \
+      [--config CONFIG] [--mnist-root PATH_TO_MNIST_DOWNLOAD]
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from torchvision import datasets
 
+REPO_ROOT = Path(__file__).resolve().parents[5]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from src.v1_mnist.component.analysis.run_settings import (
+    DEFAULT_CONFIG,
+    cluster_output_dir,
+    selected_model_from_config,
+)
 from src.v1_mnist.component.utils.logging import get_logger
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-
-TABLE_PATH = (
-    REPO_ROOT
-    / "outputs/v1_mnist/cluster_analysis/tables"
-    / "val_misclassified_samples.csv"
-)
-
-OUTPUT_DIR = (
-    Path.home()
-    / "Downloads/V1_Minist/week5_error_patterns/representative_samples"
-)
-
+# Set in main() from the config; module-level so the helpers below keep working.
+TABLE_PATH: Path = Path()
+OUTPUT_DIR: Path = Path()
 DATA_ROOT = Path.home() / "All_Data"
 
 MAX_PER_HOTSPOT = 6
@@ -236,6 +245,22 @@ def plot_overall(rows: list[dict], train, test) -> None:
 
 
 def main() -> None:
+    global TABLE_PATH, OUTPUT_DIR, DATA_ROOT
+
+    parser = argparse.ArgumentParser(description="Representative images for Week 5 hotspots.")
+    parser.add_argument("--config", default=DEFAULT_CONFIG,
+                        help="SOM config naming the selected model.")
+    parser.add_argument("--mnist-root", default=str(DATA_ROOT),
+                        help="Folder holding the torchvision MNIST download.")
+    args = parser.parse_args()
+
+    run_dir = cluster_output_dir(REPO_ROOT, selected_model_from_config(args.config, REPO_ROOT))
+    TABLE_PATH = run_dir / "tables" / "val_misclassified_samples.csv"
+    OUTPUT_DIR = run_dir / "week5_error_patterns" / "representative_samples"
+    DATA_ROOT = Path(args.mnist_root)
+    if not TABLE_PATH.is_file():
+        raise FileNotFoundError(f"{TABLE_PATH} not found: run error_patterns.py with the same config first.")
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     rows = load_rows()
