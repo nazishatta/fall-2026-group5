@@ -1,0 +1,175 @@
+\documentclass[11pt]{article}
+\input{File_Setup.tex}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\thispagestyle{empty}
+
+\vspace*{0.15in}
+
+\includegraphics[
+    width=0.5\textwidth
+]{gwu_logo.pdf}
+
+\vspace{0.28in}
+
+{\large\bfseries Data Science Program\par}
+{\large\bfseries Department of Data Science\par}
+{\large DATS 6501 - Capstone Project - Fall 2026\par}
+
+\vspace{0.38in}
+
+{\Large\bfseries
+Post-Training Analysis \& Novelty Detection Using\par}
+
+\vspace{0.08in}
+
+{\Large\bfseries
+Neural Network Self-Organizing Maps (NNSOM)\par}
+
+\vspace{0.34in}
+
+{\large\bfseries
+PHASE 2 REPORT\par}
+
+\vspace{0.22in}
+
+{\large\bfseries
+NNSOM Training, Cluster and Error Analysis\par}
+
+\vspace{0.36in}
+
+{\large\bfseries Capstone - Group 5\par}
+
+\vspace{0.08in}
+
+{\large\bfseries Fyrooz Khan\par}
+{\large\bfseries Nazish Atta\par}
+
+\vspace{0.30in}
+
+{\large The George Washington University\par}
+{\large Washington, DC\par}
+
+\vspace{0.30in}
+
+{\large\itshape Supervised by\par}
+{\large\itshape Dr. Amir Jafari\par}
+{\large\itshape Associate Professor of Data Science\par}
+
+\vspace*{\fill}
+
+\end{titlepage}
+
+\section{SOM 15$\times$15 Overview}
+
+This phase applies a 15$\times$15 Self-Organizing Map (SOM) to the
+84-dimensional \texttt{fc2} representations extracted from the pretrained
+MNIST CNN. The SOM was trained with seed 42 on 49,000 training embeddings and
+validated on 10,500 held-out validation embeddings. The objective is to examine
+whether topology-preserving organization of the learned representation reveals
+class structure, density patterns, and localized validation weaknesses
+\cite{kohonen1990som,jafari_nnsom}.
+
+\section{SOM TRAINING}
+
+\begin{itemize}
+
+
+
+\item 
+
+\item 
+
+\item 
+
+
+\end{itemize}
+
+
+\section{CLUSTER ANALYSIS}
+
+
+\begin{itemize}
+
+
+
+\item 
+
+\item 
+
+\item 
+
+
+\end{itemize}
+
+\section{ERROR ANALYSIS}
+
+
+\begin{itemize}
+
+
+
+\item 
+
+\item 
+
+\item 
+
+
+\end{itemize}
+
+\section{Leakage Control}
+
+The SOM work uses the training and validation splits only:
+\begin{itemize}
+    \item The SOM was trained on the 49,000 training embeddings. The scaler that
+    maps the embeddings to $[-1,1]$ was fitted on the training embeddings only and
+    then applied unchanged to the validation embeddings.
+    \item SOM settings were compared on validation data only (the configuration
+    sets \texttt{use\_test\_for\_selection: false}). The 15$\times$15 grid follows the
+    instructor's request; its selection history is recorded in the project's
+    deviation log.
+    \item The maps, purity, label-shuffle control and error maps in this report
+    use validation images. The test embeddings are never loaded: the model's
+    metrics file records that the test split was not evaluated, and the analysis
+    code refuses to run otherwise.
+    \item The CNN that produced the embeddings used the same validation split to
+    choose its checkpoint, so validation is not entirely untouched by model
+    development; the test split remains unused for the final evaluation.
+\end{itemize}
+
+\section{Discussion}
+\begin{itemize}
+
+
+
+\item 
+
+\item 
+
+\item 
+
+
+\end{itemize}
+
+\section{Conclusion and Next Phase}
+
+\begin{itemize}
+
+
+
+\item 
+
+\item 
+
+\item 
+
+
+\end{itemize}
+
+\printbibliography[title={References}]
+
+\end{document}

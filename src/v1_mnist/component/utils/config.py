@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import random
 from types import SimpleNamespace
-from typing import Any, Mapping
+from typing import Any
 import numpy as np
 import yaml
 
@@ -16,8 +16,13 @@ except ImportError:
     HAS_TORCH = False
 
 
+# Run names from before the folders followed the proposal's phases. They are
+# refused (not silently mapped) so that no output folder is named after a week.
+OLD_RUN_NAMES = {"week_2": "cnn_baseline", "week_3": "som"}
+
+
 def merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
-    """Merge weekly settings on top of base settings."""
+    """Merge a run config's settings on top of the base settings."""
     result = base.copy()
 
     for key, value in override.items():
@@ -37,7 +42,7 @@ def load_config(config_path: str | Path) -> SimpleNamespace:
     """Load configuration YAML and return nested SimpleNamespace."""
     cfg_str = str(config_path)
     with open(cfg_str, "r", encoding="utf-8") as f:
-        weekly_config: dict[str, Any] = yaml.safe_load(f) or {}
+        run_config: dict[str, Any] = yaml.safe_load(f) or {}
 
     config_dir = os.path.dirname(os.path.abspath(cfg_str))
     base_path = os.path.join(config_dir, "base.yaml")
@@ -45,16 +50,22 @@ def load_config(config_path: str | Path) -> SimpleNamespace:
     if os.path.basename(cfg_str) != "base.yaml" and os.path.exists(base_path):
         with open(base_path, "r", encoding="utf-8") as f:
             base_config: dict[str, Any] = yaml.safe_load(f) or {}
-        config_dict = merge_dicts(base_config, weekly_config)
+        config_dict = merge_dicts(base_config, run_config)
     else:
-        config_dict = weekly_config
+        config_dict = run_config
 
     if "run" in config_dict and "name" in config_dict["run"]:
         raw_run_name = str(config_dict["run"]["name"])
-        if raw_run_name in ("week_2", "cnn_baseline"):
-            folder_name = "cnn_baseline"
-        elif raw_run_name in ("week_3", "som"):
-            folder_name = "som"
+        if raw_run_name in OLD_RUN_NAMES:
+            raise ValueError(
+                f"run.name '{raw_run_name}' is an old name. "
+                f"Use '{OLD_RUN_NAMES[raw_run_name]}' instead."
+            )
+        # Output folders follow the proposal: <output_root>/p<phase>_<name>/<step folder>/
+        if raw_run_name == "cnn_baseline":
+            folder_name = os.path.join("p1_model_training_baseline", "cnn_baseline_training")
+        elif raw_run_name == "som":
+            folder_name = os.path.join("p2_som_training_visualization", "som_nnsom_training")
         else:
             folder_name = raw_run_name
 
@@ -93,6 +104,22 @@ def load_config(config_path: str | Path) -> SimpleNamespace:
             "analysis_dir", os.path.join(output_dir, "analysis")
         )
 
+        # Step folders that sit next to the run's own folder.
+        p1_dir = os.path.join(output_root, "p1_model_training_baseline")
+        p2_dir = os.path.join(output_root, "p2_som_training_visualization")
+        config_dict["paths"].setdefault(
+            "data_pipeline_dir", os.path.join(p1_dir, "data_pipeline")
+        )
+        config_dict["paths"].setdefault(
+            "cluster_dir", os.path.join(p2_dir, "cluster_analysis")
+        )
+        config_dict["paths"].setdefault(
+            "error_dir", os.path.join(p2_dir, "error_pattern_analysis")
+        )
+        config_dict["paths"].setdefault(
+            "interactive_report_dir", os.path.join(p2_dir, "interactive_report")
+        )
+
     def dict_to_namespace(d: Any) -> Any:
         if isinstance(d, dict):
             for k, v in d.items():
@@ -104,6 +131,20 @@ def load_config(config_path: str | Path) -> SimpleNamespace:
             return d
 
     return dict_to_namespace(config_dict)
+
+
+def require_seed(config: Any) -> int:
+    """Return ``training.seed`` from the config; stop if the config does not set one.
+
+    There is no default seed in the code, so every run's seed is visible in its config.
+    """
+    seed = getattr(getattr(config, "training", None), "seed", None)
+    if seed is None:
+        raise ValueError(
+            "The config has no training.seed. Set it in the config (base.yaml sets "
+            "the shared value); the code has no default seed."
+        )
+    return int(seed)
 
 
 def set_seed(seed: int) -> None:

@@ -1,0 +1,14 @@
+{
+  "assignments/train_bmu.npy": "c1e946a1461956098c51108ef1111fd2f4fe1e6bbb177d11a3475c01e323e3c0",
+  "assignments/train_bmu_assignments.csv": "d2e71469e13f80e24ec030c5cc2ab6447cd9d913e41976b7a64c22a9fac5a304",
+  "assignments/train_bmu_distance.npy": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+  "assignments/val_bmu.npy": "bcfdb20a244d96d5c3e6b6eb797b98cf3c2ee83ef99bc6f1fae234564b454369",
+  "assignments/val_bmu_assignments.csv": "0b966b56ab4196d54a47d9f1c686aff7e55cef2719c454bc469dd409f6f4ab94",
+  "assignments/val_bmu_distance.npy": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+  "cluster_summary.json": "fbb893d1b71fc34f02fccca7f4e27c29fa9c68254375ccd9e41baccd5f50edbd",
+  "metadata/input_hashes.json": "d2f151fb9fb9b594371d8e7b2828de48df17011c68beaf21213468285f201631",
+  "tables/train_class_neuron_intersection.csv": "acf8610b7295ed26b6ed1de6bc913149f6842cc6224b778cdf496183edb75eb6",
+  "tables/train_cluster_metrics.csv": "a31f6040a70b2f9f343b1f227fb8098a1044e7c5620da1be02fe7be6a202f986",
+  "tables/val_class_neuron_intersection.csv": "a45d9762bc2bce9cbe706a7e19b515a9b450d8fd0345aa1dcab00e02e61e07cc",
+  "tables/val_cluster_metrics.csv": "396232f20fe3ff1c45286643d99771633daf390e043ee94ff4db209ff957679d"
+}

@@ -1,12 +1,19 @@
 # ==============================================================================
 # Milestone Configuration: Baseline Data Preparation & LeNet-5 Training
-# Outputs saved to: ./outputs/v1_mnist/cnn_baseline/
+# Outputs saved to: ./outputs/v1_mnist/p1_model_training_baseline/
+#   data_pipeline/ (prepare_data) and cnn_baseline_training/ (train_baseline, extract_embeddings)
 # ==============================================================================
 
 run:
   name: cnn_baseline
   version: v1_mnist
   stage: baseline
+  # Run ID of this CNN training run. Its checkpoint is checkpoints/<id>.pth, and its
+  # test metrics, run record, figures and logs start with <id>_. The scripts refuse
+  # to overwrite an existing run, so a new or re-tuned run needs a new ID, and
+  # paths.embeddings_dir must point at a new folder for its embeddings.
+  # lenet5_best is the run every SOM was built from (made before run IDs existed).
+  id: lenet5_best
 
 tasks:
   prepare_data: true
