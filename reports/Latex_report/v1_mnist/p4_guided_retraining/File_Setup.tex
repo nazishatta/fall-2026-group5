@@ -1,0 +1,119 @@
+% Adapted from an original template by Hlyni Arnórssyni,
+% Reykjavik University, Iceland
+
+% ------------------------------ PAGE SETTINGS ------------------------------
+\usepackage{geometry}
+
+\geometry{
+    paper=a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.5cm,
+    right=2.4cm,
+    headheight=0.75cm,
+    footskip=1.5cm,
+    headsep=0.75cm
+}
+
+% ------------------------------ BASIC PACKAGES ------------------------------
+\usepackage{blindtext}
+
+% Character encoding
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Mathematics
+\usepackage{amsmath, amsfonts, amsthm, amssymb}
+\usepackage{braket, nicefrac}
+
+% SI units
+\usepackage{siunitx}
+
+% Lists / columns
+\usepackage{enumitem, multicol}
+
+% ------------------------------ FIGURES ------------------------------
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{keystroke}
+\usepackage{pgfplots}
+\usepgfplotslibrary{units}
+\pgfplotsset{compat=1.16}
+
+% Search these locations automatically for figures
+\graphicspath{{fig/}{graphics/}{Graphics/}{./}}
+
+% ------------------------------ TABLES ------------------------------
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[table]{xcolor}
+
+% ------------------------------ TYPOGRAPHY ------------------------------
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{csquotes}
+
+% ------------------------------ COLORS ------------------------------
+\definecolor{GWBlue}{HTML}{1E4E79}
+
+% ------------------------------ SECTION STYLING ------------------------------
+\titleformat{\section}
+  {\Large\bfseries\color{GWBlue}}
+  {\thesection.}
+  {0.40em}
+  {}
+
+\titlespacing*{\section}
+  {0pt}
+  {0.70em}
+  {0.28em}
+
+% ------------------------------ CAPTION STYLING ------------------------------
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    textfont=it,
+    labelsep=period,
+    skip=4pt
+}
+
+% ------------------------------ PARAGRAPH SPACING ------------------------------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.30em}
+
+% ------------------------------ BIBLIOGRAPHY ------------------------------
+\usepackage[
+    backend=biber,
+    style=authoryear,
+    sorting=none,
+    giveninits=true,
+    maxbibnames=99,
+    dashed=false
+]{biblatex}
+
+\addbibresource{references.bib}
+
+\DeclareNameAlias{sortname}{family-given}
+\DeclareNameAlias{default}{family-given}
+\DeclareFieldFormat[article]{title}{#1}
+\DeclareFieldFormat[misc]{title}{#1}
+\renewbibmacro{in:}{}
+
+\AtEveryBibitem{%
+    \clearfield{doi}%
+    \clearfield{urldate}%
+}
+
+\AtBeginBibliography{\small}
+\setlength{\bibitemsep}{0.35em}
+
+% ------------------------------ HYPERLINKS ------------------------------
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=GWBlue,
+    citecolor=GWBlue,
+    urlcolor=GWBlue
+}

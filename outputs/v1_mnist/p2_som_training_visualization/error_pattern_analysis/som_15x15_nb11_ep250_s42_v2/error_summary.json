@@ -1,0 +1,44 @@
+{
+  "analysis": "error_pattern_analysis",
+  "som": "som_15x15_nb11_ep250_s42_v2",
+  "model_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+  "som_grid": [
+    15,
+    15
+  ],
+  "config": "som.yaml",
+  "development_split": "val",
+  "test_used": false,
+  "validation_samples": 10500,
+  "validation_errors": 92,
+  "validation_error_rate": 0.008761904761904762,
+  "mean_confidence_correct": 0.996728241443634,
+  "mean_confidence_error": 0.832645833492279,
+  "hotspot_rule": {
+    "rule": "top k occupied neurons by 95% Wilson lower bound of the error rate; ties: more errors, then more images, then lower neuron index",
+    "k": 11,
+    "hotspot_fraction": 0.05,
+    "min_hotspots": 5,
+    "document": "src/v1_mnist/docs/p2_som_training_visualization/error_pattern_analysis/HOTSPOT_RULE.md"
+  },
+  "hotspot_neurons_in_rank_order": [
+    130,
+    124,
+    47,
+    67,
+    37,
+    154,
+    86,
+    109,
+    160,
+    213,
+    176
+  ],
+  "hotspots_descriptive": {
+    "note": "Same validation images used to choose the hotspots and to count their errors, so this overstates the concentration. The tested, held-out result is hotspot_concentration_held_out in robustness/<model>_error_pattern_robustness.json.",
+    "images_in_hotspots": 174,
+    "errors_in_hotspots": 34,
+    "share_of_images": 0.01657142857142857,
+    "share_of_errors": 0.3695652173913043
+  }
+}

@@ -52,6 +52,19 @@ def setup_logger(
     return logger
 
 
+def get_console_logger(name: str = "v1_mnist.pipeline") -> logging.Logger:
+    """Logger for the pipeline runners: plain messages to the console (no timestamps),
+    so the runner's step list reads like a normal command-line tool."""
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+    return logger
+
+
 def get_logger(name: str = "v1_mnist") -> logging.Logger:
     """Retrieve an existing logger or create a default one if unconfigured."""
     logger = logging.getLogger(name)

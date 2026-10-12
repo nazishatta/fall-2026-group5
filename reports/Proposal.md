@@ -43,7 +43,7 @@ reported as unsupported.
 
 - LeNet-5 baseline on MNIST: **99.18% test accuracy**, macro-F1 0.9918.
 - 84-dimensional embeddings extracted from the CNN's second fully connected layer (fc2).
-- A 15x15 SOM trained on those embeddings (run `som_15x15_seed42_final`), with static and
+- A 15x15 SOM trained on those embeddings (run `som_15x15_seed42_v1`), with static and
   interactive figures.
 - Cluster analysis and error-pattern analysis code, and a first LaTeX report with a related-work
   section, are written and under review.
@@ -113,7 +113,7 @@ results**, and will decide by 2026-10-20 whether to add EuroSAT as a more realis
 data -> CNN baseline -> embeddings (fc2) -> SOM (NNSOM) -> analysis -> novelty detection -> guided retraining
 ```
 
-The diagram is in the README (`demo/fig/project_pipeline/nnsom_project_pipeline.drawio.svg`).
+The diagram is in the README (`demo/project_pipeline/nnsom_project_pipeline.drawio.svg`).
 
 1. **Baseline.** Train LeNet-5 (MNIST, Fashion-MNIST) and ResNet-18 (CIFAR-10) with fixed seeds.
    Report accuracy, per-class F1, and the confusion matrix.
