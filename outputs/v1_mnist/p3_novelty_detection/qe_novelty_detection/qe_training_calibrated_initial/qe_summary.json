@@ -1,0 +1,33 @@
+{
+  "method": "som_bmu_quantization_distance",
+  "threshold_source": "train_only",
+  "threshold_percentile": 95.0,
+  "threshold_rule": "distance > threshold",
+  "threshold": 1.5690279077294162,
+  "train_count": 49000,
+  "train_flagged": 2450,
+  "validation_count": 10500,
+  "validation_flagged": 539,
+  "validation_flag_rate": 0.051333333333333335,
+  "external_ood_evaluated": false,
+  "final_test_used": false,
+  "som_run": "som_15x15_nb11_ep250_s42_v2",
+  "model_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+  "input_sha256": {
+    "train_bmu_distance": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+    "val_bmu_distance": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+    "val_correct": "708271197be47a028bb3b87cd5afaa813fbec83c68ad13553c2b142e11147edf"
+  },
+  "error_association": {
+    "validation_samples": 10500,
+    "flagged_samples": 539,
+    "cnn_errors": 92,
+    "flagged_and_error": 22,
+    "flagged_and_correct": 517,
+    "unflagged_and_error": 70,
+    "unflagged_and_correct": 9891,
+    "final_test_used": false,
+    "external_ood_evaluated": false
+  },
+  "run_id": "qe_training_calibrated_initial"
+}

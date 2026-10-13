@@ -1,0 +1,58 @@
+{
+  "autoencoder_reproduction": {
+    "agreement": "exact for reported numerical values on EC2 rerun",
+    "checkpoint_saved": false,
+    "environment": "EC2, same project environment; full package version manifest not yet captured",
+    "original": {
+      "final_training_loss": 0.11244814694414333,
+      "initial_training_loss": 7.2162517681705705,
+      "validation_mean_reconstruction_error": 0.11096985942453501,
+      "validation_samples": 10500
+    },
+    "reproduced": {
+      "final_training_loss": 0.11244814694414333,
+      "initial_training_loss": 7.2162517681705705,
+      "validation_mean_reconstruction_error": 0.11096985942453501,
+      "validation_samples": 10500
+    }
+  },
+  "configuration_consistency_checks": {
+    "autoencoder_epochs_match_config": true,
+    "autoencoder_final_loss_matches": true,
+    "autoencoder_initial_loss_matches": true,
+    "autoencoder_seed_matches_config": true,
+    "autoencoder_validation_mean_matches": true,
+    "classical_seed_matches_config": true,
+    "svm_budget_matches_config": true,
+    "validation_count_matches": true
+  },
+  "limitations": [
+    "Classical baseline numerical reruns have not been verified.",
+    "Autoencoder cross-environment numerical reproducibility is not established.",
+    "True OOD AUROC, AUPR and FPR@95TPR remain [TBD].",
+    "A full environment/package manifest has not been captured.",
+    "Autoencoder weights/checkpoint were not preserved."
+  ],
+  "random_seed": 42,
+  "recorded_at_utc": "2026-10-12T19:35:53.982980+00:00",
+  "scope": "MNIST Phase 3 development reproducibility evidence only",
+  "sha256": {
+    "autoencoder_results": "c8c4ec9f93eb04e3f4f3e5b098fb3673237b0b2ff8ab362d2fe71def7757ccd3",
+    "classical_results": "89923dc4dc679f669ba5b5469149272a7c87515983f614be6a32bd91f223aa13",
+    "config": "320bd62dd21d8dc698bfcc6ee5998626fe5c1458af49532393f4cd9c0a981a02",
+    "train": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "validation": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
+  },
+  "sha256_paths": {
+    "autoencoder_results": "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/autoencoder_mnist_validation_initial.json",
+    "classical_results": "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/classical_mnist_validation_initial.json",
+    "config": "src/v1_mnist/component/configs/novelty_benchmark.yaml",
+    "train": "outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy",
+    "validation": "outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy"
+  },
+  "test_evidence": {
+    "phase3_ec2": "27 passed in 4.24s",
+    "phase3_ruff": "passed",
+    "repository_ec2": "118 passed, 3 skipped, 3 errors (Phase 1 dataset permission)"
+  }
+}
