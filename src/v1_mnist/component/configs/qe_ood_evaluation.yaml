@@ -1,0 +1,27 @@
+# Proposed Phase 3 development evaluation settings; never overwrite an existing run.
+id_dataset: mnist
+id_split: val
+ood_datasets:
+  - name: svhn
+    split: test
+    run_id: mnist_svhn_qe_dev_initial
+  - name: fashion_mnist
+    split: test
+    run_id: mnist_fashion_mnist_qe_dev_initial
+som_config: src/v1_mnist/component/configs/som.yaml
+qe_config: src/v1_mnist/component/configs/qe_novelty.yaml
+cnn_checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
+image_size: [28, 28]
+feature_layer: fc2
+threshold_percentile: 95.0
+bootstrap:
+  iterations: 2000
+  seed: 42
+  confidence: 0.95
+target_tpr: 0.95
+output_dir: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
+data_root: data/ood
+batch_size: 256
+cnn_sha256: 0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d
+training_distance_path: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/train_bmu_distance.npy
+validation_distance_path: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
