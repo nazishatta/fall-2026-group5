@@ -1,0 +1,28 @@
+# MNIST Phase 3 classical novelty benchmark
+dataset: mnist
+seed: 42
+
+embeddings:
+  train: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+
+one_class_svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: scale
+  max_training_samples: 10000
+
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
