@@ -1,0 +1,306 @@
+\documentclass[11pt]{article}
+\input{File_Setup.tex}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
+
+\begin{document}
+
+\begin{center}
+\includegraphics[width=0.28\textwidth]{gwu_logo.pdf}\par\vspace{4pt}
+{\Large\bfseries Where Do Neural Networks Fail?\par}
+{\large\bfseries Post-Training Analysis and Novelty Detection Using\\ Neural Network Self-Organizing Maps (NNSOM)\par}
+\vspace{6pt}
+{\normalsize Capstone Group 5: Fyrooz Khan, Nazish Atta\par}
+{\small DATS 6501 Capstone, Fall 2026, The George Washington University. Supervised by Dr.\ Amir Jafari.\par}
+\end{center}
+
+\begin{abstract}
+\noindent ...
+\par\smallskip
+\noindent\textbf{Keywords:} self-organizing map, post-training analysis, error analysis, novelty detection, MNIST.
+\end{abstract}
+
+\section{Introduction}
+
+A neural network can be right 99\% of the time and still make mistakes that follow a pattern. Our starting model is a LeNet-5 network \parencite{lecun1998gradient}. It reads handwritten digits from the MNIST dataset and gets 99.18\% of the test images right (86 mistakes in 10,500 images).
+The question we ask is: where do these few mistakes come from?
+
+Well-known tools such as saliency maps \parencite{simonyan2014saliency}, LIME \parencite{ribeiro2016lime} and SHAP \parencite{lundberg2017shap} explain one prediction at a time.
+They do not show where, inside the network, the mistakes gather.
+
+We use a Self-Organizing Map (SOM) \parencite{kohonen1990som} to get this wider view. A SOM places data on a flat grid so that similar items end up in nearby cells. We use the NNSOM library \parencite{jafari_nnsom}.
+The plan is to train the CNN first, then record the 84 numbers it computes for each image just before it answers (the \emph{embedding}), and then train a SOM on these embeddings. We ask three questions:
+(i)~where on the map do the CNN's mistakes gather; (ii)~can the map spot inputs that are unlike the training data; and (iii)~can the map choose better samples for retraining than random choice?
+Because the SOM is trained on the CNN's own embeddings, we also check whether it tells us more than simple methods do, and we compare the plain CNN with a SOM-assisted CNN from start to finish (Figure~\ref{fig:endtoend}).
+
+\textbf{Contributions.}
+(1)~A repeatable CNN and SOM pipeline for MNIST.
+(2)~Evidence that the CNN's mistakes gather in a small set of cells of a 15$\times$15 map, where digits overlap. This is tested against chance.
+(3)~A comparison with simple baselines. It shows that this pattern is not special to the SOM, and that the CNN's own confidence is a much stronger signal for finding mistakes.
+(4)~...
+
+\section{Related Work}
+
+Our work touches four areas of research. For each one we say what it does and how our work is different.
+
+\textbf{CNNs as a source of features.} LeNet-5 \parencite{lecun1998gradient} showed that convolutional networks learn useful features for handwritten digits. We do not propose a new classifier.
+We train LeNet-5 with the Adam optimizer \parencite{kingma2015adam} and then keep it fixed, so we can study how it organizes its features and where it fails.
+
+\textbf{Explaining single predictions.} Saliency maps \parencite{simonyan2014saliency} show which pixels change a class score the most. LIME \parencite{ribeiro2016lime} fits a simple model around one prediction.
+SHAP \parencite{lundberg2017shap} gives each input feature a share of the credit. All three answer the question ``why this prediction?''. We ask a different question, ``where in the network's features do mistakes gather?'', so our work adds to theirs.
+
+\textbf{Self-Organizing Maps.} Kohonen's SOM \parencite{kohonen1990som} puts data on a flat grid so that nearby cells hold similar data. Vesanto and Alhoniemi \parencite{vesanto2000clustering} showed how to group the cells of a trained SOM and measure the result.
+NNSOM \parencite{jafari_nnsom} provides the training code and the quality measures we use. SOM-VAE \parencite{fortuin2019somvae} and DESOM \parencite{forest2021desom} train the features and the map together.
+We do the opposite on purpose. We keep the CNN fixed, so any signal from the SOM can be judged on its own.
+
+\textbf{Finding systematic errors.} Domino \parencite{eyuboglu2022domino} looks for groups of data where a model does badly and describes them in words. The Spotlight \parencite{deon2022spotlight} searches the feature space for a region where the model's loss is high.
+These are closest to our error analysis. We differ in two ways. We use a map that keeps neighbors close, which gives one fixed picture that a person can read. And we test every claim against chance and against simple baselines.
+
+\textbf{Novelty and out-of-distribution detection.} Hendrycks and Gimpel \parencite{hendrycks2017baseline} proposed the maximum softmax probability (the network's top probability) as a simple baseline for finding mistakes and unfamiliar inputs.
+ODIN \parencite{liang2018odin} improves it with a temperature setting and small changes to the input. Lee et al.\ \parencite{lee2018mahalanobis} measure distance to each class in feature space, and Liu et al.\ \parencite{liu2020energy} use an energy score.
+Deep SVDD \parencite{ruff2018deep} learns a compact description of normal data, and Sun et al.\ \parencite{sun2022knn} show that the distance to the nearest training features works well. The survey by Yang et al.\ \parencite{yang2024generalized} puts these methods side by side.
+We do not claim that a SOM beats them. We test whether the SOM's own measures give a useful novelty signal, while also giving a picture of where mistakes sit.
+
+\textbf{How our work differs.} Earlier work either explains single predictions, trains maps together with the model, or detects novelty without showing where the failures sit. We use one SOM on fixed features for all three jobs: finding mistakes, detecting novelty, and guiding retraining.
+We test each claim against chance and against simple baselines. This already changed one conclusion: on MNIST the pattern of mistakes is real, but a plain k-means grouping and the CNN's own confidence do as well or better at finding them (Table~\ref{tab:error-pattern-baselines}).
+
+\section{Method}
+\label{sec:method}
+
+\subsection{Data and model}
+
+MNIST is split once into 49,000 training, 10,500 validation and 10,500 test images. The split keeps the same share of each digit in every part, and it uses a fixed random seed so it can be repeated.
+We train a LeNet-5 with Adam \parencite{kingma2015adam} and keep the version with the best validation accuracy. For every image we then record the 84 numbers from the network's second-to-last layer (called fc2). These numbers are the embedding.
+We rescale them to the range $-1$ to $1$, using the training data only (Figure~\ref{fig:pipeline}).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize, node distance=5mm and 4mm,
+  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=10mm, text width=30mm, fill=GWBlue!6, line width=0.6pt},
+  todo/.style={box, dashed, fill=white, draw=GWBlue!70},
+  tag/.style={font=\bfseries\scriptsize, text=GWBlue, anchor=south west, inner sep=1pt},
+  arr/.style={-{Stealth[length=2mm]}, line width=0.6pt, draw=GWBlue}]
+\node[box] (data) {MNIST\\70,000 images};
+\node[box, right=of data] (split) {Stratified split\\49,000 / 10,500 / 10,500};
+\node[box, right=of split] (cnn) {Baseline LeNet-5\\99.18\% test accuracy};
+\node[box, right=of cnn] (emb) {fc2 embeddings\\84 dimensions};
+\node[tag] at (data.north west) {Phase 1: Model Training Baseline};
+\node[box, below=9mm of emb] (som) {SOM training\\NNSOM 15$\times$15};
+\node[box, left=of som] (viz) {SOM visualization\\U-matrix, hit histogram};
+\node[box, left=of viz] (cluster) {Cluster analysis\\purity, class overlap};
+\node[box, left=of cluster] (err) {Error pattern analysis\\hotspots, baseline checks};
+\node[tag] at (err.north west) {Phase 2: SOM Training and Visualization};
+\node[todo, below=9mm of err] (nov) {Novelty detection\\quantization error, U-matrix};
+\node[todo, right=of nov] (cmp) {Comparative evaluation\\max-softmax, energy, Mahalanobis, \dots};
+\node[todo, right=of cmp] (retrain) {Guided retraining\\hard examples, augmentation};
+\node[todo, right=of retrain] (rean) {Iterative SOM re-analysis\\before / after};
+\node[tag, anchor=north west] at (nov.south west) {Phases 3 and 4};
+\draw[arr] (data) -- (split); \draw[arr] (split) -- (cnn); \draw[arr] (cnn) -- (emb);
+\draw[arr] (emb) -- (som); \draw[arr] (som) -- (viz); \draw[arr] (viz) -- (cluster); \draw[arr] (cluster) -- (err);
+\draw[arr, dashed] (err) -- (nov); \draw[arr, dashed] (nov) -- (cmp);
+\draw[arr, dashed] (cmp) -- (retrain); \draw[arr, dashed] (retrain) -- (rean);
+\end{tikzpicture}
+\caption{The project pipeline. Solid boxes: Phases 1 and 2. Dashed boxes: Phases 3 and 4.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Self-Organizing Map}
+
+We train a 15$\times$15 map (225 cells) on the 49,000 training embeddings. Each image is assigned to the cell whose weights are closest to it, called its best-matching neuron (BMU).
+We judge the map with two numbers. The quantization error (QE) is the average distance between an image and its cell. The topological error (TE1) is the share of images whose two closest cells are not neighbors on the grid.
+
+We tried three grid sizes (10$\times$10, 15$\times$15 and 20$\times$20) under the same conditions: the same data, three starting neighborhood sizes, ten maps per grid, and validation data only.
+Larger grids fit the data more closely (QE 1.21, 1.06 and 0.98) and have slightly purer cells (97.6\%, 98.2\% and 98.4\%), but they also have a higher topological error (TE1 4.8\%, 6.6\% and 7.7\%).
+The grids are not clearly different at predicting the CNN's mistakes: the AUROC difference between 20$\times$20 and 15$\times$15 is $+0.001$ (95\% range $-0.100$ to $+0.089$), so the comparison is inconclusive.
+Since no grid is clearly better, we use the 15$\times$15 map for the main analysis. It has good purity and a lower topological error than the 20$\times$20 map.
+We repeat the error analysis on the other two grids to check that the conclusions do not depend on this choice.
+
+\subsection{Finding where mistakes gather}
+
+For each cell we compute its \emph{purity} (the share of its images that belong to its most common digit) and the \emph{entropy} of its digit mix (how mixed the digits are). We compare the overall purity with a chance level. To get the chance level,
+we shuffle the digit labels 1,000 times and measure the purity again.
+
+To find hotspots, we rank the cells by the lower end of the 95\% Wilson interval \parencite{wilson1927probable} of their error rate. This keeps small cells from ranking high by luck.
+The top $\max(5,\,5\%\text{ of the cells})$ are the hotspots. We pick hotspots using a random half of the validation images and measure them on the other half, using the \emph{concentration ratio}:
+\[
+\text{ratio}=\frac{\text{share of the mistakes that fall in hotspots}}{\text{share of the images that fall in hotspots}}.
+\]
+A ratio of 1 means the mistakes are spread evenly. We repeat this over 200 random half-splits and report the median. Chance is estimated by repeating everything 200 times with the mistake labels shuffled.
+We also compute the Spearman correlation between a cell's error rate and its purity and entropy, to see whether mistakes sit where digits overlap.
+
+\subsection{Comparison with simple baselines}
+
+We repeat the analysis with three simple methods: (a)~k-means with 225 clusters (the same number as SOM cells); (b)~the impurity of the 15 nearest training embeddings; and
+(c)~the network's maximum softmax probability \parencite{hendrycks2017baseline}, meaning how sure the network is of its answer.
+Each score is judged on the same validation images by the area under the ROC curve (AUROC), which says how well the score separates mistakes from correct answers (1 is perfect, 0.5 is chance). We give bootstrap confidence intervals.
+None of these methods depends on the dataset, so they can also be used on Fashion-MNIST and CIFAR-10.
+
+\subsection{Phase 3: Novelty detection}
+
+...
+
+\subsection{Phase 4: Guided retraining}
+
+...
+
+\subsection{End-to-end comparison}
+
+Two paths are compared on the same test images (Figure~\ref{fig:endtoend}). In path~1 (CF1), an image goes through the CNN and gets a prediction.
+In path~2 (CF2), the image first goes through the SOM/graph stage and then through the CNN. Each path gives a confusion matrix, CF1 and CF2. CF1 is the confusion matrix of the baseline CNN on the test images, the same one as in Phase 1 (Figure~\ref{fig:cf}). The comparison shows how the SOM stage changes the predictions. The SOM/graph stage works as follows: ...
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize, node distance=6mm,
+  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=9mm, minimum width=19mm, fill=GWBlue!6, line width=0.6pt},
+  som/.style={box, dashed, fill=white},
+  cf/.style={draw=GWBlue, fill=white, minimum width=22mm, minimum height=14mm, align=center, line width=0.6pt},
+  arr/.style={-{Stealth[length=2mm]}, line width=0.6pt, draw=GWBlue}]
+\node[box] (s1) {Sample};
+\node[box, right=of s1] (c1) {CNN};
+\node[box, right=of c1] (p1) {Prediction};
+\node[cf, right=of p1] (m1) {CF1\\confusion matrix\\(as in Phase 1)};
+\node[box, below=14mm of s1] (s2) {Sample};
+\node[som, right=of s2] (g2) {SOM / graph\\stage ...};
+\node[box, right=of g2] (c2) {CNN};
+\node[box, right=of c2] (p2) {Prediction};
+\node[cf, right=of p2] (m2) {CF2\\confusion matrix\\...};
+\draw[arr] (s1)--(c1); \draw[arr] (c1)--(p1); \draw[arr] (p1)--(m1);
+\draw[arr] (s2)--(g2); \draw[arr] (g2)--(c2); \draw[arr] (c2)--(p2); \draw[arr] (p2)--(m2);
+\node[font=\bfseries\scriptsize, text=GWBlue, anchor=south west] at (s1.north west) {Path 1: CNN only};
+\node[font=\bfseries\scriptsize, text=GWBlue, anchor=south west] at (s2.north west) {Path 2: SOM-assisted CNN};
+\draw[arr, dashed] (m1.south) -- ++(0,-5mm) -| node[pos=0.25, above, font=\scriptsize\itshape] {comparison of predictions} (m2.north);
+\end{tikzpicture}
+\caption{End-to-end comparison: sample $\rightarrow$ CNN $\rightarrow$ prediction (CF1) against sample $\rightarrow$ SOM/graph $\rightarrow$ CNN $\rightarrow$ prediction (CF2), on the same samples. Dashed parts: ...}
+\label{fig:endtoend}
+\end{figure}
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Leakage control}
+
+All development choices use the training and validation images only. The scaler, the SOM, k-means and the nearest-neighbor reference set are fitted on training embeddings. All error statistics are computed on validation images.
+The test images were used once, to score the baseline CNN, and the SOM analysis does not use them. The evaluation rules (grid comparison, hotspot rule, number of splits and shuffles, seeds) were set before the results were looked at.
+One caution: we chose the CNN checkpoint using the validation images, so these images are not completely untouched by model development.
+
+\subsection{Phase 1: Baseline CNN}
+
+The LeNet-5 gets 99.18\% of the test images right (10,414 of 10,500; 95\% Wilson interval 98.99--99.34\%), with a macro F1-score of 0.9918. It makes 92 mistakes on the validation images
+(its average confidence is 0.997 when it is right and 0.833 when it is wrong) and 29 on the 49,000 training images. The most common validation confusions are $5\rightarrow0$, $9\rightarrow4$ and $4\rightarrow9$ (six each).
+
+\subsection{Phase 2: SOM structure and where mistakes gather}
+
+On the validation images the 15$\times$15 map has a QE of 1.041 (training: 1.039) and a TE1 of 6.18\%. Its cells follow the digit classes: the purity is 98.19\% on validation images, against 17.4\% (95\% range 17.0--17.7\%) with shuffled labels ($p=0.001$).
+
+The CNN's mistakes gather in a few hotspot cells (Figure~\ref{fig:maps} and Table~\ref{tab:phase2}). The 11 hotspot cells of the 15$\times$15 map hold 11.1 times their fair share of the mistakes (95\% range 6.1--17.6), against about 1 by chance ($p=0.005$).
+The result is similar on the 10$\times$10 and 20$\times$20 maps. The error rate of a cell goes down as its purity goes up, and goes up as its digit mix grows, far beyond chance on all three grids.
+A finer grid does not predict mistakes better (the AUROC difference between 20$\times$20 and 15$\times$15 is $+0.001$, range $-0.100$ to $+0.089$), but with only 92 mistakes we cannot detect differences smaller than about 0.1 AUROC.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\small
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Measure (validation images)} & \textbf{10$\times$10} & \textbf{15$\times$15} & \textbf{20$\times$20} \\ \hline
+Hotspot cells & 5 & 11 & 20 \\ \hline
+Concentration ratio (95\% range) & 10.5 (5.4--17.3) & 11.1 (6.1--17.6) & 13.4 (8.0--19.3) \\ \hline
+Chance level (median) & 0.98 & 0.94 & 0.93 \\ \hline
+Spearman, error rate vs.\ purity & $-0.755$ & $-0.810$ & $-0.766$ \\ \hline
+Spearman, error rate vs.\ digit mix (entropy) & $+0.778$ & $+0.816$ & $+0.768$ \\ \hline
+\end{tabular}
+\caption{Where mistakes gather, on three grid sizes (92 validation mistakes). All $p=0.005$. The ratios should not be used to compare grids with each other.}
+\label{tab:phase2}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}[c]{0.40\textwidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio]{p2_u_matrix.pdf}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.58\textwidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio]{p2_validation_complex_error_map.pdf}
+\end{minipage}
+\caption{Left: U-matrix of the 15$\times$15 SOM (high values mark borders between groups of cells). Right: validation error map (fill: most common true digit; edge: most common wrong answer; size: how many mistakes).}
+\label{fig:maps}
+\end{figure}
+
+\subsection{Comparison with baselines}
+
+Table~\ref{tab:error-pattern-baselines} compares the SOM with the baselines on the same validation images. A SOM cell and a k-means cell find mistakes equally well (AUROC 0.685 and 0.684).
+Nearest-neighbor impurity does much better (0.874), and the CNN's own confidence does best (0.981). The SOM's hotspots are smaller than those of k-means (1.6\% of the images against 3.8\%), and they catch a similar share of the mistakes (18\% against 21\%).
+This is why the SOM has a higher concentration ratio. The hotspot-size numbers are exploratory.
+
+{\setlength{\tabcolsep}{3pt}\input{tables/error_pattern_baselines.tex}}
+
+\subsection{Phase 3: Novelty detection}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\small
+\begin{tabular}{|p{0.38\textwidth}|p{0.14\textwidth}|p{0.14\textwidth}|p{0.17\textwidth}|}
+\hline
+\textbf{Novelty score} & \textbf{AUROC} & \textbf{AUPR} & \textbf{FPR at 95\% TPR} \\ \hline
+SOM quantization error & ... & ... & ... \\ \hline
+SOM U-matrix distance & ... & ... & ... \\ \hline
+Maximum softmax probability & ... & ... & ... \\ \hline
+Energy / Mahalanobis & ... & ... & ... \\ \hline
+Isolation Forest / One-Class SVM / autoencoder & ... & ... & ... \\ \hline
+\end{tabular}
+\caption{Novelty detection with MNIST as normal data: ...}
+\label{tab:novelty}
+\end{table}
+
+\subsection{Phase 4: Guided retraining}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\small
+\begin{tabular}{|p{0.30\textwidth}|p{0.18\textwidth}|p{0.18\textwidth}|p{0.18\textwidth}|}
+\hline
+\textbf{Selection} & \textbf{Test accuracy} & \textbf{Hotspot ratio} & \textbf{Map purity} \\ \hline
+No retraining (baseline) & 99.18\% & 11.1 & 98.19\% \\ \hline
+Random selection & ... & ... & ... \\ \hline
+SOM-guided selection & ... & ... & ... \\ \hline
+\end{tabular}
+\caption{Guided retraining against random selection: ...}
+\label{tab:retraining}
+\end{table}
+
+\subsection{End-to-end comparison}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}[c][4.6cm][c]{0.44\textwidth}\centering
+\includegraphics[width=\linewidth,height=4.3cm,keepaspectratio]{p1_confusion_matrix.pdf}\\[2pt]
+{\small CF1: sample $\rightarrow$ CNN $\rightarrow$ prediction}
+\end{minipage}\hfill
+\fbox{\parbox[c][4.6cm][c]{0.44\textwidth}{\centering\small CF2: sample $\rightarrow$ SOM/graph $\rightarrow$ CNN $\rightarrow$ prediction\\[2pt] ...}}
+\caption{Confusion matrices of the two paths on the same test images. Left (CF1): the baseline CNN, the same matrix as in Phase 1. Right (CF2): to be filled after the SOM/graph stage has been run.}
+\label{fig:cf}
+\end{figure}
+
+\section{Discussion and Limitations}
+
+On MNIST the SOM turns the 84 numbers of each embedding into a map where the digit classes form clean regions and the mistakes sit in the few cells where digits mix. This holds on three grid sizes and against chance.
+But if the only goal were to find likely mistakes, the maximum softmax probability would be the better tool. So the value of the SOM lies in the picture it gives, and possibly in novelty detection and retraining.
+Mistakes are also farther from their cell than correct images are (average distance 1.349 against 0.960), which may help find unfamiliar inputs. ...
+
+\textbf{Limitations.}
+(1)~We have only 92 validation mistakes, so the intervals are wide, and differences below about 0.1 AUROC cannot be seen.
+(2)~MNIST is easy. Harder datasets (Fashion-MNIST, CIFAR-10) are needed before we can draw general conclusions.
+(3)~The grid comparison could not separate the three grid sizes, so the choice of 15$\times$15 rests on a trade-off between purity and topological error, not on a clear winner.
+(4)~The baseline comparison covers only the 15$\times$15 map and uses three k-means starts per seed.
+(5)~We also used the validation images to choose the CNN checkpoint.
+
+\section{Conclusion}
+
+...
+
+\clearpage
+\printbibliography[title={References}]
+
+\end{document}
