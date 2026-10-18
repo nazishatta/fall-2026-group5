@@ -45,15 +45,7 @@ from src.v1_mnist.component.utils.som_io import reconstruct_assignments
 
 LOGGER = logging.getLogger("phase3_svhn_comparison")
 ROOT = Path.cwd().resolve()
-RUN_ID = "mnist_svhn_five_method_comparison_s42_initial"
-OUTPUT = ROOT / "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark" / RUN_ID
 CONFIG_PATH = ROOT / "src/v1_mnist/component/configs/novelty_benchmark.yaml"
-QE_CONFIG_PATH = ROOT / "src/v1_mnist/component/configs/qe_ood_evaluation.yaml"
-SVHN_FILE = ROOT / "data/ood_svhn/test_32x32.mat"
-QE_RESULT = ROOT / (
-    "outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/"
-    "mnist_svhn_qe_frozen_s42_initial/qe_ood_metrics.json"
-)
 
 
 def sha256(path: Path) -> str:
@@ -87,14 +79,22 @@ def score_method(
 def main() -> None:
     """Run the preregistered five-method MNIST vs SVHN comparison."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    if OUTPUT.exists():
-        raise FileExistsError(f"STOP: Existing run must not be overwritten: {OUTPUT}")
-    for path in (CONFIG_PATH, QE_CONFIG_PATH, SVHN_FILE, QE_RESULT):
+    benchmark = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+    run_id = benchmark["run_id"]
+    if not isinstance(run_id, str) or not run_id or "/" in run_id or ".." in run_id:
+        raise ValueError("Invalid benchmark run ID")
+    output = ROOT / benchmark["output_root"] / run_id
+    qe_config_path = ROOT / benchmark["qe_evaluation_config"]
+    svhn_file = ROOT / benchmark["svhn_file"]
+    qe_result = ROOT / benchmark["qe_reference_metrics"]
+
+    if output.exists():
+        raise FileExistsError(f"STOP: Existing run must not be overwritten: {output}")
+    for path in (qe_config_path, svhn_file, qe_result):
         if not path.is_file():
             raise FileNotFoundError(f"Required frozen input missing: {path}")
 
-    benchmark = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
-    ood_config = read_settings(QE_CONFIG_PATH)
+    ood_config = read_settings(qe_config_path)
     if benchmark["dataset"] != "mnist" or int(benchmark["seed"]) != 42:
         raise RuntimeError("Benchmark configuration differs from recorded protocol")
     if (tuple(ood_config["image_size"]) != (28, 28)
@@ -109,7 +109,7 @@ def main() -> None:
     hashes = {"train": sha256(train_path), "validation": sha256(val_path)}
     if hashes != expected_hashes:
         raise RuntimeError("STOP: CNN embeddings do not match original fingerprints")
-    qe_saved = json.loads(QE_RESULT.read_text(encoding="utf-8"))
+    qe_saved = json.loads(qe_result.read_text(encoding="utf-8"))
     if qe_saved.get("metrics", {}).get("ood_count") != 26032:
         raise RuntimeError("STOP: QE reference run does not have 26,032 SVHN samples")
 
@@ -126,7 +126,7 @@ def main() -> None:
 
     # SVHN is used for scoring ONLY; no fitting, threshold calibration or selection.
     dataset = SVHN(
-        root=str(SVHN_FILE.parent), split="test", download=False,
+        root=str(svhn_file.parent), split="test", download=False,
         transform=image_transform("svhn", (28, 28)),
     )
     loader = DataLoader(dataset, batch_size=int(ood_config["batch_size"]), shuffle=False)
@@ -181,7 +181,7 @@ def main() -> None:
         sample_ids=np.arange(len(features)), max_examples=20,
     )
     result: dict[str, object] = {
-        "run_id": RUN_ID,
+        "run_id": run_id,
         "id_dataset": "mnist", "id_split": "validation",
         "ood_dataset": "svhn", "ood_split": "test",
         "sample_counts": {"mnist_train": len(train), "mnist_validation": cut,
@@ -192,10 +192,10 @@ def main() -> None:
         "autoencoder_final_training_loss": losses[-1],
         "settings": benchmark,
         "provenance": {**provenance, "config_sha256": sha256(CONFIG_PATH),
-                       "svhn_mat_sha256": sha256(SVHN_FILE),
+                       "svhn_mat_sha256": sha256(svhn_file),
                        "train_embeddings_sha256": hashes["train"],
                        "validation_embeddings_sha256": hashes["validation"],
-                       "previous_qe_metrics_sha256": sha256(QE_RESULT)},
+                       "previous_qe_metrics_sha256": sha256(qe_result)},
         "leakage_control": (
             "CNN and SOM remain frozen. Baselines fit only on MNIST train. "
             "MNIST validation and SVHN test used only for scoring; OOD scores "
@@ -203,27 +203,27 @@ def main() -> None:
             "on labeled evaluation samples, not a deployable frozen threshold."
         ),
         "limitations": [
-            "One-Class SVM fitted on 10,000 MNIST train examples; other "
-            "baselines used 49,000, so fitting budgets differ.",
+            ("One-Class SVM fitted on 10,000 MNIST train examples; other "
+             "baselines used 49,000, so fitting budgets differ."),
             "This is a single-seed, single-OOD-dataset comparison.",
             "Sample-level miss IDs alone do not establish causes of failures.",
-            "U-Matrix scores indicate local SOM prototype separation, not "
-            "direct sample-to-BMU distance.",
+            ("U-Matrix scores indicate local SOM prototype separation, not "
+             "direct sample-to-BMU distance."),
         ],
     }
     # Output directory is created only after all scorers/metrics succeed.
-    OUTPUT.mkdir(parents=True, exist_ok=False)
-    with (OUTPUT / "comparison_metrics.json").open("x", encoding="utf-8") as file:
+    output.mkdir(parents=True, exist_ok=False)
+    with (output / "comparison_metrics.json").open("x", encoding="utf-8") as file:
         json.dump(result, file, indent=2, allow_nan=False)
         file.write("\n")
     # Save sample order and scores for reproducible miss analysis; outputs/ is ignored.
-    with (OUTPUT / "svhn_labels.npy").open("xb") as file:
+    with (output / "svhn_labels.npy").open("xb") as file:
         np.save(file, labels, allow_pickle=False)
     for name, (id_s, ood_s) in scores.items():
         for split, values in (("mnist_val", id_s), ("svhn_test", ood_s)):
-            with (OUTPUT / f"{name}_{split}_scores.npy").open("xb") as file:
+            with (output / f"{name}_{split}_scores.npy").open("xb") as file:
                 np.save(file, np.asarray(values, dtype=np.float64), allow_pickle=False)
-    LOGGER.info("SAVED %s", OUTPUT / "comparison_metrics.json")
+    LOGGER.info("SAVED %s", output / "comparison_metrics.json")
     for method, metrics in results.items():
         LOGGER.info("%s: AUROC %.6f, AUPR %.6f, FPR@95TPR %.6f", method,
                     metrics["auroc"], metrics["aupr"], metrics["fpr_at_95_tpr"])

@@ -1,3 +1,6 @@
+
+from pathlib import Path
+
 """Small deterministic tests that never touch official MNIST test or OOD data."""
 
 import numpy as np
@@ -38,7 +41,7 @@ def test_misses_are_ordered() -> None:
     assert result["lowest_scoring_misses"][0]["sample_id"] == "b"
 
 
-def test_never_overwrite_existing_result(tmp_path) -> None:
+def test_never_overwrite_existing_result(tmp_path: Path) -> None:
     path = tmp_path / "metrics.json"
     save_new_json(path, {"auroc": 0.8})
     with pytest.raises(FileExistsError):

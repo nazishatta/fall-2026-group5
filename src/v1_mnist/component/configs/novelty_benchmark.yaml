@@ -8,6 +8,10 @@ embeddings:
 
 output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
 
+# Existing frozen reference: read-only, never overwrite.
+qe_reference_metrics: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/mnist_svhn_qe_frozen_s42_initial/qe_ood_metrics.json
+
+
 isolation_forest:
   n_estimators: 200
   max_samples: 256
@@ -26,3 +30,8 @@ autoencoder:
   epochs: 20
   batch_size: 256
   learning_rate: 0.001
+
+# Historical comparison run; never overwrite its saved results.
+run_id: mnist_svhn_five_method_comparison_s42_initial
+svhn_file: data/ood_svhn/test_32x32.mat
+qe_evaluation_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
