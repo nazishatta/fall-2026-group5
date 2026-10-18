@@ -59,10 +59,12 @@ def score_method(
     ood_scores: np.ndarray,
     repeats: int,
     seed: int,
+    target_tpr: float,
 ) -> dict[str, object]:
     """Evaluate fixed scores with stratified confidence intervals."""
     return evaluate_scores(
-        id_scores, ood_scores, bootstrap_repeats=repeats, seed=seed
+        id_scores, ood_scores, bootstrap_repeats=repeats, seed=seed,
+        target_tpr=target_tpr
     )
 
 
@@ -151,7 +153,7 @@ def main() -> None:
     scores["autoencoder"] = (ae_scores[:cut], ae_scores[cut:])
 
     # Cross-check QE results against the independent, already frozen evaluation.
-    qe_eval = score_method(*scores["qe"], repeats=0, seed=int(benchmark["seed"]))
+    qe_eval = score_method(*scores["qe"], repeats=0, target_tpr=float(ood_config["target_tpr"]), seed=int(benchmark["seed"]))
     for key, old_key in (("auroc", "auroc"), ("aupr", "aupr_ood")):
         difference = abs(float(qe_eval[key]) - float(qe_saved["metrics"][old_key]))
         if difference > benchmark["tolerances"]["metric_agreement"]:
@@ -160,7 +162,8 @@ def main() -> None:
     iterations = int(ood_config["bootstrap"]["iterations"])
     seed = int(ood_config["bootstrap"]["seed"])
     results = {
-        name: score_method(id_s, ood_s, repeats=iterations, seed=seed)
+        name: score_method(id_s, ood_s, repeats=iterations, seed=seed,
+                           target_tpr=float(ood_config["target_tpr"]))
         for name, (id_s, ood_s) in scores.items()
     }
     results["qe"]["frozen_threshold_misses"] = analyze_misses(

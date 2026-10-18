@@ -24,7 +24,7 @@ def test_fpr_definition_matches_qe() -> None:
 
     qe_result = ood_metrics(normal, novel, threshold=0.5)
     comparison = evaluate_scores(
-        normal, novel, bootstrap_repeats=10, seed=42
+        normal, novel, bootstrap_repeats=10, seed=42, target_tpr=0.95
     )
 
     assert comparison["fpr_at_95_tpr"] == qe_result["fpr_at_target_tpr"]
@@ -44,7 +44,7 @@ def test_fpr_is_not_interpolated() -> None:
 
 def test_perfect_separation() -> None:
     result = evaluate_scores(np.array([0.0, 0.1]), np.array([0.9, 1.0]),
-                             bootstrap_repeats=10)
+                             bootstrap_repeats=10, seed=42, target_tpr=0.95)
     assert result["auroc"] == 1.0
     assert result["aupr"] == 1.0
     assert result["fpr_at_95_tpr"] == 0.0
@@ -53,14 +53,14 @@ def test_perfect_separation() -> None:
 def test_reproducible_bootstrap() -> None:
     normal = np.array([0.1, 0.4, 0.5])
     novel = np.array([0.3, 0.6, 0.8])
-    first = evaluate_scores(normal, novel, bootstrap_repeats=25, seed=42)
-    second = evaluate_scores(normal, novel, bootstrap_repeats=25, seed=42)
+    first = evaluate_scores(normal, novel, bootstrap_repeats=25, seed=42, target_tpr=0.95)
+    second = evaluate_scores(normal, novel, bootstrap_repeats=25, seed=42, target_tpr=0.95)
     assert first == second
 
 
 def test_no_ood_rejected() -> None:
     with pytest.raises(ValueError, match="Both ID and OOD"):
-        evaluate_scores(np.array([0.5]), np.array([]))
+        evaluate_scores(np.array([0.5]), np.array([]), bootstrap_repeats=0, seed=42, target_tpr=0.95)
 
 
 def test_misses_are_ordered() -> None:
@@ -75,3 +75,15 @@ def test_never_overwrite_existing_result(tmp_path: Path) -> None:
     save_new_json(path, {"auroc": 0.8})
     with pytest.raises(FileExistsError):
         save_new_json(path, {"auroc": 0.9})
+
+
+def test_historical_metric_schema_rejects_other_target_tpr() -> None:
+    """Never label a different operating point as FPR@95TPR."""
+    with pytest.raises(ValueError, match="requires target_tpr=0.95"):
+        evaluate_scores(
+            np.array([0.1, 0.2]),
+            np.array([0.8, 0.9]),
+            bootstrap_repeats=0,
+            seed=42,
+            target_tpr=0.90,
+        )

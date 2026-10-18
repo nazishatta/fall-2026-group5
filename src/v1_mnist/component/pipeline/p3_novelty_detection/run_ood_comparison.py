@@ -13,6 +13,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
     evaluate_scores,
     save_new_json,
 )
+from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
 
 LOGGER = get_logger("v1_mnist.p3.ood_comparison")
@@ -34,8 +35,11 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--detector", required=True)
     parser.add_argument("--frozen-threshold", type=float)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--bootstrap-repeats", type=int, default=1000)
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path("src/v1_mnist/component/configs/qe_ood_evaluation.yaml"),
+    )
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Output exists: do not overwrite an existing run")
@@ -43,8 +47,14 @@ def main() -> None:
         parser.error("A non-empty new run-id is required")
     normal = np.load(args.id_scores, allow_pickle=False)
     novel = np.load(args.ood_scores, allow_pickle=False)
-    metrics = evaluate_scores(normal, novel, seed=args.seed,
-                              bootstrap_repeats=args.bootstrap_repeats)
+    settings = load_config(args.config)
+    metrics = evaluate_scores(
+        normal,
+        novel,
+        seed=int(settings.bootstrap.seed),
+        bootstrap_repeats=int(settings.bootstrap.iterations),
+        target_tpr=float(settings.target_tpr),
+    )
     payload: dict[str, object] = {
         "run_id": args.run_id,
         "detector": args.detector,

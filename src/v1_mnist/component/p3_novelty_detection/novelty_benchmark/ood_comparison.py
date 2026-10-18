@@ -20,8 +20,9 @@ def evaluate_scores(
     id_scores: np.ndarray,
     ood_scores: np.ndarray,
     *,
-    bootstrap_repeats: int = 1000,
-    seed: int = 42,
+    bootstrap_repeats: int,
+    seed: int,
+    target_tpr: float,
 ) -> dict[str, object]:
     """Evaluate higher-is-more-novel scores on held-out ID and OOD examples.
 
@@ -34,6 +35,8 @@ def evaluate_scores(
         raise ValueError("Both ID and OOD samples are required for OOD metrics")
     if not np.isfinite(normal).all() or not np.isfinite(novel).all():
         raise ValueError("Score arrays must contain only finite values")
+    if target_tpr != 0.95:
+        raise ValueError("Historical fpr_at_95_tpr schema requires target_tpr=0.95")
     if bootstrap_repeats < 0:
         raise ValueError("bootstrap_repeats must be nonnegative")
 
@@ -42,7 +45,7 @@ def evaluate_scores(
     auc = float(roc_auc_score(labels, scores))
     aupr = float(average_precision_score(labels, scores))
     fpr, tpr, _ = roc_curve(labels, scores)
-    fpr95 = minimum_fpr_at_target_tpr(fpr, tpr, 0.95)
+    fpr95 = minimum_fpr_at_target_tpr(fpr, tpr, target_tpr)
     rng = np.random.default_rng(seed)
     estimates: list[list[float]] = []
     for _ in range(bootstrap_repeats):
@@ -54,7 +57,7 @@ def evaluate_scores(
         estimates.append([
             float(roc_auc_score(b_labels, b_scores)),
             float(average_precision_score(b_labels, b_scores)),
-            minimum_fpr_at_target_tpr(b_fpr, b_tpr, 0.95),
+            minimum_fpr_at_target_tpr(b_fpr, b_tpr, target_tpr),
         ])
     intervals = (
         np.quantile(np.asarray(estimates), [0.025, 0.975], axis=0)
@@ -63,6 +66,7 @@ def evaluate_scores(
     result: dict[str, object] = {
         "n_id": len(normal), "n_ood": len(novel), "seed": seed,
         "bootstrap_repeats": bootstrap_repeats,
+        "target_tpr": target_tpr,
         "auroc": auc, "aupr": aupr, "fpr_at_95_tpr": fpr95,
         "confidence_intervals_95": (
             {name: [float(intervals[0, index]), float(intervals[1, index])]
