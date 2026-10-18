@@ -1,0 +1,18 @@
+# Phase 3 validation-only U-Matrix reproduction.
+# Original results remain immutable.
+run_id: qe_u_matrix_validation_reproduction_initial
+output_root: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis
+
+som_model: outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/som_models/som_15x15_nb11_ep250_s42_v2
+validation_bmu: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu.npy
+validation_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+qe_summary: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial/qe_summary.json
+
+grid_height: 15
+grid_width: 15
+feature_dim: 84
+validation_count: 10500
+
+expected_sha256:
+  som_model: e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831
+  validation_qe: b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186
