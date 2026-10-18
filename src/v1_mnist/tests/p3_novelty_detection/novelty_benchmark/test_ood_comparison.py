@@ -13,6 +13,35 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
 )
 
 
+def test_fpr_definition_matches_qe() -> None:
+    """Baseline FPR must equal the preregistered QE definition."""
+    from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
+        ood_metrics,
+    )
+
+    normal = np.array([0.1, 0.4, 0.6])
+    novel = np.array([0.2, 0.5, 0.7])
+
+    qe_result = ood_metrics(normal, novel, threshold=0.5)
+    comparison = evaluate_scores(
+        normal, novel, bootstrap_repeats=10, seed=42
+    )
+
+    assert comparison["fpr_at_95_tpr"] == qe_result["fpr_at_target_tpr"]
+
+
+def test_fpr_is_not_interpolated() -> None:
+    """Choose the observed ROC point reaching the target TPR."""
+    from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
+        minimum_fpr_at_target_tpr,
+    )
+
+    fpr = np.array([0.0, 0.4, 0.6])
+    tpr = np.array([0.0, 0.9, 1.0])
+
+    assert minimum_fpr_at_target_tpr(fpr, tpr, 0.95) == 0.6
+
+
 def test_perfect_separation() -> None:
     result = evaluate_scores(np.array([0.0, 0.1]), np.array([0.9, 1.0]),
                              bootstrap_repeats=10)

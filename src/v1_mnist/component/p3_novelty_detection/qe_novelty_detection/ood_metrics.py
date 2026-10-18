@@ -15,6 +15,30 @@ def _scores(values: NDArray[np.floating], name: str) -> NDArray[np.float64]:
     return data
 
 
+
+def minimum_fpr_at_target_tpr(
+    fpr: NDArray[np.floating],
+    tpr: NDArray[np.floating],
+    target_tpr: float,
+) -> float:
+    """Minimum observed FPR where the ROC reaches the target TPR."""
+    false_rates = np.asarray(fpr, dtype=np.float64)
+    true_rates = np.asarray(tpr, dtype=np.float64)
+    if (
+        false_rates.ndim != 1
+        or true_rates.ndim != 1
+        or false_rates.shape != true_rates.shape
+        or not false_rates.size
+        or not np.isfinite(false_rates).all()
+        or not np.isfinite(true_rates).all()
+        or not 0 < target_tpr <= 1
+    ):
+        raise ValueError("Invalid ROC curve or target TPR")
+    qualified = false_rates[true_rates >= target_tpr]
+    if not qualified.size:
+        raise ValueError("ROC curve does not reach target TPR")
+    return float(np.min(qualified))
+
 def ood_metrics(
     id_scores: NDArray[np.floating],
     ood_scores: NDArray[np.floating],
@@ -31,13 +55,12 @@ def ood_metrics(
     ]
     scores = np.r_[id_values, ood_values]
     fpr, tpr, _ = roc_curve(labels, scores)
-    qualified = fpr[tpr >= target_tpr]
     return {
         "id_count": int(id_values.size),
         "ood_count": int(ood_values.size),
         "auroc": float(roc_auc_score(labels, scores)),
         "aupr_ood": float(average_precision_score(labels, scores)),
-        "fpr_at_target_tpr": float(np.min(qualified)),
+        "fpr_at_target_tpr": minimum_fpr_at_target_tpr(fpr, tpr, target_tpr),
         "target_tpr": float(target_tpr),
         "ood_detection_rate": float(np.mean(ood_values > threshold)),
         "id_false_positive_rate": float(np.mean(id_values > threshold)),

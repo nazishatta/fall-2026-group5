@@ -9,6 +9,10 @@ from pathlib import Path
 import numpy as np
 from sklearn.metrics import average_precision_score, roc_auc_score, roc_curve
 
+from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
+    minimum_fpr_at_target_tpr,
+)
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -38,7 +42,7 @@ def evaluate_scores(
     auc = float(roc_auc_score(labels, scores))
     aupr = float(average_precision_score(labels, scores))
     fpr, tpr, _ = roc_curve(labels, scores)
-    fpr95 = float(np.interp(0.95, tpr, fpr))
+    fpr95 = minimum_fpr_at_target_tpr(fpr, tpr, 0.95)
     rng = np.random.default_rng(seed)
     estimates: list[list[float]] = []
     for _ in range(bootstrap_repeats):
@@ -50,7 +54,7 @@ def evaluate_scores(
         estimates.append([
             float(roc_auc_score(b_labels, b_scores)),
             float(average_precision_score(b_labels, b_scores)),
-            float(np.interp(0.95, b_tpr, b_fpr)),
+            minimum_fpr_at_target_tpr(b_fpr, b_tpr, 0.95),
         ])
     intervals = (
         np.quantile(np.asarray(estimates), [0.025, 0.975], axis=0)
