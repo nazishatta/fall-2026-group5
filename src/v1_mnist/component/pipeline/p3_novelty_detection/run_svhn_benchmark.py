@@ -5,7 +5,6 @@ Run from the isolated project root, with PYTHONDONTWRITEBYTECODE=1.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 from pathlib import Path
@@ -41,20 +40,11 @@ from src.v1_mnist.component.pipeline.p3_novelty_detection.run_qe_ood import (
     prepare,
     read_settings,
 )
-from src.v1_mnist.component.utils.som_io import reconstruct_assignments
+from src.v1_mnist.component.utils.som_io import reconstruct_assignments, sha256_file
 
 LOGGER = logging.getLogger("phase3_svhn_comparison")
-ROOT = Path.cwd().resolve()
+ROOT = Path(__file__).resolve().parents[5]
 CONFIG_PATH = ROOT / "src/v1_mnist/component/configs/novelty_benchmark.yaml"
-
-
-def sha256(path: Path) -> str:
-    """Hash a file in bounded-memory chunks."""
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def score_som(som: Any, features: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -95,33 +85,30 @@ def main() -> None:
             raise FileNotFoundError(f"Required frozen input missing: {path}")
 
     ood_config = read_settings(qe_config_path)
-    if benchmark["dataset"] != "mnist" or int(benchmark["seed"]) != 42:
+    if benchmark["dataset"] != "mnist" or int(benchmark["seed"]) != int(ood_config["bootstrap"]["seed"]):
         raise RuntimeError("Benchmark configuration differs from recorded protocol")
     if (tuple(ood_config["image_size"]) != (28, 28)
             or ood_config["feature_layer"] != "fc2"):
         raise RuntimeError("CNN preprocessing or feature layer protocol changed")
     train_path = ROOT / benchmark["embeddings"]["train"]
     val_path = ROOT / benchmark["embeddings"]["validation"]
-    expected_hashes = {
-        "train": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
-        "validation": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
-    }
-    hashes = {"train": sha256(train_path), "validation": sha256(val_path)}
+    expected_hashes = benchmark["expected_sha256"]
+    hashes = {"train": sha256_file(train_path), "validation": sha256_file(val_path)}
     if hashes != expected_hashes:
         raise RuntimeError("STOP: CNN embeddings do not match original fingerprints")
     qe_saved = json.loads(qe_result.read_text(encoding="utf-8"))
-    if qe_saved.get("metrics", {}).get("ood_count") != 26032:
+    if qe_saved.get("metrics", {}).get("ood_count") != benchmark["expected"]["svhn_count"]:
         raise RuntimeError("STOP: QE reference run does not have 26,032 SVHN samples")
 
     # Verify checkpoint, SOM and frozen QE calibration via existing preflight.
     model, som, frozen_id_qe, provenance = prepare(ood_config)
-    if provenance["qe_threshold"] != 1.5690279077294162:
+    if provenance["qe_threshold"] != benchmark["expected"]["qe_threshold"]:
         raise RuntimeError("STOP: Frozen QE threshold unexpectedly changed")
-    if len(frozen_id_qe) != 10500 or tuple(som.w.shape) != (225, 84):
+    if len(frozen_id_qe) != benchmark["expected"]["mnist_validation_count"] or tuple(som.w.shape) != (benchmark["expected"]["som_neurons"], benchmark["expected"]["feature_dim"]):
         raise RuntimeError("STOP: MNIST reference or SOM dimensions changed")
     train = np.load(train_path, allow_pickle=False)
     validation = np.load(val_path, allow_pickle=False)
-    if len(train) != 49000 or len(validation) != len(frozen_id_qe):
+    if len(train) != benchmark["expected"]["mnist_train_count"] or len(validation) != len(frozen_id_qe):
         raise RuntimeError("STOP: Original MNIST split sizes changed")
 
     # SVHN is used for scoring ONLY; no fitting, threshold calibration or selection.
@@ -133,7 +120,7 @@ def main() -> None:
     torch.set_num_threads(1)
     features, labels, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     del model, loader, dataset
-    if features.shape != (26032, 84):
+    if features.shape != (benchmark["expected"]["svhn_count"], benchmark["expected"]["feature_dim"]):
         raise RuntimeError(f"Unexpected SVHN embeddings: {features.shape}")
     if len(labels) != len(features):
         raise RuntimeError("SVHN label order mismatch")
@@ -142,7 +129,7 @@ def main() -> None:
     id_bmu, id_qe = score_som(som, validation)
     ood_bmu, ood_qe = score_som(som, features)
     qe_error = float(np.max(np.abs(id_qe - frozen_id_qe)))
-    if qe_error > 1e-4:
+    if qe_error > benchmark["tolerances"]["qe_reconstruction"]:
         raise RuntimeError(f"STOP: QE validation reconstruction mismatch: {qe_error}")
 
     som_neuron_scores = neuron_u_matrix(som.w, som.neuron_dist)
@@ -164,10 +151,10 @@ def main() -> None:
     scores["autoencoder"] = (ae_scores[:cut], ae_scores[cut:])
 
     # Cross-check QE results against the independent, already frozen evaluation.
-    qe_eval = score_method(*scores["qe"], repeats=0, seed=42)
+    qe_eval = score_method(*scores["qe"], repeats=0, seed=int(benchmark["seed"]))
     for key, old_key in (("auroc", "auroc"), ("aupr", "aupr_ood")):
         difference = abs(float(qe_eval[key]) - float(qe_saved["metrics"][old_key]))
-        if difference > 1e-10:
+        if difference > benchmark["tolerances"]["metric_agreement"]:
             raise RuntimeError(f"STOP: QE {key} disagrees with frozen run: {difference}")
 
     iterations = int(ood_config["bootstrap"]["iterations"])
@@ -191,11 +178,11 @@ def main() -> None:
         "autoencoder_initial_training_loss": losses[0],
         "autoencoder_final_training_loss": losses[-1],
         "settings": benchmark,
-        "provenance": {**provenance, "config_sha256": sha256(CONFIG_PATH),
-                       "svhn_mat_sha256": sha256(svhn_file),
+        "provenance": {**provenance, "config_sha256": sha256_file(CONFIG_PATH),
+                       "svhn_mat_sha256": sha256_file(svhn_file),
                        "train_embeddings_sha256": hashes["train"],
                        "validation_embeddings_sha256": hashes["validation"],
-                       "previous_qe_metrics_sha256": sha256(qe_result)},
+                       "previous_qe_metrics_sha256": sha256_file(qe_result)},
         "leakage_control": (
             "CNN and SOM remain frozen. Baselines fit only on MNIST train. "
             "MNIST validation and SVHN test used only for scoring; OOD scores "

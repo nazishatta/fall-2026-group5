@@ -35,3 +35,20 @@ autoencoder:
 run_id: mnist_svhn_five_method_comparison_s42_initial
 svhn_file: data/ood_svhn/test_32x32.mat
 qe_evaluation_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+
+# Frozen historical input fingerprints and verification criteria.
+expected_sha256:
+  train: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+
+expected:
+  svhn_count: 26032
+  mnist_train_count: 49000
+  mnist_validation_count: 10500
+  som_neurons: 225
+  feature_dim: 84
+  qe_threshold: 1.5690279077294162
+
+tolerances:
+  qe_reconstruction: 0.0001
+  metric_agreement: 0.0000000001
