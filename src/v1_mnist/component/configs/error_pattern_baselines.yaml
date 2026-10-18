@@ -1,0 +1,38 @@
+# ==============================================================================
+# Error pattern baselines (Phase 2: SOM training and visualization)
+# Is the SOM's error-geography result special, or do simple alternatives find the
+# same thing? Written down before running: src/v1_mnist/docs/p2_som_training_visualization/
+# error_pattern_analysis/baselines/PLAN.md. Validation split only; the test split is never loaded.
+#
+# The headline SOM, the embeddings, the scaling, the hotspot rule and the split and
+# shuffle settings all come from the SOM config below, so they cannot drift from the
+# project's own error pattern analysis.
+# ==============================================================================
+
+run:
+  name: error_pattern_baselines
+  # Change the revision for every new or re-tuned run. Results are never overwritten.
+  revision: r1
+
+inputs:
+  som_config: src/v1_mnist/component/configs/som.yaml
+
+paths:
+  output_root: ./outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/error_pattern_baselines
+
+baselines:
+  # k-means uses as many clusters as the SOM has neurons (grid height x width).
+  kmeans:
+    seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    n_init: 3
+  # kNN impurity: 1 - largest class share among the k nearest training embeddings.
+  knn:
+    neighbors: 15
+
+error_detection:
+  # Random stratified half-splits of the validation images (cell scores are fitted on one
+  # half and scored on the other). Seeds are split_seed_base + repeat from the SOM config.
+  repeats: 200
+  bootstrap:
+    resamples: 2000
+    seed: 2026
