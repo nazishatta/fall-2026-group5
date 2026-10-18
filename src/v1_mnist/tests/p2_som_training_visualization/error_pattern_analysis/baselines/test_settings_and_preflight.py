@@ -25,6 +25,6 @@ def test_finished_run_is_never_overwritten(tmp_path: Path) -> None:
 def test_settings_come_from_the_config_and_the_som_config() -> None:
     settings, analysis = load_baseline_settings(None, CODE_ROOT)
     assert settings.num_cells == analysis.grid_height * analysis.grid_width
-    assert settings.run_id.startswith("error_pattern_baselines_") and analysis.selected_model in settings.run_id
+    assert settings.run_id.startswith("error_pattern_baselines_som_") and f"{analysis.grid_height}x{analysis.grid_width}" in settings.run_id
     assert "week" not in settings.run_id.lower() and "rq" not in settings.run_id.lower()
     assert settings.robustness.n_splits > 0 and settings.output_dir.name == settings.run_id

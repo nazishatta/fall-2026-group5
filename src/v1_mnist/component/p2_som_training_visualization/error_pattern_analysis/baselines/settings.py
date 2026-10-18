@@ -66,7 +66,10 @@ def load_baseline_settings(
     analysis = load_analysis_settings(som_config, repo_root)
     som = load_config(str(resolve_path(repo_root, som_config)))
 
-    run_id = f"{raw['run']['name']}_{analysis.selected_model}_{raw['run']['revision']}"
+    # Short run ID: the grid is in the name (the exact SOM model and its SHA-256 are recorded in results.json).
+    # The first run has no suffix; a new or re-tuned run sets run.revision (r2, r3, ...) and gets its own folder.
+    revision = raw["run"].get("revision") or ""
+    run_id = f"{raw['run']['name']}_som_{analysis.grid_height}x{analysis.grid_width}" + (f"_{revision}" if revision else "")
     output_dir = resolve_path(repo_root, raw["paths"]["output_root"]) / run_id
     settings = BaselineSettings(
         config_path=cfg_path,

@@ -11,8 +11,9 @@
 
 run:
   name: error_pattern_baselines
-  # Change the revision for every new or re-tuned run. Results are never overwritten.
-  revision: r1
+  # Run folder: <name>_som_<height>x<width>[_<revision>]. Leave the revision empty for the first run.
+  # Set a new one (r2, r3, ...) for every new or re-tuned run: results are never overwritten.
+  revision: ""
 
 inputs:
   som_config: src/v1_mnist/component/configs/som.yaml
