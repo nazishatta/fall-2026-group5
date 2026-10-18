@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import logging
 from pathlib import Path
 
 import numpy as np
@@ -14,8 +13,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
     evaluate_scores,
     save_new_json,
 )
+from src.v1_mnist.component.utils.logging import get_logger
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger("v1_mnist.p3.ood_comparison")
 
 
 def _sha256(path: Path) -> str:
@@ -37,7 +37,6 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--bootstrap-repeats", type=int, default=1000)
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO)
     if args.output.exists():
         parser.error("Output exists: do not overwrite an existing run")
     if not args.run_id.strip():
@@ -62,7 +61,7 @@ def main() -> None:
             novel, threshold=args.frozen_threshold
         )
     save_new_json(args.output, payload)
-    LOGGER.info("Created Week 8 evaluation: %s", args.output)
+    LOGGER.info("Created novelty evaluation: %s", args.output)
 
 
 if __name__ == "__main__":
