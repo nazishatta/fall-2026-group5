@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import yaml
 from sklearn.preprocessing import MinMaxScaler
 
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
@@ -19,6 +18,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metric
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_scoring import (
     score_embeddings,
 )
+from src.v1_mnist.component.utils.config import load_config
 
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[5]
@@ -34,7 +34,12 @@ def resolved(path: str) -> Path:
 
 def read_settings(config_path: Path) -> dict[str, Any]:
     """Validate the development-only configuration without reading test samples."""
-    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    shared = load_config(config_path)
+    config = vars(shared).copy()
+    config['ood_datasets'] = [vars(entry).copy() for entry in shared.ood_datasets]
+    config['bootstrap'] = vars(shared.bootstrap).copy()
+    config['image_size'] = [int(shared.dataset.image_size)] * 2
+    config['feature_layer'] = str(shared.model.feature_layer)
     if not isinstance(config, dict) or config.get("id_dataset") != "mnist":
         raise ValueError("This runner currently supports the MNIST ID model only")
     if config.get("id_split") != "val":
@@ -109,9 +114,7 @@ def prepare(config: dict[str, Any]) -> tuple[Any, Any, np.ndarray, dict[str, Any
     )
     som.norm_func = scaler.transform
 
-    qe_config = yaml.safe_load(
-        resolved(config["qe_config"]).read_text(encoding="utf-8")
-    )
+    qe_config = vars(load_config(resolved(config["qe_config"])))
     qe_summary = (
         resolved(qe_config["output_dir"]) / qe_config["run_id"] / "qe_summary.json"
     )

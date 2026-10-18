@@ -11,8 +11,6 @@ ood_datasets:
 som_config: src/v1_mnist/component/configs/som.yaml
 qe_config: src/v1_mnist/component/configs/qe_novelty.yaml
 cnn_checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
-image_size: [28, 28]
-feature_layer: fc2
 threshold_percentile: 95.0
 bootstrap:
   iterations: 2000
