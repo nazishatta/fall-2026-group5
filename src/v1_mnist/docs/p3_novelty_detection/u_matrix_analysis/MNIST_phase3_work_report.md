@@ -150,3 +150,42 @@ using these SVHN results.
 
 This comparison uses one frozen CNN and one external OOD
 dataset. It does not establish multi-seed robustness.
+
+## Verified additional SVHN baseline results (2026-10-19)
+
+The frozen MNIST validation (10,500 samples) versus SVHN test
+(26,032 samples) benchmark was rerun with an additional kNN baseline,
+k=5, using the frozen 84-dimensional CNN embeddings.
+
+| Method | AUROC | 95% bootstrap CI |
+|---|---:|---|
+| QE | 0.981107 | [0.979048, 0.983089] |
+| kNN | 0.976561 | [0.974306, 0.978747] |
+| Max-softmax | 0.998495 | [0.998232, 0.998741] |
+| Energy | 0.999797 | [0.999723, 0.999859] |
+| Mahalanobis | 0.776437 | [0.768794, 0.783205] |
+
+An aligned, stratified paired bootstrap (2,000 iterations,
+seed 42) measured QE minus max-softmax AUROC as -0.017388,
+with 95% confidence interval [-0.019406, -0.015418].
+Max-softmax performed better on this particular comparison.
+
+Leakage Control: The CNN and SOM were frozen. No parameters
+were tuned on SVHN and the final MNIST test set was not used.
+The original 95th-percentile MNIST training-QE threshold was
+preserved.
+
+Limitation: Historical QE arrays have no per-image identifiers.
+Pairing assumes the identical deterministic SVHN test ordering,
+preprocessing and frozen model; both independently recomputed
+AUROCs match the historical values. Bootstrap uncertainty does
+not capture variation across independently trained models.
+
+Evidence:
+- `mnist_svhn_required_baselines_knn_s42_v1/required_baseline_metrics.json`
+- `mnist_svhn_qe_msp_paired_s42_v1/qe_msp_paired_metrics.json`
+
+The paired result was produced using the existing
+`compare_auroc_paired` implementation and frozen CNN inference.
+A dedicated end-to-end paired execution runner remains to be
+committed for complete reproducibility.
