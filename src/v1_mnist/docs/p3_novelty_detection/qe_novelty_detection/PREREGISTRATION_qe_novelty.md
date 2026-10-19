@@ -1,6 +1,9 @@
 # Preregistration: Quantization Error Novelty Detection
 
-Written: 2026-10-11. **Status: proposed development protocol; official OOD results not examined.**
+Originally dated 2026-10-11. **Historical development protocol, not a verified prospective registration.**
+
+**Status update (2026-10-19):** SVHN and Fashion-MNIST evaluations have been completed and recorded in separate, frozen-run result files. The original wording below records the development proposal at the time it was written; it is not a claim about present experiment status. Git history does not establish that this document was fixed before the original SVHN scores were examined; therefore prospective preregistration is **not** claimed. No thresholds or baselines have been changed retroactively. See `src/v1_mnist/docs/DEVIATIONS.md` for instructor threshold-protocol differences.
+
 
 ## 1. Question
 Can frozen SOM quantization-error (QE) scores distinguish MNIST from SVHN and Fashion-MNIST? Report the two ID/OOD pairs separately.

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import logging
 from pathlib import Path
 from typing import Any
 
@@ -19,8 +18,9 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_scorin
     score_embeddings,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.logging import get_logger
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 ROOT = Path(__file__).resolve().parents[5]
 
 
@@ -36,10 +36,10 @@ def read_settings(config_path: Path) -> dict[str, Any]:
     """Validate the development-only configuration without reading test samples."""
     shared = load_config(config_path)
     config = vars(shared).copy()
-    config['ood_datasets'] = [vars(entry).copy() for entry in shared.ood_datasets]
-    config['bootstrap'] = vars(shared.bootstrap).copy()
-    config['image_size'] = [int(shared.dataset.image_size)] * 2
-    config['feature_layer'] = str(shared.model.feature_layer)
+    config["ood_datasets"] = [vars(entry).copy() for entry in shared.ood_datasets]
+    config["bootstrap"] = vars(shared.bootstrap).copy()
+    config["image_size"] = [int(shared.dataset.image_size)] * 2
+    config["feature_layer"] = str(shared.model.feature_layer)
     if not isinstance(config, dict) or config.get("id_dataset") != "mnist":
         raise ValueError("This runner currently supports the MNIST ID model only")
     if config.get("id_split") != "val":
@@ -263,10 +263,6 @@ def main() -> None:
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--save", action="store_true")
     args = parser.parse_args()
-    from src.v1_mnist.component.utils.logging import get_logger
-
-    global LOGGER
-    LOGGER = get_logger("v1_mnist.p3.qe_ood")
     if args.save and not args.evaluate:
         parser.error("--save requires --evaluate")
     config = read_settings(args.config)

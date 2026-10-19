@@ -1,3 +1,9 @@
+# Development-only QE OOD config. Run IDs here intentionally differ from immutable
+# historical SVHN runs (mnist_svhn_qe_frozen_s42_initial) and the new
+# standalone Fashion-MNIST comparison; do NOT repoint historical evidence.
+# The original generic data_root below is a dataset staging prerequisite for
+# this combined runner, not the path used by run_svhn_benchmark.py.
+# Keep --evaluate/--save disabled until both datasets exist under this root.
 # Proposed Phase 3 development evaluation settings; never overwrite an existing run.
 id_dataset: mnist
 id_split: val
