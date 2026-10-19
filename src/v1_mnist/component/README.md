@@ -61,7 +61,7 @@ component/
 │   │                                   extended_plots.py (dense Week 3 plots),
 │   │                                   convergence_plots/ (3 chart scripts ▶, artifacts.py)
 │   ├── cluster_analysis/               run_cluster_analysis.py ▶, cluster_figures.py ▶,
-│   │                                   cluster_heatmaps.py ▶, cluster_metrics.py
+│   │                                   cluster_heatmaps.py ▶, confusion_overlay.py ▶, cluster_metrics.py
 │   ├── error_pattern_analysis/         error_patterns.py ▶, hotspot_samples.py ▶, error_figures.py ▶,
 │   │                                   error_heatmaps.py ▶,
 │   │                                   error_pattern_robustness.py ▶,

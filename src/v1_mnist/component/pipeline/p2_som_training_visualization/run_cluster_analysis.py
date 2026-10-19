@@ -6,6 +6,7 @@ Steps:
      the class-neuron intersection table; each image's BMU and BMU distance.
   2. cluster_figures: class maps, purity map, class pie and stem.
   3. cluster_heatmaps: cluster heatmaps (hit count, purity, entropy, dominant class).
+  4. confusion_overlay: the most frequent confusions drawn on the SOM map.
 
 Results go to outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/.
 
@@ -45,6 +46,8 @@ def main() -> None:
         Step("Class maps, purity map, class pie and stem",
              folder / "cluster_figures.py", ["--config", args.config, "--model-name", model]),
         Step("Cluster heatmaps", folder / "cluster_heatmaps.py", ["--config", args.config]),
+        Step("Confusion overlay on the SOM map",
+             folder / "confusion_overlay.py", ["--config", args.config]),
     ]
     run_steps(f"Cluster analysis ({model})", steps, args.dry_run)
 

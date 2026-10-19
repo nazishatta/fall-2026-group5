@@ -195,6 +195,7 @@ On the validation images the 15$\times$15 map has a QE of 1.041 (training: 1.039
 
 The CNN's mistakes gather in a few hotspot cells (Figure~\ref{fig:maps} and Table~\ref{tab:phase2}). The 11 hotspot cells of the 15$\times$15 map hold 11.1 times their fair share of the mistakes (95\% range 6.1--17.6), against about 1 by chance ($p=0.005$).
 The result is similar on the 10$\times$10 and 20$\times$20 maps. The error rate of a cell goes down as its purity goes up, and goes up as its digit mix grows, far beyond chance on all three grids.
+The three most frequent confusions (4 called 9, 5 called 0 and 9 called 4) each fall on only four or five cells, mostly among the cells of the digit they were mistaken for. The pictures of the mistakes in the hotspot cells suggest that many involve digits that share strokes (4 and 9, 7 and 9, 5, 6 and 8) and that some are unusual handwriting.
 A finer grid does not predict mistakes better (the AUROC difference between 20$\times$20 and 15$\times$15 is $+0.001$, range $-0.100$ to $+0.089$), but with only 92 mistakes we cannot detect differences smaller than about 0.1 AUROC.
 
 \begin{table}[H]

@@ -60,6 +60,7 @@ tests/
 │   ├── cluster_analysis/                            # Week 4
 │   │   ├── test_bmu_assignment_and_entropy.py
 │   │   ├── test_cluster_metrics.py
+│   │   ├── test_confusion_overlay.py
 │   │   ├── test_heatmap_figure.py
 │   │   ├── test_purity_label_shuffle.py
 │   │   └── test_qe_model_check.py
