@@ -10,9 +10,8 @@ and the standalone Phase 3 pipeline adapter.
 - Complete repository suite: **168 passed, 2 warnings, 0 failed**
   on the compatible EC2 environment.
 - Four standalone Phase 3 integration tests passed.
-- Fashion-MNIST baseline reproduction tests passed.
-- Independent numerical reproduction confirmed the five Fashion-MNIST
-  methods: QE, max-softmax, kNN, energy, and Mahalanobis.
+- The SVHN-only OOD configuration and runner tests passed (10 targeted tests).
+- A complete test-suite rerun is still required after the scope cleanup.
 - Ruff checks passed across Phase 3 scoring, pipeline, and tests.
 - The two warnings originate from existing Seaborn and NNSOM code.
 

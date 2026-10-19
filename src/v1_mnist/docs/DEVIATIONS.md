@@ -41,13 +41,22 @@ independent held-out evaluation. No such result is claimed here.
 
 ### OOD dataset scope
 
-The original Phase 3 proposal used SVHN. Subsequent instructor reviews
-prioritized Fashion-MNIST.
+The original Phase 3 proposal specified SVHN as the external OOD dataset.
+Subsequent instructor-review feedback was interpreted as requiring
+Fashion-MNIST during the current MNIST phase. Additional exploratory
+Fashion-MNIST code and results were produced in response.
 
-Decision: retain SVHN as historical evidence and evaluate Fashion-MNIST
-separately using the frozen MNIST CNN checkpoint and fc2 embeddings.
-No MNIST final-test data is used for tuning. Fashion-MNIST is an OOD
-evaluation dataset, not a source for selecting model hyperparameters.
+On 2026-10-19, Professor Jafari clarified through the teammate review
+that the current scope is MNIST versus SVHN only. Fashion-MNIST and
+KMNIST comparisons belong to later dataset work, not this PR.
+
+Decision: retain the original MNIST-SVHN evaluation and frozen
+training-calibrated QE threshold. Remove Fashion-MNIST-specific
+code, tests, configurations, results, and current-result claims
+from PR #17 through ordinary commits without rewriting Git history.
+Preserve the exploratory Fashion-MNIST work privately for possible
+later reuse; do not create or push a separate GitHub branch now.
+No official MNIST final-test data is used for this Phase 3 tuning.
 
 ### Historical SOM configuration
 

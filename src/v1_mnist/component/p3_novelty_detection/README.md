@@ -2,7 +2,7 @@
 
 Phase 3 investigates whether frozen MNIST-trained representations and SOM
 distances can identify unfamiliar images. Development uses MNIST training
-and validation artifacts. SVHN and Fashion-MNIST are separate external OOD evaluation sets.
+and validation artifacts. SVHN is the current external OOD evaluation set. Other datasets are deferred.
 
 ## Implemented components
 
@@ -23,14 +23,13 @@ The independent `run_phase3_stage.py` adapter accepts `--config`,
   0 failures**. The warnings concern existing Seaborn and NNSOM code.
 - Ruff checks passed for the Phase 3 source, pipeline, and test directories.
 - Four standalone Phase 3 integration tests passed.
-- MNIST validation versus Fashion-MNIST evaluation was completed using
-  the frozen CNN checkpoint and 84-dimensional fc2 embeddings.
-- QE, max-softmax, kNN, energy, and Mahalanobis measurements have
-  been independently reproduced against their saved metrics.
-- These Fashion-MNIST results use one frozen CNN/SOM realization;
-  bootstrap intervals do not substitute for independent training seeds.
-- SVHN remains a separate historical evaluation, including classical
-  baselines and a feature-reconstruction autoencoder.
+- MNIST validation versus SVHN is the current ID/OOD comparison.
+- Saved SVHN max-softmax, energy, and Mahalanobis results include
+  bootstrap intervals; the SVHN kNN comparison still requires verification.
+- Historical SVHN comparisons also include QE, U-Matrix, classical
+  baselines, and a feature-reconstruction autoencoder.
+- These evaluations use one frozen CNN/SOM realization;
+  bootstrap intervals do not replace independent training seeds.
 - Historical Isolation Forest and autoencoder results require further
   investigation. Their recorded scores must not be silently reversed
   or reselected to improve AUROC.
@@ -47,8 +46,8 @@ The independent `run_phase3_stage.py` adapter accepts `--config`,
 ## Leakage control
 
 Baseline fitting uses MNIST training embeddings. MNIST validation is
-used for in-distribution evaluation, while Fashion-MNIST and SVHN
-are evaluated as external OOD datasets. The original training-calibrated
+used for in-distribution evaluation, while SVHN is the current
+external OOD evaluation dataset. The original training-calibrated
 QE threshold is not presented as validation-selected.
 
 Do not tune models, thresholds, or baseline hyperparameters using OOD
