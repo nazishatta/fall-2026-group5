@@ -1,6 +1,6 @@
 # Phase 3 novelty detection — current results and verification
 
-Updated: 2026-10-19. MNIST validation is the in-distribution reference; Fashion-MNIST and SVHN are evaluated separately as OOD samples. These are development comparisons, not held-out final MNIST test claims.
+Updated: 2026-10-19. MNIST validation is the in-distribution reference; SVHN is the current external OOD evaluation set. These are development comparisons, not held-out final MNIST test claims.
 
 ## Scope and protocol
 
@@ -13,27 +13,13 @@ Updated: 2026-10-19. MNIST validation is the in-distribution reference; Fashion-
 
 This report reflects the current verified state. Earlier development-only observations and obsolete test counts are preserved separately in `MNIST_phase3_historical_development_log.md`.
 
-### Verified Fashion-MNIST comparison
+### Current evaluation scope
 
-All methods use the frozen MNIST CNN checkpoint and 84-dimensional
-fc2 feature representation. MNIST validation provides 10,500 ID
-examples; Fashion-MNIST test provides 10,000 OOD examples.
-
-| Method | AUROC | 95% bootstrap AUROC interval |
-|---|---:|---|
-| Energy | 0.995678 | [0.995057, 0.996299] |
-| Max-softmax | 0.988127 | [0.986964, 0.989391] |
-| kNN | 0.939197 | [0.935631, 0.942673] |
-| Quantization Error | 0.918486 | [0.914368, 0.922389] |
-| Mahalanobis | 0.733506 | [0.725800, 0.741031] |
-
-The reported intervals use 2,000 stratified bootstrap iterations
-with evaluation seed 2026. They quantify sampling uncertainty for
-one frozen representation, not variation across independently
-trained CNNs or SOMs.
-
-All five methods were independently checked against their saved
-Fashion-MNIST evaluation metrics on EC2.
+Following the professor's 2026-10-19 clarification, the current
+comparison uses MNIST validation as in-distribution data and SVHN
+as external out-of-distribution data. Exploratory Fashion-MNIST
+results are deferred to later work and are not reported as current
+Phase 3 findings.
 
 ### Historical SVHN baseline investigation
 

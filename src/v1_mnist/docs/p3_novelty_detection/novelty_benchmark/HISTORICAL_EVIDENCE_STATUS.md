@@ -12,7 +12,7 @@ Recorded: 2026-10-19. This is a limitations record, **not** a declaration that a
 
 ## Leakage Control
 
-No final MNIST test data were used for this documentation audit. No old run was overwritten; new Fashion-MNIST and SVHN baselines remain separate.
+No final MNIST test data were used for this documentation audit. No old run was overwritten. MNIST validation versus SVHN is the current OOD comparison; exploratory Fashion-MNIST work is deferred.
 
 ## Reviewer decision needed
 

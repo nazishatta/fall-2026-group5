@@ -56,13 +56,14 @@ These checks do NOT establish end-to-end pipeline execution.
 - The historical SVHN benchmark currently uses its fixed YAML location.
 - A full test-suite execution was blocked locally because the project's
   pinned PyTorch version was unavailable for the Intel macOS environment.
-- Missing scientific baselines, Fashion-MNIST evaluation, and other reviewer
-  requirements must be handled separately.
+- Remaining SVHN scientific baseline comparisons and reviewer
+  requirements are tracked separately in PR #17.
 - Previously recorded historical evaluation metrics must not be described
   as results of a new run.
 
-## Review request
+## Deferred integration decision
 
-Please review and approve the minimal changes to the two shared pipeline
-registration files before integration. Do not alter existing Phase 1–2
-behavior or results.
+Following Fyrooz's review, shared pipeline registration is deferred until
+PR #17 is merged. No modifications to `pipeline/common.py` or
+`pipeline/run_all.py` are requested in the current PR. The standalone
+Phase 3 adapter and its tests remain in place.

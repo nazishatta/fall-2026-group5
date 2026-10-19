@@ -2,8 +2,10 @@
 
 Originally dated 2026-10-11. **Historical development protocol, not a verified prospective registration.**
 
-**Status update (2026-10-19):** SVHN and Fashion-MNIST evaluations have been completed and recorded in separate, frozen-run result files. The original wording below records the development proposal at the time it was written; it is not a claim about present experiment status. Git history does not establish that this document was fixed before the original SVHN scores were examined; therefore prospective preregistration is **not** claimed. No thresholds or baselines have been changed retroactively. See `src/v1_mnist/docs/DEVIATIONS.md` for instructor threshold-protocol differences.
+**Status update (2026-10-19):** Following Professor Jafari's clarification, the current Phase 3 scope is MNIST validation versus SVHN. Exploratory Fashion-MNIST work was completed in response to earlier feedback but is deferred and excluded from the active PR. The original wording below records the development proposal at the time it was written; it is not a claim about present experiment status. Git history does not establish that this document was fixed before the original SVHN scores were examined; therefore prospective preregistration is **not** claimed. No thresholds or baselines have been changed retroactively. See `src/v1_mnist/docs/DEVIATIONS.md` for instructor threshold-protocol differences.
 
+
+The historical protocol below is retained as originally written. Its Fashion-MNIST references do not define the current evaluation scope. This document is not claimed to be a verified prospective registration.
 
 ## 1. Question
 Can frozen SOM quantization-error (QE) scores distinguish MNIST from SVHN and Fashion-MNIST? Report the two ID/OOD pairs separately.
