@@ -64,11 +64,14 @@ recorded in src/v1_mnist/docs/DEVIATIONS.md.
 
 ### Current test verification
 
-The complete repository suite passed on EC2:
-168 passed, 2 warnings, 0 failures.
+The most recently recorded full repository verification before the
+current scope cleanup was 172 tests passed on EC2. This is historical
+verification, not a claim that the latest commits passed the full suite.
 
-Phase 3 Ruff checks passed. The earlier test counts and Phase 1
-data-path errors recorded above are historical development results.
+After the MNIST-SVHN scope cleanup, 73 Phase 3 tests passed locally
+with the two PyTorch-dependent test files excluded. Phase 3 Ruff
+checks passed. The complete local suite is blocked during collection
+because PyTorch is absent from the macOS Python environment.
 
 ### Leakage Control
 
@@ -79,6 +82,22 @@ not post-result hyperparameter selection.
 
 Historical fitting-budget differences, including the 10,000-sample
 One-Class SVM, remain limitations of those comparisons.
+
+## Outstanding SVHN verification — 2026-10-19
+
+The kNN novelty baseline has been integrated into a separate,
+configured SVHN evaluation runner and its unit tests passed.
+However, no SVHN kNN AUROC or confidence interval has yet been
+measured for this new run; these values remain [TBD].
+
+A paired stratified-bootstrap implementation for comparing QE
+against max-softmax AUROC is also committed and unit-tested.
+Its actual paired confidence interval remains [TBD] because
+sample-aligned SVHN max-softmax score arrays are not currently
+available locally. The saved individual method confidence
+intervals must not be presented as a paired comparison.
+
+Historical results, provenance, and run IDs remain unchanged.
 
 ## Additional SVHN baseline comparison — 2026-10-19
 
