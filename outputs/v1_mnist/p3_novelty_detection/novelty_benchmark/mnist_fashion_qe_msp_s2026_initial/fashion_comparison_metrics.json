@@ -1,0 +1,42 @@
+{
+  "run_id": "mnist_fashion_qe_msp_s2026_initial",
+  "status": "measured_console_results_pending_reproducible_runner",
+  "id_dataset": "mnist",
+  "id_split": "validation",
+  "id_samples": 10500,
+  "ood_dataset": "fashion_mnist",
+  "ood_split": "test",
+  "ood_samples": 10000,
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 2026,
+    "confidence": 0.95
+  },
+  "quantization_error": {
+    "auroc": 0.9184864,
+    "auroc_ci95": [
+      0.9143676804761905,
+      0.9223888752380953
+    ],
+    "aupr_ood": 0.8528278438537336,
+    "fpr_at_95_tpr": 0.2200952380952381,
+    "frozen_training_qe_threshold": 1.5690279077294162,
+    "ood_detection_rate_at_threshold": 0.4277,
+    "id_false_positive_rate_at_threshold": 0.051333333333333335
+  },
+  "max_softmax": {
+    "auroc": 0.9881274238095239,
+    "auroc_ci95": [
+      0.9869636144047619,
+      0.9893913889285716
+    ],
+    "aupr_ood": 0.9846043418254089,
+    "fpr_at_95_tpr": 0.04428571428571428
+  },
+  "input_sha256": {
+    "cnn_checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "mnist_validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "mnist_validation_confidence": "bef98e4a9cdb9e7bbc2b12c775b0db4562e5954a250db3ae3e86b230d3db9b04"
+  },
+  "leakage_control": "No MNIST final test used. Frozen training-calibrated QE threshold preserved. Fashion-MNIST used for evaluation only."
+}

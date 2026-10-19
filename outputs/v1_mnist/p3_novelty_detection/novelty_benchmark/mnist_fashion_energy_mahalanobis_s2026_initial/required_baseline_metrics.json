@@ -1,0 +1,50 @@
+{
+  "run_id": "mnist_fashion_energy_mahalanobis_s2026_initial",
+  "status": "measured_console_results_pending_reproducible_runner",
+  "id_dataset": "mnist",
+  "id_split": "validation",
+  "id_samples": 10500,
+  "ood_dataset": "fashion_mnist",
+  "ood_split": "test",
+  "ood_samples": 10000,
+  "feature_layer": "fc2",
+  "feature_dimensions": 84,
+  "bootstrap": {
+    "iterations": 2000,
+    "seed": 2026,
+    "confidence": 0.95
+  },
+  "energy": {
+    "temperature": 1.0,
+    "auroc": 0.9956784666666667,
+    "auroc_ci95": [
+      0.9950571419047619,
+      0.9962987547619049
+    ],
+    "aupr_ood": 0.9949624911206185,
+    "fpr_at_95_tpr": 0.021047619047619048
+  },
+  "mahalanobis": {
+    "covariance": "LedoitWolf",
+    "class_conditional": true,
+    "auroc": 0.7335057142857142,
+    "auroc_ci95": [
+      0.7257995014285715,
+      0.7410311459523808
+    ],
+    "aupr_ood": 0.5926618190927941,
+    "fpr_at_95_tpr": 0.472
+  },
+  "input_sha256": {
+    "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_labels": "34459b6379469ff1d1c8b542c8d2e0b5123e31e38f5f2438b988d36c04a4fae6",
+    "validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
+  },
+  "leakage_control": "Frozen checkpoint and features. Mahalanobis fitted only on MNIST training embeddings. MNIST validation and Fashion-MNIST are evaluation sets. No MNIST final-test use.",
+  "limitations": [
+    "Single frozen CNN checkpoint.",
+    "Energy temperature fixed at 1.0 for this evaluation.",
+    "Reproducible evaluation integration still pending."
+  ]
+}
