@@ -45,11 +45,8 @@ def read_settings(config_path: Path) -> dict[str, Any]:
     if config.get("id_split") != "val":
         raise ValueError("Development runner must use MNIST validation, never test")
     entries = config.get("ood_datasets")
-    if not isinstance(entries, list) or {e.get("name") for e in entries} != {
-        "svhn",
-        "fashion_mnist",
-    }:
-        raise ValueError("Expected separate SVHN and Fashion-MNIST experiments")
+    if not isinstance(entries, list) or len(entries) != 1 or entries[0].get("name") != "svhn":
+        raise ValueError("Expected one SVHN evaluation")
     if any(e.get("split") != "test" for e in entries):
         raise ValueError("Unexpected OOD evaluation split")
     run_ids = [e.get("run_id") for e in entries]
@@ -196,14 +193,9 @@ def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]
         name = entry["name"]
         transform = image_transform(name, tuple(config["image_size"]))
         data_root = resolved(config["data_root"])
-        if name == "svhn":
-            dataset = datasets.SVHN(
-                str(data_root), split="test", transform=transform, download=False
-            )
-        else:
-            dataset = datasets.FashionMNIST(
-                str(data_root), train=False, transform=transform, download=False
-            )
+        dataset = datasets.SVHN(
+            str(data_root), split="test", transform=transform, download=False
+        )
         loader = DataLoader(
             dataset, batch_size=int(config["batch_size"]), shuffle=False
         )

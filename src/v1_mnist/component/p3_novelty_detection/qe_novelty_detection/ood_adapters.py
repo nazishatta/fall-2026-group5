@@ -22,10 +22,4 @@ def image_transform(dataset: str, image_size: tuple[int, int]) -> Any:
                 transforms.ToTensor(),
             ]
         )
-    if dataset == "fashion_mnist":
-        if image_size != (28, 28):
-            raise ValueError(
-                "Fashion-MNIST native size is 28x28; no resize is preregistered"
-            )
-        return transforms.ToTensor()
     raise ValueError(f"Unsupported OOD dataset: {dataset}")

@@ -20,7 +20,6 @@ def _config() -> dict[str, object]:
         "id_split": "val",
         "ood_datasets": [
             {"name": "svhn", "split": "test", "run_id": "svhn_new"},
-            {"name": "fashion_mnist", "split": "test", "run_id": "fashion_new"},
         ],
         "dataset": {"image_size": 28},
         "model": {"feature_layer": "fc2"},
@@ -41,17 +40,17 @@ def _config() -> dict[str, object]:
     }
 
 
-def test_dev_config_accepts_two_pairs(tmp_path: Path) -> None:
+def test_dev_config_accepts_svhn_pair(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(yaml.safe_dump(_config()), encoding="utf-8")
-    assert len(read_settings(config_path)["ood_datasets"]) == 2
+    assert [entry["name"] for entry in read_settings(config_path)["ood_datasets"]] == ["svhn"]
 
 
 @pytest.mark.parametrize(
     "change",
     [
         {"id_split": "test"},
-        {"id_dataset": "fashion_mnist"},
+        {"id_dataset": "other_dataset"},
         {"model": {"feature_layer": "fc1"}},
         {"threshold_percentile": 0},
     ],
@@ -67,12 +66,14 @@ def test_rejects_unsafe_or_invalid_config(
         read_settings(path)
 
 
-def test_rejects_duplicate_run_ids(tmp_path: Path) -> None:
+def test_rejects_multiple_ood_datasets(tmp_path: Path) -> None:
     config = _config()
-    config["ood_datasets"][1]["run_id"] = "svhn_new"
+    config["ood_datasets"].append(
+        {"name": "other_dataset", "split": "test", "run_id": "other_new"}
+    )
     path = tmp_path / "config.yaml"
     path.write_text(yaml.safe_dump(config), encoding="utf-8")
-    with pytest.raises(ValueError, match="Duplicate"):
+    with pytest.raises(ValueError, match="Expected one SVHN"):
         read_settings(path)
 
 

@@ -29,13 +29,9 @@ def test_ood_settings_preserve_run_ids_and_evaluation_rules() -> None:
     effective = read_settings(CONFIG)
 
     assert effective["id_split"] == "val"
-    assert {entry["name"] for entry in effective["ood_datasets"]} == {
-        "svhn",
-        "fashion_mnist",
-    }
+    assert [entry["name"] for entry in effective["ood_datasets"]] == ["svhn"]
     assert [entry["run_id"] for entry in effective["ood_datasets"]] == [
         "mnist_svhn_qe_dev_initial",
-        "mnist_fashion_mnist_qe_dev_initial",
     ]
     assert effective["threshold_percentile"] == 95.0
     assert effective["bootstrap"]["iterations"] == 2000
