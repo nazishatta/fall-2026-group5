@@ -61,6 +61,7 @@ def test_pdf_only_figure(tmp_path: Path) -> None:
     val = np.linspace(0.2, 2.5, 20)
     pdf = tmp_path / "qe_score_distribution.pdf"
     save_qe_distribution(train, val, 1.8, pdf)
-    assert pdf.read_bytes().startswith(b"%PDF-")
+    actual_pdf = tmp_path / "pdf" / "qe_score_distribution.pdf"
+    assert actual_pdf.read_bytes().startswith(b"%PDF-")
     with pytest.raises(ValueError, match="PDF"):
         save_qe_distribution(train, val, 1.8, tmp_path / "plot.svg")

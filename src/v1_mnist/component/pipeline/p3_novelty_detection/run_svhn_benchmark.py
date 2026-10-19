@@ -8,11 +8,11 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
 import torch
-import yaml
 from torch.utils.data import DataLoader
 from torchvision.datasets import SVHN
 
@@ -40,11 +40,22 @@ from src.v1_mnist.component.pipeline.p3_novelty_detection.run_qe_ood import (
     prepare,
     read_settings,
 )
+from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.som_io import reconstruct_assignments, sha256_file
 
-LOGGER = logging.getLogger("phase3_svhn_comparison")
+LOGGER = get_logger("phase3_svhn_comparison")
 ROOT = Path(__file__).resolve().parents[5]
 CONFIG_PATH = ROOT / "src/v1_mnist/component/configs/novelty_benchmark.yaml"
+
+
+def _to_mapping(value: Any) -> Any:
+    """Convert nested shared configuration namespaces to dictionaries."""
+    if isinstance(value, SimpleNamespace):
+        return {key: _to_mapping(item) for key, item in vars(value).items()}
+    if isinstance(value, list):
+        return [_to_mapping(item) for item in value]
+    return value
 
 
 def score_som(som: Any, features: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -71,7 +82,7 @@ def score_method(
 def main() -> None:
     """Run the preregistered five-method MNIST vs SVHN comparison."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    benchmark = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+    benchmark = _to_mapping(load_config(CONFIG_PATH))
     run_id = benchmark["run_id"]
     if not isinstance(run_id, str) or not run_id or "/" in run_id or ".." in run_id:
         raise ValueError("Invalid benchmark run ID")

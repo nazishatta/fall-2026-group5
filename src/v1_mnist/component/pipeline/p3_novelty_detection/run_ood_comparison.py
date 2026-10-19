@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -15,16 +14,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
 )
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.som_io import sha256_file
 
 LOGGER = get_logger("v1_mnist.p3.ood_comparison")
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def main() -> None:
@@ -58,8 +50,8 @@ def main() -> None:
     payload: dict[str, object] = {
         "run_id": args.run_id,
         "detector": args.detector,
-        "id_scores_sha256": _sha256(args.id_scores),
-        "ood_scores_sha256": _sha256(args.ood_scores),
+        "id_scores_sha256": sha256_file(args.id_scores),
+        "ood_scores_sha256": sha256_file(args.ood_scores),
         "evaluation": metrics,
         "leakage_control": (
             "Scores must come from frozen models trained without held-out ID/OOD evaluation examples; "

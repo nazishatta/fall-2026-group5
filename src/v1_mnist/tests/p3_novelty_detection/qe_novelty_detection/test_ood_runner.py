@@ -22,8 +22,13 @@ def _config() -> dict[str, object]:
             {"name": "svhn", "split": "test", "run_id": "svhn_new"},
             {"name": "fashion_mnist", "split": "test", "run_id": "fashion_new"},
         ],
-        "image_size": [28, 28],
-        "feature_layer": "fc2",
+        "dataset": {"image_size": 28},
+        "model": {"feature_layer": "fc2"},
+        "bootstrap": {
+            "iterations": 2000,
+            "seed": 2026,
+            "confidence": 0.95,
+        },
         "som_config": "src/v1_mnist/component/configs/som.yaml",
         "qe_config": "src/v1_mnist/component/configs/qe_novelty.yaml",
         "cnn_checkpoint": "checkpoints/checkpoint.pth",
@@ -47,7 +52,7 @@ def test_dev_config_accepts_two_pairs(tmp_path: Path) -> None:
     [
         {"id_split": "test"},
         {"id_dataset": "fashion_mnist"},
-        {"feature_layer": "fc1"},
+        {"model": {"feature_layer": "fc1"}},
         {"threshold_percentile": 0},
     ],
 )

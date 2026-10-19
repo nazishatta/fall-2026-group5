@@ -1,4 +1,4 @@
-"""Regression tests for Phase 3 integration with the shared pipeline."""
+"""Verify shared Phase 2 compatibility and standalone Phase 3 dry-runs."""
 
 from __future__ import annotations
 
@@ -10,37 +10,24 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[4]
 RUN_ALL = ROOT / "src/v1_mnist/component/pipeline/run_all.py"
-
-
-@pytest.mark.parametrize(
-    ("first", "last", "expected"),
-    [
-        (
-            "error_pattern_analysis",
-            "error_pattern_analysis",
-            ["error_pattern_analysis", "interactive report"],
-        ),
-        (
-            "qe_novelty",
-            "svhn_benchmark",
-            ["qe_novelty", "qe_ood", "svhn_benchmark"],
-        ),
-    ],
+PHASE3 = (
+    ROOT
+    / "src/v1_mnist/component/pipeline/p3_novelty_detection/"
+    "run_phase3_stage.py"
 )
-def test_shared_pipeline_dry_run(
-    first: str,
-    last: str,
-    expected: list[str],
-) -> None:
-    """Existing Phase 2 behavior and Phase 3 ordering must remain intact."""
+CONFIG_DIR = ROOT / "src/v1_mnist/component/configs"
+
+
+def test_shared_phase2_pipeline_unchanged() -> None:
+    """The original shared pipeline must still dry-run Phase 2."""
     result = subprocess.run(
         [
             sys.executable,
             str(RUN_ALL),
             "--from",
-            first,
+            "error_pattern_analysis",
             "--to",
-            last,
+            "error_pattern_analysis",
             "--dry-run",
         ],
         cwd=ROOT,
@@ -50,8 +37,38 @@ def test_shared_pipeline_dry_run(
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-
     output = result.stdout + result.stderr
-    positions = [output.index(f"] {name}\n") for name in expected]
-    assert positions == sorted(positions)
-    assert "Dry run finished." in output or "no experiment executed" in output
+    assert "error_pattern_analysis" in output
+    assert "Dry run finished." in output
+
+
+@pytest.mark.parametrize(
+    ("stage", "config"),
+    [
+        ("qe_novelty", "qe_novelty.yaml"),
+        ("qe_ood", "qe_ood_evaluation.yaml"),
+        ("svhn_benchmark", "novelty_benchmark.yaml"),
+    ],
+)
+def test_standalone_phase3_dry_run(stage: str, config: str) -> None:
+    """Phase 3 adapter builds commands without running experiments."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(PHASE3),
+            "--stage",
+            stage,
+            "--config",
+            str(CONFIG_DIR / config),
+            "--dry-run",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    output = result.stdout + result.stderr
+    assert f"Phase 3 stage: {stage}" in output
+    assert "Dry run: no experiment executed" in output

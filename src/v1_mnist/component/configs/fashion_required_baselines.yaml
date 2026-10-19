@@ -1,0 +1,24 @@
+# Newly fixed comparison settings, not a claim of historical preregistration.
+# Evaluation must not tune parameters using Fashion-MNIST.
+run_id: mnist_fashion_required_baselines_verification_s2026
+checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
+embeddings_dir: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings
+fashion_root: data/ood_fashion_mnist
+feature_layer: fc2
+image_size: 28
+batch_size: 256
+expected_train_count: 49000
+expected_validation_count: 10500
+expected_fashion_count: 10000
+feature_dim: 84
+num_classes: 10
+neighbors: 5
+energy_temperature: 1.0
+bootstrap_iterations: 2000
+bootstrap_seed: 2026
+confidence: 0.95
+target_tpr: 0.95
+threads: 1
+results:
+  knn: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_fashion_knn_k5_s2026_initial/knn_metrics.json
+  energy_mahalanobis: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_fashion_energy_mahalanobis_s2026_initial/required_baseline_metrics.json

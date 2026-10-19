@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import logging
 from pathlib import Path
 
 import numpy as np
@@ -12,8 +11,9 @@ from sklearn.metrics import average_precision_score, roc_auc_score, roc_curve
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
     minimum_fpr_at_target_tpr,
 )
+from src.v1_mnist.component.utils.logging import get_logger
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 
 
 def evaluate_scores(
