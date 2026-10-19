@@ -1,4 +1,4 @@
-"""Frozen-CNN max-softmax, energy and Mahalanobis OOD evaluation."""
+"""Frozen-CNN max-softmax, energy, Mahalanobis and optional kNN evaluation."""
 
 from __future__ import annotations
 
@@ -10,6 +10,9 @@ from typing import Any
 
 import numpy as np
 
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.knn_baseline import (
+    knn_novelty,
+)
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_comparison import (
     evaluate_scores,
 )
@@ -223,6 +226,13 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         mahalanobis[: len(validation)],
         mahalanobis[len(validation) :],
     )
+
+    if hasattr(config.evaluation, "knn_neighbors"):
+        neighbors = int(config.evaluation.knn_neighbors)
+        scores['knn'] = (
+            knn_novelty(train, validation, neighbors=neighbors),
+            knn_novelty(train, svhn_features, neighbors=neighbors),
+        )
 
     results: dict[str, Any] = {}
     for name, (id_scores, ood_scores) in scores.items():
