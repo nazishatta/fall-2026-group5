@@ -144,7 +144,7 @@ dvc pull
 
 ## Data and results
 
-MNIST downloads automatically via torchvision on first run. Fashion-MNIST and CIFAR-10 are planned.
+MNIST downloads automatically via torchvision on first run. Fashion-MNIST has been evaluated as an out-of-distribution dataset using frozen MNIST CNN representations in Phase 3. CIFAR-10 remains planned.
 
 Results in `outputs/v1_mnist/` are split between git and DVC:
 

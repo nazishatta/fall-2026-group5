@@ -2,7 +2,7 @@
 
 Phase 3 investigates whether frozen MNIST-trained representations and SOM
 distances can identify unfamiliar images. Development uses MNIST training
-and validation artifacts; SVHN is used as an external OOD evaluation set.
+and validation artifacts. SVHN and Fashion-MNIST are separate external OOD evaluation sets.
 
 ## Implemented components
 
@@ -19,20 +19,39 @@ The independent `run_phase3_stage.py` adapter accepts `--config`,
 
 ## Verification and limitations
 
-- Phase 3 adapter dry runs and four adapter regression tests passed locally.
-- Five targeted novelty-comparison tests passed locally.
-- Ruff checks passed for the tested Phase 3 runner files.
-- Full Phase 3 tests were not verified on the local Intel Mac because
-  the repository-pinned PyTorch version lacked a compatible wheel.
-- The adapter is not yet registered in the shared `pipeline/run_all.py`;
+- Full repository test suite on EC2: **168 passed, 2 warnings,
+  0 failures**. The warnings concern existing Seaborn and NNSOM code.
+- Ruff checks passed for the Phase 3 source, pipeline, and test directories.
+- Four standalone Phase 3 integration tests passed.
+- MNIST validation versus Fashion-MNIST evaluation was completed using
+  the frozen CNN checkpoint and 84-dimensional fc2 embeddings.
+- QE, max-softmax, kNN, energy, and Mahalanobis measurements have
+  been independently reproduced against their saved metrics.
+- These Fashion-MNIST results use one frozen CNN/SOM realization;
+  bootstrap intervals do not substitute for independent training seeds.
+- SVHN remains a separate historical evaluation, including classical
+  baselines and a feature-reconstruction autoencoder.
+- Historical Isolation Forest and autoencoder results require further
+  investigation. Their recorded scores must not be silently reversed
+  or reselected to improve AUROC.
+- The standalone adapter is not registered in shared `pipeline/run_all.py`.
+  Registration is deferred to a separate PR after reviewer approval;
   see `pipeline/p3_novelty_detection/INTEGRATION_HANDOFF.md`.
-- The required max-softmax, energy, and Mahalanobis comparisons and
-  Fashion-MNIST evaluation must not be claimed complete until verified.
-- Previously saved results are historical artifacts, not outputs from
-  this documentation update.
+- The original training-derived QE threshold remains frozen. Its
+  difference from the instructor's validation-selection request is
+  recorded in `src/v1_mnist/docs/DEVIATIONS.md`.
+- The EC2 verification does not establish cross-platform numerical
+  reproducibility or multiple independent model-training seeds.
+- Historical outputs are preserved; no previous run is overwritten.
 
 ## Leakage control
 
-Keep model training and threshold selection separate from final OOD
-evaluation. Do not retune frozen settings using SVHN test scores.
-Never overwrite existing experiment runs.
+Baseline fitting uses MNIST training embeddings. MNIST validation is
+used for in-distribution evaluation, while Fashion-MNIST and SVHN
+are evaluated as external OOD datasets. The original training-calibrated
+QE threshold is not presented as validation-selected.
+
+Do not tune models, thresholds, or baseline hyperparameters using OOD
+evaluation outcomes. The official MNIST final-test set remains outside
+this Phase 3 tuning process. Preserve run IDs and SHA-256 provenance;
+never overwrite historical experiment outputs.

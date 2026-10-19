@@ -15,3 +15,62 @@ Week 3 rows refer to `p2_som_training_visualization/som_nnsom_training/SOM_GRID_
 | 2026-10-10 | 5 | (merge of the Week 4–5 code; see git log) | Three different error-hotspot rules were in use (top 20 by Wilson lower bound; at least 20 images and Wilson lower bound above the overall error rate; top 5% by Wilson lower bound). | Not a deviation: no written rule was broken. Two rules that were never written down are replaced by the one fixed in advance. | One rule everywhere: the one in `ERROR_PATTERN_ROBUSTNESS_CRITERIA.md`, section 3. See `p2_som_training_visualization/error_pattern_analysis/HOTSPOT_RULE.md`. The Week 5 LaTeX report (2026-10-03) used the old rule and is left unchanged. |
 | 2026-10-10 | 4 | (Week 4 model-check tolerance; see git log) | The Week 4 model check required the recomputed quantization error to match the Week 3 value to an absolute 1e-12. Outside EC2 (scikit-learn 1.7.2 vs 1.9.0) it differs by about 2 parts in a billion, so Week 4 could only run on EC2. | Not a deviation: the 1e-12 value was a coding choice, not part of any rule fixed in advance. | The tolerance is now relative, one part in a million. The number of neurons used must still match exactly, and the model and embedding fingerprints are still checked. Week 4 records both QE values and their relative difference in `cluster_summary.json`. |
 | 2026-10-10 | 4 | (label-shuffle comparison; see git log) | Added a label-shuffle comparison for the validation weighted purity: the class labels are shuffled across images 1,000 times (seed 20261010, both in `configs/som*.yaml`, `analysis.purity_null_*`), each image keeping its neuron, and the purity is recomputed each time. Asked for by the project rules ("use a null or control"). | Not a deviation: an addition after the fact, not part of any rule fixed in advance; no existing Week 4 result changed. | Result on the 15x15 SOM: observed 0.9819 vs shuffled mean 0.1738 (95% range 0.1703–0.1774, maximum 0.1807), p = 0.001 (the smallest possible with 1,000 shuffles). Stored in `cluster_summary.json` under `splits.val.purity_label_shuffle`. |
+
+## Phase 3 — novelty threshold and OOD benchmark
+
+Recorded: 2026-10-19.
+
+### Training-calibrated QE threshold versus validation selection
+
+The original Phase 3 proposal specified a novelty threshold at the
+95th percentile of MNIST training quantization errors. The completed
+SVHN experiment followed this specification. Its frozen threshold
+is 1.5690279077294162.
+
+Subsequent instructor reviews requested validation-based threshold
+selection. The two protocols are not equivalent.
+
+Decision: preserve the original training-calibrated experiment and its
+recorded results. Do not retroactively replace the threshold or change
+the historical run. The training-calibrated threshold is not described
+as validation-selected.
+
+A separate validation-selected threshold experiment would require a
+new run ID, its selection rule fixed before evaluation, and an
+independent held-out evaluation. No such result is claimed here.
+
+### OOD dataset scope
+
+The original Phase 3 proposal used SVHN. Subsequent instructor reviews
+prioritized Fashion-MNIST.
+
+Decision: retain SVHN as historical evidence and evaluate Fashion-MNIST
+separately using the frozen MNIST CNN checkpoint and fc2 embeddings.
+No MNIST final-test data is used for tuning. Fashion-MNIST is an OOD
+evaluation dataset, not a source for selecting model hyperparameters.
+
+### Historical SOM configuration
+
+Phase 3 uses the frozen 15x15 SOM employed by the previous analysis.
+This does not retroactively change the earlier SOM grid-selection
+results or the grid-selection protocol documented above.
+
+### Baseline comparability
+
+The historical One-Class SVM fit uses a seeded sample of 10,000 MNIST
+training embeddings, while other fitted baselines may use 49,000.
+These historical results are not treated as equal-training-budget
+comparisons without qualification.
+
+The historical Isolation Forest and Autoencoder AUROC concerns require
+an explicit score-direction and reproducibility investigation. Values
+must not be reversed or reselected after examining OOD outcomes merely
+to improve reported performance.
+
+### Leakage control
+
+Training embeddings are used for fitting baseline models. MNIST
+validation serves as in-distribution evaluation data. Historical
+training-calibrated QE thresholding remains distinct from any future
+validation-based threshold selection. The official MNIST final-test set
+must remain unused until the protocol and success criteria are frozen.
