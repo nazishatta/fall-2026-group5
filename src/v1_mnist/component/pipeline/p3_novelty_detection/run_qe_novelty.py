@@ -29,16 +29,13 @@ LOGGER = get_logger(__name__)
 ROOT = Path(__file__).resolve().parents[5]
 
 
-def sha256(path: Path) -> str:
-    """Hash a local artifact without loading it into memory."""
-    return sha256_file(path)
 
 
 def require_hash(path: Path, expected: str) -> str:
     """Fail closed for missing or changed upstream artifacts."""
     if not path.is_file():
         raise FileNotFoundError(f"Required artifact missing: {path}")
-    observed = sha256(path)
+    observed = sha256_file(path)
     if observed != expected:
         raise RuntimeError(
             f"SHA-256 mismatch: {path} (expected {expected}; got {observed})"

@@ -30,6 +30,50 @@ STAGES = {
         "run_svhn_benchmark.py",
         [],
     ),
+    "historical_baseline_verification": (
+        "run_historical_baseline_verification.py",
+        ["--save"],
+    ),
+    "qe_energy_knn_paired": (
+        "run_qe_energy_knn_paired.py",
+        [],
+    ),
+    "qe_random_control": (
+        "run_qe_random_control.py",
+        ["--save"],
+    ),
+    "qe_u_matrix": (
+        "run_qe_u_matrix.py",
+        ["--save"],
+    ),
+    "qe_umatrix_random_ood": (
+        "run_qe_umatrix_random_ood.py",
+        [],
+    ),
+    "required_baselines": (
+        "run_required_baselines.py",
+        ["--save"],
+    ),
+    "standardized_autoencoder": (
+        "run_standardized_autoencoder.py",
+        [],
+    ),
+    "qe_umatrix_validation_figure": (
+        "run_qe_umatrix_validation_figure.py",
+        [],
+    ),
+    "u_matrix_grid_figure": (
+        "run_u_matrix_grid_figure.py",
+        [],
+    ),
+    "missed_svhn_figure": (
+        "run_missed_svhn_figure.py",
+        [],
+    ),
+    "fair_budget_baselines": (
+        "run_fair_budget_baselines.py",
+        [],
+    ),
 }
 
 BENCHMARK_CONFIG = (

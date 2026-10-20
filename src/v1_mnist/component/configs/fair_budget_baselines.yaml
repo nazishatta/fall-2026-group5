@@ -1,0 +1,52 @@
+run_id: mnist_svhn_fair_budget_baselines_s42_46_v1
+analysis_status: post_hoc_exploratory
+dataset: mnist
+seed_list:
+- 42
+- 43
+- 44
+- 45
+- 46
+training_sample_count: 10000
+sampling:
+  method: numpy_default_rng_choice
+  replace: false
+  same_indices_for_all_methods: true
+embeddings:
+  train: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+expected_sha256:
+  train: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+expected:
+  svhn_count: 26032
+  mnist_train_count: 49000
+  mnist_validation_count: 10500
+  som_neurons: 225
+  feature_dim: 84
+  qe_threshold: 1.5690279077294162
+svhn_file: data/ood_svhn/test_32x32.mat
+qe_evaluation_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+one_class_svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: scale
+  max_training_samples: 10000
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
+metrics:
+- auroc
+- aupr
+selection_policy: No hyperparameter tuning or selection using SVHN scores.
+leakage_control: Fit on MNIST train only. Score MNIST validation and SVHN test without
+  refitting. Do not access final MNIST test.

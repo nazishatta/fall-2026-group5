@@ -76,6 +76,44 @@ an explicit score-direction and reproducibility investigation. Values
 must not be reversed or reselected after examining OOD outcomes merely
 to improve reported performance.
 
+### Autoencoder input-standardization diagnostic
+
+Recorded: 2026-10-20.
+
+The historical feature-reconstruction autoencoder was trained on raw
+84-dimensional CNN embeddings and obtained AUROC 0.007719 on MNIST
+validation versus SVHN test data. This unexpectedly low performance
+motivated an exploratory input-standardization diagnostic.
+
+A separate experiment fitted StandardScaler on the 49,000 MNIST
+training embeddings only. The original autoencoder architecture
+(84-32-16-32-84), seed 42, 20 epochs, batch size 256, and learning
+rate 0.001 were retained.
+
+New run ID: `mnist_svhn_ae_train_standardized_s42_v1`.
+
+Measured standardized-autoencoder results:
+- AUROC: 0.760492 (95% bootstrap CI: 0.753684-0.766459)
+- AUPR: 0.807320 (95% bootstrap CI: 0.802132-0.812269)
+- FPR at 95% TPR: 0.597810
+  (95% bootstrap CI: 0.584664-0.610669)
+- Evaluation: 10,500 MNIST validation and 26,032 SVHN test samples.
+- Bootstrap replicates: 2,000.
+
+The frozen CNN checkpoint, SOM, and training-calibrated QE threshold
+were not changed. The scaler and autoencoder were fitted on MNIST
+training features only. No official MNIST final-test data was used.
+
+This is an exploratory follow-up designed after observing the historical
+OOD results, not an independently selected final benchmark. The original
+autoencoder result remains preserved and must not be overwritten or
+silently replaced. The improvement is consistent with feature scaling
+affecting reconstruction-based novelty scoring, but does not establish
+that scaling was the only cause of the historical result.
+
+Metrics and SHA-256 provenance are recorded in:
+`outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_ae_train_standardized_s42_v1/standardized_autoencoder_metrics.json`.
+
 ### Leakage control
 
 Training embeddings are used for fitting baseline models. MNIST

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -13,19 +12,13 @@ from scipy.stats import hypergeom
 
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.som_io import sha256_file as sha256_file_local
 from src.v1_mnist.component.utils.stats import wilson_interval
 
 ROOT = Path(__file__).resolve().parents[5]
 LOGGER = get_logger("v1_mnist.p3.qe_random_control")
 
 
-def sha256_file_local(path: Path) -> str:
-    """Hash inputs without importing the NNSOM-dependent SOM loader."""
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def source_path(value: str) -> Path:

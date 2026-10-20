@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -16,28 +15,22 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.knn_baseline 
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_comparison import (
     evaluate_scores,
 )
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.paired_bootstrap import (
-    compare_auroc_paired,
-)
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_baselines import (
     energy_novelty,
     mahalanobis_novelty,
     max_softmax_novelty,
 )
+from src.v1_mnist.component.pipeline.p3_novelty_detection.paired_ood_comparison import (
+    evaluate_paired_qe,
+)
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.som_io import sha256_file as fingerprint
 
 ROOT = Path(__file__).resolve().parents[5]
 LOGGER = get_logger("v1_mnist.p3.required_baselines")
 
 
-def fingerprint(path: Path) -> str:
-    """Compute a SHA-256 fingerprint without loading a full file."""
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def input_path(value: str) -> Path:
@@ -52,52 +45,10 @@ def input_path(value: str) -> Path:
     return path
 
 
-def reconstruct_logits(
-    model: Any, features: np.ndarray
-) -> np.ndarray:
-    """Apply frozen LeNet-5 ReLU and classifier to saved fc2 activations."""
-    import torch
-
-    values = np.asarray(features, dtype=np.float32)
-    if values.ndim != 2 or not np.isfinite(values).all():
-        raise ValueError("Expected finite 2D fc2 features")
-
-    batches: list[np.ndarray] = []
-    with torch.inference_mode():
-        for start in range(0, len(values), 4096):
-            batch = torch.from_numpy(values[start : start + 4096])
-            logits = model.fc3(torch.relu(batch))
-            batches.append(logits.cpu().numpy())
-
-    if not batches:
-        raise ValueError("Empty feature array")
-    return np.concatenate(batches, axis=0)
-
-
-def verify_predictions(
-    logits: np.ndarray,
-    predictions: np.ndarray,
-    confidence: np.ndarray,
-    tolerance: float,
-) -> None:
-    """Confirm reconstructed logits agree with original CNN outputs."""
-    from scipy.special import softmax
-
-    predicted = np.argmax(logits, axis=1)
-    probabilities = softmax(logits.astype(np.float64), axis=1)
-    recovered_confidence = probabilities.max(axis=1)
-
-    if predicted.shape != predictions.shape or not np.array_equal(
-        predicted, predictions
-    ):
-        raise RuntimeError("CNN predictions disagree with saved outputs")
-
-    if confidence.shape != recovered_confidence.shape:
-        raise RuntimeError("CNN confidence array length mismatch")
-    if not np.allclose(
-        recovered_confidence, confidence, rtol=0, atol=tolerance
-    ):
-        raise RuntimeError("CNN confidence reconstruction failed")
+from src.v1_mnist.component.pipeline.p3_novelty_detection.cnn_score_inference import (
+    reconstruct_logits,
+    verify_predictions,
+)
 
 
 def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
@@ -222,6 +173,78 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         ),
     }
 
+    if bool(getattr(config, "export_scores_only", False)):
+        from sklearn.metrics import roc_auc_score
+
+        neighbors = int(config.evaluation.knn_neighbors)
+        scores["knn"] = (
+            knn_novelty(train, validation, neighbors=neighbors),
+            knn_novelty(train, svhn_features, neighbors=neighbors),
+        )
+
+        exported = {}
+        labels = np.r_[
+            np.zeros(len(validation), dtype=int),
+            np.ones(len(svhn_features), dtype=int),
+        ]
+        for name in ("energy", "knn"):
+            id_scores, ood_scores = scores[name]
+            if not (
+                len(id_scores) == len(validation)
+                and len(ood_scores) == len(svhn_features)
+                and np.isfinite(id_scores).all()
+                and np.isfinite(ood_scores).all()
+            ):
+                raise RuntimeError(f"STOP: Invalid {name} score arrays")
+            observed_auc = float(
+                roc_auc_score(labels, np.r_[id_scores, ood_scores])
+            )
+            expected_auc = float(
+                getattr(config.expected_export_auroc, name)
+            )
+            if not np.isclose(
+                observed_auc, expected_auc, atol=1e-6, rtol=0
+            ):
+                raise RuntimeError(f"STOP: Historical {name} AUROC mismatch")
+            exported[name] = observed_auc
+
+        destination.mkdir(parents=True, exist_ok=False)
+        for name in ("energy", "knn"):
+            for split, values in zip(
+                ("mnist_val", "svhn_test"), scores[name], strict=True
+            ):
+                output_path = destination / f"{name}_{split}_scores.npy"
+                with output_path.open("xb") as stream:
+                    np.save(stream, np.asarray(values, dtype=np.float64),
+                            allow_pickle=False)
+
+        metadata = {
+            "run_id": run_id,
+            "mode": "frozen_score_export_only",
+            "auroc": exported,
+            "n_id": len(validation),
+            "n_ood": len(svhn_features),
+            "knn_neighbors": neighbors,
+            "energy_temperature": temperature,
+            "input_sha256": hashes,
+            "config_sha256": fingerprint(config_path),
+            "leakage_control": (
+                "Frozen CNN, original MNIST train/validation and SVHN test. "
+                "No model retraining, threshold selection, or MNIST final test."
+            ),
+            "alignment_limitation": (
+                "Unshuffled torchvision SVHN test ordering; historical QE "
+                "arrays do not contain independently verifiable sample IDs."
+            ),
+        }
+        with (destination / "score_export_metrics.json").open(
+            "x", encoding="utf-8"
+        ) as stream:
+            json.dump(metadata, stream, indent=2, allow_nan=False)
+            stream.write("\\n")
+        LOGGER.info("Exported energy and kNN scores to %s", destination)
+        return metadata
+
     # Fit only on MNIST training embeddings; score both evaluation splits.
     joined = np.concatenate([validation, svhn_features], axis=0)
     mahalanobis = mahalanobis_novelty(train, train_labels, joined)
@@ -255,69 +278,16 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         )
 
 
-    paired_result: dict[str, Any] | None = None
-    if hasattr(config, "paired_qe"):
-        qe_settings = config.paired_qe
-        qe_id_path = input_path(str(qe_settings.id_scores))
-        qe_ood_path = input_path(str(qe_settings.ood_scores))
-
-        for label, path, expected_hash in (
-            ("MNIST QE", qe_id_path, str(qe_settings.id_sha256)),
-            ("SVHN QE", qe_ood_path, str(qe_settings.ood_sha256)),
-        ):
-            if fingerprint(path) != expected_hash:
-                raise RuntimeError(f"STOP: {label} fingerprint mismatch")
-
-        qe_id = np.load(qe_id_path, allow_pickle=False)
-        qe_ood = np.load(qe_ood_path, allow_pickle=False)
-        msp_id, msp_ood = scores["max_softmax"]
-
-        paired_result = compare_auroc_paired(
-            qe_id,
-            qe_ood,
-            msp_id,
-            msp_ood,
-            iterations=int(config.evaluation.bootstrap_iterations),
-            seed=int(config.evaluation.bootstrap_seed),
-        )
-
-        for method, actual, expected in (
-            ("QE", paired_result["qe_auroc"], qe_settings.expected_qe_auroc),
-            ("MSP", paired_result["msp_auroc"], qe_settings.expected_msp_auroc),
-        ):
-            if not np.isclose(
-                float(actual),
-                float(expected),
-                rtol=0,
-                atol=float(qe_settings.auroc_tolerance),
-            ):
-                raise RuntimeError(f"STOP: {method} AUROC mismatch")
-
-        paired_result.update({
-            "run_id": run_id,
-            "id_dataset": "mnist_validation",
-            "ood_dataset": "svhn_test",
-            "qe_id_sha256": fingerprint(qe_id_path),
-            "qe_ood_sha256": fingerprint(qe_ood_path),
-            "checkpoint_sha256": hashes["checkpoint"],
-            "svhn_sha256": hashes["svhn_file"],
-            "source_config_sha256": fingerprint(config_path),
-            "leakage_control": (
-                "Frozen CNN and historical QE; no OOD fitting, tuning "
-                "or final MNIST test-set use."
-            ),
-            "alignment_evidence": (
-                "Same frozen checkpoint, torchvision SVHN test ordering, "
-                "SVHN preprocessing and unshuffled inference. Historical "
-                "QE arrays lack per-image identifiers; alignment is "
-                "supported but cannot be independently ID-verified."
-            ),
-        })
-        LOGGER.info(
-            "QE minus MSP AUROC=%.9f; paired CI=%s",
-            paired_result["qe_minus_msp_auroc"],
-            paired_result["difference_ci_95"],
-        )
+    paired_result = evaluate_paired_qe(
+        config=config,
+        scores=scores,
+        run_id=run_id,
+        hashes=hashes,
+        config_path=config_path,
+        input_path=input_path,
+        fingerprint=fingerprint,
+        logger=LOGGER,
+    )
 
     result: dict[str, Any] = {
         "run_id": run_id,
