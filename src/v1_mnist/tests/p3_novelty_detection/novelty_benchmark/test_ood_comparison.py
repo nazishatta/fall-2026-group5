@@ -77,13 +77,29 @@ def test_never_overwrite_existing_result(tmp_path: Path) -> None:
         save_new_json(path, {"auroc": 0.9})
 
 
-def test_historical_metric_schema_rejects_other_target_tpr() -> None:
-    """Never label a different operating point as FPR@95TPR."""
-    with pytest.raises(ValueError, match="requires target_tpr=0.95"):
+def test_nonhistorical_target_tpr_uses_correct_metric_name() -> None:
+    """FPR at 90% TPR must never be mislabeled FPR at 95% TPR."""
+    result = evaluate_scores(
+        np.array([0.1, 0.2]),
+        np.array([0.8, 0.9]),
+        bootstrap_repeats=10,
+        seed=42,
+        target_tpr=0.90,
+    )
+    assert result["target_tpr"] == 0.90
+    assert result["fpr_at_target_tpr"] == 0.0
+    assert "fpr_at_95_tpr" not in result
+    assert "fpr_at_target_tpr" in result["confidence_intervals_95"]
+
+
+@pytest.mark.parametrize("target_tpr", [0.0, -0.1, 1.1, float("nan")])
+def test_invalid_target_tpr_rejected(target_tpr: float) -> None:
+    """Only finite target TPRs greater than zero and at most one are valid."""
+    with pytest.raises(ValueError, match="target_tpr"):
         evaluate_scores(
             np.array([0.1, 0.2]),
             np.array([0.8, 0.9]),
             bootstrap_repeats=0,
             seed=42,
-            target_tpr=0.90,
+            target_tpr=target_tpr,
         )

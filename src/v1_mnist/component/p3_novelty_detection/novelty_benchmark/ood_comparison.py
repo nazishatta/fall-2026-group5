@@ -35,8 +35,8 @@ def evaluate_scores(
         raise ValueError("Both ID and OOD samples are required for OOD metrics")
     if not np.isfinite(normal).all() or not np.isfinite(novel).all():
         raise ValueError("Score arrays must contain only finite values")
-    if target_tpr != 0.95:
-        raise ValueError("Historical fpr_at_95_tpr schema requires target_tpr=0.95")
+    if not np.isfinite(target_tpr) or not 0 < target_tpr <= 1:
+        raise ValueError("target_tpr must be in (0, 1]")
     if bootstrap_repeats < 0:
         raise ValueError("bootstrap_repeats must be nonnegative")
 
@@ -63,14 +63,15 @@ def evaluate_scores(
         np.quantile(np.asarray(estimates), [0.025, 0.975], axis=0)
         if estimates else None
     )
+    fpr_key = "fpr_at_95_tpr" if target_tpr == 0.95 else "fpr_at_target_tpr"
     result: dict[str, object] = {
         "n_id": len(normal), "n_ood": len(novel), "seed": seed,
         "bootstrap_repeats": bootstrap_repeats,
         "target_tpr": target_tpr,
-        "auroc": auc, "aupr": aupr, "fpr_at_95_tpr": fpr95,
+        "auroc": auc, "aupr": aupr, fpr_key: fpr95,
         "confidence_intervals_95": (
             {name: [float(intervals[0, index]), float(intervals[1, index])]
-             for index, name in enumerate(("auroc", "aupr", "fpr_at_95_tpr"))}
+             for index, name in enumerate(("auroc", "aupr", fpr_key))}
             if intervals is not None else None
         ),
         "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
