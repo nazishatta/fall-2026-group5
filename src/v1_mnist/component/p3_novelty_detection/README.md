@@ -77,3 +77,24 @@ Do not tune models, thresholds, or baseline hyperparameters using OOD
 evaluation outcomes. The official MNIST final-test set remains outside
 this Phase 3 tuning process. Preserve run IDs and SHA-256 provenance;
 never overwrite historical experiment outputs.
+
+## Test-count and benchmark provenance clarification
+
+The earlier full-repository count of 168 passed and 2 warnings is
+a historical EC2 verification result. The latest Phase 3-only suite,
+executed on 2026-10-20, passed 134 tests with no failures.
+These figures describe different test scopes and must not be treated
+as conflicting measurements of the same test suite.
+
+The consolidated nine-method CSV contains results from two source runs,
+not a newly fitted single execution. It preserves each method's
+source_run_id. QE and U-Matrix were evaluated together in the original
+five-method benchmark; max-softmax, energy, Mahalanobis and kNN were
+evaluated in the subsequent frozen-CNN baseline run.
+
+The equal-fitting-budget diagnostic uses five explicit seeds, stored
+under `seed_list` in its original configuration. That original
+configuration is retained because its SHA-256 is recorded in the
+committed experiment metrics. This is a naming compatibility exception
+to the requested `seeds` key, not evidence that the experiment was
+executed without a seed list.
