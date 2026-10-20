@@ -1,0 +1,10 @@
+method,auroc,aupr,fpr_at_95_tpr,source_run_id,evaluation,comparison_type
+qe,0.981106814,0.976554650,0.045333333,mnist_svhn_five_method_comparison_s42_initial,MNIST validation (10500) versus SVHN test (26032),historical
+u_matrix,0.969628971,0.986497587,0.070055816,mnist_svhn_five_method_comparison_s42_initial,MNIST validation (10500) versus SVHN test (26032),historical
+isolation_forest,0.238261338,0.555241354,0.871809524,mnist_svhn_five_method_comparison_s42_initial,MNIST validation (10500) versus SVHN test (26032),historical
+one_class_svm,0.960424437,0.976437952,0.179428571,mnist_svhn_five_method_comparison_s42_initial,MNIST validation (10500) versus SVHN test (26032),historical
+autoencoder,0.007718722,0.497909753,0.999904762,mnist_svhn_five_method_comparison_s42_initial,MNIST validation (10500) versus SVHN test (26032),historical
+max_softmax,0.998495006,0.999357532,0.007809524,mnist_svhn_required_baselines_knn_s42_v1,MNIST validation (10500) versus SVHN test (26032),additional frozen CNN
+energy,0.999797407,0.999916940,0.000380952,mnist_svhn_required_baselines_knn_s42_v1,MNIST validation (10500) versus SVHN test (26032),additional frozen CNN
+mahalanobis,0.776436518,0.785874541,0.313142857,mnist_svhn_required_baselines_knn_s42_v1,MNIST validation (10500) versus SVHN test (26032),additional frozen CNN
+knn,0.976560709,0.973923680,0.059238095,mnist_svhn_required_baselines_knn_s42_v1,MNIST validation (10500) versus SVHN test (26032),additional frozen CNN

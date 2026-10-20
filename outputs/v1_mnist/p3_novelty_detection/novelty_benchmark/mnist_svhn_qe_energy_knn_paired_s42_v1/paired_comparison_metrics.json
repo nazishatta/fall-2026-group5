@@ -1,0 +1,46 @@
+{
+  "run_id": "mnist_svhn_qe_energy_knn_paired_s42_v1",
+  "comparisons": {
+    "energy": {
+      "qe_auroc": 0.9811068135920626,
+      "baseline_auroc": 0.9997974068545674,
+      "qe_minus_baseline_auroc": -0.018690593262504773,
+      "paired_difference_ci_95": [
+        -0.02073465450946823,
+        -0.016708852748997634
+      ]
+    },
+    "knn": {
+      "qe_auroc": 0.9811068135920626,
+      "baseline_auroc": 0.9765607091638131,
+      "qe_minus_baseline_auroc": 0.004546104428249542,
+      "paired_difference_ci_95": [
+        0.002430753998741353,
+        0.006807360172095764
+      ]
+    }
+  },
+  "seed": 42,
+  "bootstrap_iterations": 2000,
+  "sample_counts": {
+    "mnist_val": 10500,
+    "svhn_test": 26032
+  },
+  "input_sha256": {
+    "qe": {
+      "mnist_val": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+      "svhn_test": "88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265"
+    },
+    "energy": {
+      "mnist_val": "9dac6bdd9df77b3b824fc555db0cd1819387c2e0e1a287e99a7ee2fecdc7b2f6",
+      "svhn_test": "533dd48b98228dea159fe6e49183a3ffab3a0b643d1665c7539b1f11415c7869"
+    },
+    "knn": {
+      "mnist_val": "39f3d68cb8f5706bd4af88e1021cf35d4e52268f3171de51e8590c43d3048944",
+      "svhn_test": "41d9756747ebc974ea36594d1d162d533064fb7e93c803cda5b1206cac2a1b6d"
+    }
+  },
+  "config_sha256": "bd501dedd31b02fde30a79979bc900f2cdcb9aa66a11c0ae204ca9b5f58ff8ec",
+  "leakage_control": "Frozen historical novelty scores; no fitting, tuning, or official MNIST final-test access.",
+  "alignment_limitation": "Historical score arrays lack independent per-image identifiers. Paired analysis assumes the established identical sample order."
+}
