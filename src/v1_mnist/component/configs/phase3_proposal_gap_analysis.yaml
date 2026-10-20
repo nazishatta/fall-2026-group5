@@ -1,0 +1,13 @@
+# New standalone analysis; historical runs are never overwritten.
+run_id: mnist_svhn_proposal_gap_analysis_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis
+som_grid:
+  height: 15
+  width: 15
+expected_validation_count: 10500
+expected_svhn_count: 26032
+inputs:
+  validation_bmu: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu.npy
+  validation_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+  qe_summary: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial/qe_summary.json
+  svhn_qe: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/qe_svhn_test_scores.npy
