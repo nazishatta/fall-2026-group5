@@ -25,3 +25,4 @@ batch_size: 256
 cnn_sha256: 0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d
 training_distance_path: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/train_bmu_distance.npy
 validation_distance_path: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+max_missed_examples: 20

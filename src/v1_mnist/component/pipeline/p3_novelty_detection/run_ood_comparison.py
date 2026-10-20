@@ -27,11 +27,7 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--detector", required=True)
     parser.add_argument("--frozen-threshold", type=float)
-    parser.add_argument(
-        "--config",
-        type=Path,
-        default=Path("src/v1_mnist/component/configs/qe_ood_evaluation.yaml"),
-    )
+    parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Output exists: do not overwrite an existing run")
@@ -60,7 +56,9 @@ def main() -> None:
     }
     if args.frozen_threshold is not None:
         payload["missed_ood"] = analyze_misses(
-            novel, threshold=args.frozen_threshold
+            novel,
+            threshold=args.frozen_threshold,
+            max_examples=int(settings.max_missed_examples),
         )
     save_new_json(args.output, payload)
     LOGGER.info("Created novelty evaluation: %s", args.output)
