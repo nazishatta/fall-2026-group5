@@ -27,6 +27,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.autoencoder_b
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_comparison import (
     evaluate_scores,
 )
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    verify_shared_inputs,
+)
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
     image_transform,
 )
@@ -69,6 +72,7 @@ def run(config_path: Path) -> Path:
     """Run exactly once with a new ID, preserving historical outputs."""
     config_path = config_path.resolve()
     settings: dict[str, Any] = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    verify_shared_inputs(settings["inputs"])
     run_id = str(settings["run_id"])
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
         raise ValueError("Invalid run ID")

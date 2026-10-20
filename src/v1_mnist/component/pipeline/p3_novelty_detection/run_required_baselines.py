@@ -20,6 +20,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_base
     mahalanobis_novelty,
     max_softmax_novelty,
 )
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    verify_shared_inputs,
+)
 from src.v1_mnist.component.pipeline.p3_novelty_detection.paired_ood_comparison import (
     evaluate_paired_qe,
 )
@@ -68,6 +71,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     )
 
     config = load_config(config_path)
+    verify_shared_inputs(vars(config.inputs))
     run_id = str(config.run_id)
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
         raise ValueError("Invalid run ID")
