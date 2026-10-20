@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import logging
 from pathlib import Path
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
 
-LOGGER = logging.getLogger(__name__)
+from src.v1_mnist.component.utils.logging import get_logger
+
+LOGGER = get_logger(__name__)
 
 
 def inspect(folder: Path) -> dict[str, object]:
@@ -49,14 +50,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO)
     from src.v1_mnist.component.utils.config import load_config
 
     settings = load_config(args.config)
     folder = Path(settings.historical_run_directory)
     result = inspect(folder)
     LOGGER.info("Historical SVHN separation diagnostic (no refits)")
-    print(json.dumps(result, indent=2))
+    LOGGER.info("%s", json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

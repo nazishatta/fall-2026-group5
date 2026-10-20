@@ -6,7 +6,6 @@ Run from the isolated project root, with PYTHONDONTWRITEBYTECODE=1.
 from __future__ import annotations
 
 import json
-import logging
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -81,7 +80,6 @@ def score_method(
 
 def main() -> None:
     """Run the preregistered five-method MNIST vs SVHN comparison."""
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     benchmark = _to_mapping(load_config(CONFIG_PATH))
     run_id = benchmark["run_id"]
     if not isinstance(run_id, str) or not run_id or "/" in run_id or ".." in run_id:

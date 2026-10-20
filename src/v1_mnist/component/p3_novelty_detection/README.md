@@ -19,13 +19,13 @@ The independent `run_phase3_stage.py` adapter accepts `--config`,
 
 ## Verification and limitations
 
-- Full repository test suite on EC2: **168 passed, 2 warnings,
+- Historical full repository test suite on EC2: **168 passed, 2 warnings,
   0 failures**. The warnings concern existing Seaborn and NNSOM code.
 - Ruff checks passed for the Phase 3 source, pipeline, and test directories.
 - Four standalone Phase 3 integration tests passed.
 - MNIST validation versus SVHN is the current ID/OOD comparison.
 - Saved SVHN max-softmax, energy, and Mahalanobis results include
-  bootstrap intervals; the SVHN kNN comparison still requires verification.
+  bootstrap intervals; the SVHN kNN comparison is verified (AUROC 0.976561, 95% CI [0.974306, 0.978747]).
 - Historical SVHN comparisons also include QE, U-Matrix, classical
   baselines, and a feature-reconstruction autoencoder.
 - These evaluations use one frozen CNN/SOM realization;
@@ -42,6 +42,29 @@ The independent `run_phase3_stage.py` adapter accepts `--config`,
 - The EC2 verification does not establish cross-platform numerical
   reproducibility or multiple independent model-training seeds.
 - Historical outputs are preserved; no previous run is overwritten.
+
+## SVHN dataset setup
+
+The current OOD evaluation uses the SVHN test split at `data/ood_svhn/test_32x32.mat`.
+
+Official Stanford download URL:
+
+https://ufldl.stanford.edu/housenumbers/test_32x32.mat
+
+For a fresh checkout, run the following commands from the repository root only if the dataset is missing:
+
+    mkdir -p data/ood_svhn
+    curl -fL --retry 3 https://ufldl.stanford.edu/housenumbers/test_32x32.mat -o data/ood_svhn/test_32x32.mat
+    sha256sum data/ood_svhn/test_32x32.mat
+
+Expected SHA-256:
+
+`cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b`
+
+Verify with `sha256sum data/ood_svhn/test_32x32.mat` before running benchmarks.
+Do not overwrite an existing dataset. The EC2 workspace currently uses a verified symlink to the SVHN file.
+
+The latest Phase 3-only pytest run completed with **131 passed**. This is separate from the historical full-repository test count.
 
 ## Leakage control
 

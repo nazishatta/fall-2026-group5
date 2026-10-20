@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import logging
 import subprocess
 import sys
 from pathlib import Path
@@ -13,7 +12,9 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-LOGGER = logging.getLogger("v1_mnist.pipeline.phase3")
+from src.v1_mnist.component.utils.logging import get_logger
+
+LOGGER = get_logger("v1_mnist.pipeline.phase3")
 
 PIPELINE_DIR = Path(__file__).resolve().parent
 
@@ -149,7 +150,6 @@ def main() -> None:
         if not required.issubset(set(forwarded)):
             parser.error("OOD comparison requires all five named arguments")
 
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     command = build_command(args.stage, args.config, forwarded)
     LOGGER.info("Phase 3 stage: %s", args.stage)
     LOGGER.info("Command: %s", " ".join(command))
