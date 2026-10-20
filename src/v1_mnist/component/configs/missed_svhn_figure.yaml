@@ -1,0 +1,10 @@
+run_id: mnist_svhn_missed_qe_figure_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/
+historical_run: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial
+svhn_file: data/ood_svhn/test_32x32.mat
+svhn_sha256: cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b
+qe_scores_sha256: 88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265
+expected_samples: 26032
+expected_misses: 996
+example_count: 20
+figure_name: qe_missed_svhn_examples.pdf

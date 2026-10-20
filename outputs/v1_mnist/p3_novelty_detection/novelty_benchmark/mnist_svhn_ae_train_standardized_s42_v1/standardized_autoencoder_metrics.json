@@ -1,0 +1,56 @@
+{
+  "run_id": "mnist_svhn_ae_train_standardized_s42_v1",
+  "method": "autoencoder_train_standardized_diagnostic",
+  "id_dataset": "mnist",
+  "id_split": "validation",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "metrics": {
+    "n_id": 10500,
+    "n_ood": 26032,
+    "seed": 42,
+    "bootstrap_repeats": 2000,
+    "target_tpr": 0.95,
+    "auroc": 0.7604918397137589,
+    "aupr": 0.8073197601978916,
+    "fpr_at_95_tpr": 0.5978095238095238,
+    "confidence_intervals_95": {
+      "auroc": [
+        0.7536844868129335,
+        0.7664590228235578
+      ],
+      "aupr": [
+        0.8021324723235131,
+        0.8122689872186871
+      ],
+      "fpr_at_95_tpr": [
+        0.5846642857142857,
+        0.6106690476190476
+      ]
+    },
+    "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+  },
+  "losses": {
+    "initial": 0.40690237946169716,
+    "final": 0.01445795090663798
+  },
+  "preprocessing": "StandardScaler fitted on MNIST training embeddings ONLY",
+  "config_sha256": "c74e98b1bde72782fec4f921adb21965da759dcff9a00a94bff9f3f8f8ee7fec",
+  "input_sha256": {
+    "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "frozen_provenance": {
+    "qe_threshold": 1.5690279077294162,
+    "som_model": "som_15x15_nb11_ep250_s42_v2",
+    "som_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+    "cnn_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_qe_sha256": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+    "val_qe_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186"
+  },
+  "leakage_control": "Frozen CNN and SOM. Train-fitted scaler and autoencoder see MNIST training features only. MNIST validation and SVHN test used only for evaluation. No threshold tuning or MNIST final test access.",
+  "limitation": "Exploratory follow-up after observing anomalous historical OOD AUROC. Do not replace historical result or claim independent test-based selection."
+}

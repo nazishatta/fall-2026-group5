@@ -1,0 +1,17 @@
+{
+  "run_id": "mnist_qe_umatrix_validation_figure_s42_v1",
+  "figure": "qe_u_matrix_validation_initial.pdf",
+  "sample_count": 10500,
+  "qe_mean": 0.9634832918297878,
+  "u_matrix_mean": 0.7809652917712436,
+  "spearman_correlation": 0.4396258885327658,
+  "input_sha256": {
+    "qe": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+    "u_matrix": "f22e0dd1f2456012856709d8b4586b3ef59ae9be58d44638e2e457b4bb1f121f"
+  },
+  "source_summary_sha256": "9e2b7e678e1e1ce3ee61bad776fd1c3d42bf077c2e1d4bfc55129f54c23a23be",
+  "config_sha256": "bd565895bc3d9d60a78ad97c922d4b99717e9470ea20896300a3a2ca8b7ba3f4",
+  "figure_sha256": "5fe425a94b2a11f13028bbdcc9cb6b086bd7bd44b82bd370a5a397a377b4a884",
+  "leakage_control": "Frozen MNIST validation scores only; no model fitting, threshold tuning, SVHN use, or final MNIST test access.",
+  "reproduction_note": "Reproduces historical summary statistics and score data, not necessarily the original figure's visual layout."
+}
