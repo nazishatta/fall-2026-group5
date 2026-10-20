@@ -12,9 +12,8 @@ from sklearn.metrics import roc_auc_score
 LOGGER = logging.getLogger(__name__)
 
 
-def inspect(root: Path) -> dict[str, object]:
+def inspect(folder: Path) -> dict[str, object]:
     """Compare existing saved scores against immutable historical metrics."""
-    folder = root / "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial"
     historical = json.loads((folder / "comparison_metrics.json").read_text(encoding="utf-8"))
     output: dict[str, object] = {"historical_run_id": historical["run_id"], "methods": {}}
     for method in ("isolation_forest", "autoencoder", "one_class_svm"):
@@ -48,10 +47,14 @@ def inspect(root: Path) -> dict[str, object]:
 def main() -> None:
     """Print diagnosis to stdout; make no filesystem writes."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
-    result = inspect(args.root.resolve())
+    from src.v1_mnist.component.utils.config import load_config
+
+    settings = load_config(args.config)
+    folder = Path(settings.historical_run_directory)
+    result = inspect(folder)
     LOGGER.info("Historical SVHN separation diagnostic (no refits)")
     print(json.dumps(result, indent=2))
 
