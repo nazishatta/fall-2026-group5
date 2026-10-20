@@ -25,6 +25,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.autoencoder_b
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.classical_baselines import (
     fit_classical_baselines,
 )
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    verify_shared_inputs,
+)
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
     image_transform,
 )
@@ -130,6 +133,12 @@ def run(config_path: Path) -> Path:
     destination = repository_path(config["output_root"]) / run_id
     if destination.exists():
         raise FileExistsError(f"Existing run must not be reused: {destination}")
+
+    verify_shared_inputs({
+        "train_features": str(config["embeddings"]["train"]),
+        "validation_features": str(config["embeddings"]["validation"]),
+        "svhn_file": str(config["svhn_file"]),
+    })
 
     train_path = repository_path(config["embeddings"]["train"])
     val_path = repository_path(config["embeddings"]["validation"])
