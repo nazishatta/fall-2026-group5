@@ -1,0 +1,10 @@
+# Verified frozen Phase 3 inputs; do not edit historical outputs.
+inputs:
+  checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
+  train_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+expected_sha256:
+  checkpoint: 0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d
+  train_features: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation_features: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+svhn_file: data/ood_svhn/test_32x32.mat
