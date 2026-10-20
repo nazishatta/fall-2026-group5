@@ -54,9 +54,12 @@ def run(config_path: Path) -> dict[str, Any]:
     grid = config["som_grid"]
     if bmu.size != int(config["expected_validation_count"]) or svhn_qe.size != int(config["expected_svhn_count"]):
         raise ValueError("Unexpected sample counts")
-    if "input_sha256" in summary and "val_bmu_distance" in summary["input_sha256"]:
-        if sha256_file(inputs["validation_qe"]) != summary["input_sha256"]["val_bmu_distance"]:
-            raise ValueError("QE array does not match frozen QE summary")
+    if (
+        "input_sha256" in summary
+        and "val_bmu_distance" in summary["input_sha256"]
+        and sha256_file(inputs["validation_qe"]) != summary["input_sha256"]["val_bmu_distance"]
+    ):
+        raise ValueError("QE array does not match frozen QE summary")
     # Preflight all outputs before creating the run directory.
     root = destination / "pdf"
     if root.exists():
