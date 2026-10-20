@@ -70,6 +70,14 @@ STAGES = {
         "run_missed_svhn_figure.py",
         [],
     ),
+    "ood_comparison": (
+        "run_ood_comparison.py",
+        [],
+    ),
+    "proposal_gap_analysis": (
+        "run_proposal_gap_analysis.py",
+        [],
+    ),
     "fair_budget_baselines": (
         "run_fair_budget_baselines.py",
         [],
@@ -82,7 +90,11 @@ BENCHMARK_CONFIG = (
 )
 
 
-def build_command(stage: str, config: Path) -> list[str]:
+def build_command(
+    stage: str,
+    config: Path,
+    extra_args: list[str] | None = None,
+) -> list[str]:
     """Build one Phase 3 stage command without executing it."""
     script, extra = STAGES[stage]
     resolved_config = (
@@ -96,6 +108,20 @@ def build_command(stage: str, config: Path) -> list[str]:
                 "SVHN benchmark currently requires novelty_benchmark.yaml"
             )
         return [sys.executable, str(PIPELINE_DIR / script)]
+
+    if stage == "ood_comparison":
+        if not extra_args:
+            raise ValueError(
+                "OOD comparison requires --id-scores, --ood-scores, "
+                "--output, --run-id and --detector."
+            )
+        return [
+            sys.executable,
+            str(PIPELINE_DIR / script),
+            "--config",
+            str(resolved_config),
+            *extra_args,
+        ]
 
     return [
         sys.executable,
@@ -112,10 +138,19 @@ def main() -> None:
     parser.add_argument("--stage", choices=STAGES, required=True)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
-    args = parser.parse_args()
+    args, forwarded = parser.parse_known_args()
+    if forwarded and args.stage != "ood_comparison":
+        parser.error("Additional arguments are only allowed for ood_comparison")
+    if args.stage == "ood_comparison":
+        required = {
+            "--id-scores", "--ood-scores", "--output",
+            "--run-id", "--detector",
+        }
+        if not required.issubset(set(forwarded)):
+            parser.error("OOD comparison requires all five named arguments")
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    command = build_command(args.stage, args.config)
+    command = build_command(args.stage, args.config, forwarded)
     LOGGER.info("Phase 3 stage: %s", args.stage)
     LOGGER.info("Command: %s", " ".join(command))
 

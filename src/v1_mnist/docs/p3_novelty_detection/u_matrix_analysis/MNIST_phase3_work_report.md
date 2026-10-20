@@ -189,3 +189,30 @@ The paired result was produced using the existing
 `compare_auroc_paired` implementation and frozen CNN inference.
 A dedicated end-to-end paired execution runner remains to be
 committed for complete reproducibility.
+
+## Current Phase 3 verification — 2026-10-20
+
+The older test counts and [TBD] entries above describe historical
+development stages. They must not be interpreted as the current status.
+
+The latest dedicated Phase 3 EC2 test run passed 131 tests. The complete Phase 3 Ruff check also passed.
+Ruff checks passed. This does not establish that the full repository
+test suite passes; the shared pipeline test still has a default-stage
+expectation mismatch.
+
+Subsequent measurements resolved the earlier kNN and paired
+QE/max-softmax uncertainties:
+
+- kNN AUROC: 0.976561 on MNIST validation versus SVHN test.
+- QE AUROC: 0.981107.
+- Max-softmax AUROC: 0.998495.
+- Paired QE minus max-softmax AUROC: -0.017388.
+- Paired 95% bootstrap confidence interval: [-0.019406, -0.015418].
+
+The paired comparison favors max-softmax on this benchmark.
+Historical validation-only records and their original [TBD] fields
+remain unchanged. No official MNIST final-test data was used.
+
+Leakage Control: The existing CNN and SOM were frozen, with no
+selection of hyperparameters on SVHN evaluation results. The
+training-calibrated QE threshold was preserved.

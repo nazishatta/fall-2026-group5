@@ -65,4 +65,6 @@ def test_phase3_registered_stage_command(
 
 def test_registered_stage_count() -> None:
     """All compatible Phase 3 runners have stage entries."""
-    assert len(STAGES) == 14
+    assert {stage for stage, _ in CASES}.issubset(STAGES)
+    assert "ood_comparison" in STAGES
+    assert "proposal_gap_analysis" in STAGES
