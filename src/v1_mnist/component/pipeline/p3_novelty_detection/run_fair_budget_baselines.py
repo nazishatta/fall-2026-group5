@@ -134,11 +134,14 @@ def run(config_path: Path) -> Path:
     if destination.exists():
         raise FileExistsError(f"Existing run must not be reused: {destination}")
 
-    verify_shared_inputs({
-        "train_features": str(config["embeddings"]["train"]),
-        "validation_features": str(config["embeddings"]["validation"]),
-        "svhn_file": str(config["svhn_file"]),
-    })
+    verify_shared_inputs(
+        {
+            "train_features": str(config["embeddings"]["train"]),
+            "validation_features": str(config["embeddings"]["validation"]),
+            "svhn_file": str(config["svhn_file"]),
+        },
+        required_keys=("train_features", "validation_features", "svhn_file"),
+    )
 
     train_path = repository_path(config["embeddings"]["train"])
     val_path = repository_path(config["embeddings"]["validation"])

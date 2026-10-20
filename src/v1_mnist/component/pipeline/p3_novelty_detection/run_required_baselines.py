@@ -71,7 +71,13 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     )
 
     config = load_config(config_path)
-    verify_shared_inputs(vars(config.inputs))
+    verify_shared_inputs(
+        vars(config.inputs),
+        required_keys=(
+            "checkpoint", "train_features",
+            "validation_features", "svhn_file",
+        ),
+    )
     run_id = str(config.run_id)
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
         raise ValueError("Invalid run ID")

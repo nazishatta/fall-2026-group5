@@ -72,7 +72,13 @@ def run(config_path: Path) -> Path:
     """Run exactly once with a new ID, preserving historical outputs."""
     config_path = config_path.resolve()
     settings: dict[str, Any] = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    verify_shared_inputs(settings["inputs"])
+    verify_shared_inputs(
+        settings["inputs"],
+        required_keys=(
+            "checkpoint", "train_features",
+            "validation_features", "svhn_file",
+        ),
+    )
     run_id = str(settings["run_id"])
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
         raise ValueError("Invalid run ID")
