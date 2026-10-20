@@ -251,7 +251,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
             "x", encoding="utf-8"
         ) as stream:
             json.dump(metadata, stream, indent=2, allow_nan=False)
-            stream.write("\\n")
+            stream.write("\n")
         LOGGER.info("Exported energy and kNN scores to %s", destination)
         return metadata
 
