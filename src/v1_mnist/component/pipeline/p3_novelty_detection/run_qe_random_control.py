@@ -12,7 +12,7 @@ from scipy.stats import hypergeom
 
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
-from src.v1_mnist.component.utils.som_io import sha256_file as sha256_file_local
+from src.v1_mnist.component.utils.som_io import sha256_file
 from src.v1_mnist.component.utils.stats import wilson_interval
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -120,8 +120,8 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     expected_hashes = summary["input_sha256"]
 
     hashes = {
-        "val_bmu_distance": sha256_file_local(distance_path),
-        "val_correct": sha256_file_local(correct_path),
+        "val_bmu_distance": sha256_file(distance_path),
+        "val_correct": sha256_file(correct_path),
     }
     for key, observed in hashes.items():
         if observed != expected_hashes[key]:
@@ -152,8 +152,8 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         "run_id": run_id,
         "source_summary_run_id": str(summary["run_id"]),
         "input_sha256": hashes,
-        "source_summary_sha256": sha256_file_local(summary_path),
-        "config_sha256": sha256_file_local(config_path),
+        "source_summary_sha256": sha256_file(summary_path),
+        "config_sha256": sha256_file(config_path),
     })
 
     if save:

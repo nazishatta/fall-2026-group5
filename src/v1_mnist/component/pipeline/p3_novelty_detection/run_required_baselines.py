@@ -28,7 +28,7 @@ from src.v1_mnist.component.pipeline.p3_novelty_detection.paired_ood_comparison 
 )
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
-from src.v1_mnist.component.utils.som_io import sha256_file as fingerprint
+from src.v1_mnist.component.utils.som_io import sha256_file
 
 ROOT = Path(__file__).resolve().parents[5]
 LOGGER = get_logger("v1_mnist.p3.required_baselines")
@@ -93,7 +93,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
             "svhn_file",
         )
     }
-    hashes = {key: fingerprint(path) for key, path in inputs.items()}
+    hashes = {key: sha256_file(path) for key, path in inputs.items()}
 
     for key in ("checkpoint", "train_features", "validation_features"):
         expected_hash = str(getattr(config.expected_sha256, key))
@@ -231,7 +231,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
             "knn_neighbors": neighbors,
             "energy_temperature": temperature,
             "input_sha256": hashes,
-            "config_sha256": fingerprint(config_path),
+            "config_sha256": sha256_file(config_path),
             "leakage_control": (
                 "Frozen CNN, original MNIST train/validation and SVHN test. "
                 "No model retraining, threshold selection, or MNIST final test."
@@ -289,7 +289,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         hashes=hashes,
         config_path=config_path,
         input_path=input_path,
-        fingerprint=fingerprint,
+        fingerprint=sha256_file,
         logger=LOGGER,
     )
 
@@ -305,7 +305,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         "methods": results,
         "energy_temperature": temperature,
         "input_sha256": hashes,
-        "config_sha256": fingerprint(config_path),
+        "config_sha256": sha256_file(config_path),
         "leakage_control": (
             "Frozen CNN. Mahalanobis fitted on MNIST training embeddings "
             "only. MNIST validation and SVHN used for evaluation, not tuning. "

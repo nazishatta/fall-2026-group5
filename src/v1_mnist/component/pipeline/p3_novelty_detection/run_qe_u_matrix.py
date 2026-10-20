@@ -15,7 +15,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
 )
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
-from src.v1_mnist.component.utils.som_io import sha256_file as file_hash
+from src.v1_mnist.component.utils.som_io import sha256_file
 from src.v1_mnist.component.utils.stats import finite_spearman
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -93,10 +93,10 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     summary_path = resolve_input(str(config.qe_summary))
 
     hashes = {
-        "som_model": file_hash(model_path),
-        "validation_bmu": file_hash(bmu_path),
-        "validation_qe": file_hash(qe_path),
-        "qe_summary": file_hash(summary_path),
+        "som_model": sha256_file(model_path),
+        "validation_bmu": sha256_file(bmu_path),
+        "validation_qe": sha256_file(qe_path),
+        "qe_summary": sha256_file(summary_path),
     }
 
     if hashes["som_model"] != str(config.expected_sha256.som_model):
@@ -153,7 +153,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
             "qe_threshold": float(summary["threshold"]),
             "source_summary_run_id": str(summary["run_id"]),
             "input_sha256": hashes,
-            "config_sha256": file_hash(config_path),
+            "config_sha256": sha256_file(config_path),
             "historical_result_overwritten": False,
         }
     )
