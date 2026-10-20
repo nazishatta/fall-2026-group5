@@ -10,6 +10,13 @@ from typing import Any
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    ROOT as PROVENANCE_ROOT,
+)
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    load_manifest,
+    verify_shared_inputs,
+)
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metrics import (
     ood_metrics,
     stratified_auroc_interval,
@@ -192,9 +199,15 @@ def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]
     for entry in config["ood_datasets"]:
         name = entry["name"]
         transform = image_transform(name, tuple(config["image_size"]))
-        data_root = resolved(config["data_root"])
+        svhn_relative = str(load_manifest()["svhn_file"])
+        verify_shared_inputs(
+            {"svhn_file": svhn_relative},
+            required_keys=("svhn_file",),
+        )
+        canonical_svhn = PROVENANCE_ROOT / svhn_relative
         dataset = datasets.SVHN(
-            str(data_root), split="test", transform=transform, download=False
+            str(canonical_svhn.parent), split="test",
+            transform=transform, download=False,
         )
         loader = DataLoader(
             dataset, batch_size=int(config["batch_size"]), shuffle=False
