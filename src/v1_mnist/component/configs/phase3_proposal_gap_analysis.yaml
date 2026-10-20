@@ -10,4 +10,4 @@ inputs:
   validation_bmu: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu.npy
   validation_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
   qe_summary: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial/qe_summary.json
-  svhn_qe: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/qe_svhn_test_scores.npy
+  svhn_qe: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays/qe_svhn_test_scores.npy
