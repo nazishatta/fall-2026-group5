@@ -64,7 +64,7 @@ Expected SHA-256:
 Verify with `sha256sum data/ood_svhn/test_32x32.mat` before running benchmarks.
 Do not overwrite an existing dataset. The EC2 workspace currently uses a verified symlink to the SVHN file.
 
-The latest Phase 3-only pytest run completed with **131 passed**. This is separate from the historical full-repository test count.
+Phase 3-only pytest verification on EC2 at commit `1d30862` (2026-10-26): **135 passed**. Ruff checks also passed. This count applies only to `src/v1_mnist/tests/p3_novelty_detection` and must not be confused with historical full-repository test counts.
 
 ## Leakage control
 

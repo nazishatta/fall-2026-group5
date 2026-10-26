@@ -18,6 +18,27 @@ The random-score null simulation interval is not a detector's bootstrap confiden
 
 The separate Phase 3 adapter now enumerates additional experiments. Check every `--stage` and its own `--config` with dry-run tests before claiming end-to-end integration. Shared `pipeline/common.py` and `pipeline/run_all.py` require teammate agreement; a dedicated follow-up PR was previously agreed for those shared files. Do not imply that standalone adapter coverage means shared end-to-end pipeline integration.
 
+## Multi-seed fitting-budget diagnostic
+
+The exploratory fair-budget configuration
+`fair_budget_baselines.yaml` uses `seed_list` rather than `seeds`.
+The runner explicitly reads `config["seed_list"]`, requires at least
+five distinct seeds, and records them under `seeds` in its results.
+
+The completed experiment used seeds 42, 43, 44, 45 and 46, with
+10,000 MNIST training embeddings per method and identical selected
+training indices within each seed. Isolation Forest, One-Class SVM
+and autoencoder AUROC means, sample standard deviations and
+per-seed values are saved in
+`mnist_svhn_fair_budget_baselines_s42_46_v1/fair_budget_metrics.json`.
+
+The experiment equalizes training-example counts, not necessarily
+computation time or optimization budgets. It is exploratory and
+does not replace the historical benchmark.
+
+The original YAML field must remain unchanged because the recorded
+configuration SHA-256 is part of the experiment provenance.
+
 ## Frozen configuration provenance
 
 The canonical Phase 3 input fingerprints are maintained in
