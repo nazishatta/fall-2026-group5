@@ -22,7 +22,7 @@ def test_fpr_definition_matches_qe() -> None:
     normal = np.array([0.1, 0.4, 0.6])
     novel = np.array([0.2, 0.5, 0.7])
 
-    qe_result = ood_metrics(normal, novel, threshold=0.5)
+    qe_result = ood_metrics(normal, novel, threshold=0.5, target_tpr=0.95)
     comparison = evaluate_scores(
         normal, novel, bootstrap_repeats=10, seed=42, target_tpr=0.95
     )

@@ -43,7 +43,7 @@ def ood_metrics(
     id_scores: NDArray[np.floating],
     ood_scores: NDArray[np.floating],
     threshold: float,
-    target_tpr: float = 0.95,
+    target_tpr: float,
 ) -> dict[str, float | int]:
     """Compute AUROC, OOD-positive AUPR, FPR@TPR, and threshold rates."""
     id_values = _scores(id_scores, "ID")
@@ -73,7 +73,7 @@ def stratified_auroc_interval(
     *,
     iterations: int,
     seed: int,
-    confidence: float = 0.95,
+    confidence: float,
 ) -> tuple[float, float]:
     """Return a reproducible stratified percentile bootstrap AUROC interval."""
     ids = _scores(id_scores, "ID")
