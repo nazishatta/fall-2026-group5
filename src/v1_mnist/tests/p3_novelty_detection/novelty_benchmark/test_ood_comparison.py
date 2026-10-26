@@ -65,7 +65,7 @@ def test_no_ood_rejected() -> None:
 
 def test_misses_are_ordered() -> None:
     result = analyze_misses(np.array([0.8, 0.2, 0.7]), threshold=0.5,
-                            sample_ids=np.array(["a", "b", "c"]))
+                            sample_ids=np.array(["a", "b", "c"]), max_examples=20)
     assert result["missed"] == 1
     assert result["lowest_scoring_misses"][0]["sample_id"] == "b"
 

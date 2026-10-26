@@ -85,7 +85,7 @@ def analyze_misses(
     *,
     threshold: float,
     sample_ids: np.ndarray | None = None,
-    max_examples: int = 20,
+    max_examples: int,
 ) -> dict[str, object]:
     """Report genuine OOD samples missed by a previously frozen threshold."""
     values = np.asarray(ood_scores, dtype=np.float64).reshape(-1)
