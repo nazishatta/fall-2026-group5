@@ -177,7 +177,8 @@ def main() -> None:
     }
     results["qe"]["frozen_threshold_misses"] = analyze_misses(
         scores["qe"][1], threshold=provenance["qe_threshold"],
-        sample_ids=np.arange(len(features)), max_examples=20,
+        sample_ids=np.arange(len(features)),
+        max_examples=int(ood_config["max_missed_examples"]),
     )
     result: dict[str, object] = {
         "run_id": run_id,
