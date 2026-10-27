@@ -1,0 +1,189 @@
+\documentclass[11pt]{article}
+\input{File_Setup.tex}
+\usepackage{booktabs}
+\begin{document}
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{0pt}
+\includegraphics[width=0.50\textwidth,height=3.0cm,keepaspectratio]{fig/gwu_logo.pdf}\par
+\vspace{0.22cm}
+{\normalsize\bfseries Data Science Program\par}
+{\normalsize\bfseries Department of Data Science\par}
+{\normalsize DATS 6501 -- Capstone Project -- Fall 2026\par}
+\vspace{0.52cm}
+{\large\bfseries Post-Training Analysis \& Novelty Detection Using\par}
+{\large\bfseries Neural Network Self-Organizing Maps (NNSOM)\par}
+\vspace{0.53cm}
+{\normalsize\bfseries PHASE 3 REPORT\par}
+\vspace{0.30cm}
+{\normalsize\bfseries Novelty Detection via Quantization Error,\par}
+{\normalsize\bfseries U-Matrix and Baseline Evaluation\par}
+\vspace{0.55cm}
+{\normalsize\bfseries Capstone -- Group 5\par}
+\vspace{0.17cm}
+{\normalsize\bfseries Nazish Atta\par}
+{\normalsize Fyrooz Khan\par}
+\vspace{0.52cm}
+{\normalsize The George Washington University\par}
+{\normalsize Washington, DC\par}
+\vspace{0.58cm}
+{\normalsize\itshape Supervised by\par}
+{\normalsize\itshape Dr. Amir Jafari\par}
+{\normalsize\itshape Associate Professor of Data Science\par}
+\vfill
+{\footnotesize Draft for Issue \#18; pending team and instructor review.\par}
+\end{titlepage}
+
+\section{Overview and Scope}
+Following the project's Phase 3 objective, we examine whether a frozen self-organizing map (SOM) and comparison detectors can recognize feature representations that differ from MNIST. A trained MNIST convolutional classifier provides 84-dimensional \texttt{fc2} embeddings, and a frozen $15\times15$ SOM supplies the reference prototypes. MNIST training embeddings ($n=49{,}000$) support fitting; MNIST validation ($n=10{,}500$) forms the in-distribution (ID) evaluation set. The proposal-specified SVHN test split ($n=26{,}032$) is the current external out-of-distribution (OOD) evaluation set, following the instructor clarification on 19 October 2026. Fashion-MNIST and KMNIST are deferred to later phases and are not part of the current Phase 3 results. These are development comparisons, not a final locked MNIST test result.
+
+\section{Related Work and Project Contribution}
+Kohonen introduced self-organizing maps, a topology-preserving organization of inputs into neuron prototypes \parencite{kohonen1990som}. Unlike work developing the SOM itself, this study applies an already-trained map as a frozen novelty reference. Vesanto and Alhoniemi investigated clustering of SOM representations \parencite{vesanto2000clustering}; our use of the U-Matrix focuses instead on local prototype separation as a candidate novelty signal.
+
+LeCun and coauthors described convolutional approaches to document recognition \parencite{lecun1998gradient}. In this project, an MNIST CNN is not trained for OOD classification; its frozen intermediate embeddings provide the shared space for downstream SOM and distance-based detectors. The NNSOM library documentation from Jafari provides the implementation context for the project's SOM component \parencite{jafari_nnsom}; the contribution here is comparative post-training evaluation rather than a new SOM library.
+
+Hendrycks and Gimpel established the maximum softmax probability (MSP) as a simple confidence-based reference for detecting misclassified and out-of-distribution inputs \parencite{hendrycks2017baseline}. Low maximum class probability can indicate uncertainty, but high confidence need not imply that an image resembles training data. We evaluate the frozen CNN's MSP alongside SOM quantization error (QE), which measures distance in embedding space rather than classification confidence.
+
+Liu and colleagues proposed energy-based OOD detection using a scalar score computed from classifier logits \parencite{liu2020energy}. Energy uses the logit distribution rather than only the largest softmax probability and can offer a useful alternative OOD ranking. Our comparison evaluates the recorded energy score from the same frozen MNIST classifier without retraining a detector or claiming that QE is superior.
+
+Lee and colleagues introduced a Mahalanobis-distance framework that models neural features through class-conditional statistics \parencite{lee2018mahalanobis}. Such distances detect departures from learned feature distributions but depend on their estimated means and covariance structure. Our study compares a training-fitted Mahalanobis reference against the SOM's nearest-prototype distance on the recorded MNIST representation.
+
+Sun and colleagues investigated nearest-neighbor distances in deep representation space for OOD detection \parencite{sun2022knn}. Their approach assesses how close an example lies to reference training embeddings without requiring an explicit SOM grid. We use a recorded $k$NN-distance baseline in the same frozen feature space to test whether SOM topology offers benefits beyond ordinary neighbor proximity.
+
+Liang and colleagues introduced ODIN, which modifies neural confidence scoring by applying temperature scaling and small input perturbations \parencite{liang2018odin}. These adjustments aim to sharpen separation between in-distribution and OOD inputs, but the perturbation procedure differs from evaluating an unchanged frozen embedding through SOM QE. We discuss ODIN as related work only; \emph{no ODIN benchmark was run for the results in this report}, so its performance is not inferred or inserted into the tables.
+
+Isolation Forest uses random partitioning to isolate unusual observations \parencite{liu2008isolation}. Here we evaluate its novelty scores on the frozen CNN representations rather than raw features, and report its poor historical ranking without reversing the score after observing OOD labels. One-Class SVM estimates a support boundary for typical data \parencite{scholkopf2001support}; our application fits that boundary on MNIST embeddings, while noting that its historical fitting budget differs from other baselines.
+
+Sakurada and Yairi examined reconstruction-based anomaly detection using autoencoders \parencite{sakurada2014autoencoder}. Our feature autoencoder similarly uses reconstruction error, but operates on frozen classifier embeddings and has an unresolved historical input-scaling limitation. 
+
+\subsection{Phase 3 Framework Diagram}
+Figure~\ref{fig:framework} summarizes the frozen CNN-to-embedding and SOM scoring workflow, baseline comparisons, and evaluation boundary. The diagram is a conceptual architecture, not a quantitative outcome. Its editable \texttt{.drawio} source and associated \texttt{.drawio.svg} are retained under \texttt{diagram/}; the PDF is an inclusion copy for LaTeX.
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.95\linewidth]{fig/phase3_novelty_framework.pdf}
+\caption{Phase 3 novelty-detection evaluation framework (conceptual diagram).}\label{fig:framework}
+\end{figure}
+
+\section{Methods and Frozen Experimental Setup}
+\subsection{Representation, SOM and Quantization Error}
+The SOM has 225 units and uses an 84-dimensional representation. For scaled embedding $z(x)$ and SOM weights $w_j$, the best matching unit and quantization error are
+\begin{equation}
+ b(x)=\arg\min_j \lVert z(x)-w_j\rVert_2,\qquad
+ s_{\mathrm{QE}}(x)=\lVert z(x)-w_{b(x)}\rVert_2.
+\end{equation}
+Higher QE means a sample's embedding lies farther from its nearest map prototype. The historical decision threshold is the 95th percentile of MNIST training QE, $\tau=1.5690279077$; a sample with QE $>\tau$ is flagged. The 19 October 2026 instructor clarification confirmed retaining this training-percentile threshold from the original Phase 3 proposal. Earlier, conflicting validation-threshold review guidance and its resolution are recorded in \texttt{src/v1\_mnist/docs/DEVIATIONS.md}; the threshold was not retroactively tuned.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.80\linewidth]{fig/qe_novelty_detection/qe_score_distribution.pdf}
+\caption{Previously generated training and validation QE distributions with the frozen training-percentile threshold. This figure is not an OOD performance comparison.}\label{fig:qe}
+\end{figure}
+
+\subsection{U-Matrix and Comparison Methods}
+For unit $j$ with grid neighbors $\mathcal N(j)$, a neighborhood-distance summary is
+\begin{equation}
+ U_j=\frac{1}{|\mathcal N(j)|}\sum_{k\in\mathcal N(j)}\lVert w_j-w_k\rVert_2.
+\end{equation}
+The example-level U-Matrix signal uses the score of an example's BMU neighborhood. It measures prototype-to-prototype separation, not necessarily distance of the example from its BMU. The original historical five-method SVHN comparison additionally includes Isolation Forest, One-Class SVM and feature autoencoder reconstruction error. Subsequent comparisons add MSP, energy, Mahalanobis and $k$-nearest-neighbor distance on the frozen CNN representation. Different historical fitting budgets remain documented limitations rather than being silently equalized.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.84\linewidth]{fig/u_matrix_analysis/u_matrix_novelty_som_grid.pdf}
+\caption{Recorded U-Matrix overview for the $15\times15$ SOM. Larger local prototype separations do not by themselves prove that individual samples are OOD.}\label{fig:umatrix}
+\end{figure}
+
+\section{Quantitative Evaluation}
+We report AUROC as a threshold-independent ranking measure. AUPR uses OOD as the positive class and depends on class prevalence. FPR@95TPR denotes the minimum observed ROC false-positive rate at an operating point with TPR at least $0.95$; it must not be confused with the false-positive rate at the previously frozen QE threshold \parencite{fawcett2006roc,saito2015pr}. We do not use observed external-OOD results to change historical model settings.
+
+\subsection{Current MNIST validation versus SVHN evaluation}
+The current development comparison evaluates 10,500 MNIST validation examples (ID, negative class) against 26,032 official SVHN test examples (OOD, positive class). All methods use the frozen 84-dimensional CNN representation or its logits, as appropriate. Each listed uncertainty interval for the additional methods is a 95\% percentile bootstrap interval from 2,000 resamples with seed 42. The QE interval is from the preserved historical QE scoring experiment, not a new SOM fit.
+
+\begin{table}[H]\centering\small
+\caption{MNIST-validation versus SVHN OOD ranking. Intervals quantify resampling uncertainty with a fixed CNN/SOM, not variability across training seeds. QE is a historical frozen result; the other rows come from the additional frozen-CNN baseline run.}
+\label{tab:svhn_new}
+\begin{tabular}{@{}lccc@{}}\toprule
+Method & AUROC & 95\% bootstrap AUROC CI & AUPR\\\midrule
+Energy & 0.999797 & [0.999723, 0.999859] & 0.999917\\
+Max-softmax (MSP) & 0.998495 & [0.998232, 0.998741] & 0.999358\\
+Quantization error (QE) & 0.981107 & [0.979048, 0.983089] & 0.9766\\
+$k$NN distance ($k=5$) & 0.976561 & [0.974306, 0.978747] & 0.973924\\
+Mahalanobis & 0.776437 & [0.768794, 0.783205] & 0.785875\\
+\bottomrule\end{tabular}
+\end{table}
+
+Max-softmax and energy outrank QE for these two evaluated distributions. The data do not support a claim that QE is the best overall OOD detector. The result is an additional retrospectively specified comparison, not a prospectively registered all-method competition.
+
+\paragraph{Paired QE versus MSP comparison.}
+A stratified paired bootstrap uses the \emph{same} resampled ID and OOD indices for both methods in each of 2,000 iterations (seed 42). The observed difference $\mathrm{AUROC}_{\mathrm{QE}}-\mathrm{AUROC}_{\mathrm{MSP}}=-0.017388$ has a 95\% paired bootstrap interval $[-0.019406,-0.015418]$. Thus MSP ranks OOD cases better by approximately 1.74 AUROC percentage points for these fixed datasets. The historical QE score arrays do not contain per-image identifiers; sample alignment rests on identical deterministic dataset order, transforms and model provenance rather than direct ID-by-ID verification. The measured difference and interval were reproduced exactly by the committed paired runner under the distinct run ID \texttt{mnist\_svhn\_qe\_msp\_reproduction\_s42\_v1}.
+
+\subsection{Historical SVHN comparison}
+The original five-method benchmark uses the same $10{,}500$ MNIST validation examples and $26{,}032$ SVHN test examples, with the frozen MNIST representation. The table below records the historical benchmark; it is not retroactively merged into a single equal-budget experiment with the newer methods. At the historical frozen QE threshold, the detector flagged 25,036 of 26,032 SVHN samples (96.17\% detection), while 5.13\% of MNIST validation samples exceeded that threshold.
+\begin{table}[H]\centering\small
+\caption{Historical SVHN benchmark (one recorded seed). FPR@95TPR values are proportions, not percentages.}\label{tab:svhn}
+\begin{tabular}{@{}lccc@{}}\toprule
+Method & AUROC & AUPR & FPR@95TPR\\\midrule
+QE & 0.9811 & 0.9766 & 0.0453\\
+U-Matrix & 0.9696 & 0.9865 & 0.0701\\
+Isolation Forest & 0.2383 & 0.5552 & 0.8718\\
+One-Class SVM & 0.9604 & 0.9764 & 0.1794\\
+Feature autoencoder & 0.0077 & 0.4979 & 0.9999\\
+\bottomrule\end{tabular}
+\end{table}
+These detection and false-positive percentages describe the original fixed QE threshold, while AUROC measures ranking and FPR@95TPR describes a different evaluation operating point.
+
+
+\subsection{Unified Nine-Method Post-Hoc Benchmark (New Evidence)}
+A subsequent, separately versioned exploratory run (\texttt{mnist\_svhn\_unified\_nine\_methods\_s42\_46\_v1}; implementation and recorded evidence in commit \texttt{17ace48}) evaluates all nine novelty-scoring methods over the same 10,500 MNIST-validation ID and 26,032 official-SVHN OOD examples. The scores of the historical fixed SOM/CNN methods (QE, U-Matrix, MSP, and energy) are evaluated as \emph{frozen references}; Isolation Forest, One-Class SVM, standardized feature autoencoder, Mahalanobis, and $k$NN are freshly fitted on a common 10,000-row subset of MNIST training features per seed. The same selected row indices are used within each seed, with seeds 42--46. This equalizes the fitting \emph{sample count} for the five fitted methods, not computational budgets, model classes, or the historical training of the CNN and SOM. The SVHN results were already examined before this run; therefore all such new comparisons are explicitly \emph{post-hoc exploratory}, not an independent final-test assessment.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Unified exploratory run: AUROC on the identical MNIST-validation/SVHN evaluation sets. Mean $\pm$ sample SD across five fitting seeds is reported only for freshly fitted methods; frozen references have no new independent fitting seeds.}
+\label{tab:unified}
+\begin{tabular}{@{}lll@{}}\toprule
+Method & AUROC & Training provenance \\\midrule
+Energy & 0.999797 & Frozen CNN \\
+Max-softmax (MSP) & 0.998495 & Frozen CNN \\
+QE & 0.981107 & Frozen SOM \\
+Standardized autoencoder & $0.979042 \pm 0.017246$ & Five fitted seeds \\
+U-Matrix & 0.969629 & Frozen SOM \\
+One-Class SVM & $0.961593 \pm 0.002353$ & Five fitted seeds \\
+$k$NN & $0.960716 \pm 0.008020$ & Five fitted seeds \\
+Mahalanobis & $0.807632 \pm 0.011178$ & Five fitted seeds \\
+Isolation Forest & $0.280102 \pm 0.084964$ & Five fitted seeds \\\bottomrule
+\end{tabular}
+\end{table}
+
+The random-score null control from the same new run had AUROC $0.504640$ (near chance $0.5$), AUPR $0.714416$ (reflecting the higher OOD class prevalence), and FPR@95TPR $0.947905$. These are observed control values, not a confidence interval. The new standardized autoencoder has markedly higher average AUROC than the original unstandardized historical result (0.007719); this is a \emph{different} trained experiment and does not retroactively correct or replace the historical benchmark. Its AUROC varies appreciably across seeds (0.950747--0.992755). Isolation Forest remains below chance in the new five-seed run; its score convention and distributional behavior should not be reoriented using examined SVHN labels. Mean $\pm$ SD across fitting seeds does not constitute a 95\% bootstrap confidence interval. The full new run JSON stores AUROC, AUPR, FPR@95TPR and provenance for each evaluated method.
+
+\subsection{Additional operating-point results}
+The separately measured SVHN FPR@95TPR values for the same additional benchmark are energy 0.000381, MSP 0.007810, $k$NN 0.059238 and Mahalanobis 0.313143. These are proportions rather than percentages. The historical QE threshold false-positive rate on MNIST validation was 5.13\%, which is a \emph{different} operating-point calculation; historical FPR definitions should not be mixed into a single directly comparable operating-point ranking.
+
+\section{U-Matrix Association and Failure Analysis}
+Across 10,500 MNIST validation samples, QE and the U-Matrix BMU score have a recorded Spearman rank correlation of $0.4396$. The moderate association is consistent with related but distinct SOM geometry signals.
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.82\linewidth]{fig/u_matrix_analysis/qe_u_matrix_validation_initial.pdf}
+\caption{Recorded QE versus U-Matrix association on MNIST validation; the figure is a development-only comparison.}\label{fig:association}
+\end{figure}
+The historical QE experiment missed 996 SVHN samples at its frozen threshold. Several low-scoring examples have clean, MNIST-like numeral strokes; this visual pattern is a hypothesis about representation similarity, not a causal explanation. \paragraph{Unexpected baseline rankings and diagnostic status.}
+The historical Isolation Forest (AUROC $0.2383$) and feature autoencoder (AUROC $0.0077$) fall substantially below the chance-level value of $0.5$ under the recorded score definitions (Table~\ref{tab:svhn}). This means that the recorded scores rank many evaluated ID/OOD pairs opposite to the desired ``larger means more novel'' ordering; it does \emph{not} by itself establish a programming error. Two possibilities requiring controlled investigation are anomaly-score orientation (including whether the library returns normality rather than anomaly scores) and inconsistent feature transformations between fitting and scoring, particularly in the historical autoencoder. A separate validation-only reproduction confirmed seven historical MNIST score/loss summaries (Section~6), but \emph{did not} recompute the SVHN AUROCs, audit score orientation on independent OOD labels, or recover the original autoencoder checkpoint. Therefore the cause has not been verified. We preserve the original AUROCs and do not flip signs, retune, or reinterpret the reported benchmark after inspecting the OOD outcomes. A future pre-specified diagnostic run should inspect score conventions, train/evaluation scaling, OOD-positive label assignment, and score distributions, saving new provenance and run identifiers.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.90\linewidth]{fig/novelty_benchmark/qe_missed_svhn_examples.pdf}
+\caption{Recorded lowest-QE SVHN examples missed at the original frozen threshold. These examples are descriptive, not a complete explanation of model behavior.}\label{fig:missed}
+\end{figure}
+
+\section{Leakage Control and Reproducibility}
+The CNN and SOM were frozen for the documented Phase 3 comparisons. The additionally measured SVHN kNN baseline ($k=5$) and paired QE--MSP comparison are reproducible using the committed runner and fixed configuration; both reproduction and previous run IDs remain separate and immutable. Training embeddings supplied model fitting and the training-derived QE threshold. MNIST validation supplied ID evaluation examples; the official MNIST final-test split was not used for the reported Phase 3 results. External SVHN test samples supplied observed OOD evaluation evidence, not inputs for post-hoc fitting or threshold selection. Fashion-MNIST is outside this report's current evaluation scope. As these external sets have now been examined, further configuration changes using their outcomes would be exploratory and require a new protocol and run IDs; they must not be represented as independent validation.
+
+The preregistration document's recorded writing date does not establish from Git history alone that its criteria were fixed before all external OOD results were examined. Historical JSON evidence has been preserved under run-specific directories with a relocation record. The latest EC2 verification after the final paired-runner changes completed 176 full MNIST tests successfully, with clean Phase 3 Ruff checks; the earlier Phase 1 data-path errors were resolved by running the suite from the appropriate working directory without changing Phase 1 code. SHA-256 input provenance and run-ID overwrite preflight remain part of the verification procedure.
+
+A later Phase 3-only EC2 regression suite passed 148 tests with Ruff clean across the Phase 3 source, pipeline, and tests (commit \texttt{4f0bf48}); this is a different test scope from the earlier 176-test full-MNIST suite and is not a claim of a more recent full-repository test run.\par
+
+A separate, newly identified verification run (\texttt{mnist\_historical\_baseline\_verification\_s42\_v1}) reproduced all seven historical MNIST-validation summary measurements with zero absolute numerical difference: Isolation Forest and One-Class SVM score means and standard deviations, and the feature autoencoder initial loss, final loss and mean validation reconstruction error. Frozen training and validation embedding SHA-256 fingerprints matched the references. This verification used MNIST training/validation evidence only; its seven comparisons are summary statistics, not a rerun of the full SVHN discrimination experiment. This supports numerical agreement under the currently committed settings, not byte-identical regeneration of the original historical JSON, checkpoint, or execution environment. The original autoencoder checkpoint and historical package-version manifest remain unavailable; old metrics were not overwritten. No final MNIST test or external OOD samples were accessed during this validation-only reproduction.
+
+\section{Limitations and Interpretation}
+This report provides fixed-model bootstrap sampling intervals and a paired QE--MSP comparison, and a five-seed assessment of freshly fitted comparison methods, but not variability across five independent CNN/SOM retrainings. The original One-Class SVM used 10,000 MNIST training embeddings whereas some other historically fitted baselines used 49,000. In a separate post-hoc five-seed exploratory evaluation, five newly fitted methods shared 10,000 training examples per seed; four reference methods remained frozen, so not all nine underwent equivalent retraining. The cause of the historical autoencoder score behavior and the below-chance Isolation Forest ranking remains unresolved; orientation, consistent preprocessing, and positive-label definitions require a prospective diagnostic evaluation. The separate seven-summary reproduction does not validate the original SVHN AUROCs or establish an identical historic environment. No final locked MNIST test-set result is claimed. The comparison demonstrates useful novelty ranking on the examined distributions, not universal or clinically transferable OOD behavior.
+
+\section{Conclusion and Next Phase}
+The primary MNIST-validation versus SVHN comparison finds energy and MSP above SOM QE in AUROC, while QE remains a meaningful frozen-prototype distance signal. The paired QE--MSP comparison confirms this difference for these fixed samples with a resampling interval below zero. The historical SVHN comparison shows stronger QE ranking relative to its original comparison set, but the additional SVHN baselines outperform it. A future prospectively specified study should extend the exploratory common-sample and multi-seed controls to fully matched fitting budgets and independently retrained CNN/SOM models, resolve historical reproduction gaps, and fix the final selection rules before using the untouched MNIST final-test split. These Phase 3 outputs can inform the project's subsequent guided-retraining work without prematurely claiming final benchmark success.
+
+\printbibliography[title={References}]
+\end{document}
