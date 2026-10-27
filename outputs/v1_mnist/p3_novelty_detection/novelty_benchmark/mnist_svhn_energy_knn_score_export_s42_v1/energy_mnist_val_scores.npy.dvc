@@ -1,0 +1,5 @@
+outs:
+- md5: dbb9a2e8b677141ff68f1d2b6097bdf1
+  size: 84128
+  hash: md5
+  path: energy_mnist_val_scores.npy
