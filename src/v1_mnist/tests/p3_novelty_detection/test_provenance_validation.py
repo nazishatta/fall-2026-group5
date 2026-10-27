@@ -18,6 +18,13 @@ def test_rejects_noncanonical_input_path() -> None:
         shared_provenance.verify_shared_inputs(inputs)
 
 
+@pytest.mark.skipif(
+    not all(
+        (shared_provenance.ROOT / str(path)).is_file()
+        for path in shared_provenance.load_manifest()["inputs"].values()
+    ),
+    reason="Frozen Phase 3 DVC inputs unavailable in this checkout",
+)
 def test_rejects_incorrect_input_hash(monkeypatch: pytest.MonkeyPatch) -> None:
     manifest = shared_provenance.load_manifest()
     monkeypatch.setattr(
@@ -38,6 +45,13 @@ def test_rejects_noncanonical_svhn_path() -> None:
         shared_provenance.verify_shared_inputs(inputs)
 
 
+@pytest.mark.skipif(
+    not (
+        shared_provenance.ROOT
+        / str(shared_provenance.load_manifest()["svhn_file"])
+    ).is_file(),
+    reason="SVHN DVC dataset unavailable in this checkout",
+)
 def test_rejects_incorrect_svhn_checksum(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
