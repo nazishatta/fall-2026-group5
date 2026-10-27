@@ -28,6 +28,9 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
     analyze_misses,
     evaluate_scores,
 )
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
+    verify_shared_inputs,
+)
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
     image_transform,
 )
@@ -103,6 +106,18 @@ def main() -> None:
         raise RuntimeError("CNN preprocessing or feature layer protocol changed")
     train_path = ROOT / benchmark["embeddings"]["train"]
     val_path = ROOT / benchmark["embeddings"]["validation"]
+    verify_shared_inputs(
+        {
+            "train_features": str(benchmark["embeddings"]["train"]),
+            "validation_features": str(benchmark["embeddings"]["validation"]),
+            "svhn_file": str(benchmark["svhn_file"]),
+            "checkpoint": str(ood_config["cnn_checkpoint"]),
+        },
+        required_keys=(
+            "checkpoint", "train_features",
+            "validation_features", "svhn_file",
+        ),
+    )
     expected_hashes = benchmark["expected_sha256"]
     hashes = {"train": sha256_file(train_path), "validation": sha256_file(val_path)}
     if hashes != expected_hashes:
