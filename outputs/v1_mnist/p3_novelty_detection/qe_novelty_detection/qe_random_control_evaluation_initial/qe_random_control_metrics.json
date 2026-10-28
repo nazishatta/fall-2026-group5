@@ -1,0 +1,44 @@
+{
+  "run_id": "qe_random_control_evaluation_initial",
+  "source_run_id": "qe_training_calibrated_initial",
+  "evaluation": "cnn_error_enrichment_vs_uniform_random_selection",
+  "validation_samples": 10500,
+  "qe_flagged_samples": 539,
+  "cnn_errors": 92,
+  "qe_captured_errors": 22,
+  "qe_error_capture_rate": 0.2391304347826087,
+  "wilson_95_interval": [
+    0.16355145893303868,
+    0.33562143982467696
+  ],
+  "random_expected_errors": 4.722666666666667,
+  "random_exact_one_sided_p_value": 8.834306580361853e-10,
+  "random_seeded_control": {
+    "seeds": [
+      11,
+      23,
+      37,
+      47,
+      59
+    ],
+    "captured_errors": [
+      7,
+      4,
+      5,
+      7,
+      7
+    ],
+    "mean": 6.0,
+    "note": "Prior count-equivalent simulation; not recomputed in this save."
+  },
+  "leakage_control": {
+    "threshold_source": "train_only",
+    "final_test_used": false,
+    "external_ood_evaluated": false
+  },
+  "limitations": [
+    "Uniform random-selection control is not an OOD baseline.",
+    "No external OOD AUROC measured.",
+    "No final test data evaluated."
+  ]
+}

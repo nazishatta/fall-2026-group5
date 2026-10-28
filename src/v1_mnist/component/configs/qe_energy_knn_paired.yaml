@@ -1,0 +1,23 @@
+run_id: mnist_svhn_qe_energy_knn_paired_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/
+seed: 42
+bootstrap_iterations: 2000
+expected_counts:
+  mnist_validation: 10500
+  svhn_test: 26032
+scores:
+  qe:
+    directory: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays
+    sha256:
+      mnist_val: b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186
+      svhn_test: 88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265
+  energy:
+    directory: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_energy_knn_score_export_s42_v1
+    sha256:
+      mnist_val: 9dac6bdd9df77b3b824fc555db0cd1819387c2e0e1a287e99a7ee2fecdc7b2f6
+      svhn_test: 533dd48b98228dea159fe6e49183a3ffab3a0b643d1665c7539b1f11415c7869
+  knn:
+    directory: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_energy_knn_score_export_s42_v1
+    sha256:
+      mnist_val: 39f3d68cb8f5706bd4af88e1021cf35d4e52268f3171de51e8590c43d3048944
+      svhn_test: 41d9756747ebc974ea36594d1d162d533064fb7e93c803cda5b1206cac2a1b6d

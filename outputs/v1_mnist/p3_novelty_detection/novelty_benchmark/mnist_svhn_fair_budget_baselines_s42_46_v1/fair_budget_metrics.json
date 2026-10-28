@@ -1,0 +1,201 @@
+{
+  "run_id": "mnist_svhn_fair_budget_baselines_s42_46_v1",
+  "analysis_status": "post_hoc_exploratory",
+  "training_sample_count": 10000,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "per_seed_results": [
+    {
+      "seed": 42,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.14183980522141248,
+          "aupr": 0.5295183253681701
+        },
+        "one_class_svm": {
+          "auroc": 0.9601463693037142,
+          "aupr": 0.9762581633008577
+        },
+        "autoencoder": {
+          "auroc": 0.004758928571428577,
+          "aupr": 0.49753840359649815
+        }
+      },
+      "autoencoder_initial_loss": 18.219581745910645,
+      "autoencoder_final_loss": 0.26419057755470277
+    },
+    {
+      "seed": 43,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.36433731378230455,
+          "aupr": 0.5949517751610892
+        },
+        "one_class_svm": {
+          "auroc": 0.9648031177744607,
+          "aupr": 0.9797559605704833
+        },
+        "autoencoder": {
+          "auroc": 0.008285110633066993,
+          "aupr": 0.49824798887493
+        }
+      },
+      "autoencoder_initial_loss": 18.42248157043457,
+      "autoencoder_final_loss": 0.21609957227706908
+    },
+    {
+      "seed": 44,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.2781637215734481,
+          "aupr": 0.5669261388135464
+        },
+        "one_class_svm": {
+          "auroc": 0.9625959478444113,
+          "aupr": 0.9794821050419359
+        },
+        "autoencoder": {
+          "auroc": 0.005313584745514685,
+          "aupr": 0.4976196582162404
+        }
+      },
+      "autoencoder_initial_loss": 17.975989164733885,
+      "autoencoder_final_loss": 0.21966858685016633
+    },
+    {
+      "seed": 45,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.2846991761055989,
+          "aupr": 0.5687917079965614
+        },
+        "one_class_svm": {
+          "auroc": 0.9617772558316504,
+          "aupr": 0.9777677037577193
+        },
+        "autoencoder": {
+          "auroc": 0.00586468302748266,
+          "aupr": 0.49770022574842954
+        }
+      },
+      "autoencoder_initial_loss": 18.274140480041503,
+      "autoencoder_final_loss": 0.2096015862941742
+    },
+    {
+      "seed": 46,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.33146827348025876,
+          "aupr": 0.5842116075780077
+        },
+        "one_class_svm": {
+          "auroc": 0.9586412620364679,
+          "aupr": 0.9750436822546149
+        },
+        "autoencoder": {
+          "auroc": 0.006293565428629969,
+          "aupr": 0.4978064203306964
+        }
+      },
+      "autoencoder_initial_loss": 18.381697427368163,
+      "autoencoder_final_loss": 0.21701513690948487
+    }
+  ],
+  "summary": {
+    "isolation_forest": {
+      "auroc": {
+        "mean": 0.2801016580326045,
+        "sample_sd": 0.08496382700164837,
+        "per_seed": [
+          0.14183980522141248,
+          0.36433731378230455,
+          0.2781637215734481,
+          0.2846991761055989,
+          0.33146827348025876
+        ]
+      },
+      "aupr": {
+        "mean": 0.568879910983475,
+        "sample_sd": 0.024839295731625695,
+        "per_seed": [
+          0.5295183253681701,
+          0.5949517751610892,
+          0.5669261388135464,
+          0.5687917079965614,
+          0.5842116075780077
+        ]
+      }
+    },
+    "one_class_svm": {
+      "auroc": {
+        "mean": 0.961592790558141,
+        "sample_sd": 0.0023532003672381047,
+        "per_seed": [
+          0.9601463693037142,
+          0.9648031177744607,
+          0.9625959478444113,
+          0.9617772558316504,
+          0.9586412620364679
+        ]
+      },
+      "aupr": {
+        "mean": 0.9776615229851222,
+        "sample_sd": 0.002033160758201163,
+        "per_seed": [
+          0.9762581633008577,
+          0.9797559605704833,
+          0.9794821050419359,
+          0.9777677037577193,
+          0.9750436822546149
+        ]
+      }
+    },
+    "autoencoder": {
+      "auroc": {
+        "mean": 0.006103174481224577,
+        "sample_sd": 0.0013494833524186616,
+        "per_seed": [
+          0.004758928571428577,
+          0.008285110633066993,
+          0.005313584745514685,
+          0.00586468302748266,
+          0.006293565428629969
+        ]
+      },
+      "aupr": {
+        "mean": 0.4977825393533589,
+        "sample_sd": 0.00027844282194591357,
+        "per_seed": [
+          0.49753840359649815,
+          0.49824798887493,
+          0.4976196582162404,
+          0.49770022574842954,
+          0.4978064203306964
+        ]
+      }
+    }
+  },
+  "input_sha256": {
+    "train": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "validation": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "svhn_mat": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "config_sha256": "2d684e215472d30225b41db972783deb92cfc578f98202398278c8622990a043",
+  "leakage_control": "All three baselines trained only on the same 10,000 MNIST training examples per seed. MNIST validation and SVHN test used for evaluation, not fitting; final MNIST test untouched.",
+  "limitation": "Post-hoc analysis after prior SVHN result inspection. Training-pool sizes are equal, but computational budgets, model preprocessing, and optimization costs are not equal. Seed spread is not an independent-data confidence interval."
+}

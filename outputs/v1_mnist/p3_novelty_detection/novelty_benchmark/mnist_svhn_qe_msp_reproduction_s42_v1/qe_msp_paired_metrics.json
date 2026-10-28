@@ -1,0 +1,25 @@
+{
+  "qe_auroc": 0.9811068135920626,
+  "msp_auroc": 0.9984950061462814,
+  "qe_minus_msp_auroc": -0.01738819255421875,
+  "difference_ci_95": [
+    -0.019406191738373175,
+    -0.015417952812655348
+  ],
+  "bootstrap_iterations": 2000,
+  "seed": 42,
+  "n_id": 10500,
+  "n_ood": 26032,
+  "positive_class": "OOD",
+  "limitation": "Paired validity requires identically ordered QE and MSP scores for each evaluation split.",
+  "run_id": "mnist_svhn_qe_msp_reproduction_s42_v1",
+  "id_dataset": "mnist_validation",
+  "ood_dataset": "svhn_test",
+  "qe_id_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+  "qe_ood_sha256": "88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265",
+  "checkpoint_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+  "svhn_sha256": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+  "source_config_sha256": "37ea7286ba41e389193f21f82f74e227c149326d94e4db39d7b1912d0e813873",
+  "leakage_control": "Frozen CNN and historical QE; no OOD fitting, tuning or final MNIST test-set use.",
+  "alignment_evidence": "Same frozen checkpoint, torchvision SVHN test ordering, SVHN preprocessing and unshuffled inference. Historical QE arrays lack per-image identifiers; alignment is supported but cannot be independently ID-verified."
+}

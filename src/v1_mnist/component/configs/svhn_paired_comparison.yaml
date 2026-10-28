@@ -1,0 +1,42 @@
+run_id: mnist_svhn_qe_msp_reproduction_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+inputs:
+  checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
+  train_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  train_labels: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_labels.npy
+  validation_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+  validation_predictions: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_preds.npy
+  validation_confidence: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_confidence.npy
+  svhn_file: data/ood_svhn/test_32x32.mat
+expected_sha256:
+  checkpoint: 0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d
+  train_features: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation_features: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  classes: 10
+inference:
+  feature_layer: fc2
+  image_size:
+  - 28
+  - 28
+  batch_size: 256
+  thread_count: 1
+  confidence_tolerance: 1.0e-05
+evaluation:
+  energy_temperature: 1.0
+  target_tpr: 0.95
+  bootstrap_iterations: 2000
+  bootstrap_seed: 42
+  knn_neighbors: 5
+paired_qe:
+  id_scores: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays/qe_mnist_val_scores.npy
+  ood_scores: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays/qe_svhn_test_scores.npy
+  id_sha256: b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186
+  ood_sha256: 88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265
+  expected_qe_auroc: 0.9811068135920626
+  expected_msp_auroc: 0.9984950061462814
+  auroc_tolerance: 1.0e-10
