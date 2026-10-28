@@ -39,7 +39,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the step runners in proposal order.")
     parser.add_argument("--from", dest="first", default="som_nnsom_training", choices=STEP_NAMES,
                         help="First step to run (default: som_nnsom_training).")
-    parser.add_argument("--to", dest="last", default="error_pattern_analysis", choices=STEP_NAMES,
+    parser.add_argument("--to", dest="last", default=STEP_NAMES[-1], choices=STEP_NAMES,
                         help=f"Last step to run (default: {STEP_NAMES[-1]}).")
     parser.add_argument("--cnn-config", default=CNN_CONFIG, help=f"Config for {' and '.join(CNN_STEPS)}.")
     parser.add_argument("--som-config", default=SOM_CONFIG, help="Config for the SOM steps and the report.")
@@ -47,16 +47,6 @@ def main() -> None:
                         help="som_nnsom_training: use the existing SOM instead of training a new one.")
     parser.add_argument("--no-report", action="store_true", help="Do not build the interactive report.")
     parser.add_argument("--dry-run", action="store_true", help="Print every runner's steps without running them.")
-    parser.add_argument(
-        "--phase3-stage",
-        default="qe_novelty",
-        help="Phase 3 stage when phase3_novelty is selected.",
-    )
-    parser.add_argument(
-        "--phase3-config",
-        default="src/v1_mnist/component/configs/qe_novelty.yaml",
-        help="Configuration for the selected Phase 3 stage.",
-    )
     args = parser.parse_args()
     start, end = STEP_NAMES.index(args.first), STEP_NAMES.index(args.last)
     if start > end:
@@ -66,20 +56,11 @@ def main() -> None:
     common = ["--dry-run"] if args.dry_run else []
     plan = []
     for name in STEP_NAMES[start:end + 1]:
-        if name == "phase3_novelty":
-            extra = [
-                "--stage", args.phase3_stage,
-                "--config", args.phase3_config,
-            ]
-        else:
-            extra = [
-                "--config",
-                args.cnn_config if name in CNN_STEPS else args.som_config,
-            ]
+        extra = ["--config", args.cnn_config if name in CNN_STEPS else args.som_config]
         if name == "som_nnsom_training" and args.skip_training:
             extra.append("--skip-training")
         plan.append(Step(name, STEP_RUNNERS[name], [*extra, *common]))
-    if args.last == "error_pattern_analysis" and not args.no_report:
+    if args.last == STEP_NAMES[-1] and not args.no_report:
         plan.append(Step("interactive report", REPORT_RUNNER, ["--config", args.som_config, *common]))
 
     run_steps("run_all: " + ", ".join(step.label for step in plan), plan, dry_run=False)

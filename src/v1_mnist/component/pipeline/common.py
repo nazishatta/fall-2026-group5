@@ -46,7 +46,6 @@ STEP_RUNNERS = {
     "som_nnsom_training": PIPELINE / "p2_som_training_visualization" / "run_som_nnsom_training.py",
     "cluster_analysis": PIPELINE / "p2_som_training_visualization" / "run_cluster_analysis.py",
     "error_pattern_analysis": PIPELINE / "p2_som_training_visualization" / "run_error_pattern_analysis.py",
-    "phase3_novelty": PIPELINE / "p3_novelty_detection" / "run_phase3_stage.py",
 }
 # Steps that use the CNN config; every later step uses the SOM config.
 CNN_STEPS = ("data_pipeline", "cnn_baseline_training")

@@ -23,6 +23,10 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_base
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.shared_provenance import (
     verify_shared_inputs,
 )
+from src.v1_mnist.component.pipeline.p3_novelty_detection.cnn_score_inference import (
+    reconstruct_logits,
+    verify_predictions,
+)
 from src.v1_mnist.component.pipeline.p3_novelty_detection.paired_ood_comparison import (
     evaluate_paired_qe,
 )
@@ -48,10 +52,6 @@ def input_path(value: str) -> Path:
     return path
 
 
-from src.v1_mnist.component.pipeline.p3_novelty_detection.cnn_score_inference import (
-    reconstruct_logits,
-    verify_predictions,
-)
 
 
 def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:

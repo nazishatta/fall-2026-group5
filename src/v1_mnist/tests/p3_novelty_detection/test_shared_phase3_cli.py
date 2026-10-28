@@ -1,4 +1,4 @@
-"""Regression tests for Phase 3 registration in shared run_all."""
+"""Regression tests for standalone Phase 3 and unchanged shared pipeline."""
 
 from __future__ import annotations
 
@@ -8,12 +8,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 RUN_ALL = ROOT / "src/v1_mnist/component/pipeline/run_all.py"
+PHASE3 = (
+    ROOT
+    / "src/v1_mnist/component/pipeline/p3_novelty_detection/run_phase3_stage.py"
+)
 
 
-def invoke(*arguments: str) -> subprocess.CompletedProcess[str]:
-    """Run only the shared pipeline command-line interface."""
+def invoke(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+    """Invoke a pipeline CLI in a subprocess."""
     return subprocess.run(
-        [sys.executable, str(RUN_ALL), *arguments],
+        [sys.executable, str(script), *arguments],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -22,29 +26,24 @@ def invoke(*arguments: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_explicit_phase3_dry_run() -> None:
-    """Explicit Phase 3 routes the requested stage and config."""
+    """Standalone Phase 3 previews the requested stage and config."""
     result = invoke(
-        "--from", "phase3_novelty",
-        "--to", "phase3_novelty",
-        "--phase3-stage", "fair_budget_baselines",
-        "--phase3-config",
-        "src/v1_mnist/component/configs/fair_budget_baselines.yaml",
-        "--no-report",
+        PHASE3,
+        "--stage", "fair_budget_baselines",
+        "--config", "src/v1_mnist/component/configs/fair_budget_baselines.yaml",
         "--dry-run",
     )
     output = result.stdout + result.stderr
 
     assert result.returncode == 0, output
-    assert "run_all: phase3_novelty" in output
     assert "Phase 3 stage: fair_budget_baselines" in output
     assert "fair_budget_baselines.yaml" in output
     assert "Dry run: no experiment executed" in output
-    assert "interactive report" not in output
 
 
 def test_default_pipeline_stays_phase2() -> None:
-    """Default pipeline must not trigger Phase 3."""
-    result = invoke("--dry-run")
+    """Shared default pipeline must remain Phase 1/2 only."""
+    result = invoke(RUN_ALL, "--dry-run")
     output = result.stdout + result.stderr
 
     assert result.returncode == 0, output
@@ -55,11 +54,11 @@ def test_default_pipeline_stays_phase2() -> None:
 
 
 def test_invalid_phase3_stage_rejected() -> None:
-    """Unknown Phase 3 stages cannot execute."""
+    """Standalone Phase 3 rejects unknown stages."""
     result = invoke(
-        "--from", "phase3_novelty",
-        "--to", "phase3_novelty",
-        "--phase3-stage", "not_a_real_stage",
+        PHASE3,
+        "--stage", "not_a_real_stage",
+        "--config", "src/v1_mnist/component/configs/fair_budget_baselines.yaml",
         "--dry-run",
     )
     output = result.stdout + result.stderr

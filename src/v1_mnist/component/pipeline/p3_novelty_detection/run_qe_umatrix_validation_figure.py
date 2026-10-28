@@ -13,9 +13,10 @@ import yaml
 from scipy.stats import spearmanr
 
 from src.v1_mnist.component.utils.figures import save_pdf
+from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.som_io import sha256_file
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = setup_logger(__name__, level=logging.INFO)
 ROOT = Path(__file__).resolve().parents[5]
 
 
@@ -143,7 +144,6 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO)
     run(args.config)
 
 

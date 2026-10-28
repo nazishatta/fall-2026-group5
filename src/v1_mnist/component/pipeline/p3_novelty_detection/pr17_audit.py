@@ -5,9 +5,12 @@ import argparse
 import json
 import logging
 import subprocess
+import sys
 from pathlib import Path
 
-LOGGER = logging.getLogger(__name__)
+from src.v1_mnist.component.utils.logging import setup_logger
+
+LOGGER = setup_logger(__name__, level=logging.INFO)
 
 REQUIRED_METRICS = {
     "mnist_svhn_five_method_comparison_s42_initial": "comparison_metrics.json",
@@ -101,10 +104,14 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     blockers, advisories = audit(args.root.resolve())
     if args.json:
-        print(json.dumps({"blockers": blockers, "advisories": advisories}, indent=2))
+        sys.stdout.write(
+            json.dumps(
+                {"blockers": blockers, "advisories": advisories},
+                indent=2,
+            ) + "\n"
+        )
     else:
         LOGGER.info("PR #17: %d blockers, %d review advisories", len(blockers), len(advisories))
         for item in blockers:

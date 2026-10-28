@@ -1,7 +1,6 @@
+"""Small deterministic tests that never touch official MNIST test or OOD data."""
 
 from pathlib import Path
-
-"""Small deterministic tests that never touch official MNIST test or OOD data."""
 
 import numpy as np
 import pytest

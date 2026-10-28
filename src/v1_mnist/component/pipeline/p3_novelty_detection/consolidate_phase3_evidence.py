@@ -8,7 +8,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-LOGGER = logging.getLogger(__name__)
+from src.v1_mnist.component.utils.logging import setup_logger
+
+LOGGER = setup_logger(__name__, level=logging.INFO)
 BASE = Path('outputs/v1_mnist/p3_novelty_detection/novelty_benchmark')
 HISTORICAL = 'mnist_svhn_five_method_comparison_s42_initial/comparison_metrics.json'
 ADDITIONAL = 'mnist_svhn_required_baselines_knn_s42_v1/required_baseline_metrics.json'
@@ -92,5 +94,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
     main()
