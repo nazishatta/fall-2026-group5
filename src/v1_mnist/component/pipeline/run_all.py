@@ -23,20 +23,13 @@ the whole run (results are never overwritten; move or delete them to redo a step
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
+import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from src.v1_mnist.component.pipeline.common import (
-    CNN_CONFIG,
-    CNN_STEPS,
-    PHASE3_RUNNER,
-    REPORT_RUNNER,
-    SOM_CONFIG,
-    STEP_RUNNERS,
-    Step,
-    run_steps,
+from src.v1_mnist.component.pipeline.common import (  # noqa: E402
+    CNN_CONFIG, CNN_STEPS, REPORT_RUNNER, SOM_CONFIG, STEP_RUNNERS, Step, run_steps,
 )
 
 STEP_NAMES = list(STEP_RUNNERS)
@@ -54,55 +47,7 @@ def main() -> None:
                         help="som_nnsom_training: use the existing SOM instead of training a new one.")
     parser.add_argument("--no-report", action="store_true", help="Do not build the interactive report.")
     parser.add_argument("--dry-run", action="store_true", help="Print every runner's steps without running them.")
-    parser.add_argument("--phase3-stage")
-    parser.add_argument("--phase3-config")
     args = parser.parse_args()
-    if args.phase3_stage is not None or args.phase3_config is not None:
-        if not args.phase3_stage or not args.phase3_config:
-            parser.error(
-                "--phase3-stage and --phase3-config must be supplied together"
-            )
-
-        phase12_options = {
-            "--from",
-            "--to",
-            "--cnn-config",
-            "--som-config",
-            "--skip-training",
-            "--no-report",
-        }
-        if any(
-            argument.split("=", 1)[0] in phase12_options
-            for argument in sys.argv[1:]
-        ):
-            parser.error(
-                "Phase 1/2 options cannot be combined with --phase3-stage"
-            )
-
-        from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.run_phase3_stage import (
-            STAGES,
-        )
-
-        if args.phase3_stage not in STAGES:
-            parser.error("Unknown Phase 3 stage: " + args.phase3_stage)
-
-        if args.phase3_stage == "ood_comparison":
-            parser.error(
-                "Use the standalone launcher for ood_comparison, "
-                "which requires additional score arguments"
-            )
-
-        extra = [
-            "--stage", args.phase3_stage,
-            "--config", args.phase3_config,
-        ]
-        if args.dry_run:
-            extra.append("--dry-run")
-
-        plan = [Step("Phase 3: " + args.phase3_stage, PHASE3_RUNNER, extra)]
-        run_steps("Phase 3 novelty", plan, dry_run=args.dry_run)
-        return
-
     start, end = STEP_NAMES.index(args.first), STEP_NAMES.index(args.last)
     if start > end:
         parser.error("--from must not come after --to")

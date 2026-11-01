@@ -244,131 +244,23 @@ def test_standalone_phase3_dry_run(stage: str, config: str) -> None:
     assert "Dry run: no experiment executed" in output
 
 
-def test_shared_phase3_dry_run() -> None:
-    """Verify Phase 3 dispatch without running an experiment."""
-    runner = REPO_ROOT / "src/v1_mnist/component/pipeline/run_all.py"
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(runner),
-            "--phase3-stage", "qe_novelty",
-            "--phase3-config",
-            "src/v1_mnist/component/configs/qe_novelty.yaml",
-            "--dry-run",
-        ],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert result.returncode == 0, result.stderr
-    output = result.stdout + result.stderr
-    assert "run_phase3_stage.py" in output
-    assert "dry run: nothing is executed" in output.lower()
-
-
 @pytest.mark.parametrize(
     "arguments",
     [
-        ["--phase3-stage", "qe_novelty", "--dry-run"],
-        [
-            "--phase3-config",
-            "src/v1_mnist/component/configs/qe_novelty.yaml",
-            "--dry-run",
-        ],
-        [
-            "--phase3-stage", "invalid_stage",
-            "--phase3-config",
-            "src/v1_mnist/component/configs/qe_novelty.yaml",
-            "--dry-run",
-        ],
-        [
-            "--phase3-stage", "ood_comparison",
-            "--phase3-config",
-            "src/v1_mnist/component/configs/qe_novelty.yaml",
-            "--dry-run",
-        ],
+        ["--stage", "invalid_stage", "--dry-run"],
+        ["--stage", "qe_novelty", "--unknown-option", "--dry-run"],
     ],
 )
-def test_shared_phase3_rejects_unsupported_arguments(
+def test_standalone_phase3_rejects_invalid_arguments(
     arguments: list[str],
 ) -> None:
-    """Reject invalid requests before any scientific execution."""
-    runner = REPO_ROOT / "src/v1_mnist/component/pipeline/run_all.py"
+    """Reject invalid standalone Phase 3 requests without running experiments."""
     result = subprocess.run(
-        [sys.executable, str(runner), *arguments],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert result.returncode != 0
-    assert "error:" in result.stderr.lower()
-
-
-@pytest.mark.parametrize(
-    "conflicting_args",
-    [
-        ["--from", "som_nnsom_training"],
-        ["--to", "error_pattern_analysis"],
-        ["--skip-training"],
-        ["--no-report"],
-        ["--cnn-config", "other.yaml"],
-        ["--som-config=other.yaml"],
-    ],
-)
-def test_shared_phase3_rejects_phase12_options(
-    conflicting_args: list[str],
-) -> None:
-    """Phase 3 must not silently ignore Phase 1/2 arguments."""
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(RUN_ALL),
-            "--phase3-stage",
-            "svhn_benchmark",
-            "--phase3-config",
-            str(CONFIG_DIR / "novelty_benchmark.yaml"),
-            "--dry-run",
-            *conflicting_args,
-        ],
+        [sys.executable, str(PHASE3), *arguments],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=False,
     )
     assert result.returncode != 0
-    assert "Phase 1/2 options cannot be combined" in result.stderr
 
-
-def test_shared_phase3_dispatch_without_execution(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify dispatch with the execution function mocked."""
-    from src.v1_mnist.component.pipeline import run_all
-
-    recorded = []
-
-    def mock_run_steps(title: str, steps: list, dry_run: bool) -> None:
-        recorded.append((title, steps, dry_run))
-
-    monkeypatch.setattr(run_all, "run_steps", mock_run_steps)
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            "run_all.py",
-            "--phase3-stage", "qe_novelty",
-            "--phase3-config",
-            "src/v1_mnist/component/configs/qe_novelty.yaml",
-        ],
-    )
-
-    run_all.main()
-
-    assert len(recorded) == 1
-    title, steps, dry_run = recorded[0]
-    assert title == "Phase 3 novelty"
-    assert dry_run is False
-    assert steps[0].script.name == "run_phase3_stage.py"
-    assert "--dry-run" not in steps[0].args

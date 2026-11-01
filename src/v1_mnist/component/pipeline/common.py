@@ -12,20 +12,21 @@ Common options for every runner:
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import argparse
+from dataclasses import dataclass, field
+from pathlib import Path
 import shlex
 import subprocess
 import sys
-from collections.abc import Callable, Sequence
-from dataclasses import dataclass, field
-from pathlib import Path
-from types import SimpleNamespace
+from typing import Callable, Optional, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[4]          # code root (holds src/ and outputs/)
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.v1_mnist.component.utils.logging import get_console_logger
+from src.v1_mnist.component.utils.logging import get_console_logger  # noqa: E402
 
 log = get_console_logger()
 
@@ -49,7 +50,6 @@ STEP_RUNNERS = {
 # Steps that use the CNN config; every later step uses the SOM config.
 CNN_STEPS = ("data_pipeline", "cnn_baseline_training")
 REPORT_RUNNER = PIPELINE / "p2_som_training_visualization" / "run_interactive_report.py"
-PHASE3_RUNNER = COMPONENT / "p3_novelty_detection" / "novelty_benchmark" / "run_phase3_stage.py"
 
 
 @dataclass
@@ -57,9 +57,9 @@ class Step:
     """One step of a runner: a script with arguments, or a Python function."""
 
     label: str
-    script: Path | None = None
+    script: Optional[Path] = None
     args: Sequence[str] = field(default_factory=list)
-    func: Callable[[], None] | None = None
+    func: Optional[Callable[[], None]] = None
 
     def describe(self) -> str:
         if self.func is not None:
@@ -116,7 +116,7 @@ def run_steps(title: str, steps: Sequence[Step], dry_run: bool) -> None:
         if step.func is not None:
             step.func()
             continue
-        result = subprocess.run([sys.executable, str(step.script), *step.args], check=False, cwd=REPO_ROOT)
+        result = subprocess.run([sys.executable, str(step.script), *step.args], cwd=REPO_ROOT)
         if result.returncode != 0:
             log.error(f"\nStopped: step {i} ({step.label}) failed with exit code {result.returncode}.")
             sys.exit(result.returncode)
