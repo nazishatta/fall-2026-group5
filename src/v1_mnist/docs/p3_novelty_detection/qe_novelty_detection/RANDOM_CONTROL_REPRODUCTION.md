@@ -13,7 +13,7 @@ The historical result remains unchanged:
 
 From the repository root:
 
-    python -m src.v1_mnist.component.pipeline.p3_novelty_detection.run_qe_random_control
+    python -m src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_random_control
 
 The command is read-only by default.
 

@@ -39,4 +39,4 @@ Run ID: mnist_svhn_five_method_comparison_s42_initial
 Score files restored through the existing score_arrays.dvc pointer.
 
 Reproduction script:
-src/v1_mnist/component/pipeline/p3_novelty_detection/inspect_svhn_scores.py
+src/v1_mnist/component/p3_novelty_detection/novelty_benchmark/inspect_svhn_scores.py

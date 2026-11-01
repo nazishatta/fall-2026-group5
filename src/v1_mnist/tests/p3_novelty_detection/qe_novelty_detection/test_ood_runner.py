@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import yaml
 
-from src.v1_mnist.component.pipeline.p3_novelty_detection.run_qe_ood import (
+from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
     read_settings,
     resolved,
 )

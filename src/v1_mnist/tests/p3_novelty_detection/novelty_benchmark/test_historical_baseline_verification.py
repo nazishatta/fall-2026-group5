@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from src.v1_mnist.component.pipeline.p3_novelty_detection import (
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark import (
     run_historical_baseline_verification as verifier,
 )
 

@@ -4,7 +4,7 @@
 
 Command (read-only):
 
-    python -m src.v1_mnist.component.pipeline.p3_novelty_detection.run_qe_u_matrix
+    python -m src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.run_qe_u_matrix
 
 Frozen SOM: `som_15x15_nb11_ep250_s42_v2`
 

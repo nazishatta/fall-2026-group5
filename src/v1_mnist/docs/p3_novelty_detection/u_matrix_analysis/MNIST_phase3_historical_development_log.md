@@ -17,8 +17,8 @@ This report covers **MNIST-only Phase 3 work completed before presentation**.
 - `src/v1_mnist/component/p3_novelty_detection/qe_novelty_detection/ood_metrics.py`
 - `src/v1_mnist/component/p3_novelty_detection/qe_novelty_detection/ood_scoring.py`
 - `src/v1_mnist/component/p3_novelty_detection/u_matrix_analysis/u_matrix_novelty.py`
-- `src/v1_mnist/component/pipeline/p3_novelty_detection/run_qe_novelty.py`
-- `src/v1_mnist/component/pipeline/p3_novelty_detection/run_qe_ood.py`
+- `src/v1_mnist/component/p3_novelty_detection/qe_novelty_detection/run_qe_novelty.py`
+- `src/v1_mnist/component/p3_novelty_detection/qe_novelty_detection/run_qe_ood.py`
 
 ### Tests
 - `src/v1_mnist/tests/p3_novelty_detection/qe_novelty_detection/test_quantization_novelty.py`
