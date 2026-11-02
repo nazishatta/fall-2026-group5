@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[5]
 ROOT = REPO_ROOT
 RUN_ALL = ROOT / "src/v1_mnist/component/pipeline/run_all.py"
 

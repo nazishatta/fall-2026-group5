@@ -8,7 +8,7 @@ from pathlib import Path
 
 from src.v1_mnist.component.pipeline.common import STEP_RUNNERS
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[5]
 RUN_ALL = REPO_ROOT / "src" / "v1_mnist" / "component" / "pipeline" / "run_all.py"
 
 
