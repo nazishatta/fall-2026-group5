@@ -17,6 +17,36 @@ Scientific runners are organized under `component/p3_novelty_detection/novelty_b
 The independent `run_phase3_stage.py` adapter accepts `--config`,
 `--stage`, and `--dry-run`.
 
+## Historical provenance verification
+
+The detailed investigation is recorded in
+[HISTORICAL_PROVENANCE_AUDIT.md](HISTORICAL_PROVENANCE_AUDIT.md).
+
+For the historical QE OOD run
+`mnist_svhn_qe_frozen_s42_initial`, all five recorded
+SHA-256 values were independently matched against
+existing EC2 artifacts:
+
+- Frozen SOM model
+- Frozen CNN checkpoint
+- MNIST training embeddings
+- Training QE-distance array
+- Validation QE-distance array
+
+This establishes the availability and content identity
+of these recorded artifacts.
+
+The exact historical generating YAML revision remains
+unverified.
+
+The historical QE random-control and QE/U-Matrix
+experiments also have unresolved configuration-to-result
+provenance. Their available metadata and limitations
+are documented in the audit.
+
+No historical experiments were rerun, no results were
+overwritten, and no final MNIST test samples were used.
+
 ## Historical configuration-to-result traceability
 
 This table inventories the 22 identified Phase 3 YAML files
