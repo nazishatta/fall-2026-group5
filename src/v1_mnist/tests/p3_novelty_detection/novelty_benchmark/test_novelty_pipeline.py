@@ -37,9 +37,7 @@ CASES = [
 
 
 @pytest.mark.parametrize(("stage", "filename"), CASES)
-def test_phase3_registered_stage_command(
-    stage: str, filename: str
-) -> None:
+def test_phase3_registered_stage_command(stage: str, filename: str) -> None:
     """Commands use the correct scripts and CLI arguments."""
     config = CONFIG_DIR / filename
     assert (REPO_ROOT / config).is_file()
@@ -49,22 +47,22 @@ def test_phase3_registered_stage_command(
 
     assert command[0] == sys.executable
     if stage in {
-            "qe_novelty",
-            "qe_ood",
-            "qe_random_control",
-            "historical_baseline_verification",
-            "qe_energy_knn_paired",
-            "required_baselines",
-            "fair_budget_baselines",
-            "standardized_autoencoder",
-            "missed_svhn_figure",
-            "svhn_benchmark",
-            "qe_u_matrix",
-            "qe_umatrix_random_ood",
-            "qe_umatrix_validation_figure",
-            "u_matrix_grid_figure",
-            "proposal_gap_analysis",
-        }:
+        "qe_novelty",
+        "qe_ood",
+        "qe_random_control",
+        "historical_baseline_verification",
+        "qe_energy_knn_paired",
+        "required_baselines",
+        "fair_budget_baselines",
+        "standardized_autoencoder",
+        "missed_svhn_figure",
+        "svhn_benchmark",
+        "qe_u_matrix",
+        "qe_umatrix_random_ood",
+        "qe_umatrix_validation_figure",
+        "u_matrix_grid_figure",
+        "proposal_gap_analysis",
+    }:
         assert command[1] == "-m"
         assert command[2] == (
             "src.v1_mnist.component.p3_novelty_detection."
@@ -72,7 +70,14 @@ def test_phase3_registered_stage_command(
         )
     else:
         assert command[1] == str(PIPELINE_DIR / script)
-    if stage == "svhn_benchmark" or stage in {"historical_baseline_verification", "qe_energy_knn_paired", "required_baselines", "fair_budget_baselines", "standardized_autoencoder", "missed_svhn_figure"}:
+    if stage == "svhn_benchmark" or stage in {
+        "historical_baseline_verification",
+        "qe_energy_knn_paired",
+        "required_baselines",
+        "fair_budget_baselines",
+        "standardized_autoencoder",
+        "missed_svhn_figure",
+    }:
         expected_file = (
             PIPELINE_DIR.parent.parent
             / "p3_novelty_detection/novelty_benchmark"
@@ -94,8 +99,10 @@ def test_phase3_registered_stage_command(
         assert command == [
             sys.executable,
             "-m",
-            ("src.v1_mnist.component.p3_novelty_detection."
-            "novelty_benchmark.run_svhn_benchmark"),
+            (
+                "src.v1_mnist.component.p3_novelty_detection."
+                "novelty_benchmark.run_svhn_benchmark"
+            ),
             "--config",
             str((REPO_ROOT / config).resolve()),
         ]
@@ -183,33 +190,8 @@ def test_no_duplicate_src_path(stage: str, config_name: str) -> None:
 ROOT = REPO_ROOT
 RUN_ALL = ROOT / "src/v1_mnist/component/pipeline/run_all.py"
 PHASE3 = ROOT / (
-    "src/v1_mnist/component/p3_novelty_detection/"
-    "novelty_benchmark/run_phase3_stage.py"
+    "src/v1_mnist/component/p3_novelty_detection/novelty_benchmark/run_phase3_stage.py"
 )
-
-def test_shared_phase2_pipeline_unchanged() -> None:
-    """The original shared pipeline must still dry-run Phase 2."""
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(RUN_ALL),
-            "--from",
-            "error_pattern_analysis",
-            "--to",
-            "error_pattern_analysis",
-            "--dry-run",
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0, result.stdout + result.stderr
-    output = result.stdout + result.stderr
-    assert "error_pattern_analysis" in output
-    assert "Dry run finished." in output
-
 
 
 @pytest.mark.parametrize(
@@ -263,4 +245,3 @@ def test_standalone_phase3_rejects_invalid_arguments(
         check=False,
     )
     assert result.returncode != 0
-

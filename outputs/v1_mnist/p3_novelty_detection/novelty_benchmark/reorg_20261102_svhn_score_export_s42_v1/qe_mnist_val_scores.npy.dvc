@@ -1,0 +1,5 @@
+outs:
+- md5: ddf1abf45e852c257f06b13cc60c3a06
+  size: 84128
+  hash: md5
+  path: qe_mnist_val_scores.npy

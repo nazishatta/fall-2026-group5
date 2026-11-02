@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from src.v1_mnist.component.pipeline.common import STEP_RUNNERS
 
@@ -14,7 +14,7 @@ RUN_ALL = REPO_ROOT / "src" / "v1_mnist" / "component" / "pipeline" / "run_all.p
 
 def run_all(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([sys.executable, str(RUN_ALL), *args, "--dry-run"],
-                          cwd=REPO_ROOT, capture_output=True, text=True, timeout=300)
+                          cwd=REPO_ROOT, capture_output=True, text=True, timeout=300, check=False)
 
 
 def test_dry_run_lists_every_step_in_order() -> None:

@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.v1_mnist.component.utils.logging import get_logger  # noqa: E402
+from src.v1_mnist.component.utils.logging import get_logger
 
 LOGGER = get_logger("v1_mnist.pipeline.phase3")
 
@@ -85,10 +85,7 @@ STAGES = {
     ),
 }
 
-BENCHMARK_CONFIG = (
-    REPO_ROOT
-    / "src/v1_mnist/component/configs/novelty_benchmark.yaml"
-)
+BENCHMARK_CONFIG = REPO_ROOT / "src/v1_mnist/component/configs/novelty_benchmark.yaml"
 
 
 def build_command(
@@ -98,16 +95,16 @@ def build_command(
 ) -> list[str]:
     """Build one Phase 3 stage command without executing it."""
     script, extra = STAGES[stage]
-    resolved_config = (
-        config if config.is_absolute() else REPO_ROOT / config
-    ).resolve()
+    resolved_config = (config if config.is_absolute() else REPO_ROOT / config).resolve()
 
     if stage == "svhn_benchmark":
         return [
             sys.executable,
             "-m",
-            ("src.v1_mnist.component.p3_novelty_detection."
-            "novelty_benchmark.run_svhn_benchmark"),
+            (
+                "src.v1_mnist.component.p3_novelty_detection."
+                "novelty_benchmark.run_svhn_benchmark"
+            ),
             "--config",
             str(resolved_config),
         ]
@@ -120,7 +117,11 @@ def build_command(
             )
         return [
             sys.executable,
-            str(PIPELINE_DIR / Path(script).name),
+            "-m",
+            (
+                "src.v1_mnist.component.p3_novelty_detection."
+                "novelty_benchmark.run_ood_comparison"
+            ),
             "--config",
             str(resolved_config),
             *extra_args,
@@ -177,8 +178,11 @@ def main() -> None:
         parser.error("Additional arguments are only allowed for ood_comparison")
     if args.stage == "ood_comparison":
         required = {
-            "--id-scores", "--ood-scores", "--output",
-            "--run-id", "--detector",
+            "--id-scores",
+            "--ood-scores",
+            "--output",
+            "--run-id",
+            "--detector",
         }
         if not required.issubset(set(forwarded)):
             parser.error("OOD comparison requires all five named arguments")

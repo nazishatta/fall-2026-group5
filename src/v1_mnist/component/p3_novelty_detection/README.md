@@ -32,7 +32,7 @@ scientific validity or prove which configuration revision produced it.
 | `historical_svhn_inspection.yaml` | `Not applicable` | `Supporting configuration` | No standalone run expected |
 | `missed_svhn_figure.yaml` | `mnist_svhn_missed_qe_figure_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `novelty_benchmark.yaml` | `mnist_svhn_five_method_comparison_s42_initial` | `novelty_benchmark` | Configured directory exists |
-| `phase3_proposal_gap_analysis.yaml` | `mnist_svhn_proposal_gap_analysis_s42_v1` | `u_matrix_analysis` | No matching saved directory verified |
+| `phase3_proposal_gap_analysis.yaml` | `mnist_svhn_proposal_gap_analysis_s42_v1` | `u_matrix_analysis` | Generated locally: `u_matrix_analysis/mnist_svhn_proposal_gap_analysis_s42_v1/`; `analysis.json` and `pdf.dvc` prepared for Git; PDF pushed to and verified in DVC remote |
 | `phase3_shared_provenance.yaml` | `Not applicable` | `Supporting configuration` | No standalone run expected |
 | `qe_energy_knn_paired.yaml` | `mnist_svhn_qe_energy_knn_paired_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `qe_novelty.yaml` | `qe_training_calibrated_initial` | `qe_novelty_detection` | Configured directory exists |
@@ -57,9 +57,14 @@ scientific validity or prove which configuration revision produced it.
   have historical result directories with different run IDs.
   Do not treat the current YAML as proven to be the exact
   configuration revision used for those historical runs.
-- The Proposal Gap Analysis has no matching saved result
-  in the inspected workspace. Its configured Phase 2
-  validation BMU input is also unavailable locally.
+- The Proposal Gap Analysis now has a generated local result:
+  `u_matrix_analysis/mnist_svhn_proposal_gap_analysis_s42_v1/`.
+  Its `analysis.json` and `pdf.dvc` are prepared for Git tracking;
+  the PDF is pushed to and verified in the DVC remote.
+  The result has not yet been committed to Git.
+- The three historical run-ID mismatches remain unresolved
+  at the provenance level. Do not assume that current
+  configurations produced those historical results.
 - Historical thresholds, configurations, SHA-256 records,
   output directories, and scientific results remain unchanged.
 

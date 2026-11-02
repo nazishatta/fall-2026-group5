@@ -19,6 +19,6 @@ The professor's **"why"** requirement cannot be established merely from miss IDs
 2. Apply only on your own novelty branch if you approve, with no changes to Phase 1/2 or shared scripts.
 3. Confirm that required DVC score arrays are restored and that the input hashes match. Do **not** overwrite any older run.
 4. Run `python3 -m pytest src/v1_mnist/tests/ -q` in a working pinned environment and Ruff on the new files. Stop if tests fail; do not push.
-5. Run `python3 -m src.v1_mnist.component.pipeline.p3_novelty_detection.run_proposal_gap_analysis --config src/v1_mnist/component/configs/phase3_proposal_gap_analysis.yaml` after reviewing the config. Generated PDFs must stay in gitignored outputs (DVC-track if large).
+5. Run `python3 -m src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.run_proposal_gap_analysis --config src/v1_mnist/component/configs/phase3_proposal_gap_analysis.yaml` after reviewing the config. Generated PDFs must stay in gitignored outputs (DVC-track if large).
 
 No MNIST final test is accessed, and no experiment/model fitting is performed in this patch.
