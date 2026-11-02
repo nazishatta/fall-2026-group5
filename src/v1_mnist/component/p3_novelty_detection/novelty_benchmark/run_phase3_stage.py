@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.logging import get_logger  # noqa: E402
 
 LOGGER = get_logger("v1_mnist.pipeline.phase3")
 

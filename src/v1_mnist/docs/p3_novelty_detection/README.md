@@ -6,6 +6,29 @@ The current external out-of-distribution (OOD) evaluation uses SVHN.
 
 The official MNIST final-test split is excluded from this evaluation.
 
+## Historical numerical verification — 2026-11-02
+
+Read-only EC2 reproduction verified:
+
+- QE OOD: historical numerical metrics, bootstrap interval,
+  and five recorded artifact SHA-256 hashes.
+- QE/U-Matrix: historical numerical metrics and the maximum
+  QE reconstruction difference (`4.860474741713583e-06`).
+- QE random control: historical aggregate statistics and
+  confidence interval. Original seed-specific counts
+  remain unreproduced.
+
+The exact original generating YAML revisions were not
+established. Current configurations reproduce the principal
+numerical findings but are not claimed to be the original
+executing configurations.
+
+See the [historical provenance audit](../../component/p3_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
+for detailed verification evidence and limitations.
+
+No historical experiment outputs were overwritten.
+The official MNIST final-test split was not accessed.
+
 ## Components and documentation
 
 | Component | Scientific documentation |

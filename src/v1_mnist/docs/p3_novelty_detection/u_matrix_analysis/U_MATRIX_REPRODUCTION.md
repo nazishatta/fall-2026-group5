@@ -35,7 +35,11 @@ No MNIST final-test samples or external OOD data were used.
 - The original SOM includes a MinMaxScaler serialized with
   scikit-learn 1.9.0; local scikit-learn 1.4.2 emitted an
   InconsistentVersionWarning during loading.
-- The historical maximum QE reconstruction difference
-  (4.860474741713583e-06) was not independently remeasured.
+- On 2026-11-02, the historical maximum QE reconstruction
+  difference was independently recalculated using the frozen
+  SOM and MNIST validation embeddings.
+  Historical value: `4.860474741713583e-06`.
+  Recomputed value: `4.860474741713583e-06`.
+  Absolute difference: `0.0`.
 - No new run was saved; execution was read-only.
 - The historical JSON was not modified.

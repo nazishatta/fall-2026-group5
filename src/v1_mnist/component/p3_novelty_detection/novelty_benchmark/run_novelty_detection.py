@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.run_phase3_stage import (
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.run_phase3_stage import (  # noqa: E402
     STAGES,
 )
 

@@ -85,3 +85,31 @@ enrichment, not an OOD detector.
 Read-only reproduction verified on 2026-10-18.
 
 A new saved run has not yet been created.
+
+## Additional seed investigation — 2026-11-02
+
+Using the verified MNIST validation correctness array,
+the following sampling methods were tested with seeds
+11, 23, 37, 47 and 59, selecting 539 unique samples.
+
+| Sampling algorithm | Captured CNN errors |
+|---|---|
+| `default_rng.choice` | `[6, 5, 5, 5, 5]` |
+| `RandomState.choice` | `[4, 6, 4, 5, 7]` |
+| `default_rng.permutation` | `[4, 5, 7, 2, 5]` |
+| `RandomState.permutation` | `[4, 6, 4, 5, 7]` |
+| Historical record | `[7, 4, 5, 7, 7]` |
+
+None of these methods reproduced the historical
+seed-specific counts.
+
+The historical JSON identifies those counts as a
+previous simulation not recomputed when saved.
+The original sampling procedure remains unidentified.
+
+The aggregate statistical results, including the
+exact p-value and Wilson confidence interval,
+were independently reproduced.
+
+This is a historical traceability limitation,
+not a failure of the current deterministic control.

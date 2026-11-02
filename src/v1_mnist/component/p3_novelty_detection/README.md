@@ -44,8 +44,11 @@ experiments also have unresolved configuration-to-result
 provenance. Their available metadata and limitations
 are documented in the audit.
 
-No historical experiments were rerun, no results were
-overwritten, and no final MNIST test samples were used.
+On 2026-11-02, read-only numerical reproductions verified the historical QE OOD metrics, all five recorded artifact SHA-256 hashes, and all QE/U-Matrix numerical metrics, including the maximum QE reconstruction difference. The random-control aggregate statistics also reproduced; its historical seeded counts remain unmatched.
+
+The exact original generating YAML revisions remain unidentified. Current reproduction configurations are documented separately in [HISTORICAL_PROVENANCE_AUDIT.md](HISTORICAL_PROVENANCE_AUDIT.md).
+
+No historical outputs were overwritten, and no official MNIST final-test samples were used.
 
 ## Historical configuration-to-result traceability
 
@@ -194,6 +197,33 @@ Verify with `sha256sum data/ood_svhn/test_32x32.mat` before running benchmarks.
 Do not overwrite an existing dataset. The EC2 workspace currently uses a verified symlink to the SVHN file.
 
 Phase 3-only pytest verification on EC2 at commit `1d30862` (2026-10-26): **135 passed**. Ruff checks also passed. This count applies only to `src/v1_mnist/tests/p3_novelty_detection` and must not be confused with historical full-repository test counts.
+
+### Historical test-count reconciliation — 2026-11-02
+
+Historical test totals refer to different execution scopes,
+commits, and environments; they are retained as recorded.
+
+| Tests passed | Recorded context |
+|---|---|
+| 73 | Earlier local Phase 3 subset; two PyTorch-dependent test files excluded |
+| 168 | Earlier EC2 full repository verification; two warnings |
+| 172 | Historical EC2 full repository verification before scope cleanup |
+| 134 | Phase 3-only execution recorded for 2026-10-20 |
+| 135 | Phase 3-only execution at commit `1d30862`, 2026-10-26 |
+| 148 | Phase 3 PR re-review verification recorded in Issue #24 |
+| 246 | Full suite from the earlier PR re-review; two warnings |
+| 252 | Full suite recorded in scientific README on 2026-11-02; two warnings |
+| 260 | Full suite recorded on EC2 on 2026-11-01; two warnings |
+
+These records are historical snapshots, not conflicting
+results of one identical test execution.
+
+Some historical records lack exact environment manifests,
+full commit IDs or command logs. Missing metadata are not
+inferred or reconstructed.
+
+A new current-checkout verification must report its own
+command, Git revision, environment and actual pytest result.
 
 ## Leakage control
 

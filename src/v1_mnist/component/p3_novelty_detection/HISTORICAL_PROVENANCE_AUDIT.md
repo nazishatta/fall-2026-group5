@@ -30,7 +30,7 @@ The experiment has substantial recorded artifact provenance.
 However, its exact original YAML revision has not been
 identified in the inspected Git history.
 
-Status: PARTIALLY VERIFIED.
+Status: NUMERICALLY VERIFIED; original YAML identity unverified.
 
 ## 2. QE Random Control
 
@@ -52,7 +52,7 @@ Assessment:
 The source run and random seeds are recorded.
 The exact generating YAML revision remains unidentified.
 
-Status: PARTIALLY VERIFIED.
+Status: AGGREGATE STATISTICS VERIFIED; historical seeded counts and original YAML identity unverified.
 
 ## 3. QE and U-Matrix Validation
 
@@ -74,7 +74,7 @@ The threshold is consistent with the recorded historical
 QE OOD threshold, but this agreement alone does not prove
 identical model artifacts or generating configurations.
 
-Status: LIMITED PROVENANCE.
+Status: NUMERICALLY VERIFIED; original YAML identity unverified.
 
 
 ## Verified QE OOD Artifact Hashes
@@ -141,9 +141,54 @@ These searches are limited to the inspected file histories.
 They do not establish that no original configuration exists
 in another path, uncommitted workspace, or external archive.
 
+
+## Verified Numerical Reproduction — 2026-11-02
+
+Read-only EC2 reproduction; historical outputs unchanged.
+
+### QE OOD
+- Historical run: `mnist_svhn_qe_frozen_s42_initial`
+- Current configuration run: `mnist_svhn_qe_dev_initial`
+- AUROC: `0.9811068135920626` (exact match)
+- AUPR: `0.9765546499418931` (exact match)
+- FPR@95TPR: `0.04533333333333334` (exact match)
+- AUROC CI: `[0.9790482566328621, 0.9830887456280913]`
+- All five recorded artifact SHA-256 hashes matched.
+
+### QE random control
+- Historical aggregate results reproduced exactly.
+- Validation samples: `10500`; QE flags: `539`.
+- CNN errors: `92`; captured errors: `22`.
+- Exact one-sided p-value: `8.834306580361853e-10`.
+- Historical seeded counts: `[7, 4, 5, 7, 7]`.
+- Reproduced seeded counts: `[6, 5, 5, 5, 5]`.
+- Original seeded sampling procedure remains unidentified.
+
+### QE/U-Matrix
+- Mean QE: `0.9634832918297878`.
+- Mean U-Matrix: `0.7809652917712436`.
+- Spearman correlation: `0.4396258885327658`.
+- Historical maximum QE reconstruction difference:
+  `4.860474741713583e-06`.
+- Independently recomputed: `4.860474741713583e-06`.
+- Absolute difference: `0.0`.
+
+### Original YAML provenance
+Five historical revisions of `qe_ood_evaluation.yaml` were
+inspected. All used `mnist_svhn_qe_dev_initial`, not the
+historical frozen run ID. The historical JSON has no
+`config_sha256` field. The exact original generating YAML
+identity remains unestablished.
+
+Current YAML SHA-256:
+`7ba80772bce316c84d22b216272ca0152a047ef4f2ca89ed6571540e21b43377`.
+
+These are verified numerical reproductions, not proof that
+current YAML files are byte-identical to original configurations.
+
 ## Leakage Control
 
-No new experiment was executed for this audit.
+Read-only numerical reproductions were executed on EC2 on 2026-11-02. No new training or saved experimental run was created.
 
 No MNIST final-test data was accessed.
 
@@ -157,10 +202,11 @@ The three historical run-ID discrepancies are documented.
 The original configuration-to-result mappings remain
 unverified.
 
-Historical results must not be presented as fully
-reproducible from the current YAML files.
+The principal historical numerical results have been reproduced using current configurations. This does not establish the identity of the original generating YAML revisions.
 
-Any future reproduction must use an independently
-identified configuration and a new run ID.
+Future reproductions must use an explicitly documented
+configuration with verified input fingerprints and a new,
+non-overwriting run ID. Current reproduction configurations
+are not claimed to be the original historical YAML revisions.
 
 No historical output may be overwritten.
