@@ -22,8 +22,8 @@ Weeks 12–14 (results, paper, code release) have no folder because they produce
 | 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | *(empty, to be added)* |
 | 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | *(empty, to be added)* |
 | **Phase 4: Guided Retraining** | `p4_guided_retraining/` | | |
-| 9 | `hard_example_mining/` | Week 9: Hard Example Mining | *(empty, to be added)* |
-| 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | *(empty, to be added)* |
+| 9 | `hard_example_mining/` | Week 9: Hard Example Mining | The three difficulty rules, the msp and random pools (equal size, same digit mix), the run-ID preflight, and the pool rules staying as fixed in `retraining.yaml` |
+| 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | Altered copies keep shape, range and labels and are seeded; every augmented arm adds the same number of images with the SOM pool's digit mix |
 | 11 | `som_reanalysis/` | Week 11: Iterative SOM Re-analysis | *(empty, to be added)* |
 
 ## Files in each folder
@@ -75,8 +75,12 @@ tests/
 │   ├── u_matrix_analysis/                           # Week 7   (empty)
 │   └── novelty_benchmark/                           # Week 8   (empty)
 └── p4_guided_retraining/
-    ├── hard_example_mining/                         # Week 9   (empty)
-    ├── targeted_augmentation/                       # Week 10  (empty)
+    ├── hard_example_mining/                         # Week 9
+    │   ├── test_difficulty_and_pools.py
+    │   ├── test_build_pools.py
+    │   └── test_curriculum.py
+    ├── targeted_augmentation/                       # Week 10
+    │   └── test_augmentation_arms.py
     └── som_reanalysis/                              # Week 11  (empty)
 ```
 

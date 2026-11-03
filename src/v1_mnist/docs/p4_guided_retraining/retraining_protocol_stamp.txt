@@ -1,0 +1,7 @@
+status: protocol complete; written before the test split was used for Phase 4
+stamped_utc: 2026-11-03T03:01:21Z
+protocol: RETRAINING_PROTOCOL.md
+protocol_sha256: b1933e0188a700ecd54d753676e60ebeb3c035ecb7eefeda15229aabe0ca22af
+config: retraining.yaml
+config_sha256: 01cac1b36323f84f3d92225ee2ea27439236c3ee2be0c42a177b37297355b88b
+macro_f1_guard: 0.0015657542982220032
