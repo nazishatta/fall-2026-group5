@@ -14,6 +14,33 @@ Historical JSON files containing `[TBD]` are **validation-only development-stage
 
 The random-score null simulation interval is not a detector's bootstrap confidence interval. The additional standardized-autoencoder run is post-hoc exploratory and does not supersede the original unscaled autoencoder experiment. The official MNIST final-test set remains untouched until selection criteria are frozen and a guarded evaluation is implemented.
 
+## Headline SVHN results (MNIST validation vs SVHN test)
+
+Frozen LeNet-5 (84-D `fc2` embeddings), 15x15 SOM, MNIST validation 10,500 (not
+novel) vs SVHN test 26,032 (novel); OOD is the positive class and a higher score
+means more novel. Values are from the source files named above and from the QE
+reproduction in `HISTORICAL_PROVENANCE_AUDIT.md`. 95% bootstrap intervals for AUROC.
+
+| Method | AUROC | AUPR | FPR at 95% TPR |
+|---|---:|---:|---:|
+| Energy | 0.9998 [0.9997, 0.9999] | 0.9999 | 0.0004 |
+| Max-softmax | 0.9985 [0.9982, 0.9987] | 0.9994 | 0.0078 |
+| QE (95th-percentile training cutoff) | 0.9811 [0.9790, 0.9831] | 0.9766 | 0.0453 |
+| kNN (k=5) | 0.9766 [0.9743, 0.9787] | 0.9739 | 0.0592 |
+| Mahalanobis | 0.7764 [0.7688, 0.7832] | 0.7859 | 0.3131 |
+
+- **FPR at 95% TPR** is the lowest false-positive rate among ROC points with TPR of
+  at least 0.95. It is a proportion, and it is **not** the frozen QE cutoff's false
+  alarm rate (5.1%). Do not mix it with records that define FPR differently.
+- **Paired QE vs max-softmax** (stratified paired bootstrap, 2,000 iterations,
+  seed 42): QE minus max-softmax AUROC is -0.0174, 95% interval [-0.0194, -0.0154].
+  Max-softmax is better on this benchmark. The other pairs were not tested.
+- **Limits:** one frozen CNN, one external dataset, one seed. Energy temperature is
+  fixed at 1.0 and Mahalanobis uses a shared Ledoit-Wolf covariance. These settings
+  were specified after the earlier results and are not claimed as preregistered.
+  Pairing assumes the identical deterministic SVHN ordering (the historical QE
+  arrays have no per-image IDs).
+
 ## Pipeline scope
 
 The Phase 3 step runners in `pipeline/p3_novelty_detection/` list every step with its own config in a dry run (checked by `tests/pipeline/test_phase3_runners.py`). Shared `pipeline/common.py` and `pipeline/run_all.py` require teammate agreement; a dedicated follow-up PR was previously agreed for those shared files. Do not imply that the Phase 3 runners mean shared end-to-end pipeline integration.
@@ -72,7 +99,62 @@ has been fully deduplicated.
 ## Baseline scores that look odd
 
 Isolation Forest (AUROC about 0.28) and the raw autoencoder (about 0.006) score
-below chance on SVHN, and the autoencoder gives very different numbers across
-runs. The facts, what is verified and what is only a hypothesis are in
-`BASELINE_SCORE_ANALYSIS.md`. A controlled follow-up
-(`autoencoder_scaling_diagnostic.yaml`) is configured but not yet run.
+below chance on SVHN, and the autoencoder gave very different numbers across
+runs. A controlled run (`mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1`,
+5 seeds, exploratory) shows that embedding length alone separates MNIST from SVHN
+(length-only AUROC 0.00007; mean length 40.3 vs 5.8), that the raw autoencoder
+follows it, and that standardizing the input fixes the direction (0.979 ± 0.017
+at 10,000 training rows, 0.902 ± 0.072 at 49,000). Isolation Forest stays below
+chance (0.280 ± 0.085 and 0.275 ± 0.043). The earlier single-run 0.760 is **not
+reproduced** and its cause is **not identified**. Details, per-seed ranges and the
+open questions are in `BASELINE_SCORE_ANALYSIS.md`.
+
+## QE cutoff sensitivity (MNIST validation vs SVHN test)
+
+Run `mnist_svhn_qe_threshold_sweep_s42_v1`. Cutoffs come from MNIST training QE
+only; the 95th percentile (1.5690279077294162) stays the headline cutoff and no
+percentile was chosen from SVHN results. SVHN was seen earlier, so this is a
+post-hoc sensitivity analysis. Wilson 95% intervals in brackets.
+
+| Cutoff percentile | MNIST validation false alarms | SVHN detected |
+|---:|---:|---:|
+| 90 | 10.4% [9.8, 11.0] | 99.2% [99.1, 99.3] |
+| 95 (headline) | 5.1% [4.7, 5.6] | 96.2% [95.9, 96.4] (996 missed) |
+| 97.5 | 2.5% [2.3, 2.9] | 83.8% [83.3, 84.2] |
+| 99 | 0.95% [0.78, 1.16] | 18.0% [17.5, 18.5] |
+| 99.5 | 0.51% [0.39, 0.67] | 0.008% (2 of 26,032) |
+
+- **AUROC does not depend on the cutoff:** 0.981 (95% bootstrap interval 0.979 to
+  0.983), AUPR 0.977. A label-shuffle control gives a mean of 0.4999 (largest of
+  1,000 shuffles 0.511), so the result is far from chance.
+- **The usable operating point is sensitive to the cutoff.** About 66% of SVHN
+  images have a QE between the 97.5th and 99th percentile cutoffs (1.714 and
+  1.894). Moving the cutoff across that band drops detection from 84% to 18%. With
+  this SOM, the proposal's "99th percentile" option would catch few SVHN images
+  even though AUROC is high.
+
+## Where the QE detector misses (SVHN on the SOM grid)
+
+Run `mnist_svhn_som_overlay_s42_v1`. Descriptive only, nothing tuned. SVHN test is
+the novel set; MNIST validation and the training class table are references. The
+rebuilt SVHN QE scores match the saved historical ones within 9.8e-07.
+
+- At the 95th-percentile cutoff the detector misses 996 of 26,032 SVHN images
+  (3.8%).
+- SVHN images land on only 28 of the 225 neurons. 22,542 of them (86.6%) land on
+  neurons whose dominant MNIST class is 4, and neuron 79 alone receives 22,521.
+- The misses are concentrated: neurons 79, 80, 60 and 72 hold 841 of the 996
+  (84.4%). Neuron 79 holds 355 (a 1.6% miss rate there). Neuron 60 (dominant class
+  1) misses 162 of 360 images (45%).
+- By dominant MNIST class of the landing neuron, the miss rate is 45.7% for
+  class 1 (169 of 370), 14.8% for class 5, 13.7% for class 8, 10.4% for class 0 and
+  1.7% for class 4. Classes with fewer than 30 SVHN images are too small to
+  compare.
+- Missed images are mostly **not** typical for their neuron: the median ratio of a
+  missed image's QE to the median MNIST validation QE in the same neuron is 1.23,
+  and only 7.6% of missed images are at or below that median. So they fit their
+  cell somewhat worse than a typical MNIST digit, but not enough to pass the
+  global cutoff.
+
+This describes where the score fails. It does not show why, or that the cause is
+visual.

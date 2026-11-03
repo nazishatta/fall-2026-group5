@@ -23,7 +23,7 @@ established. Current configurations reproduce the principal
 numerical findings but are not claimed to be the original
 executing configurations.
 
-See the [historical provenance audit](HISTORICAL_PROVENANCE_AUDIT.md)
+See the [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
 for detailed verification evidence and limitations.
 
 No historical experiment outputs were overwritten.
@@ -34,11 +34,9 @@ The official MNIST final-test split was not accessed.
 | Component | Scientific documentation |
 |---|---|
 | QE novelty detection | [Preregistration](qe_novelty_detection/PREREGISTRATION_qe_novelty.md), [random-control reproduction](qe_novelty_detection/RANDOM_CONTROL_REPRODUCTION.md) |
-| U-Matrix analysis | [U-Matrix reproduction](u_matrix_analysis/U_MATRIX_REPRODUCTION.md), [work report](u_matrix_analysis/MNIST_phase3_work_report.md), [historical development log](u_matrix_analysis/MNIST_phase3_historical_development_log.md) |
-| Novelty benchmark | [Consolidated evidence](novelty_benchmark/CONSOLIDATED_EVIDENCE.md), [historical evidence status](novelty_benchmark/HISTORICAL_EVIDENCE_STATUS.md), [result relocation record](novelty_benchmark/RESULT_RELOCATION_RECORD.md), [why Isolation Forest and the autoencoder look odd on SVHN](novelty_benchmark/BASELINE_SCORE_ANALYSIS.md) |
+| U-Matrix analysis | [U-Matrix reproduction](u_matrix_analysis/U_MATRIX_REPRODUCTION.md) |
+| Novelty benchmark | [Consolidated evidence](novelty_benchmark/CONSOLIDATED_EVIDENCE.md), [why Isolation Forest and the autoencoder look odd on SVHN](novelty_benchmark/BASELINE_SCORE_ANALYSIS.md) |
 
-The historical development log preserves earlier file paths and
-chronology. It is not an authoritative current-path inventory.
 
 ## Implementation and configuration
 
@@ -68,7 +66,7 @@ historical configuration revision produced its contents.
 
 | Configuration | Configured run ID | Step | Local evidence |
 |---|---|---|---|
-| `autoencoder_scaling_diagnostic.yaml` | `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `novelty_benchmark` | Not yet run (needs EC2: PyTorch and the SVHN files) |
+| `autoencoder_scaling_diagnostic.yaml` | `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `novelty_benchmark` | Configured directory exists (run on EC2, 2026-11-03) |
 | `autoencoder_standardized_diagnostic.yaml` | `mnist_svhn_ae_train_standardized_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `fair_budget_baselines.yaml` | `mnist_svhn_fair_budget_baselines_s42_46_v1` | `novelty_benchmark` | Configured directory exists |
 | `historical_baseline_verification.yaml` | `mnist_historical_baseline_verification_s42_v1` | `novelty_benchmark` | Configured directory exists |
@@ -81,7 +79,7 @@ historical configuration revision produced its contents.
 | `qe_novelty.yaml` | `qe_training_calibrated_initial` | `qe_novelty_detection` | Configured directory exists |
 | `qe_ood_evaluation.yaml` | `mnist_svhn_qe_dev_initial` | `qe_novelty_detection` | Historical directory: `mnist_svhn_qe_frozen_s42_initial` (different run ID; provenance not fully established) |
 | `qe_random_control.yaml` | `qe_random_control_reproduction_initial` | `qe_novelty_detection` | Historical directory: `qe_random_control_evaluation_initial` (different run ID; provenance not fully established) |
-| `qe_threshold_sweep.yaml` | `mnist_svhn_qe_threshold_sweep_s42_v1` | `qe_novelty_detection` | Not yet run (needs EC2: saved SVHN QE scores) |
+| `qe_threshold_sweep.yaml` | `mnist_svhn_qe_threshold_sweep_s42_v1` | `qe_novelty_detection` | Configured directory exists (run on EC2, 2026-11-03) |
 | `qe_u_matrix_random_ood.yaml` | `mnist_svhn_qe_umatrix_random_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `qe_u_matrix_reproduction.yaml` | `qe_u_matrix_validation_reproduction_initial` | `u_matrix_analysis` | Historical directory: `qe_u_matrix_validation_s42_initial` (different run ID; provenance not fully established) |
 | `qe_umatrix_validation_figure.yaml` | `mnist_qe_umatrix_validation_figure_s42_v1` | `u_matrix_analysis` | Configured directory exists |
@@ -90,14 +88,14 @@ historical configuration revision produced its contents.
 | `svhn_knn_baselines.yaml` | `mnist_svhn_required_baselines_knn_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `svhn_paired_comparison.yaml` | `mnist_svhn_qe_msp_reproduction_s42_v1` | `novelty_benchmark` | Configured directory exists |
 | `svhn_score_export.yaml` | `mnist_svhn_energy_knn_score_export_s42_v1` | `novelty_benchmark` | Configured directory exists |
-| `svhn_som_overlay.yaml` | `mnist_svhn_som_overlay_s42_v1` | `u_matrix_analysis` | Not yet run (needs EC2: PyTorch, NNSOM and the SVHN files) |
+| `svhn_som_overlay.yaml` | `mnist_svhn_som_overlay_s42_v1` | `u_matrix_analysis` | Configured directory exists (run on EC2, 2026-11-03) |
 | `u_matrix_grid_figure.yaml` | `mnist_umatrix_hex_grid_s42_v1` | `u_matrix_analysis` | Configured directory exists |
 | `unified_novelty_benchmark.yaml` | `mnist_svhn_unified_nine_methods_s42_46_v1` | `novelty_benchmark` | Configured directory exists |
 
 The historical run-ID mismatches are identified in the
 [configuration-to-result table](#configuration-to-result-traceability).
 For unresolved provenance limitations, see the
-[historical provenance audit](HISTORICAL_PROVENANCE_AUDIT.md).
+[historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md).
 
 
 ## Execution and verification

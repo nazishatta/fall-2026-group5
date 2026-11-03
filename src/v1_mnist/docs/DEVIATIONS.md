@@ -253,3 +253,19 @@ reproduced the originals.
 - Later steps still read the original folders, so a from-scratch run is not fully
   reproducible from the code alone. This is a known limit.
 - No original run ID, config or result was changed.
+
+### Outdated Phase 3 working documents removed
+
+Recorded: 2026-11-03.
+
+`docs/p3_novelty_detection/` now holds only protocol, results and reproduction
+documents, like the Phase 1 and 2 docs folders. Five working documents were
+deleted because they were outdated or duplicated other records: the proposal
+gap-analysis handover note, the historical development log, the Phase 3 work
+report, the historical evidence status tracker and the result relocation record.
+Git history keeps all of them.
+
+- The headline SVHN comparison table moved into `CONSOLIDATED_EVIDENCE.md`.
+- The facts that the original autoencoder checkpoint and package versions cannot
+  be recovered moved into `HISTORICAL_PROVENANCE_AUDIT.md`.
+- No output, config or run ID was changed.

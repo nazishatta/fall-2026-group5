@@ -1,6 +1,6 @@
 # Why Isolation Forest and the autoencoder look odd on SVHN
 
-Recorded: 2026-11-03. Development results only (MNIST validation vs SVHN test).
+Recorded: 2026-11-03 (controlled check added the same day). Development results only (MNIST validation vs SVHN test).
 The official MNIST test split was not used. No old run, config or score was changed.
 
 Two baseline results look strange: Isolation Forest scores below chance, and the
@@ -35,56 +35,87 @@ between them, because the unified run standardizes its input.
 - **Below-chance AUROC means the detector rates SVHN as more normal than MNIST.**
   The mean scores in `SVHN_BASELINE_DIAGNOSTIC.md` show it: the autoencoder's
   mean error is 0.111 on MNIST and 0.020 on SVHN.
-- **The autoencoder result is not seed noise.** Its standard deviation across
-  seeds is 0.001 (raw) and 0.017 (standardized). The three families of numbers
-  (about 0.006, 0.760, 0.979) differ because of how the input was prepared and
-  how much data was used.
+- **The raw autoencoder result is not seed noise.** Its standard deviation across
+  seeds is 0.001. The standardized result is noisier (see section 3), and the
+  three families of numbers (about 0.006, 0.760, 0.979) differ because of how the
+  input was prepared and how much data was used.
 - **SVHN embeddings are much shorter than MNIST ones.** The mean L2 length of the
   84-D embeddings is about 5.8 for SVHN (`svhn_inverted_embedding_norm_s42_v1`)
   and about 40.3 for MNIST validation (computed from the saved `val_features.npy`).
   Flipping SVHN pixel intensity changes the SVHN mean by only about 0.27, so the
   small size is not a polarity effect.
 
-## 3. What is only a hypothesis
+## 3. What the controlled check showed
 
-These explanations fit the numbers but have **not** been tested.
+Run `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` (new run, 2026-11-03).
+Settings were fixed in `autoencoder_scaling_diagnostic.yaml` before the run:
+seeds 42 to 46, network and forest settings copied from the earlier configs,
+nothing tuned. MNIST validation vs SVHN test; the final MNIST test split was not
+used. Because SVHN was seen in earlier runs, this is **exploratory**.
 
-- **Raw autoencoder.** The error is an absolute squared difference, so
-  small-magnitude inputs are reconstructed with a small error whatever they are.
-  SVHN embeddings are about 7 times shorter than MNIST ones, so they would get
-  low errors and look "normal". This would explain a near-zero AUROC.
-- **Isolation Forest.** Points near the middle of the training cloud need many
-  splits to isolate, so they look normal. Short SVHN embeddings may sit nearer the
-  middle of the scaled MNIST cloud than typical MNIST digits do.
-- **Standardized autoencoder, 0.760 vs 0.979.** Both runs use the same network
-  and 20 epochs. They differ in training size (49,000 vs 10,000, so about five
-  times more training steps) and in which data the scaler was fitted on. Which of
-  these matters, if either, is **not explained**.
+AUROC, mean ± sample SD over 5 seeds:
 
-## 4. Decisions
+| Method | Input | 10,000 training rows | 49,000 training rows |
+|---|---|---:|---:|
+| Autoencoder | raw | 0.006 ± 0.001 | 0.010 ± 0.004 |
+| Autoencoder | standardized | 0.979 ± 0.017 | 0.902 ± 0.072 |
+| Isolation Forest | standardized | 0.280 ± 0.085 | 0.275 ± 0.043 |
+
+Per-seed ranges: autoencoder standardized 0.951 to 0.993 (10,000 rows) and 0.803
+to 0.978 (49,000 rows); Isolation Forest 0.14 to 0.36 and 0.23 to 0.33.
+
+What this shows:
+
+- **The new code reproduces the earlier runs.** At 10,000 rows the AUROC differs
+  from the unified run by at most 2.2e-8 (autoencoder) and 0 (Isolation Forest),
+  over the same five seeds.
+- **Embedding length alone separates the two sets.** A control that scores each
+  image by its embedding length gets AUROC 0.00007 (mean length 40.3 for MNIST
+  validation, 5.8 for SVHN). So SVHN embeddings are far shorter, and ranking by
+  "longer = more novel" is almost perfectly backwards.
+- **The raw autoencoder behaves like that backwards length score** (0.006 and
+  0.010) and does not change with training size. This fits the earlier hypothesis
+  that its raw squared error mostly follows embedding size. It does not prove the
+  mechanism.
+- **Standardizing fixes the direction.** The same autoencoder scores 0.979 and
+  0.902 once the input is standardized.
+- **More training data did not help.** The 49,000-row result is lower (0.902 vs
+  0.979) and less stable across seeds. No significance test was run, so treat the
+  size of the gap as an observation only.
+- **Isolation Forest is below chance in all 10 runs**, at both training sizes. It
+  is stable, not a fluke, and standardizing did not change that.
+
+## 4. What is still unexplained
+
+- **The earlier 0.760 is not reproduced.** The earlier single run
+  (`mnist_svhn_ae_train_standardized_s42_v1`) used seed 42, 49,000 rows, the same
+  network and 20 epochs, with the scaler fitted on all 49,000 training embeddings.
+  The new run gives 0.856 for seed 42 at 49,000 rows, and all five new 49,000-row
+  seeds (0.803 to 0.978) are above 0.760. So seed choice alone does not explain
+  it. The two code paths have not been compared line by line, and the cause is not
+  identified.
+- **Why Isolation Forest is below chance.** The idea that short SVHN embeddings sit
+  nearer the middle of the standardized MNIST cloud than typical MNIST digits is
+  still untested. The length control does not test it directly.
+- **Why 49,000 rows scores lower than 10,000 rows** for the standardized
+  autoencoder.
+
+## 5. Decisions
 
 - Scores are **not** reversed after seeing SVHN results, and no old run is edited.
   Reversing a score because it did badly on the evaluation set would be tuning on
   that set.
-- In reports, the autoencoder's headline number is the standardized, same-budget,
-  five-seed result (0.979 ± 0.017). The raw result (about 0.006) is shown as a
-  separate "unscaled" row, with this note as the reason for the difference.
-  Isolation Forest is reported as measured (0.280 ± 0.085) and described as
-  "below chance on this embedding", not hidden.
+- In reports, show the standardized, same-budget, five-seed autoencoder result
+  (0.979 ± 0.017) as the headline for the fair comparison, and show the
+  49,000-row result (0.902 ± 0.072) next to it, because it uses the full training
+  set and is lower and less stable. The raw result (about 0.006) is a separate
+  "unscaled" row, with this note as the reason. Isolation Forest is reported as
+  measured (0.280 ± 0.085) and described as "below chance on this embedding", not
+  hidden.
+- Do not call the 0.760 vs 0.902 vs 0.979 differences "explained". Section 4 lists
+  what is open.
 - Every number above is a development result. SVHN was examined before these
   explanations were written, so the analysis is post-hoc exploratory.
-
-## 5. Planned check (not run yet)
-
-A new run under a new run ID, on validation data only, with the settings fixed
-before it is run:
-
-- Vary one thing at a time: training size (10,000 vs 49,000) and input scaling
-  (raw vs standardized), with the same five seeds and the same network.
-- Add a length-only control score (the negative embedding length) to show how
-  much of each result comes from embedding size alone.
-
-Results: [TBD] until the run exists.
 
 ## Leakage control
 

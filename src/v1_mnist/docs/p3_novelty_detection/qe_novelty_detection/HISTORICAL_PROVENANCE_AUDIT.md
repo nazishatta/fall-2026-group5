@@ -186,6 +186,20 @@ Current YAML SHA-256:
 These are verified numerical reproductions, not proof that
 current YAML files are byte-identical to original configurations.
 
+## Evidence that cannot be recovered
+
+- The original autoencoder checkpoint was not saved, so the historical
+  autoencoder run cannot be re-executed from it. The new-run verification
+  `mnist_historical_baseline_verification_s42_v1` (EC2, 2026-10-19) reproduced all
+  7 historical validation summary numbers exactly (Isolation Forest and
+  One-Class SVM mean and standard deviation; autoencoder initial and final
+  training loss and mean validation reconstruction error). It does not regenerate
+  the original JSON files byte for byte.
+- The original software environment (package versions) was not recorded, and
+  cannot be reconstructed afterwards. The current pinned `requirements.txt` is not
+  proof of the versions used in the historical runs.
+- The original JSON files are kept unchanged.
+
 ## Leakage Control
 
 Read-only numerical reproductions were executed on EC2 on 2026-11-02. No new training or saved experimental run was created.

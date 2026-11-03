@@ -57,5 +57,5 @@ See the [Phase 3 documentation](../../docs/p3_novelty_detection/README.md)
 for configuration-to-run-ID traceability and scientific reports.
 
 
-See the [historical provenance audit](../../docs/p3_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
+See the [historical provenance audit](../../docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
 for SHA-256 verification and unresolved historical provenance.

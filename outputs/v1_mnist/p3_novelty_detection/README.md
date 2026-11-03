@@ -29,7 +29,7 @@ Status meanings:
 |---|---|---|---|
 | `mnist_svhn_qe_dev_initial` | `qe_ood` | `qe_ood_evaluation.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
 | `mnist_svhn_qe_frozen_s42_initial` | - | - | historical (kept as evidence); original run that step `qe_ood` repeats |
-| `mnist_svhn_qe_threshold_sweep_s42_v1` | `qe_threshold_sweep` | `qe_threshold_sweep.yaml` | new analysis, not yet run (needs EC2) |
+| `mnist_svhn_qe_threshold_sweep_s42_v1` | `qe_threshold_sweep` | `qe_threshold_sweep.yaml` | current (run on EC2, 2026-11-03) |
 | `qe_random_control_evaluation_initial` | - | - | historical (kept as evidence); original run that step `qe_random_control` repeats |
 | `qe_random_control_reproduction_initial` | `qe_random_control` | `qe_random_control.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
 | `qe_training_calibrated_initial` | `qe_novelty` | `qe_novelty.yaml` | current |
@@ -46,7 +46,7 @@ Status meanings:
 |---|---|---|---|
 | `mnist_qe_umatrix_validation_figure_s42_v1` | `qe_umatrix_validation_figure` | `qe_umatrix_validation_figure.yaml` | current |
 | `mnist_svhn_proposal_gap_analysis_s42_v1` | `proposal_gap_analysis` | `phase3_proposal_gap_analysis.yaml` | current |
-| `mnist_svhn_som_overlay_s42_v1` | `svhn_som_overlay` | `svhn_som_overlay.yaml` | new analysis, not yet run (needs EC2) |
+| `mnist_svhn_som_overlay_s42_v1` | `svhn_som_overlay` | `svhn_som_overlay.yaml` | current (run on EC2, 2026-11-03) |
 | `mnist_umatrix_hex_grid_s42_v1` | `u_matrix_grid_figure` | `u_matrix_grid_figure.yaml` | current |
 | `qe_u_matrix_validation_reproduction_initial` | `qe_u_matrix` | `qe_u_matrix_reproduction.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
 | `qe_u_matrix_validation_s42_initial` | - | - | historical (kept as evidence); original run that step `qe_u_matrix` repeats; later steps read it |
@@ -65,7 +65,7 @@ Status meanings:
 | `classical_mnist_validation_s42_initial` | - | - | historical (kept as evidence); first Isolation Forest / One-Class SVM run, kept as evidence |
 | `mnist_historical_baseline_verification_s42_v1` | `historical_baseline_verification` | `historical_baseline_verification.yaml` | current |
 | `mnist_svhn_ae_train_standardized_s42_v1` | `standardized_autoencoder` | `autoencoder_standardized_diagnostic.yaml` | current |
-| `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `autoencoder_scaling_diagnostic` | `autoencoder_scaling_diagnostic.yaml` | new analysis, not yet run (needs EC2) |
+| `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `autoencoder_scaling_diagnostic` | `autoencoder_scaling_diagnostic.yaml` | current (run on EC2, 2026-11-03) |
 | `mnist_svhn_consolidated_evidence_s42_v1` | - | - | historical (kept as evidence); written by `consolidate_phase3_evidence` (own command, not a `run_all` step) |
 | `mnist_svhn_energy_knn_score_export_s42_v1` | `svhn_score_export` | `svhn_score_export.yaml` | current |
 | `mnist_svhn_fair_budget_baselines_s42_46_v1` | `fair_budget_baselines` | `fair_budget_baselines.yaml` | current |
