@@ -12,7 +12,7 @@ The consolidated CSV is a **descriptive joining of saved runs**, not a claim tha
 
 Historical JSON files containing `[TBD]` are **validation-only development-stage records**. Retain them unchanged for provenance. Later SVHN evaluations are recorded under distinct run IDs. Old documentation referring to 73/168/172 tests records earlier environments and commits, not the latest passing test count. Always cite each test run with the exact branch SHA, environment and command; do not replace all historical counts with a new figure.
 
-The random-score null simulation interval is not a detector's bootstrap confidence interval. The additional standardized-autoencoder run is post-hoc exploratory and does not supersede the original unscaled autoencoder experiment. The official MNIST final-test set remains untouched until selection criteria are frozen and a guarded evaluation is implemented.
+The random-score null simulation interval is not a detector's bootstrap confidence interval. The additional standardized-autoencoder run is post-hoc exploratory and does not supersede the original unscaled autoencoder experiment. The held-out MNIST test split is not used by Phase 3 and stays unused until selection criteria are frozen and a guarded evaluation is implemented. (Phase 1 evaluated it once, to report the CNN's accuracy.)
 
 ## Headline SVHN results (MNIST validation vs SVHN test)
 

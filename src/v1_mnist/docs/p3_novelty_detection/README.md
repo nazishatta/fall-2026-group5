@@ -4,7 +4,8 @@ Phase 3 evaluates whether frozen MNIST-trained representations and
 Self-Organizing Map (SOM) distances can help identify unfamiliar images.
 The current external out-of-distribution (OOD) evaluation uses SVHN.
 
-The official MNIST final-test split is excluded from this evaluation.
+The held-out MNIST test split (the project's own 10,500-image split, not the official
+10,000-image MNIST test set) is not used in this evaluation. See `docs/DEVIATIONS.md`.
 
 ## Historical numerical verification — 2026-11-02
 
@@ -27,7 +28,7 @@ See the [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE
 for detailed verification evidence and limitations.
 
 No historical experiment outputs were overwritten.
-The official MNIST final-test split was not accessed.
+The held-out MNIST test split was not accessed by any Phase 3 run.
 
 ## Components and documentation
 

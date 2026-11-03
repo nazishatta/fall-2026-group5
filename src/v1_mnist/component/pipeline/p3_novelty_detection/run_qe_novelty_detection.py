@@ -4,7 +4,7 @@ Steps (scripts in p3_novelty_detection/qe_novelty_detection/):
   1. qe_novelty: score MNIST samples by quantization error (QE), with the
      decision threshold frozen from the training QE.
   2. qe_ood: evaluate the QE score on MNIST validation versus SVHN (AUROC with a
-     bootstrap interval). The official MNIST final-test split is never used.
+     bootstrap interval). The held-out MNIST test split is never used.
   3. qe_random_control: compare the QE flags with random selection.
   4. qe_threshold_sweep: the QE score at several training-percentile cutoffs (90 to 99.5),
      with threshold-free AUROC and a label-shuffle control.

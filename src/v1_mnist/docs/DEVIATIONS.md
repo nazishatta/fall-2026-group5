@@ -221,23 +221,34 @@ reorganization activity must not replace descriptive experiment names.
 No historical outputs, run IDs, or configurations were modified to
 resolve this naming deviation.
 
-### MNIST validation used in place of the official test split
+### MNIST validation used in place of the held-out test split
 
 Recorded: 2026-11-03.
 
+**What "test split" means in this project.** The 70,000 MNIST images were pooled and
+split once (stratified, seed 42) into 49,000 training, 10,500 validation and 10,500
+test images. The test split is therefore the project's own held-out split. It is
+**not** the official 10,000-image MNIST test set. Older code strings, config comments
+and saved JSON files say "official MNIST final-test"; they mean this held-out split.
+They were not edited, because changing a config changes its recorded SHA-256.
+
+**Where the test split has been used.** Phase 1 evaluated it once, after training, to
+report the CNN's accuracy (99.18%, `cnn_baseline_training/metrics/test_evaluation.json`),
+and test embeddings were saved. No decision, threshold or selection used it. No Phase 2
+or Phase 3 result uses it.
+
 The proposal says to score "each test sample". All Phase 3 results so far use the
-10,500 MNIST **validation** images instead, and the official test split has never
-been opened. This is on purpose: Phases 3 and 4 are still being developed, and the
-test split should stay a one-time final check.
+10,500 MNIST **validation** images instead. This is on purpose: Phases 3 and 4 are
+still being developed, and the test split should stay a one-time final check for them.
 
 - Results are development results, not final ones. SVHN results are post-hoc
   exploratory, because SVHN was inspected earlier.
 - RQ3 and RQ4 are not called "supported" or "not supported" yet.
 - The `[TBD]` thresholds in `reports/Proposal.md` section 6 (for example the RQ4
   "within `[TBD]` AUROC" margin) were due 2026-10-06 and are still empty. They
-  will be filled, with a written reason, before the test split is used.
-- The test split will be opened once, at the end, for all research questions
-  together, under a new run ID.
+  will be filled, with a written reason, before the test split is used for them.
+- For the Phase 3 and 4 research questions, the test split will be used once, at
+  the end, for all of them together, under a new run ID.
 
 ### Three Phase 3 steps are skipped by `run_all.py` by default
 

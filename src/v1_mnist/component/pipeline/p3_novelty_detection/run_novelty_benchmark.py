@@ -20,7 +20,7 @@ Steps (scripts in p3_novelty_detection/novelty_benchmark/), in the order they ru
      (read-only, writes nothing).
 
 Results go to outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/<run_id>/.
-Only MNIST validation and SVHN are scored; the official MNIST final-test split is never used.
+Only MNIST validation and SVHN are scored; the held-out MNIST test split is never used.
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p3_novelty_detection/run_novelty_benchmark.py \

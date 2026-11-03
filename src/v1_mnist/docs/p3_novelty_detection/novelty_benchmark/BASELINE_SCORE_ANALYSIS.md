@@ -1,7 +1,7 @@
 # Why Isolation Forest and the autoencoder look odd on SVHN
 
 Recorded: 2026-11-03 (controlled check added the same day). Development results only (MNIST validation vs SVHN test).
-The official MNIST test split was not used. No old run, config or score was changed.
+The held-out MNIST test split was not used. No old run, config or score was changed.
 
 Two baseline results look strange: Isolation Forest scores below chance, and the
 autoencoder has given very different numbers in different runs. This note puts
@@ -120,5 +120,5 @@ What this shows:
 ## Leakage control
 
 This note uses only saved validation and SVHN scores and embedding statistics.
-Nothing was fitted or tuned for it, and the official MNIST final-test set was
+Nothing was fitted or tuned for it, and the held-out MNIST test split was
 not used.

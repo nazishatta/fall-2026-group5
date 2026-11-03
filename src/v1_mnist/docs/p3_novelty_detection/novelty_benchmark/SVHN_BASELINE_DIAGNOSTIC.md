@@ -29,8 +29,8 @@ Other fitted baselines used different training budgets.
 ## Leakage Control
 
 This diagnostic only evaluated frozen historical score arrays.
-No models were retrained, no thresholds were tuned, and the official
-MNIST final-test set was not used.
+No models were retrained, no thresholds were tuned, and the held-out
+MNIST test split was not used.
 
 ## Provenance
 
