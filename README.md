@@ -72,8 +72,40 @@ Success criteria are fixed **before** the test set is examined
   where digit classes mix. Both findings also hold on 10x10 and 20x20 SOMs
   ([`ERROR_PATTERN_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/p2_som_training_visualization/error_pattern_analysis/ERROR_PATTERN_ROBUSTNESS_RESULTS.md)).
 
-Results for Phases 3–4 (novelty detection, guided retraining) are `[TBD]` until the experiments are run.
-Nothing is reported before it is measured. Changes to the original plan are logged in
+**Phase 3: Novelty Detection — experimental evaluation**
+
+Phase 3 includes quantization-error novelty detection, U-Matrix
+analysis, external SVHN evaluation, and comparisons with classical
+and neural novelty-detection baselines.
+
+The development evaluation uses MNIST validation (10,500 samples)
+as the in-distribution reference and SVHN test (26,032 samples)
+as the external out-of-distribution dataset.
+
+Selected measured AUROC results:
+
+| Method | AUROC |
+|---|---:|
+| Energy | 0.999797 |
+| Max-softmax probability | 0.998495 |
+| Quantization Error (QE) | 0.981107 |
+| k-Nearest Neighbors (kNN) | 0.976561 |
+| U-Matrix | 0.969629 |
+| Mahalanobis | 0.776437 |
+
+These values come from different historical benchmark executions
+and must not be interpreted as a single equal-budget experiment.
+
+The comparisons use one frozen CNN/SOM realization. They do not
+establish independent multi-seed robustness. The official MNIST
+final-test split has not been used for Phase 3 evaluation.
+
+Detailed results, historical baseline investigations,
+reproducibility limitations, and leakage controls are documented
+in the Phase 3 work report.
+
+Phase 4 (Guided Retraining) remains outstanding. Changes to the
+original experimental protocol are recorded in
 [`src/v1_mnist/docs/DEVIATIONS.md`](src/v1_mnist/docs/DEVIATIONS.md).
 
 ## Reports
@@ -85,7 +117,8 @@ the compiled PDF and a `fig/` folder with the figures it uses.
 | ----- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | 1     | [`cnn_baseline_report.pdf`](reports/Latex_report/v1_mnist/p1_model_training_baseline/cnn_baseline_report.pdf) | Done                                         |
 | 2     | [`som_cluster_error.pdf`](reports/Latex_report/v1_mnist/p2_som_training_visualization/som_cluster_error.pdf)  | In progress; its figures are ready in `fig/` |
-| 3–4   | `reports/Latex_report/v1_mnist/p3_novelty_detection/`, `p4_guided_retraining/`                                | Not started                                  |
+| 3     | `reports/Latex_report/v1_mnist/p3_novelty_detection/` | Experimental results available; LaTeX report pending |
+| 4     | `reports/Latex_report/v1_mnist/p4_guided_retraining/` | Not started |
 | Final | `reports/Latex_report/v1_mnist/Final_report/`                                                                 | Not started                                  |
 
 Technical notes: [`cnn_baseline.md`](src/v1_mnist/docs/p1_model_training_baseline/cnn_baseline_training/cnn_baseline.md)
@@ -106,7 +139,7 @@ src/v1_mnist/
       cluster_analysis/              Week 4: BMUs, purity, cluster maps
       error_pattern_analysis/        Week 5: error hotspots, robustness check
       interactive_report/            Weeks 3-5: interactive SOM HTML report
-    p3_novelty_detection/            Weeks 6-8 (planned): QE novelty, U-Matrix, benchmark
+    p3_novelty_detection/            QE novelty, U-Matrix analysis, comparative benchmarks
     p4_guided_retraining/            Weeks 9-11 (planned): hard examples, augmentation, re-analysis
     utils/                           config, logging, run settings, shared I/O, stats, figures
   docs/                              technical notes, SOM grid-selection protocol, deviation log
@@ -144,7 +177,7 @@ dvc pull
 
 ## Data and results
 
-MNIST downloads automatically via torchvision on first run. Fashion-MNIST and CIFAR-10 are planned.
+MNIST downloads automatically via torchvision on first run. Phase 3 currently evaluates MNIST validation images against SVHN as the external out-of-distribution dataset. Fashion-MNIST and CIFAR-10 remain planned for later phases.
 
 Results in `outputs/v1_mnist/` are split between git and DVC:
 

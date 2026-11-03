@@ -1,0 +1,563 @@
+{
+  "run_id": "mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1",
+  "study_type": "post_hoc_exploratory",
+  "design": {
+    "training_sizes": [
+      10000,
+      49000
+    ],
+    "scalings": [
+      "raw",
+      "standardized"
+    ],
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "autoencoder": {
+      "input_dim": 84,
+      "hidden_dim": 32,
+      "latent_dim": 16,
+      "epochs": 20,
+      "batch_size": 256,
+      "learning_rate": 0.001
+    },
+    "isolation_forest": {
+      "n_estimators": 200,
+      "max_samples": 256,
+      "contamination": 0.05
+    },
+    "note": "Network and forest settings are copied from the earlier benchmark configs, not tuned."
+  },
+  "condition_summary": [
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.006103174481224577,
+      "auroc_sample_sd": 0.0013494833524186616,
+      "auroc_per_seed": [
+        0.004758928571428577,
+        0.008285110633066993,
+        0.005313584745514685,
+        0.00586468302748266,
+        0.006293565428629969
+      ]
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.9790422677583634,
+      "auroc_sample_sd": 0.017246112299897306,
+      "auroc_per_seed": [
+        0.9507472360025756,
+        0.9757478945327364,
+        0.9840802510463312,
+        0.9918811901835104,
+        0.9927547670266632
+      ]
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.00979599650247315,
+      "auroc_sample_sd": 0.0035861377068877828,
+      "auroc_per_seed": [
+        0.01544798343430796,
+        0.006411806348230749,
+        0.01100170486141599,
+        0.008587204027277784,
+        0.007531283841133258
+      ]
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.902398667939825,
+      "auroc_sample_sd": 0.07165528708187749,
+      "auroc_per_seed": [
+        0.8557175582433342,
+        0.9470942667632511,
+        0.8025776169256885,
+        0.9286588173530015,
+        0.9779450804138496
+      ]
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.2801016580326045,
+      "auroc_sample_sd": 0.08496382700164837,
+      "auroc_per_seed": [
+        0.14183980522141248,
+        0.36433731378230455,
+        0.2781637215734481,
+        0.2846991761055989,
+        0.33146827348025876
+      ]
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "auroc_mean": 0.27533524453419966,
+      "auroc_sample_sd": 0.04335824526835308,
+      "auroc_per_seed": [
+        0.33216082038224015,
+        0.29799575979746534,
+        0.24065188632306028,
+        0.28095643091286915,
+        0.22491132525536334
+      ]
+    }
+  ],
+  "per_seed_results": [
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 42,
+      "auroc": 0.14183980522141248,
+      "aupr": 0.5295183253681701,
+      "fpr_at_target_tpr": 0.9146666666666666,
+      "training_subset_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seed": 42,
+      "auroc": 0.004758928571428577,
+      "aupr": 0.49753840359649815,
+      "fpr_at_target_tpr": 0.9999047619047619,
+      "training_subset_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f",
+      "initial_training_loss": 18.219581745910645,
+      "final_training_loss": 0.26419057755470277
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 42,
+      "auroc": 0.9507472360025756,
+      "aupr": 0.9554487783010942,
+      "fpr_at_target_tpr": 0.1657142857142857,
+      "training_subset_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f",
+      "initial_training_loss": 0.9163976895332336,
+      "final_training_loss": 0.036021906715631484
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 42,
+      "auroc": 0.33216082038224015,
+      "aupr": 0.58369182532728,
+      "fpr_at_target_tpr": 0.8277142857142857,
+      "training_subset_sha256": "ff834938857d1e1a46517270ccee10a47b466e3ffb3b684dac36d9d4fb85a9e2"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seed": 42,
+      "auroc": 0.01544798343430796,
+      "aupr": 0.49943985226582954,
+      "fpr_at_target_tpr": 0.9992380952380953,
+      "training_subset_sha256": "ff834938857d1e1a46517270ccee10a47b466e3ffb3b684dac36d9d4fb85a9e2",
+      "initial_training_loss": 7.22434753760513,
+      "final_training_loss": 0.11656518147308
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 42,
+      "auroc": 0.8557175582433342,
+      "aupr": 0.8976812122262293,
+      "fpr_at_target_tpr": 0.5388571428571428,
+      "training_subset_sha256": "ff834938857d1e1a46517270ccee10a47b466e3ffb3b684dac36d9d4fb85a9e2",
+      "initial_training_loss": 0.406808651975223,
+      "final_training_loss": 0.014444243716190056
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 43,
+      "auroc": 0.36433731378230455,
+      "aupr": 0.5949517751610892,
+      "fpr_at_target_tpr": 0.8015238095238095,
+      "training_subset_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seed": 43,
+      "auroc": 0.008285110633066993,
+      "aupr": 0.49824798887493,
+      "fpr_at_target_tpr": 0.9990476190476191,
+      "training_subset_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4",
+      "initial_training_loss": 18.42248157043457,
+      "final_training_loss": 0.21609957227706908
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 43,
+      "auroc": 0.9757478945327364,
+      "aupr": 0.9792594259396826,
+      "fpr_at_target_tpr": 0.08342857142857144,
+      "training_subset_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4",
+      "initial_training_loss": 0.950754358959198,
+      "final_training_loss": 0.03529962218403816
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 43,
+      "auroc": 0.29799575979746534,
+      "aupr": 0.5731757748556715,
+      "fpr_at_target_tpr": 0.8547619047619047,
+      "training_subset_sha256": "325cba1f373d5c41b4e83f346b5613df9bc52c45901105f155728bc9687c58c4"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seed": 43,
+      "auroc": 0.006411806348230749,
+      "aupr": 0.4978575077674365,
+      "fpr_at_target_tpr": 0.9997142857142857,
+      "training_subset_sha256": "325cba1f373d5c41b4e83f346b5613df9bc52c45901105f155728bc9687c58c4",
+      "initial_training_loss": 8.075300097154111,
+      "final_training_loss": 0.10667326673561213
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 43,
+      "auroc": 0.9470942667632511,
+      "aupr": 0.9622433407020752,
+      "fpr_at_target_tpr": 0.22180952380952382,
+      "training_subset_sha256": "325cba1f373d5c41b4e83f346b5613df9bc52c45901105f155728bc9687c58c4",
+      "initial_training_loss": 0.4212136179415547,
+      "final_training_loss": 0.015028450773078569
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 44,
+      "auroc": 0.2781637215734481,
+      "aupr": 0.5669261388135464,
+      "fpr_at_target_tpr": 0.8576190476190476,
+      "training_subset_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seed": 44,
+      "auroc": 0.005313584745514685,
+      "aupr": 0.4976196582162404,
+      "fpr_at_target_tpr": 0.9999047619047619,
+      "training_subset_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035",
+      "initial_training_loss": 17.975989164733885,
+      "final_training_loss": 0.21966858685016633
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 44,
+      "auroc": 0.9840802510463312,
+      "aupr": 0.9872664136718898,
+      "fpr_at_target_tpr": 0.05619047619047619,
+      "training_subset_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035",
+      "initial_training_loss": 0.9345045211791992,
+      "final_training_loss": 0.0360599824309349
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 44,
+      "auroc": 0.24065188632306028,
+      "aupr": 0.5556669746354508,
+      "fpr_at_target_tpr": 0.8561904761904762,
+      "training_subset_sha256": "0f9e78e29ec3f5f42a5d1304eca1a5a4831829f65b30a55c1970643410c85f46"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seed": 44,
+      "auroc": 0.01100170486141599,
+      "aupr": 0.49871032946002786,
+      "fpr_at_target_tpr": 0.9995238095238095,
+      "training_subset_sha256": "0f9e78e29ec3f5f42a5d1304eca1a5a4831829f65b30a55c1970643410c85f46",
+      "initial_training_loss": 7.266072925314611,
+      "final_training_loss": 0.1534091712333718
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 44,
+      "auroc": 0.8025776169256885,
+      "aupr": 0.8448943024844204,
+      "fpr_at_target_tpr": 0.5535238095238095,
+      "training_subset_sha256": "0f9e78e29ec3f5f42a5d1304eca1a5a4831829f65b30a55c1970643410c85f46",
+      "initial_training_loss": 0.4048877489895237,
+      "final_training_loss": 0.017047145745127786
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 45,
+      "auroc": 0.2846991761055989,
+      "aupr": 0.5687917079965614,
+      "fpr_at_target_tpr": 0.8513333333333334,
+      "training_subset_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seed": 45,
+      "auroc": 0.00586468302748266,
+      "aupr": 0.49770022574842954,
+      "fpr_at_target_tpr": 0.9995238095238095,
+      "training_subset_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c",
+      "initial_training_loss": 18.274140480041503,
+      "final_training_loss": 0.2096015862941742
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 45,
+      "auroc": 0.9918811901835104,
+      "aupr": 0.9943943490982771,
+      "fpr_at_target_tpr": 0.025333333333333333,
+      "training_subset_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c",
+      "initial_training_loss": 0.9525799826622009,
+      "final_training_loss": 0.035486057728528975
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 45,
+      "auroc": 0.28095643091286915,
+      "aupr": 0.5678470733566436,
+      "fpr_at_target_tpr": 0.8646666666666667,
+      "training_subset_sha256": "abb9b6de993265418f03a734e924ed9d26765eae8c18ed2ef5e30514e6532aec"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seed": 45,
+      "auroc": 0.008587204027277784,
+      "aupr": 0.49815736221794615,
+      "fpr_at_target_tpr": 1.0,
+      "training_subset_sha256": "abb9b6de993265418f03a734e924ed9d26765eae8c18ed2ef5e30514e6532aec",
+      "initial_training_loss": 7.358074696988475,
+      "final_training_loss": 0.11430793623778285
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 45,
+      "auroc": 0.9286588173530015,
+      "aupr": 0.9627292739596132,
+      "fpr_at_target_tpr": 0.35933333333333334,
+      "training_subset_sha256": "abb9b6de993265418f03a734e924ed9d26765eae8c18ed2ef5e30514e6532aec",
+      "initial_training_loss": 0.4121855324932507,
+      "final_training_loss": 0.014882361975251411
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 46,
+      "auroc": 0.33146827348025876,
+      "aupr": 0.5842116075780077,
+      "fpr_at_target_tpr": 0.8462857142857143,
+      "training_subset_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "raw",
+      "seed": 46,
+      "auroc": 0.006293565428629969,
+      "aupr": 0.4978064203306964,
+      "fpr_at_target_tpr": 0.9993333333333333,
+      "training_subset_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f",
+      "initial_training_loss": 18.381697427368163,
+      "final_training_loss": 0.21701513690948487
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 10000,
+      "scaling": "standardized",
+      "seed": 46,
+      "auroc": 0.9927547670266632,
+      "aupr": 0.99680803105265,
+      "fpr_at_target_tpr": 0.025238095238095237,
+      "training_subset_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f",
+      "initial_training_loss": 0.9423986210823059,
+      "final_training_loss": 0.03355138962864876
+    },
+    {
+      "method": "isolation_forest",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 46,
+      "auroc": 0.22491132525536334,
+      "aupr": 0.5516266096478386,
+      "fpr_at_target_tpr": 0.8906666666666667,
+      "training_subset_sha256": "7a85916f2f334763b0af6a85daa4a97df9091ac48be697d54f9fb8a2f78c1cf9"
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "raw",
+      "seed": 46,
+      "auroc": 0.007531283841133258,
+      "aupr": 0.4981532103635001,
+      "fpr_at_target_tpr": 0.9988571428571429,
+      "training_subset_sha256": "7a85916f2f334763b0af6a85daa4a97df9091ac48be697d54f9fb8a2f78c1cf9",
+      "initial_training_loss": 7.075994633265904,
+      "final_training_loss": 0.1117647332536931
+    },
+    {
+      "method": "autoencoder",
+      "training_size": 49000,
+      "scaling": "standardized",
+      "seed": 46,
+      "auroc": 0.9779450804138496,
+      "aupr": 0.9914026879307964,
+      "fpr_at_target_tpr": 0.11228571428571428,
+      "training_subset_sha256": "7a85916f2f334763b0af6a85daa4a97df9091ac48be697d54f9fb8a2f78c1cf9",
+      "initial_training_loss": 0.3997948038383406,
+      "final_training_loss": 0.015388351441798162
+    }
+  ],
+  "length_only_control": {
+    "auroc": 7.154930195802993e-05,
+    "aupr": 0.4971121449943159,
+    "fpr_at_target_tpr": 1.0,
+    "auroc_interval_95": [
+      4.308964058887234e-05,
+      0.00010066401791202065
+    ],
+    "mean_length_mnist_validation": 40.28457250745059,
+    "mean_length_svhn": 5.824533989455396,
+    "interpretation": "Score = embedding length, higher = more novel. An AUROC far below 0.5 means SVHN embeddings are shorter than MNIST ones; 1 minus the AUROC then says how well 'shorter = more novel' would separate them. This is a control for comparison, not a proposed detector."
+  },
+  "reference_check": {
+    "reference_training_rows": 10000,
+    "reference_file": "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_unified_nine_methods_s42_46_v1/unified_nine_method_metrics.json",
+    "autoencoder": {
+      "seeds_compared": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "max_abs_auroc_difference": 2.1951005346743102e-08
+    },
+    "isolation_forest": {
+      "seeds_compared": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "max_abs_auroc_difference": 0.0
+    }
+  },
+  "provenance": {
+    "config_sha256": "2e47539491d3ae8ecd6fb648f64bac2d275f8a1a6bdcb0fe7d2028cb3951292f",
+    "input_sha256": {
+      "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+      "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+      "validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+      "train_labels": "34459b6379469ff1d1c8b542c8d2e0b5123e31e38f5f2438b988d36c04a4fae6",
+      "som_model": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831"
+    },
+    "frozen_som": {
+      "qe_threshold": 1.5690279077294162,
+      "som_model": "som_15x15_nb11_ep250_s42_v2",
+      "som_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+      "cnn_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+      "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+      "train_qe_sha256": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+      "val_qe_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186"
+    }
+  },
+  "leakage_control": "Everything is fitted on MNIST training rows only; scalers are fitted on the selected training rows only. MNIST validation and SVHN test are used for evaluation only. SVHN was examined in earlier runs, so this is exploratory. The final MNIST test split is never opened.",
+  "limitation": "Describes how the scores respond to size and scaling; it does not prove why SVHN embeddings are shorter."
+}

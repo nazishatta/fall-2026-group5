@@ -1,0 +1,40 @@
+# New post-hoc diagnostic; historical runs and configs are never changed.
+# Question: why does the autoencoder AUROC on SVHN range from about 0.006 (raw input)
+# through 0.760 (standardized, 49,000 training rows, one seed) to 0.979 (standardized,
+# 10,000 rows, five seeds)? And why is Isolation Forest below chance?
+# One thing is varied at a time: training size and input scaling. The design below is
+# fixed before the run. The network, optimizer and forest settings are copied from the
+# existing benchmark configs; nothing is tuned. MNIST validation is the in-distribution
+# set and SVHN test is the novel set (already seen in earlier runs, so this is
+# exploratory). The final MNIST test split is never opened.
+run_id: mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+qe_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+seeds: [42, 43, 44, 45, 46]
+training_sizes: [10000, 49000]
+scalings: [raw, standardized]
+target_tpr: 0.95
+scoring:
+  batch_size: 256
+  bootstrap_iterations: 200
+  bootstrap_seed: 42
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+# Reproduction check against the earlier unified run (reported, not enforced).
+reference_metrics: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_unified_nine_methods_s42_46_v1/unified_nine_method_metrics.json
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  embedding_dimensions: 84
+  som_units: 225
+  frozen_training_qe_threshold: 1.5690279077294162

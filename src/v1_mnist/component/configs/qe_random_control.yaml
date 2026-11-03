@@ -1,0 +1,10 @@
+# Reproducible Phase 3 validation-only random-selection control.
+# Never overwrite historical or existing runs.
+run_id: qe_random_control_reproduction_initial
+source_summary: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial/qe_summary.json
+validation_distances: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+validation_correct: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_correct.npy
+output_root: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
+random_control:
+  seeds: [11, 23, 37, 47, 59]
+  sampling: uniform_without_replacement

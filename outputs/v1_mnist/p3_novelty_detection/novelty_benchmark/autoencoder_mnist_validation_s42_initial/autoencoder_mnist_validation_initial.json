@@ -1,0 +1,15 @@
+{
+  "method": "feature_autoencoder_reconstruction",
+  "dataset": "mnist",
+  "training_samples": 49000,
+  "validation_samples": 10500,
+  "epochs": 20,
+  "seed": 42,
+  "initial_training_loss": 7.2162517681705705,
+  "final_training_loss": 0.11244814694414333,
+  "validation_mean_reconstruction_error": 0.11096985942453501,
+  "ood_auroc": "[TBD]",
+  "ood_aupr": "[TBD]",
+  "ood_fpr_at_95_tpr": "[TBD]",
+  "leakage_control": "Model trained on MNIST training embeddings. MNIST validation used for evaluation only. No final test or OOD datasets accessed."
+}

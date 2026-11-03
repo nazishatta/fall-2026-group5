@@ -1,0 +1,5 @@
+outs:
+- md5: 6d6fcc22c2e20fe3ea08f3dd26f3fdad
+  size: 208384
+  hash: md5
+  path: energy_svhn_test_scores.npy

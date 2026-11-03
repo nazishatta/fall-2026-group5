@@ -1,0 +1,14 @@
+{
+  "analysis": "qe_u_matrix_validation_comparison",
+  "dataset": "MNIST",
+  "split": "validation",
+  "validation_samples": 10500,
+  "som_neurons": 225,
+  "qe_mean": 0.9634832918297878,
+  "u_matrix_mean": 0.7809652917712436,
+  "spearman_correlation": 0.4396258885327658,
+  "qe_threshold": 1.5690279077294162,
+  "maximum_qe_reconstruction_difference": 4.860474741713583e-06,
+  "ood_evaluation": "not_performed",
+  "leakage_control": "MNIST validation only; no final test or OOD data accessed. QE threshold calibrated using training data."
+}
