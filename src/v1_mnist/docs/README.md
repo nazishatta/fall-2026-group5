@@ -9,6 +9,7 @@ The documents follow the project proposal (`reports/Project_proposal.md`): one f
 | **1: Model Training Baseline** | 2 | `p1_model_training_baseline/cnn_baseline_training/` | `cnn_baseline.md`: LeNet-5 baseline, training and results |
 | **2: SOM Training & Visualization** | 3 | `p2_som_training_visualization/som_nnsom_training/` | Choosing the SOM grid size: protocol, pre-registered fair test, results ([README](p2_som_training_visualization/som_nnsom_training/README.md)) |
 | | 5 | `p2_som_training_visualization/error_pattern_analysis/` | Error-pattern robustness check: criteria and results; the one error-hotspot rule (`HOTSPOT_RULE.md`) ([README](p2_som_training_visualization/error_pattern_analysis/README.md)) |
+| **3: Novelty Detection** | – | `p3_novelty_detection/` | QE novelty detection, U-Matrix analysis, benchmark evidence, reproducibility, and limitations ([README](p3_novelty_detection/README.md)) |
 | All | – | `DEVIATIONS.md` | Every time a written rule was not followed, or was changed, and what we did about it |
 
 ## Files that are never edited

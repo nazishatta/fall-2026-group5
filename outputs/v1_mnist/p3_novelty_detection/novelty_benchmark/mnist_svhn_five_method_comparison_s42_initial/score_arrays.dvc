@@ -1,0 +1,6 @@
+outs:
+- md5: 66d5d05d6abe3355c94afa207323aedf.dir
+  size: 1670944
+  nfiles: 11
+  hash: md5
+  path: score_arrays

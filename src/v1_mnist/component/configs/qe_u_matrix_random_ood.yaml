@@ -1,0 +1,13 @@
+run_id: mnist_svhn_qe_umatrix_random_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+source_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays
+seed: 42
+bootstrap_iterations: 500
+random_simulations: 500
+expected_id_count: 10500
+expected_ood_count: 26032
+expected_sha256:
+  qe_mnist_val_scores.npy: b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186
+  qe_svhn_test_scores.npy: 88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265
+  u_matrix_mnist_val_scores.npy: f22e0dd1f2456012856709d8b4586b3ef59ae9be58d44638e2e457b4bb1f121f
+  u_matrix_svhn_test_scores.npy: 1a160ff294b7fc40d7b7f4822cb7d04a223a19e6ecf8b53016b9f009623ee8fe

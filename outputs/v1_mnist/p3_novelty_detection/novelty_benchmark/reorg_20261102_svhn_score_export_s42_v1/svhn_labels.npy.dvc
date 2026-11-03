@@ -1,0 +1,5 @@
+outs:
+- md5: f788c4d665ce13dc1055d038fa5c8f19
+  size: 208384
+  hash: md5
+  path: svhn_labels.npy

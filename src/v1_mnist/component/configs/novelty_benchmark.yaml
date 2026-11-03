@@ -1,0 +1,54 @@
+# MNIST Phase 3 classical novelty benchmark
+dataset: mnist
+seed: 42
+
+embeddings:
+  train: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+
+# Existing frozen reference: read-only, never overwrite.
+qe_reference_metrics: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/mnist_svhn_qe_frozen_s42_initial/qe_ood_metrics.json
+
+
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+
+one_class_svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: scale
+  max_training_samples: 10000
+
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
+
+# Historical comparison run; never overwrite its saved results.
+run_id: mnist_svhn_five_method_comparison_s42_initial
+svhn_file: data/ood_svhn/test_32x32.mat
+qe_evaluation_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+
+# Frozen historical input fingerprints and verification criteria.
+expected_sha256:
+  train: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+
+expected:
+  svhn_count: 26032
+  mnist_train_count: 49000
+  mnist_validation_count: 10500
+  som_neurons: 225
+  feature_dim: 84
+  qe_threshold: 1.5690279077294162
+
+tolerances:
+  qe_reconstruction: 0.0001
+  metric_agreement: 0.0000000001

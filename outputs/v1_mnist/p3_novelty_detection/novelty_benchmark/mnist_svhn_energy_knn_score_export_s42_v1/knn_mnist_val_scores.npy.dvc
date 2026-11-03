@@ -1,0 +1,5 @@
+outs:
+- md5: d4ef78b02b6e61771c5cc6d689b04936
+  size: 84128
+  hash: md5
+  path: knn_mnist_val_scores.npy

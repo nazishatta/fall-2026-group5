@@ -2,7 +2,7 @@
 
 > `p3` in the folder name means **Phase 3**.
 
-Flagging out-of-distribution samples with the SOM. Empty for now.
+Flagging out-of-distribution samples with the SOM. Phase 3 novelty detection results include QE, U-Matrix, SVHN benchmark comparisons, random controls, baseline evaluations, uncertainty estimates, and PDF figures. Results are organized into separate immutable run-ID directories. Historical evidence is preserved without overwriting runs.
 
 ```
 p3_novelty_detection/
