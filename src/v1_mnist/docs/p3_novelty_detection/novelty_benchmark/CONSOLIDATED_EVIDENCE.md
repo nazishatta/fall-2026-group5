@@ -16,7 +16,7 @@ The random-score null simulation interval is not a detector's bootstrap confiden
 
 ## Pipeline scope
 
-The separate Phase 3 adapter now enumerates additional experiments. Check every `--stage` and its own `--config` with dry-run tests before claiming end-to-end integration. Shared `pipeline/common.py` and `pipeline/run_all.py` require teammate agreement; a dedicated follow-up PR was previously agreed for those shared files. Do not imply that standalone adapter coverage means shared end-to-end pipeline integration.
+The Phase 3 step runners in `pipeline/p3_novelty_detection/` list every step with its own config in a dry run (checked by `tests/pipeline/test_phase3_runners.py`). Shared `pipeline/common.py` and `pipeline/run_all.py` require teammate agreement; a dedicated follow-up PR was previously agreed for those shared files. Do not imply that the Phase 3 runners mean shared end-to-end pipeline integration.
 
 ## Multi-seed fitting-budget diagnostic
 
@@ -68,3 +68,11 @@ filenames and fresh run IDs. No existing run or result is overwritten.
 The historical benchmark's duplicate hash fields remain an
 explicit compatibility exception, not a claim that every configuration
 has been fully deduplicated.
+
+## Baseline scores that look odd
+
+Isolation Forest (AUROC about 0.28) and the raw autoencoder (about 0.006) score
+below chance on SVHN, and the autoencoder gives very different numbers across
+runs. The facts, what is verified and what is only a hypothesis are in
+`BASELINE_SCORE_ANALYSIS.md`. A controlled follow-up
+(`autoencoder_scaling_diagnostic.yaml`) is configured but not yet run.

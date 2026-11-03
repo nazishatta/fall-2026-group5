@@ -220,3 +220,36 @@ reorganization activity must not replace descriptive experiment names.
 
 No historical outputs, run IDs, or configurations were modified to
 resolve this naming deviation.
+
+### MNIST validation used in place of the official test split
+
+Recorded: 2026-11-03.
+
+The proposal says to score "each test sample". All Phase 3 results so far use the
+10,500 MNIST **validation** images instead, and the official test split has never
+been opened. This is on purpose: Phases 3 and 4 are still being developed, and the
+test split should stay a one-time final check.
+
+- Results are development results, not final ones. SVHN results are post-hoc
+  exploratory, because SVHN was inspected earlier.
+- RQ3 and RQ4 are not called "supported" or "not supported" yet.
+- The `[TBD]` thresholds in `reports/Proposal.md` section 6 (for example the RQ4
+  "within `[TBD]` AUROC" margin) were due 2026-10-06 and are still empty. They
+  will be filled, with a written reason, before the test split is used.
+- The test split will be opened once, at the end, for all research questions
+  together, under a new run ID.
+
+### Three Phase 3 steps are skipped by `run_all.py` by default
+
+Recorded: 2026-11-03.
+
+The steps `qe_ood`, `qe_random_control` and `qe_u_matrix` only re-create results
+that already exist under the original folders (`mnist_svhn_qe_frozen_s42_initial`,
+`qe_random_control_evaluation_initial`, `qe_u_matrix_validation_s42_initial`). Their
+configs use different run IDs from those folders, and the `reorg_...` runs already
+reproduced the originals.
+
+- `run_all.py` skips these three steps unless `--with-reproductions` is given.
+- Later steps still read the original folders, so a from-scratch run is not fully
+  reproducible from the code alone. This is a known limit.
+- No original run ID, config or result was changed.

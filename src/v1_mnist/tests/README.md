@@ -35,6 +35,8 @@ tests/
 ├── test_repository_rules.py                         # whole-repo rules: no figures or large files in git, PDF only,
 │                                                    #   no overwrite options, no seeds in code, no digit-first names
 ├── pipeline/                                        # the runners in component/pipeline
+│   ├── test_phase3_plan.py                          # run_all.py runs Phase 3 in dependency order
+│   ├── test_phase3_runners.py                       # the Phase 3 runners list every step and never overwrite
 │   └── test_run_all.py                              # run_all.py --dry-run lists every step in order
 ├── utils/                                           # shared code in component/utils
 │   ├── test_config_run_names.py                     # old week-numbered run names are refused
