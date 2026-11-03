@@ -30,6 +30,8 @@ for detailed verification evidence and limitations.
 No historical experiment outputs were overwritten.
 The held-out MNIST test split was not accessed by any Phase 3 run.
 
+The newest run folder for each result is listed in the "Start here" table of `outputs/v1_mnist/p3_novelty_detection/README.md`.
+
 ## Components and documentation
 
 | Component | Scientific documentation |

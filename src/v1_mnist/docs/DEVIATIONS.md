@@ -221,6 +221,18 @@ reorganization activity must not replace descriptive experiment names.
 No historical outputs, run IDs, or configurations were modified to
 resolve this naming deviation.
 
+**Cleanup, 2026-11-03.** Two duplicate run folders were deleted. Git history keeps them.
+
+- `mnist_svhn_qe_msp_paired_s42_v1`: every number and input hash is identical to
+  `mnist_svhn_qe_msp_reproduction_s42_v1`, which stays.
+- `reorg_20261102_ood_comparison_qe_s42_v1`: it only repeated QE numbers already saved
+  in `mnist_svhn_qe_frozen_s42_initial`. Nothing referred to it.
+
+The five `reorg_20261101_` runs and the five configs that wrote them are kept. They are
+the first re-run of each step from its new folder. The `reorg_20261102_..._v2` runs are
+the second re-run. Keeping both shows that no run was overwritten, as the PR #17 review
+asked.
+
 ### MNIST validation used in place of the held-out test split
 
 Recorded: 2026-11-03.

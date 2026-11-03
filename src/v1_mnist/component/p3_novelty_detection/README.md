@@ -1,9 +1,11 @@
 # Phase 3: Novelty Detection
 
+The newest run folder for each result is listed in the "Start here" table of `outputs/v1_mnist/p3_novelty_detection/README.md`.
+
 Evaluates unfamiliar images using frozen MNIST CNN/SOM representations,
 quantization error (QE), U-Matrix scores, and OOD baselines. MNIST
-validation and SVHN are used for evaluation; the official MNIST
-final-test split is excluded.
+validation and SVHN are used for evaluation; the held-out MNIST
+test split is excluded.
 
 ```text
 p3_novelty_detection/
