@@ -6,14 +6,51 @@ and integration with the shared project pipeline.
 
 ## Test organization
 
-tests/p3_novelty_detection/
-    qe_novelty_detection/
-    u_matrix_analysis/
-    novelty_benchmark/
-        test_novelty_pipeline.py
+```text
+p3_novelty_detection/
+├── qe_novelty_detection/
+│   ├── test_novelty_figures.py
+│   ├── test_ood_metrics.py
+│   ├── test_ood_runner.py
+│   ├── test_qe_random_control.py
+│   ├── test_quantization_novelty.py
+│   └── test_shared_config.py
+├── u_matrix_analysis/
+│   ├── test_figure_runners.py
+│   ├── test_proposal_gap_analysis.py
+│   ├── test_qe_u_matrix.py
+│   └── test_u_matrix_novelty.py
+└── novelty_benchmark/
+    ├── test_autoencoder_baseline.py
+    ├── test_checkpoint_availability.py
+    ├── test_classical_baselines.py
+    ├── test_cli.py
+    ├── test_consolidation.py
+    ├── test_fair_budget_baselines.py
+    ├── test_historical_baseline_verification.py
+    ├── test_historical_svhn_inspection.py
+    ├── test_knn_baseline.py
+    ├── test_novelty_pipeline.py
+    ├── test_ood_comparison.py
+    ├── test_ood_comparison_cli.py
+    ├── test_paired_bootstrap.py
+    ├── test_provenance_validation.py
+    ├── test_qe_energy_knn_paired.py
+    ├── test_qe_umatrix_random_ood.py
+    ├── test_required_baselines.py
+    ├── test_stage_dispatch.py
+    ├── test_standardized_autoencoder_diagnostic.py
+    ├── test_svhn_canonical_location.py
+    ├── test_svhn_inverted_norm_diagnostic.py
+    ├── test_svhn_knn_config.py
+    └── test_unified_novelty_benchmark.py
+```
 
 Shared provenance tests are maintained separately under
-tests/utils/test_shared_provenance.py.
+`tests/utils/test_shared_provenance.py`.
+
+The original Phase 1/2 pipeline tests remain under
+`tests/pipeline/`.
 
 ## Test responsibilities
 

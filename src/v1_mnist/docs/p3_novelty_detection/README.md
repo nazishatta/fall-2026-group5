@@ -23,7 +23,7 @@ established. Current configurations reproduce the principal
 numerical findings but are not claimed to be the original
 executing configurations.
 
-See the [historical provenance audit](../../component/p3_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
+See the [historical provenance audit](HISTORICAL_PROVENANCE_AUDIT.md)
 for detailed verification evidence and limitations.
 
 No historical experiment outputs were overwritten.
@@ -50,9 +50,10 @@ The implementation is organized under
 - `novelty_benchmark/` — OOD scoring, baseline comparisons,
   metrics, and the standalone Phase 3 launcher.
 
-The [component README](../../component/p3_novelty_detection/README.md)
-contains the 22-configuration-to-result directory inventory and
-identifies unmatched historical run IDs.
+The authoritative 22-configuration inventory is maintained
+in the [configuration-to-result table](#configuration-to-result-traceability)
+below. The [component README](../../component/p3_novelty_detection/README.md)
+summarizes the Phase 3 implementation and runners.
 
 Configuration files are in `src/v1_mnist/component/configs/`.
 
@@ -90,9 +91,10 @@ historical configuration revision produced its contents.
 | `u_matrix_grid_figure.yaml` | `mnist_umatrix_hex_grid_s42_v1` | `u_matrix_analysis` | Configured directory exists |
 | `unified_novelty_benchmark.yaml` | `mnist_svhn_unified_nine_methods_s42_46_v1` | `novelty_benchmark` | Configured directory exists |
 
-For the historical run-ID mismatches and their provenance
-limitations, see the component README:
-`src/v1_mnist/component/p3_novelty_detection/README.md`.
+The historical run-ID mismatches are identified in the
+[configuration-to-result table](#configuration-to-result-traceability).
+For unresolved provenance limitations, see the
+[historical provenance audit](HISTORICAL_PROVENANCE_AUDIT.md).
 
 
 ## Execution and verification
@@ -101,10 +103,10 @@ The standalone launcher is:
 
 `src/v1_mnist/component/p3_novelty_detection/novelty_benchmark/run_phase3_stage.py`
 
-It supports `--stage`, `--config`, and `--dry-run`. The shared
-`pipeline/run_all.py` also supports opt-in Phase 3 execution through
-`--phase3-stage` and `--phase3-config`. The `ood_comparison` stage
-continues to use the standalone launcher.
+It supports `--stage`, `--config`, and `--dry-run`. The shared `pipeline/run_all.py` remains unchanged from
+`develop` and handles the original Phase 1/2 workflow.
+Phase 3 executes independently through `run_phase3_stage.py`,
+including the `ood_comparison` stage.
 
 The standalone Phase 3 launcher and pipeline compatibility tests are located in
 `src/v1_mnist/tests/pipeline/test_phase3_pipeline.py`.
@@ -154,28 +156,9 @@ hashes must remain unchanged.
 
 ### Historical configuration-to-result mapping
 
-| Configuration | Configured historical run ID | Actual historical result folder | Step | Status |
-|---|---|---|---|---|
-| autoencoder_standardized_diagnostic.yaml | mnist_svhn_ae_train_standardized_s42_v1 | mnist_svhn_ae_train_standardized_s42_v1 | novelty_benchmark | Directory verified |
-| fair_budget_baselines.yaml | mnist_svhn_fair_budget_baselines_s42_46_v1 | mnist_svhn_fair_budget_baselines_s42_46_v1 | novelty_benchmark | Directory verified |
-| historical_baseline_verification.yaml | mnist_historical_baseline_verification_s42_v1 | mnist_historical_baseline_verification_s42_v1 | novelty_benchmark | Directory verified |
-| missed_svhn_figure.yaml | mnist_svhn_missed_qe_figure_s42_v1 | mnist_svhn_missed_qe_figure_s42_v1 | novelty_benchmark | Directory verified |
-| novelty_benchmark.yaml | mnist_svhn_five_method_comparison_s42_initial | mnist_svhn_five_method_comparison_s42_initial | novelty_benchmark | Directory verified |
-| phase3_proposal_gap_analysis.yaml | mnist_svhn_proposal_gap_analysis_s42_v1 | mnist_svhn_proposal_gap_analysis_s42_v1 | u_matrix_analysis | Directory verified |
-| qe_energy_knn_paired.yaml | mnist_svhn_qe_energy_knn_paired_s42_v1 | mnist_svhn_qe_energy_knn_paired_s42_v1 | novelty_benchmark | Directory verified |
-| qe_novelty.yaml | qe_training_calibrated_initial | qe_training_calibrated_initial | qe_novelty_detection | Directory verified |
-| qe_ood_evaluation.yaml | mnist_svhn_qe_dev_initial | mnist_svhn_qe_frozen_s42_initial | qe_novelty_detection | Historical ID mismatch |
-| qe_random_control.yaml | qe_random_control_reproduction_initial | qe_random_control_evaluation_initial | qe_novelty_detection | Historical ID mismatch |
-| qe_u_matrix_random_ood.yaml | mnist_svhn_qe_umatrix_random_s42_v1 | mnist_svhn_qe_umatrix_random_s42_v1 | novelty_benchmark | Directory verified |
-| qe_u_matrix_reproduction.yaml | qe_u_matrix_validation_reproduction_initial | qe_u_matrix_validation_s42_initial | u_matrix_analysis | Historical ID mismatch |
-| qe_umatrix_validation_figure.yaml | mnist_qe_umatrix_validation_figure_s42_v1 | mnist_qe_umatrix_validation_figure_s42_v1 | u_matrix_analysis | Directory verified |
-| required_ood_baselines.yaml | mnist_svhn_required_baselines_reproduction_initial | mnist_svhn_required_baselines_reproduction_initial | novelty_benchmark | Directory verified |
-| svhn_inverted_norm_diagnostic.yaml | svhn_inverted_embedding_norm_s42_v1 | svhn_inverted_embedding_norm_s42_v1 | novelty_benchmark | Directory verified |
-| svhn_knn_baselines.yaml | mnist_svhn_required_baselines_knn_s42_v1 | mnist_svhn_required_baselines_knn_s42_v1 | novelty_benchmark | Directory verified |
-| svhn_paired_comparison.yaml | mnist_svhn_qe_msp_reproduction_s42_v1 | mnist_svhn_qe_msp_reproduction_s42_v1 | novelty_benchmark | Directory verified |
-| svhn_score_export.yaml | mnist_svhn_energy_knn_score_export_s42_v1 | mnist_svhn_energy_knn_score_export_s42_v1 | novelty_benchmark | Directory verified |
-| u_matrix_grid_figure.yaml | mnist_umatrix_hex_grid_s42_v1 | mnist_umatrix_hex_grid_s42_v1 | u_matrix_analysis | Directory verified |
-| unified_novelty_benchmark.yaml | mnist_svhn_unified_nine_methods_s42_46_v1 | mnist_svhn_unified_nine_methods_s42_46_v1 | novelty_benchmark | Directory verified |
+See the [authoritative configuration-to-result table](#configuration-to-result-traceability)
+above. It records all 22 historical configurations, their run IDs,
+step folders, and identified historical mismatches.
 
 ### Support configurations
 
@@ -199,42 +182,67 @@ inspection.
 
 These directories are retained unchanged.
 
-### Reorganization rerun tracking
+## SVHN dataset setup
 
-The following registry was generated from the reorganization
-YAML configurations and verified local result directories.
+The current OOD evaluation uses the SVHN test split at `data/ood_svhn/test_32x32.mat`.
 
-All 20 configured runs have matching output directories
-and at least one recorded evidence artifact.
+Official Stanford download URL:
 
-| Configuration | New run ID | Step | Result directory | Evidence |
-|---|---|---|---|---|
-| `phase3_proposal_gap_analysis.yaml` | `reorg_20261101_gap_analysis_s42_v1` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261101_gap_analysis_s42_v1` | `analysis.json` |
-| `qe_novelty.yaml` | `reorg_20261101_qe_novelty_s42_v1` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261101_qe_novelty_s42_v1` | `qe_summary.json` |
-| `qe_ood_evaluation.yaml` | `reorg_20261101_qe_ood_s42_v1` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261101_qe_ood_s42_v1` | `qe_ood_metrics.json` |
-| `qe_random_control.yaml` | `reorg_20261101_random_control_s42_v1` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261101_random_control_s42_v1` | `qe_random_control_metrics.json` |
-| `qe_u_matrix_reproduction.yaml` | `reorg_20261101_u_matrix_s42_v1` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261101_u_matrix_s42_v1` | `qe_u_matrix_metrics.json` |
-| `reorg_20261102/autoencoder_standardized_diagnostic.yaml` | `reorg_20261102_autoencoder_standardized_diagnostic_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_autoencoder_standardized_diagnostic_s42_v1` | `standardized_autoencoder_metrics.json` |
-| `reorg_20261102/fair_budget_baselines.yaml` | `reorg_20261102_fair_budget_baselines_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_fair_budget_baselines_s42_v1` | `fair_budget_metrics.json` |
-| `reorg_20261102/gap_analysis_rerun.yaml` | `reorg_20261102_gap_analysis_s42_v2` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261102_gap_analysis_s42_v2` | `analysis.json` |
-| `reorg_20261102/historical_baseline_verification.yaml` | `reorg_20261102_historical_baseline_verification_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_historical_baseline_verification_s42_v1` | `verification_metrics.json` |
-| `reorg_20261102/missed_svhn_figure.yaml` | `reorg_20261102_missed_svhn_figure_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_missed_svhn_figure_s42_v1` | `figure_metrics.json` |
-| `reorg_20261102/qe_energy_knn_paired.yaml` | `reorg_20261102_qe_energy_knn_paired_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_qe_energy_knn_paired_s42_v1` | `paired_comparison_metrics.json` |
-| `reorg_20261102/qe_novelty_rerun.yaml` | `reorg_20261102_qe_novelty_s42_v2` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261102_qe_novelty_s42_v2` | `qe_summary.json` |
-| `reorg_20261102/qe_ood_rerun.yaml` | `reorg_20261102_qe_ood_s42_v2` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261102_qe_ood_s42_v2` | `qe_ood_metrics.json` |
-| `reorg_20261102/qe_u_matrix_random_ood.yaml` | `reorg_20261102_qe_u_matrix_random_ood_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_qe_u_matrix_random_ood_s42_v1` | `qe_umatrix_random_metrics.json` |
-| `reorg_20261102/qe_umatrix_validation_figure.yaml` | `reorg_20261102_qe_umatrix_validation_figure_s42_v1` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261102_qe_umatrix_validation_figure_s42_v1` | `figure_metrics.json` |
-| `reorg_20261102/random_control_rerun.yaml` | `reorg_20261102_random_control_s42_v2` | `qe_novelty_detection` | `qe_novelty_detection/reorg_20261102_random_control_s42_v2` | `qe_random_control_metrics.json` |
-| `reorg_20261102/required_ood_baselines.yaml` | `reorg_20261102_required_ood_baselines_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_required_ood_baselines_s42_v1` | `required_baseline_metrics.json` |
-| `reorg_20261102/svhn_score_export.yaml` | `reorg_20261102_svhn_score_export_s42_v1` | `novelty_benchmark` | `novelty_benchmark/reorg_20261102_svhn_score_export_s42_v1` | `autoencoder_mnist_val_scores.npy.dvc`, `autoencoder_svhn_test_scores.npy.dvc`, `comparison_metrics.json`, `isolation_forest_mnist_val_scores.npy.dvc`, `isolation_forest_svhn_test_scores.npy.dvc`, `one_class_svm_mnist_val_scores.npy.dvc`, `one_class_svm_svhn_test_scores.npy.dvc`, `qe_mnist_val_scores.npy.dvc`, `qe_svhn_test_scores.npy.dvc`, `svhn_labels.npy.dvc`, `u_matrix_mnist_val_scores.npy.dvc`, `u_matrix_svhn_test_scores.npy.dvc` |
-| `reorg_20261102/u_matrix_grid_figure.yaml` | `reorg_20261102_u_matrix_grid_figure_s42_v1` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261102_u_matrix_grid_figure_s42_v1` | `figure_metrics.json` |
-| `reorg_20261102/u_matrix_rerun.yaml` | `reorg_20261102_u_matrix_s42_v2` | `u_matrix_analysis` | `u_matrix_analysis/reorg_20261102_u_matrix_s42_v2` | `qe_u_matrix_metrics.json` |
+https://ufldl.stanford.edu/housenumbers/test_32x32.mat
 
-These checks establish configuration-to-directory and artifact
-existence, not independent scientific reproduction of every result.
+For a fresh checkout, run the following commands from the repository root only if the dataset is missing:
 
-Historical configurations, historical run IDs, and historical
-evidence remain unchanged. New runs are kept separately under
-their unique reorganization IDs.
+    mkdir -p data/ood_svhn
+    curl -fL --retry 3 https://ufldl.stanford.edu/housenumbers/test_32x32.mat -o data/ood_svhn/test_32x32.mat
+    sha256sum data/ood_svhn/test_32x32.mat
 
-The official MNIST final-test set remains excluded.
+Expected SHA-256:
+
+`cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b`
+
+Verify with `sha256sum data/ood_svhn/test_32x32.mat` before running benchmarks.
+Do not overwrite an existing dataset. The EC2 workspace currently uses a verified symlink to the SVHN file.
+
+Phase 3-only pytest verification on EC2 at commit `1d30862` (2026-10-26): **135 passed**. Ruff checks also passed. This count applies only to `src/v1_mnist/tests/p3_novelty_detection` and must not be confused with historical full-repository test counts.
+
+### Historical test-count reconciliation — 2026-11-02
+
+Historical test totals refer to different execution scopes,
+commits, and environments; they are retained as recorded.
+
+| Tests passed | Recorded context |
+|---|---|
+| 73 | Earlier local Phase 3 subset; two PyTorch-dependent test files excluded |
+| 168 | Earlier EC2 full repository verification; two warnings |
+| 172 | Historical EC2 full repository verification before scope cleanup |
+| 134 | Phase 3-only execution recorded for 2026-10-20 |
+| 135 | Phase 3-only execution at commit `1d30862`, 2026-10-26 |
+| 148 | Phase 3 PR re-review verification recorded in Issue #24 |
+| 246 | Full suite from the earlier PR re-review; two warnings |
+| 252 | Full suite recorded in scientific README on 2026-11-02; two warnings |
+| 260 | Full suite recorded on EC2 on 2026-11-01; two warnings |
+
+These records are historical snapshots, not conflicting
+results of one identical test execution.
+
+Some historical records lack exact environment manifests,
+full commit IDs or command logs. Missing metadata are not
+inferred or reconstructed.
+
+A new current-checkout verification must report its own
+command, Git revision, environment and actual pytest result.
+
+## Historical benchmark provenance clarification
+
+The consolidated nine-method CSV contains results from two source runs,
+not a newly fitted single execution. It preserves each method's
+source_run_id. QE and U-Matrix were evaluated together in the original
+five-method benchmark; max-softmax, energy, Mahalanobis and kNN were
+evaluated in the subsequent frozen-CNN baseline run.
+
+The equal-fitting-budget diagnostic uses five explicit seeds, stored
+under `seed_list` in its original configuration. That original
+configuration is retained because its SHA-256 is recorded in the
+committed experiment metrics. This is a naming compatibility exception
+to the requested `seeds` key, not evidence that the experiment was
+executed without a seed list.

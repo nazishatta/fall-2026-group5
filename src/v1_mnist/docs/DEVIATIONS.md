@@ -61,7 +61,7 @@ validation BMU assignment file is unavailable locally. Phase 2
 source files, results, and DVC artifacts were not modified.
 
 Decision: preserve historical configs and outputs unchanged.
-Document the differences in the Phase 3 component README.
+Document the differences in the [Phase 3 configuration registry](p3_novelty_detection/README.md#configuration-to-result-traceability).
 Do not rename historical runs, claim missing results, or overwrite
 existing experiments. New executions require new run IDs.
 
@@ -173,67 +173,50 @@ must remain unused until the protocol and success criteria are frozen.
 
 ### Phase 3 configuration-to-result traceability
 
-Recorded: 2026-11-01.
+Recorded: 2026-11-01; updated 2026-11-02.
 
-The Phase 3 documentation now provides a configuration-to-result
-inventory mapping the identified YAML configurations to their
-configured run IDs, step folders, and observed historical results.
-
-Three historical run-ID mismatches remain:
-
-- QE OOD: configured `mnist_svhn_qe_dev_initial`;
-  historical directory `mnist_svhn_qe_frozen_s42_initial`.
-- QE random control: configured
-  `qe_random_control_reproduction_initial`;
-  historical directory `qe_random_control_evaluation_initial`.
-- QE/U-Matrix reproduction: configured
-  `qe_u_matrix_validation_reproduction_initial`;
-  historical directory `qe_u_matrix_validation_s42_initial`.
-
-The proposal-gap analysis was subsequently generated under
+The initial audit identified three historical configuration-to-result
+run-ID mismatches. Their exact generating YAML revisions remain
+unverified. The proposal-gap result, initially unavailable during
+the earlier inspection, was subsequently generated under
 `u_matrix_analysis/mnist_svhn_proposal_gap_analysis_s42_v1/`.
-Its analysis JSON is staged for Git tracking. Its PDF is
-DVC-tracked and its remote object has been verified.
 
-Decision: preserve all historical configurations, run IDs,
-output paths, hashes, and experiment results. Do not claim
-that a current configuration produced a historical result
-unless its provenance is independently established.
+Its analysis JSON was prepared for Git tracking, and its PDF was
+DVC-tracked and verified in the remote storage.
 
+The authoritative configuration-to-result mapping is maintained in
+[Phase 3 documentation](p3_novelty_detection/README.md#configuration-to-result-traceability).
 
 
-<!-- PHASE3_RUN_REGISTRY_DEVIATIONS -->
+Decision: preserve historical configurations, output paths, run IDs,
+SHA-256 hashes, and scientific results. Directory existence alone
+does not establish the original generating configuration. Future
+executions require new descriptive run IDs and provenance checks.
 
-## Phase 3 configuration-to-run traceability
+## Phase 3 historical reorganization run naming
 
-An audit of the Phase 3 YAML configurations and existing output
-directories identified three historical configuration-to-folder
-mismatches.
+Recorded: 2026-11-02.
 
-1. `qe_ood_evaluation.yaml` specifies
-   `mnist_svhn_qe_dev_initial`, whereas the historical folder identified
-   is `mnist_svhn_qe_frozen_s42_initial`.
+During Phase 3 directory restructuring and runner-path verification,
+new experiment executions were assigned unique run identifiers beginning
+with `reorg_20261101_` or `reorg_20261102_`. The names indicate the
+execution occasion rather than primarily identifying the scientific
+experiment. The configuration directory
+`configs/phase3_reorganization/reorg_20261102/` follows the same
+convention.
 
-2. `qe_random_control.yaml` specifies
-   `qe_random_control_reproduction_initial`, whereas the historical
-   folder identified is `qe_random_control_evaluation_initial`.
+This naming choice does not follow the project's requirement that
+runs and configurations be named by their scientific purpose.
 
-3. `qe_u_matrix_reproduction.yaml` specifies
-   `qe_u_matrix_validation_reproduction_initial`, whereas the historical
-   folder identified is `qe_u_matrix_validation_s42_initial`.
+The existing run directories and their configurations are preserved
+because run identifiers, recorded paths, output files, and hashes form
+part of the experiment provenance. Renaming historical results could
+break traceability and reproducibility.
 
-The proposal gap-analysis configuration,
-`phase3_proposal_gap_analysis.yaml`, now has an identified output
-directory under `u_matrix_analysis`:
-`mnist_svhn_proposal_gap_analysis_s42_v1`.
+Going forward, new run IDs and configuration paths must describe the
+experiment or analysis, include appropriate seed/version identifiers,
+and pass the existing run-ID and SHA-256 preflight checks. Dates or
+reorganization activity must not replace descriptive experiment names.
 
-These discrepancies are documented rather than silently corrected.
-Historical configurations and output paths are immutable for this
-reorganization. Their hashes and scientific provenance must be preserved.
-
-A configuration-to-result registry has been added to the Phase 3 README.
-It distinguishes configured historical IDs, identified historical
-result folders, support configurations, and future reorganization reruns.
-
-New reruns must receive unique IDs after preflight checks. Their results
-must be recorded separately and must not replace historical evidence.
+No historical outputs, run IDs, or configurations were modified to
+resolve this naming deviation.
