@@ -1,0 +1,130 @@
+\documentclass[11pt]{article}
+\input{File_Setup.tex}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcommand{\tbd}{\textbf{[TBD]}}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+
+\begin{titlepage}
+\centering
+\thispagestyle{empty}
+\vspace*{0.15in}
+\includegraphics[width=0.5\textwidth]{gwu_logo.pdf}
+\vspace{0.28in}
+
+{\large\bfseries Data Science Program\par}
+{\large\bfseries Department of Data Science\par}
+{\large DATS 6501 - Capstone Project - Fall 2026\par}
+\vspace{0.38in}
+{\Large\bfseries Post-Training Analysis \& Novelty Detection Using\par}
+\vspace{0.08in}
+{\Large\bfseries Neural Network Self-Organizing Maps (NNSOM)\par}
+\vspace{0.34in}
+{\large\bfseries PHASE 4 REPORT\par}
+\vspace{0.22in}
+{\large\bfseries Guided Retraining\par}
+\vspace{0.36in}
+{\large\bfseries Capstone - Group 5\par}
+\vspace{0.08in}
+{\large\bfseries Fyrooz Khan\par}
+{\large\bfseries Nazish Atta\par}
+\vspace{0.30in}
+{\large The George Washington University\par}
+{\large Washington, DC\par}
+\vspace{0.30in}
+{\large\itshape Supervised by\par}
+{\large\itshape Dr. Amir Jafari\par}
+{\large\itshape Associate Professor of Data Science\par}
+\vspace*{\fill}
+\end{titlepage}
+
+\section{Summary}
+
+Phase 4 asks whether the SOM can guide retraining of the CNN. We retrained LeNet-5 on MNIST in two ways, using the 15$\times$15 SOM from Phase 2 to pick the hard training images: \textbf{curriculum learning} (hard images are let in gradually) and \textbf{targeted augmentation} (altered copies of the hard images are added). Each way was compared with controls that use the same number of images, over 5 seeds, and judged once on the test split.
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt]
+  \item \textbf{Targeted augmentation works on the SOM hotspots.} Hotspot error fell from 11.4\% to 7.8\% (3.6 points fewer errors), the rest of the test set was not harmed, and SOM-chosen images did better than the same number of random images.
+  \item \textbf{Curriculum learning did not help.} Both SOM-guided and confidence-guided curricula ended with a worse model than standard training (test accuracy 98.66\% and 98.69\% against 99.11\%).
+  \item \textbf{The SOM is not better than a simple confidence rule at choosing images.} Choosing the lowest-confidence images (max-softmax) gave about the same result as the SOM pool. What the SOM adds is the map of where the errors are.
+  \item \textbf{Still open:} the new SOM trained on the retrained model and the novelty AUROC after retraining are \tbd{} (Section~\ref{sec:open}).
+\end{itemize}
+
+\section{Method}
+
+The loop is: SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ re-analysis. The retraining algorithm is fixed in advance and is the same for every arm.
+
+\begin{enumerate}[leftmargin=1.6em, itemsep=1pt]
+  \item \textbf{Select hard images (training images only, true labels).} A training image is in the \emph{SOM pool} if its neuron is one of the 11 error hotspots, or its neuron's purity is below 0.95, or its distance to its neuron is above the 95th percentile. This gives 4{,}217 of 49{,}000 images (8.6\%). A smaller \emph{hotspot pool} (685 images) uses the first rule only.
+  \item \textbf{Build controls of the same size.} \emph{random}: random images with the same digit mix, redrawn for each seed. \emph{msp}: the images with the lowest max-softmax confidence. \emph{standard}: nothing added.
+  \item \textbf{Retrain from scratch, once per arm.} LeNet-5 \parencite{lecun1998gradient} with the Phase 1 recipe (Adam \parencite{kingma2015adam}, 20 epochs), seeds 1 to 5, the same seeds for all arms.
+  \begin{itemize}[leftmargin=1.2em, itemsep=0pt]
+    \item \emph{Curriculum:} all easy images plus 10\% of the hard pool, with 10\% more every 5 epochs (easiest first), so the last epochs use 40\% of the pool.
+    \item \emph{Augmentation:} all original images plus 3 altered copies of every pool image (rotation up to 10$^\circ$, shift up to 1 pixel, zoom 0.9 to 1.1, shear up to 8$^\circ$). Two \emph{paced} arms add the same copies gradually, as in the curriculum.
+  \end{itemize}
+  \item \textbf{Evaluate once on the test split (10{,}500 images).} CF1 is the confusion matrix of the \texttt{standard} arm, CF2 that of a retrained arm. Differences between arms are paired bootstrap intervals over the test images (2{,}000 resamples), computed on the mean of the 5 seeds.
+\end{enumerate}
+
+\textbf{Success criteria} (written down before the test split was used): C1, curriculum\_som has lower overall error than standard; C2, curriculum\_som has lower hotspot error than curriculum\_random; A1, augmented\_som has lower hotspot error than augmented\_random; A2, augmented\_som has lower hotspot error than standard; A3, augmented\_som does not raise the error outside the hotspots by more than 0.2 points. C1, C2, A1 and A2 also need an interval that excludes 0 and a macro-F1 that does not fall by more than 0.0016.
+
+\section{Results}
+
+Table~\ref{tab:arms} gives baseline and post-retraining accuracy; Table~\ref{tab:criteria} gives the verdicts. Figures~\ref{fig:cf_aug} and~\ref{fig:cf_cur} show CF1 and CF2, and Figure~\ref{fig:curves} the learning curves.
+
+\input{tables/arm_results.tex}
+
+\input{tables/criteria_results.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{cf_augmented_som.pdf}
+\caption{CF1 (standard) and CF2 (augmented\_som): mean test confusion matrices over 5 seeds, and their difference (blue: fewer cases, red: more).}
+\label{fig:cf_aug}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{cf_curriculum_som.pdf}
+\caption{CF1 (standard) and CF2 (curriculum\_som), as in Figure~\ref{fig:cf_aug}.}
+\label{fig:cf_cur}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{val_curve_curriculum.pdf}
+\includegraphics[width=\textwidth]{val_curve_augmentation.pdf}
+\caption{Validation accuracy per epoch (mean of 5 seeds) for the curriculum arms (top) and the augmentation arms (bottom): all images, hotspot images, and images outside the hotspots.}
+\label{fig:curves}
+\end{figure}
+
+\section{What the results mean}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+  \item \textbf{SOM-guided augmentation helps where the SOM says the errors are.} Hotspot error dropped by 3.6 points against standard training (A2) and by 2.5 points against the same number of random images (A1), while the error elsewhere did not rise (A3). Overall accuracy went from 99.11\% to 99.21\%, a small gain that the paired interval still excludes from zero.
+  \item \textbf{The gain is not specific to the SOM.} Adding copies of the lowest-confidence images gave the same hotspot result (R1: the difference is $-0.7$ points, with an interval that includes 0). The SOM does not select better images than max-softmax here; its value is that it shows \emph{which regions} are weak. The hotspot-only pool did not beat its random control either (R3).
+  \item \textbf{Gradual pacing hurt.} Letting the copies in gradually made the hotspot result worse than adding them all at once (R2, $+3.4$ points).
+  \item \textbf{Curriculum learning lost to standard training (C1, C2 not met).} Both curricula that used a hard pool ended below standard training, and the learning curves (Figure~\ref{fig:curves}) show they stayed behind from the first epochs. A plausible reason, which we did not test, is that the proposed schedule only ever uses 40\% of the hard pool, so these models see fewer of the hard images; the random pool loses little because it mostly holds easy images. We report this result as measured.
+  \item \textbf{No sign of forgetting.} In every arm, the largest one-epoch fall in validation accuracy (mean over seeds) was about 0.6 points or less (curriculum\_msp was the largest), and for augmented\_som the error outside the hotspots stayed at the standard level (A3).
+\end{itemize}
+
+\textbf{Limits.} Only 146 test images fall on hotspot neurons, so one image is about 0.7 points and the hotspot intervals are wide. The hotspots are defined by the SOM, so SOM-based arms have a built-in advantage on hotspot error. The pools come from one SOM, so they do not vary across seeds, and 5 seeds give limited power to separate small differences \parencite{bouthillier2021variance}. Everything is on MNIST.
+
+\section{Deviation from the plan}
+
+The first set of augmentation ranges (shift up to 2 pixels) failed the check made before any arm was trained: the Phase 1 CNN's validation accuracy fell from 99.12\% on the original images to 95.83\% on the altered ones, a drop of 3.3 points against a limit of 2. The shift was lowered to 1 pixel (revision r2), which gave 98.21\% and passed. The failed check is kept; all augmentation results above use r2. No criterion, threshold or test comparison was changed after the test split was used.
+
+\section{Leakage Control}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt]
+  \item Pools, augmented copies and training use training images only. The augmentation check and the macro-F1 guard use validation images only.
+  \item The 11 hotspots were chosen from validation errors; this is declared, and it is why the final judgement is made on the test split.
+  \item Criteria, thresholds and the guard value were written down and stamped (SHA-256 of the protocol and the configuration) before the test split was opened. It was opened once and not re-run.
+  \item All arms use the same data, seeds and training recipe. Finished runs are never overwritten; the changed augmentation run got a new run ID.
+\end{itemize}
+
+\section{Still open}\label{sec:open}
+
+The last step of the loop is not yet measured: re-extracting embeddings from the retrained models, training new SOMs, and comparing them with the Phase 2 SOM (purity, hotspot error rate and share, topographic error \parencite{forest2020somsurvey}, and CKA \parencite{kornblith2019cka}). The same holds for the novelty AUROC after retraining. Both are \tbd{} and will be added once the run is finished. The arms for the re-analysis (standard, augmented\_som, augmented\_random) were chosen after the retraining results were known; this is stated in its protocol.
+
+\printbibliography[title={References}]
+
+\end{document}
