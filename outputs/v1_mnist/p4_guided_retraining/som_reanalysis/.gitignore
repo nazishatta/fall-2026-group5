@@ -1,0 +1,6 @@
+# Large or regenerable outputs are DVC-tracked (dvc add <run folder>/<name>); small tables and metrics stay in git.
+/*/embeddings
+/*/som_models
+/*/assignments
+/*/figures
+/*/logs

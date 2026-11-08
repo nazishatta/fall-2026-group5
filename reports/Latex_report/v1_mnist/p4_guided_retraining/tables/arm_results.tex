@@ -1,0 +1,24 @@
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\small
+\begin{tabular}{|l|C{0.20\textwidth}|C{0.20\textwidth}|C{0.20\textwidth}|}
+\hline
+\textbf{Arm} & \textbf{Test accuracy (\%)} & \textbf{Hotspot error (\%)} & \textbf{Non-hotspot error (\%)} \\ \hline
+\textbf{standard} (baseline, CF1) & 99.11 (0.12) & 11.4 (2.6) & 0.74 (0.10) \\ \hline
+\multicolumn{4}{|l|}{\textit{Curriculum}} \\ \hline
+curriculum\_som & 98.66 (0.04) & 21.4 (2.9) & 1.05 (0.06) \\ \hline
+curriculum\_random & 99.07 (0.05) & 12.2 (2.3) & 0.77 (0.03) \\ \hline
+curriculum\_msp & 98.69 (0.08) & 22.6 (3.3) & 1.01 (0.06) \\ \hline
+\multicolumn{4}{|l|}{\textit{Targeted augmentation}} \\ \hline
+augmented\_som & 99.21 (0.07) & 7.8 (2.6) & 0.69 (0.05) \\ \hline
+augmented\_random & 99.18 (0.05) & 10.3 (2.4) & 0.68 (0.05) \\ \hline
+augmented\_msp & 99.25 (0.06) & 8.5 (1.2) & 0.64 (0.06) \\ \hline
+augmented\_hotspot & 99.14 (0.08) & 9.5 (2.9) & 0.74 (0.05) \\ \hline
+augmented\_random\_hotspot & 99.12 (0.09) & 11.6 (2.9) & 0.73 (0.06) \\ \hline
+augmented\_som\_paced & 99.12 (0.09) & 11.2 (3.6) & 0.73 (0.06) \\ \hline
+augmented\_random\_paced & 99.11 (0.04) & 11.5 (2.1) & 0.74 (0.06) \\ \hline
+\end{tabular}
+\caption{Test results, mean (standard deviation) over 5 seeds. Hotspot error is measured on the 146 test images that fall on hotspot neurons, non-hotspot error on the other 10,354. Both experiments use the same \texttt{standard} arm.}
+\label{tab:arms}
+\end{table}

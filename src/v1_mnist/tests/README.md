@@ -18,12 +18,12 @@ Weeks 12–14 (results, paper, code release) have no folder because they produce
 | 4 | `cluster_analysis/` | Week 4: Cluster Analysis | BMU reconstruction, neuron entropy, staggered-grid coordinates, cluster purity, class–neuron intersection, heatmap saved as one PDF (no SVG) |
 | 5 | `error_pattern_analysis/` | Week 5: Error Pattern Analysis | Wilson lower bound for neuron error rates |
 | **Phase 3: Novelty Detection** | `p3_novelty_detection/` | | |
-| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | *(empty, to be added)* |
+| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | Measures, CKA, paired comparison, a tiny stored SOM, analysis and figures |
 | 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | *(empty, to be added)* |
 | 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | *(empty, to be added)* |
 | **Phase 4: Guided Retraining** | `p4_guided_retraining/` | | |
-| 9 | `hard_example_mining/` | Week 9: Hard Example Mining | *(empty, to be added)* |
-| 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | *(empty, to be added)* |
+| 9 | `hard_example_mining/` | Week 9: Hard Example Mining | The three difficulty rules, the msp and random pools (equal size, same digit mix), the run-ID preflight, and the pool rules staying as fixed in `retraining.yaml` |
+| 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | Altered copies keep shape, range and labels and are seeded; every augmented arm adds the same number of images with the SOM pool's digit mix |
 | 11 | `som_reanalysis/` | Week 11: Iterative SOM Re-analysis | *(empty, to be added)* |
 
 ## Files in each folder
@@ -60,6 +60,7 @@ tests/
 │   ├── cluster_analysis/                            # Week 4
 │   │   ├── test_bmu_assignment_and_entropy.py
 │   │   ├── test_cluster_metrics.py
+│   │   ├── test_confusion_overlay.py
 │   │   ├── test_heatmap_figure.py
 │   │   ├── test_purity_label_shuffle.py
 │   │   └── test_qe_model_check.py
@@ -74,9 +75,13 @@ tests/
 │   ├── u_matrix_analysis/                           # Week 7   (empty)
 │   └── novelty_benchmark/                           # Week 8   (empty)
 └── p4_guided_retraining/
-    ├── hard_example_mining/                         # Week 9   (empty)
-    ├── targeted_augmentation/                       # Week 10  (empty)
-    └── som_reanalysis/                              # Week 11  (empty)
+    ├── hard_example_mining/                         # Week 9
+    │   ├── test_difficulty_and_pools.py
+    │   ├── test_build_pools.py
+    │   └── test_curriculum.py
+    ├── targeted_augmentation/                       # Week 10
+    │   └── test_augmentation_arms.py
+    └── som_reanalysis/                              # Week 11
 ```
 
 Each phase folder has its own short `README.md`. Tests for shared code in `component/utils` go in `utils/`; checks that cover the whole repository stay in `test_repository_rules.py` at the top of `tests/`.

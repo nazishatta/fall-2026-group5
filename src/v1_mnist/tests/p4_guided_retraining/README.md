@@ -2,11 +2,11 @@
 
 > `p4` in the folder name means **Phase 4**.
 
-Empty for now.
+`hard_example_mining/` tests the difficulty rules, pools, run-ID preflight, fixed pool settings and the curriculum. `targeted_augmentation/` tests the altered copies and the augmented arms. `som_reanalysis/` tests the map measures, CKA, the paired comparison, a tiny stored SOM and the analysis stage with figures. `synthetic_data.py` is a tiny made-up dataset the tests share. Tests of the code shared by both steps are in `tests/utils/` (`test_retraining_support.py`; `test_cnn_retraining.py` needs PyTorch).
 
 ```
 p4_guided_retraining/
-├── hard_example_mining/           # Week 9: hard-example pool, curriculum schedule
-├── targeted_augmentation/         # Week 10: augmentation only in hotspot neurons
-└── som_reanalysis/                # Week 11: old vs. new SOM comparison
+├── hard_example_mining/           # hard-example pool, curriculum schedule
+├── targeted_augmentation/         # augmentation only in hotspot neurons
+└── som_reanalysis/                # old vs. new SOM comparison
 ```

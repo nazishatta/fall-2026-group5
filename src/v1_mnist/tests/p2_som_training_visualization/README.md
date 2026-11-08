@@ -15,6 +15,7 @@ p2_som_training_visualization/
 ├── cluster_analysis/              # Week 4: BMU assignment, entropy, purity, class–neuron intersection, heatmaps
 │   ├── test_bmu_assignment_and_entropy.py
 │   ├── test_cluster_metrics.py
+│   ├── test_confusion_overlay.py
 │   └── test_heatmap_figure.py
 └── error_pattern_analysis/        # Week 5: Wilson lower bound for neuron error rates
     └── test_error_metrics.py

@@ -1,0 +1,118 @@
+# ==============================================================================
+# Guided retraining (Phase 4)
+# Protocol: src/v1_mnist/docs/p4_guided_retraining/RETRAINING_PROTOCOL.md (draft until stamped).
+#
+# This file holds every number the Phase 4 code needs, so none is hard-coded.
+# Training images and validation images only; the MNIST test split is not read by the
+# hard example mining step.
+# ==============================================================================
+
+run:
+  name: hard_example_pools
+  # Run folder: <name>_<selected SOM run ID>[_<revision>]. Leave the revision empty for the first run.
+  # Set a new one (r2, r3, ...) for every new or changed run: results are never overwritten.
+  revision: ""
+
+inputs:
+  # The SOM (selected model, hotspot rule, embeddings folder) comes from this config.
+  som_config: src/v1_mnist/component/configs/som.yaml
+
+paths:
+  output_root: ./outputs/v1_mnist/p4_guided_retraining/hard_example_mining
+
+# Which training images count as hard (RETRAINING_PROTOCOL.md, section 3).
+pools:
+  # A training image is in the SOM pool if ANY of these is true:
+  #   1. its neuron is one of the validation error hotspots (rule in som.yaml: analysis.hotspot_*);
+  #   2. its neuron's training purity is below purity_cutoff;
+  #   3. its distance to its neuron is above the qe_percentile of the training distances.
+  purity_cutoff: 0.95        # round number, not from a paper, not tuned on results
+  qe_percentile: 95          # the same percentile as the novelty-detection quantization-error flag
+
+# ------------------------------------------------------------------------------
+# Retraining experiments (curriculum comparison, targeted augmentation)
+# ------------------------------------------------------------------------------
+inputs_cnn:
+  # Training recipe (optimizer, learning rate, epochs, batch size) and the MNIST folder come from the
+  # Phase 1 config, so the retrained CNNs use exactly the Phase 1 recipe.
+  cnn_config: src/v1_mnist/component/configs/cnn_baseline.yaml
+
+training:
+  # The same seeds for every arm (fair comparison). 5 seeds as the proposal asks.
+  seeds: [1, 2, 3, 4, 5]
+  device: auto               # "auto", "cuda" or "cpu"
+
+evaluation:
+  bootstrap:
+    resamples: 2000
+    seed: 2026
+  # Macro-F1 guard (RETRAINING_PROTOCOL.md, section 5): the SOM arm's macro-F1 may be lower than
+  # the random arm's by at most this much. Left empty until it is measured on validation data
+  # (2 x the standard arm's seed-to-seed standard deviation); the final test stage refuses to run
+  # while it is empty.
+  macro_f1_guard: 0.0015657542982220032
+  # "No damage elsewhere": the upper end of the 95% interval of (arm minus standard) on the
+  # non-hotspot test error may not exceed this (0.002 = 0.2 percentage points).
+  non_hotspot_damage_tolerance: 0.002
+
+protocol:
+  document: src/v1_mnist/docs/p4_guided_retraining/RETRAINING_PROTOCOL.md
+  stamp: src/v1_mnist/docs/p4_guided_retraining/retraining_protocol_stamp.txt
+
+# Curriculum comparison: train on the easy images first and let the hard pool in gradually.
+curriculum:
+  run:
+    name: curriculum_comparison
+    revision: ""
+  paths:
+    output_root: ./outputs/v1_mnist/p4_guided_retraining/hard_example_mining
+  # Share of the hard pool that is in the training set during an epoch:
+  #   initial_fraction + step_fraction x (epoch // step_epochs), at most 1.
+  # The easy images (everything outside the pool) are always in.
+  schedules:
+    proposal:
+      initial_fraction: 0.10   # start with 10% of the hard images
+      step_fraction: 0.10      # add 10% more ...
+      step_epochs: 5           # ... every 5 epochs
+  # standard = all training images every epoch (no pool). The others use the schedule above and
+  # differ only in which images form the hard pool (same size, same schedule).
+  arms:
+    - {name: standard, kind: standard}
+    - {name: curriculum_som, kind: curriculum, pool: som, schedule: proposal}
+    - {name: curriculum_random, kind: curriculum, pool: random, schedule: proposal}
+    - {name: curriculum_msp, kind: curriculum, pool: msp, schedule: proposal}
+
+# Targeted augmentation: add altered copies of the pool images, retrain, measure the hotspots
+# and the damage elsewhere. All arms add the same number of images.
+augmentation:
+  run:
+    name: augmentation_comparison
+    revision: "r2"             # r1 (shift 2 px) failed the transform check: accuracy 0.9912 -> 0.9583
+  paths:
+    output_root: ./outputs/v1_mnist/p4_guided_retraining/targeted_augmentation
+  copies_per_image: 3          # k; a middle value, not from a paper
+  transforms:                  # label-preserving: small moves only; checked on a contact sheet
+    max_rotation_degrees: 10.0
+    max_shift_pixels: 1.0      # was 2.0 (r1); the shift alone cost 0.025 of validation accuracy
+    min_zoom: 0.9
+    max_zoom: 1.1
+    max_shear_degrees: 8.0
+  # Gradual pacing for the added copies (same schedule as the curriculum): the project's
+  # protection against unstable training when the hard-example share is too high too early.
+  schedules:
+    proposal:
+      initial_fraction: 0.10
+      step_fraction: 0.10
+      step_epochs: 5
+  # augmented_som and augmented_hotspot are the SOM-guided arms; augmented_random and
+  # augmented_random_hotspot add the same number of random images with the same digit mix.
+  # The *_paced arms add the same copies gradually instead of all at once from epoch 1.
+  arms:
+    - {name: standard, kind: standard}
+    - {name: augmented_som, kind: augmentation, pool: som}
+    - {name: augmented_random, kind: augmentation, pool: random}
+    - {name: augmented_msp, kind: augmentation, pool: msp}
+    - {name: augmented_hotspot, kind: augmentation, pool: hotspot}
+    - {name: augmented_random_hotspot, kind: augmentation, pool: random_hotspot}
+    - {name: augmented_som_paced, kind: augmentation, pool: som, schedule: proposal}
+    - {name: augmented_random_paced, kind: augmentation, pool: random, schedule: proposal}

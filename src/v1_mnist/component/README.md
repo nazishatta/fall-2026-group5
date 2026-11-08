@@ -26,17 +26,17 @@ python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_cluster
 | **3: Novelty Detection** | 6 | `p3_novelty_detection/qe_novelty_detection/` | *(empty)* |
 | | 7 | `p3_novelty_detection/u_matrix_analysis/` | *(empty)* |
 | | 8 | `p3_novelty_detection/novelty_benchmark/` | *(empty)* |
-| **4: Guided Retraining** | 9 | `p4_guided_retraining/hard_example_mining/` | *(empty)* |
-| | 10 | `p4_guided_retraining/targeted_augmentation/` | *(empty)* |
-| | 11 | `p4_guided_retraining/som_reanalysis/` | *(empty)* |
+| **4: Guided Retraining** | 9 | `p4_guided_retraining/hard_example_mining/` | Which training images are hard (hotspot, low purity, far from the neuron), and the equal-size max-softmax and random pools; pool tables and SHA-256 record. Curriculum comparison with standard, SOM, max-softmax and random arms |
+| | 10 | `p4_guided_retraining/targeted_augmentation/` | Altered copies of the hard images, retraining arms (SOM, max-softmax, random, hotspot), hotspot and damage-elsewhere comparison |
+| | 11 | `p4_guided_retraining/som_reanalysis/` | SOM re-analysis of the retrained CNNs (see its README) |
 
 Shared by every week:
 
 | Folder | Contents |
 |---|---|
 | `pipeline/` | One runner per week (`p1_…/`, `p2_…/`), `run_all.py`, `common.py` |
-| `configs/` | `base.yaml`, `cnn_baseline.yaml`, `som.yaml`, `som_10x10_robustness.yaml`, `som_20x20_robustness.yaml`, `dataset/` |
-| `utils/` | `config.py` (config loader, output folders), `logging.py`, `run_settings.py` (which SOM to analyse + hash check), `som_io.py`, `stats.py` (entropy, Wilson bound, Spearman), `heatmaps.py`, `som_plotting.py` (SOM drawing helpers for every week), `som_text_style.py` (label styling for dense NNSOM plots), `som_neuron_maps.py` (per-neuron class/error statistics and the simple grid map), `som_types.py` (type names for NNSOM objects), `som_figure_setup.py` (loads the SOM and data for the figure scripts), `som_data.py` (loads the embeddings and the train-fitted scaler), `hotspots.py` (the one error-hotspot rule), `dataset_info.py` (dataset and model facts read from the config), `figures.py` (saves every figure as one PDF with embedded fonts) |
+| `configs/` | `base.yaml`, `cnn_baseline.yaml`, `som.yaml`, `som_10x10_robustness.yaml`, `som_20x20_robustness.yaml`, `retraining.yaml` (Phase 4), `dataset/` |
+| `utils/` | `config.py` (config loader, output folders), `logging.py`, `run_settings.py` (which SOM to analyse + hash check), `som_io.py`, `stats.py` (entropy, Wilson bound, Spearman), `heatmaps.py`, `som_plotting.py` (SOM drawing helpers for every week), `som_text_style.py` (label styling for dense NNSOM plots), `som_neuron_maps.py` (per-neuron class/error statistics and the simple grid map), `som_types.py` (type names for NNSOM objects), `som_figure_setup.py` (loads the SOM and data for the figure scripts), `som_data.py` (loads the embeddings and the train-fitted scaler), `hotspots.py` (the one error-hotspot rule), `dataset_info.py` (dataset and model facts read from the config), `run_provenance.py` (run-ID preflight and SHA-256/JSON helpers for Phase 4), `frozen_split.py` (rebuilds the split from the saved sample IDs), `cnn_retraining.py` (LeNet-5 trainer with the Phase 1 recipe), `retraining_*.py` (settings, data, plans, runs, metrics, summary, final test stage, CLI, figures), `paired_stats.py`, `image_transforms.py`, `protocol_stamp.py`, `som_cells.py` (neuron of each embedding), `figures.py` (saves every figure as one PDF with embedded fonts) |
 
 Dataset and model facts (number of classes, embedding size, layer name, the names used in figure titles and file names) are set once in `configs/base.yaml` under `dataset:` and `model:`. The Phase 2 code reads them from there through `utils/dataset_info.py` instead of hard-coding MNIST values, and checks the embeddings against `model.feature_dim`. Phase 1 and `hotspot_samples.py` stay MNIST-specific on purpose.
 
@@ -61,7 +61,7 @@ component/
 │   │                                   extended_plots.py (dense Week 3 plots),
 │   │                                   convergence_plots/ (3 chart scripts ▶, artifacts.py)
 │   ├── cluster_analysis/               run_cluster_analysis.py ▶, cluster_figures.py ▶,
-│   │                                   cluster_heatmaps.py ▶, cluster_metrics.py
+│   │                                   cluster_heatmaps.py ▶, confusion_overlay.py ▶, cluster_metrics.py
 │   ├── error_pattern_analysis/         error_patterns.py ▶, hotspot_samples.py ▶, error_figures.py ▶,
 │   │                                   error_heatmaps.py ▶,
 │   │                                   error_pattern_robustness.py ▶,

@@ -95,6 +95,12 @@ analysis:
   # Week 4 model check: largest allowed relative difference between the recomputed
   # quantization error and the training run's value (docs/DEVIATIONS.md, 2026-10-10).
   qe_relative_tolerance: 1.0e-6
+  # Confusion overlay (cluster_analysis/confusion_overlay.py): how many of the most
+  # frequent true -> predicted validation confusions get a map of their own, and how
+  # many maps sit in one row of the figure.
+  confusion_overlay:
+    num_pairs: 3
+    panel_columns: 3
   # The one error-hotspot rule: top k = max(min_hotspots, round(hotspot_fraction x
   # neurons)) by Wilson lower bound. Fixed in advance (error_pattern_analysis/
   # HOTSPOT_RULE.md, ERROR_PATTERN_ROBUSTNESS_CRITERIA.md): do not change.
