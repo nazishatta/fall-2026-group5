@@ -1,0 +1,10 @@
+run_id: mnist_qe_umatrix_validation_figure_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis
+scores_directory: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays
+source_summary: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/qe_u_matrix_validation_s42_initial/qe_u_matrix_validation_initial.json
+figure_name: qe_u_matrix_validation_initial.pdf
+score_sha256:
+  qe: b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186
+  u_matrix: f22e0dd1f2456012856709d8b4586b3ef59ae9be58d44638e2e457b4bb1f121f
+correlation_tolerance: 1.0e-10
+mean_tolerance: 1.0e-10

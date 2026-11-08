@@ -1,0 +1,6 @@
+# Proposal Phase 3: training-only QE calibration; no test or OOD evaluation yet.
+som_config: src/v1_mnist/component/configs/som.yaml
+threshold_percentile: 95.0
+output_dir: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
+# Unique semantic identifier; must not already exist in output_dir.
+run_id: qe_training_calibrated_initial

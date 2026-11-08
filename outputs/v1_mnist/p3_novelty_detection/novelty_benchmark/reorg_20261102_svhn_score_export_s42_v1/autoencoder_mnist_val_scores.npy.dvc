@@ -1,0 +1,5 @@
+outs:
+- md5: a478d470f82097283ca99342f723fc4f
+  size: 84128
+  hash: md5
+  path: autoencoder_mnist_val_scores.npy

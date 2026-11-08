@@ -1,0 +1,11 @@
+# New validation-only verification; historical result files remain read-only.
+run_id: mnist_historical_baseline_verification_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+benchmark_config: src/v1_mnist/component/configs/novelty_benchmark.yaml
+historical:
+  classical: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/classical_mnist_validation_s42_initial/classical_mnist_validation_initial.json
+  autoencoder: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/autoencoder_mnist_validation_s42_initial/autoencoder_mnist_validation_initial.json
+# Do not adjust these tolerances after inspecting the recheck results.
+agreement:
+  absolute_tolerance: 1.0e-9
+  relative_tolerance: 1.0e-8

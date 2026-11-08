@@ -1,0 +1,28 @@
+# New standalone analysis; historical runs are never overwritten.
+# Sensitivity of the QE cutoff: the proposal asks for the "95th or 99th percentile"
+# and AUROC "over a range of thresholds". The list below is fixed before the run.
+# The 95th percentile stays the headline cutoff; nothing is chosen from SVHN results.
+# Cutoffs are computed from MNIST training QE only. MNIST validation is the
+# in-distribution set and SVHN test is the novel set. The final MNIST test split
+# is never opened.
+run_id: mnist_svhn_qe_threshold_sweep_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
+percentiles: [90.0, 95.0, 97.5, 99.0, 99.5]
+target_tpr: 0.95
+bootstrap:
+  iterations: 2000
+  seed: 42
+  confidence: 0.95
+permutation_null:
+  iterations: 1000
+  seed: 42
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  frozen_percentile_95_threshold: 1.5690279077294162
+inputs:
+  train_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/train_bmu_distance.npy
+  validation_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+  svhn_qe: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays/qe_svhn_test_scores.npy
+  qe_summary: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial/qe_summary.json

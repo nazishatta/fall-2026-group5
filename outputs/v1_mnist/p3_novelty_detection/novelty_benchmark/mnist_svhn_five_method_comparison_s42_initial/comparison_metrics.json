@@ -1,0 +1,276 @@
+{
+  "run_id": "mnist_svhn_five_method_comparison_s42_initial",
+  "id_dataset": "mnist",
+  "id_split": "validation",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "sample_counts": {
+    "mnist_train": 49000,
+    "mnist_validation": 10500,
+    "svhn_test": 26032
+  },
+  "methods": {
+    "qe": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "auroc": 0.9811068135920626,
+      "aupr": 0.9765546499418931,
+      "fpr_at_95_tpr": 0.04533333333333334,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9790482566328621,
+          0.9830887456280913
+        ],
+        "aupr": [
+          0.9732443132936577,
+          0.9798190555831741
+        ],
+        "fpr_at_95_tpr": [
+          0.041235714285714285,
+          0.04914523809523808
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "frozen_threshold_misses": {
+        "n_ood": 26032,
+        "threshold": 1.5690279077294162,
+        "detected": 25036,
+        "missed": 996,
+        "detection_rate": 0.9617393976644131,
+        "lowest_scoring_misses": [
+          {
+            "sample_id": "17531",
+            "score": 0.7798501962391573
+          },
+          {
+            "sample_id": "2599",
+            "score": 0.85096845337055
+          },
+          {
+            "sample_id": "218",
+            "score": 0.8628754651638467
+          },
+          {
+            "sample_id": "18247",
+            "score": 0.8797352022842377
+          },
+          {
+            "sample_id": "1437",
+            "score": 0.8899613651262424
+          },
+          {
+            "sample_id": "16983",
+            "score": 0.9071223710420774
+          },
+          {
+            "sample_id": "17532",
+            "score": 0.9468389877869722
+          },
+          {
+            "sample_id": "16169",
+            "score": 0.9528229624685292
+          },
+          {
+            "sample_id": "7768",
+            "score": 0.953877251950557
+          },
+          {
+            "sample_id": "23400",
+            "score": 0.9607798330891002
+          },
+          {
+            "sample_id": "17266",
+            "score": 0.9704238733379204
+          },
+          {
+            "sample_id": "21769",
+            "score": 1.0035940224964013
+          },
+          {
+            "sample_id": "10010",
+            "score": 1.0173112541498006
+          },
+          {
+            "sample_id": "24390",
+            "score": 1.02600835539727
+          },
+          {
+            "sample_id": "11782",
+            "score": 1.0509241245045207
+          },
+          {
+            "sample_id": "18246",
+            "score": 1.079430163581149
+          },
+          {
+            "sample_id": "25897",
+            "score": 1.0883809586849296
+          },
+          {
+            "sample_id": "22987",
+            "score": 1.1239178281802287
+          },
+          {
+            "sample_id": "12830",
+            "score": 1.1340259539389737
+          },
+          {
+            "sample_id": "2423",
+            "score": 1.1340542968455014
+          }
+        ],
+        "limitation": "Explains which samples were missed; causal reasons require review of those samples"
+      }
+    },
+    "u_matrix": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "auroc": 0.9696289713027191,
+      "aupr": 0.9864975866797204,
+      "fpr_at_95_tpr": 0.07005581632653061,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9669520995679312,
+          0.9720548250139023
+        ],
+        "aupr": [
+          0.985242111547492,
+          0.9876116309781143
+        ],
+        "fpr_at_95_tpr": [
+          0.06504768069782209,
+          0.07505074756060777
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "isolation_forest": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "auroc": 0.2382613376942664,
+      "aupr": 0.5552413540205782,
+      "fpr_at_95_tpr": 0.8718095238095238,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.2306907598157579,
+          0.24563727253270698
+        ],
+        "aupr": [
+          0.5530941447413598,
+          0.5573635713005148
+        ],
+        "fpr_at_95_tpr": [
+          0.8647619047619047,
+          0.8789547619047618
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "one_class_svm": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "auroc": 0.9604244373225628,
+      "aupr": 0.9764379515085277,
+      "fpr_at_95_tpr": 0.17942857142857144,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9581041058440892,
+          0.9627118327808996
+        ],
+        "aupr": [
+          0.9738905157869641,
+          0.9790620495744938
+        ],
+        "fpr_at_95_tpr": [
+          0.16723809523809524,
+          0.19162380952380947
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "autoencoder": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "auroc": 0.007718721646618094,
+      "aupr": 0.4979097534757666,
+      "fpr_at_95_tpr": 0.9999047619047619,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.0069496416498375695,
+          0.008479214044253221
+        ],
+        "aupr": [
+          0.49778050964057025,
+          0.49806115860461125
+        ],
+        "fpr_at_95_tpr": [
+          0.9997142857142857,
+          1.0
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    }
+  },
+  "qe_validation_max_absolute_difference": 4.860474741713583e-06,
+  "autoencoder_initial_training_loss": 7.2162517681705705,
+  "autoencoder_final_training_loss": 0.11244814694414333,
+  "settings": {
+    "dataset": "mnist",
+    "seed": 42,
+    "embeddings": {
+      "train": "outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy",
+      "validation": "outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy"
+    },
+    "output_root": "outputs/v1_mnist/p3_novelty_detection/novelty_benchmark",
+    "isolation_forest": {
+      "n_estimators": 200,
+      "max_samples": 256,
+      "contamination": 0.05
+    },
+    "one_class_svm": {
+      "kernel": "rbf",
+      "nu": 0.05,
+      "gamma": "scale",
+      "max_training_samples": 10000
+    },
+    "autoencoder": {
+      "input_dim": 84,
+      "hidden_dim": 32,
+      "latent_dim": 16,
+      "epochs": 20,
+      "batch_size": 256,
+      "learning_rate": 0.001
+    }
+  },
+  "provenance": {
+    "qe_threshold": 1.5690279077294162,
+    "som_model": "som_15x15_nb11_ep250_s42_v2",
+    "som_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+    "cnn_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_qe_sha256": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+    "val_qe_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+    "config_sha256": "320bd62dd21d8dc698bfcc6ee5998626fe5c1458af49532393f4cd9c0a981a02",
+    "svhn_mat_sha256": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+    "train_embeddings_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "validation_embeddings_sha256": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "previous_qe_metrics_sha256": "41363d6c92101c50c7e7f1f0fae36268e5bcfe80b49e03c135f0d498ead811bd"
+  },
+  "leakage_control": "CNN and SOM remain frozen. Baselines fit only on MNIST train. MNIST validation and SVHN test used only for scoring; OOD scores not used for tuning. FPR@95%TPR is a ROC operating point measured on labeled evaluation samples, not a deployable frozen threshold.",
+  "limitations": [
+    "One-Class SVM fitted on 10,000 MNIST train examples; other baselines used 49,000, so fitting budgets differ.",
+    "This is a single-seed, single-OOD-dataset comparison.",
+    "Sample-level miss IDs alone do not establish causes of failures.",
+    "U-Matrix scores indicate local SOM prototype separation, not direct sample-to-BMU distance."
+  ]
+}
