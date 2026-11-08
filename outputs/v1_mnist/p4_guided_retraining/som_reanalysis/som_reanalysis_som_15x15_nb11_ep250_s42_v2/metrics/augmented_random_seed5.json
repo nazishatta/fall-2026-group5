@@ -1,0 +1,19 @@
+{
+  "cell": "augmented_random_seed5",
+  "model_sha256": "862f7550cceef5fa1f36487ec2bdd21dafc967f8800c80afd95a90794d458ce5",
+  "som_seed": 42,
+  "train_features_sha256": "6af3d2b270daf5f70eb25ae9308cded770319fa9babfcbac288fd5e87c77b037",
+  "val_features_sha256": "d1f3488bb17a2dac3f4a116e58508b5502f246158a6a654c8c2b58291268745d",
+  "validation_quality": {
+    "empty_neurons": 1,
+    "max_hits_per_neuron": 149,
+    "mean_hits_per_occupied_neuron": 46.875,
+    "n_samples": 10500,
+    "occupancy_rate": 0.9955555555555555,
+    "occupied_neurons": 224,
+    "quantization_error": 1.0499182636528577,
+    "topological_error_1st_2nd_order_pct": 3.5523809523809526,
+    "topological_error_1st_order_pct": 6.590476190476191,
+    "total_neurons": 225
+  }
+}

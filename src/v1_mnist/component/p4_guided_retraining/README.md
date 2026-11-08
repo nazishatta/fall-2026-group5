@@ -1,6 +1,6 @@
 # Phase 4: Guided Retraining
 
-Uses the SOM's error hotspots to choose what the CNN is retrained on, then checks whether the map improves. `hard_example_mining` decides which training images are hard and compares standard training with curricula; `targeted_augmentation` adds altered copies of those images and retrains. `som_reanalysis` has no code yet.
+Uses the SOM's error hotspots to choose what the CNN is retrained on, then checks whether the map improves. `hard_example_mining` decides which training images are hard and compares standard training with curricula; `targeted_augmentation` adds altered copies of those images and retrains. `som_reanalysis` re-trains the SOM on the retrained networks and compares the maps.
 
 ```
 p4_guided_retraining/

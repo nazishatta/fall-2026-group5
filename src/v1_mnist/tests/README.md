@@ -18,7 +18,7 @@ Weeks 12–14 (results, paper, code release) have no folder because they produce
 | 4 | `cluster_analysis/` | Week 4: Cluster Analysis | BMU reconstruction, neuron entropy, staggered-grid coordinates, cluster purity, class–neuron intersection, heatmap saved as one PDF (no SVG) |
 | 5 | `error_pattern_analysis/` | Week 5: Error Pattern Analysis | Wilson lower bound for neuron error rates |
 | **Phase 3: Novelty Detection** | `p3_novelty_detection/` | | |
-| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | *(empty, to be added)* |
+| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | Measures, CKA, paired comparison, a tiny stored SOM, analysis and figures |
 | 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | *(empty, to be added)* |
 | 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | *(empty, to be added)* |
 | **Phase 4: Guided Retraining** | `p4_guided_retraining/` | | |
@@ -81,7 +81,7 @@ tests/
     │   └── test_curriculum.py
     ├── targeted_augmentation/                       # Week 10
     │   └── test_augmentation_arms.py
-    └── som_reanalysis/                              # Week 11  (empty)
+    └── som_reanalysis/                              # Week 11
 ```
 
 Each phase folder has its own short `README.md`. Tests for shared code in `component/utils` go in `utils/`; checks that cover the whole repository stay in `test_repository_rules.py` at the top of `tests/`.

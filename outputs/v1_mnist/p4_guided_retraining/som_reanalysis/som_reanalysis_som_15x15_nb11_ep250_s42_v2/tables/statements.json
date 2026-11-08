@@ -1,0 +1,24 @@
+{
+  "R1_boundaries_sharpen_vs_standard": {
+    "measure": "weighted_purity",
+    "met": false
+  },
+  "R2_hotspots_shrink_vs_standard": {
+    "measure": "hotspot_error_rate",
+    "met": true
+  },
+  "R3_guidance_sharpens_vs_random": {
+    "measure": "weighted_purity",
+    "met": false
+  },
+  "R4_guidance_shrinks_hotspots_vs_random": {
+    "measure": "hotspot_error_rate",
+    "met": false
+  },
+  "R5_map_not_less_organised_vs_standard": {
+    "measure": "topographic_error_pct",
+    "met": true,
+    "tolerance": 1.0,
+    "upper_end": 0.5432012324268879
+  }
+}

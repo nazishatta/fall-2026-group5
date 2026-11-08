@@ -2,7 +2,7 @@
 
 > `p4` in the folder name means **Phase 4**.
 
-`hard_example_mining/` tests the difficulty rules, pools, run-ID preflight, fixed pool settings and the curriculum. `targeted_augmentation/` tests the altered copies and the augmented arms. `som_reanalysis/` is empty. `synthetic_data.py` is a tiny made-up dataset the tests share. Tests of the code shared by both steps are in `tests/utils/` (`test_retraining_support.py`; `test_cnn_retraining.py` needs PyTorch).
+`hard_example_mining/` tests the difficulty rules, pools, run-ID preflight, fixed pool settings and the curriculum. `targeted_augmentation/` tests the altered copies and the augmented arms. `som_reanalysis/` tests the map measures, CKA, the paired comparison, a tiny stored SOM and the analysis stage with figures. `synthetic_data.py` is a tiny made-up dataset the tests share. Tests of the code shared by both steps are in `tests/utils/` (`test_retraining_support.py`; `test_cnn_retraining.py` needs PyTorch).
 
 ```
 p4_guided_retraining/

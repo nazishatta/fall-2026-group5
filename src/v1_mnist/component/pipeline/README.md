@@ -18,6 +18,7 @@ The proposal week is shown for orientation only; the code uses the step names.
 | 2 | (report) | 3–5 | `p2_som_training_visualization/run_interactive_report.py` | Interactive HTML report | ✅ Yes |
 | 4 | `hard_example_mining` | 9 | `p4_guided_retraining/run_hard_example_mining.py` | Decide which training images are hard; SOM, max-softmax and random pool tables (training images only, no CNN trained, test split never loaded) | ✅ Once per run ID; a new `run.revision` in `configs/retraining.yaml` for a new run |
 | 4 | `hard_example_mining` (curriculum) | 9 | `p4_guided_retraining/run_curriculum_comparison.py` | Train standard and curriculum arms (5 seeds, validation images only); validation summary; the single test pass after the protocol is frozen | ✅ `--stage train`, then `summary`, then `final_test` |
+| 5 | `som_reanalysis` | 11 | `p4_guided_retraining/run_som_reanalysis.py` | Embeddings of the retrained CNNs; new SOM per cell; tables and figures | ✅ `--stage embeddings`, `train_som`, `analyze` |
 | 4 | `targeted_augmentation` | 10 | `p4_guided_retraining/run_targeted_augmentation.py` | Check the altered images; train standard and augmented arms; summary; the single test pass | ✅ `--stage check`, `train`, `summary`, `final_test` |
 | 4 | (protocol) | 9–10 | `p4_guided_retraining/run_protocol_stamp.py` | Freeze the retraining protocol once every open item is filled | ✅ Once |
 | – | – | – | `run_all.py` | Runs the steps above in order (default: `som_nnsom_training` to `error_pattern_analysis`, then the report) | ✅ Yes |
