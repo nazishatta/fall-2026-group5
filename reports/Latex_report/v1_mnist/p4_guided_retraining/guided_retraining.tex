@@ -3,6 +3,8 @@
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcommand{\tbd}{\textbf{[TBD]}}
 \setlength{\emergencystretch}{3em}
+\graphicspath{{fig/}{fig/hard_example_mining/curriculum_comparison/}{fig/targeted_augmentation/augmentation_comparison/}{fig/som_reanalysis/}}
+\usetikzlibrary{positioning,arrows.meta}
 \begin{document}
 
 \begin{titlepage}
@@ -40,18 +42,82 @@
 
 \section{Summary}
 
-Phase 4 asks whether the SOM can guide retraining of the CNN. We retrained LeNet-5 on MNIST in two ways, using the 15$\times$15 SOM from Phase 2 to pick the hard training images: \textbf{curriculum learning} (hard images are let in gradually) and \textbf{targeted augmentation} (altered copies of the hard images are added). Each way was compared with controls that use the same number of images, over 5 seeds, and judged once on the test split.
+Phase 4 asks one question: \emph{can the SOM help us train a better CNN?} The SOM is a map that shows where the CNN makes its mistakes. We used it to pick the ``hard'' training images and then retrained the CNN (LeNet-5, on MNIST digits) in two ways: \textbf{curriculum learning} (the hard images are let in slowly) and \textbf{targeted augmentation} (we add slightly changed copies of the hard images). Every idea was compared with a fair control that uses the same number of images, repeated 5 times, and checked once on the test images. Last, we trained new SOMs on the retrained CNNs to see whether the map itself changed.
 
 \begin{itemize}[leftmargin=1.4em, itemsep=1pt]
-  \item \textbf{Targeted augmentation works on the SOM hotspots.} Hotspot error fell from 11.4\% to 7.8\% (3.6 points fewer errors), the rest of the test set was not harmed, and SOM-chosen images did better than the same number of random images.
-  \item \textbf{Curriculum learning did not help.} Both SOM-guided and confidence-guided curricula ended with a worse model than standard training (test accuracy 98.66\% and 98.69\% against 99.11\%).
-  \item \textbf{The SOM is not better than a simple confidence rule at choosing images.} Choosing the lowest-confidence images (max-softmax) gave about the same result as the SOM pool. What the SOM adds is the map of where the errors are.
-  \item \textbf{Still open:} the new SOM trained on the retrained model and the novelty AUROC after retraining are \tbd{} (Section~\ref{sec:open}).
+  \item \textbf{Targeted augmentation helped.} On the SOM's error regions (the ``hotspots''), mistakes fell from 11.4\% to 7.8\%. The rest of the images did not get worse.
+  \item \textbf{Curriculum learning did not help.} It made the CNN slightly worse (98.66\% and 98.69\% correct, against 99.11\% for normal training).
+  \item \textbf{The SOM is not the only way to pick hard images.} Picking the images the CNN is least sure about worked about as well. The SOM's real value is that it shows \emph{where} the errors are.
+  \item \textbf{The new SOMs have smaller weak regions, but are not cleaner.} After augmentation the hotspots of a new SOM hold fewer mistakes than after normal training (17.5\% against 22.9\% on validation images). The neurons did not become purer, and against random copies the hotspot difference is not clear (Section~\ref{sec:reanalysis}).
+  \item \textbf{Not measured yet:} the novelty AUROC after retraining is \tbd{} (Section~\ref{sec:open}).
 \end{itemize}
 
-\section{Method}
+\subsection*{Where each item of the plan is covered}
 
-The loop is: SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ re-analysis. The retraining algorithm is fixed in advance and is the same for every arm.
+{\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.50\textwidth}|X|}
+\hline
+\textbf{What Phase 4 asks for} & \textbf{Where} \\ \hline
+Hard-example pool and curriculum against standard training & Section~\ref{sec:method}, Tables~\ref{tab:arms}--\ref{tab:criteria}, Figures~\ref{fig:cf_cur} and~\ref{fig:curves} \\ \hline
+Targeted augmentation and its effect on the rest of the data & Tables~\ref{tab:arms}--\ref{tab:criteria}, Figures~\ref{fig:cf_aug} and~\ref{fig:curves}, Appendix \\ \hline
+Re-extract features, re-train the SOM, compare old and new maps & Section~\ref{sec:reanalysis}, Table~\ref{tab:reanalysis}, Figures~\ref{fig:reanalysis_measures}--\ref{fig:reanalysis_purity} \\ \hline
+Feedback loop: SOM analysis $\rightarrow$ retraining $\rightarrow$ new SOM structure & Figure~\ref{fig:loop}, Section~\ref{sec:meaning} \\ \hline
+Table: baseline accuracy, post-retraining accuracy & Table~\ref{tab:arms} \\ \hline
+Table: novelty detection AUROC after retraining & \tbd{} (Section~\ref{sec:open}) \\ \hline
+Monitor forgetting of easy examples & Section~\ref{sec:meaning} (last item), Figure~\ref{fig:curves} \\ \hline
+Before/after comparison and learning curves & Figures~\ref{fig:cf_aug}--\ref{fig:curves} \\ \hline
+\end{tabularx}}
+
+\section{Key terms in plain words}
+
+\renewcommand{\arraystretch}{1.12}
+{\small
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.22\textwidth}|X|}
+\hline
+\textbf{Term} & \textbf{What it means} \\ \hline
+CNN, LeNet-5 & The neural network that looks at a picture of a digit and says which digit it is. \\ \hline
+SOM & A ``map'' that places similar images close together. We train it on what the CNN has learned, so we can see where the CNN gets confused. \\ \hline
+Neuron, purity & A neuron is one cell of the map. Its purity is how many of its images show the same digit; low purity means a mixed, confusing cell. \\ \hline
+Hotspot & A map cell where the CNN makes many mistakes (11 cells in our map). \\ \hline
+Hard image, pool & A training image that sits in a hotspot, in a mixed cell, or far from its cell. All hard images together are the \emph{pool} (4{,}217 images). \\ \hline
+Curriculum learning & Teach like school: start with easy images and let the hard ones in step by step. \\ \hline
+Augmentation & Adding copies of an image that are slightly changed (turned, shifted, zoomed, sheared) so the CNN sees more variety. \\ \hline
+Control & A fair comparison that uses the same number of added images but picks them differently: \emph{random} (by chance) or \emph{msp} (the images the CNN is least sure about). \\ \hline
+Max-softmax (MSP) & The CNN's confidence in its answer. Low confidence means ``not sure''. \\ \hline
+Seed & A number that fixes the randomness of one training run. We repeat every experiment with 5 seeds so one lucky run does not fool us. \\ \hline
+Validation / test images & Validation images are used while building and checking the method. Test images are kept untouched and used once at the end, like an exam. \\ \hline
+Error, accuracy & Error is the share of images the CNN gets wrong; accuracy is the share it gets right. \\ \hline
+Confusion matrix (CF1, CF2) & A table of true digit against predicted digit; the diagonal is correct answers, everything else is mistakes. CF1 is before retraining (normal training), CF2 is after. \\ \hline
+95\% interval & The range in which the true difference very likely lies. If it does not include 0, the difference is probably real and not luck. \\ \hline
+Paired difference & Two methods compared seed by seed (the same seed for both), so that the comparison is fair. \\ \hline
+Macro-F1 guard & A safety check that the CNN did not get worse on some digits while improving on others. \\ \hline
+Forgetting & The CNN becoming worse on images it already handled well after being retrained. \\ \hline
+Weighted purity & The share of images that show the main digit of their neuron. Higher means cleaner class regions. \\ \hline
+Class scatter index & How many separate patches of the map one digit occupies on average. 1 means every digit has one connected region. \\ \hline
+Topographic error & The share of images whose two closest neurons are not neighbours on the map. Lower means a better ordered map. \\ \hline
+CKA & A score from 0 to 1 for how similar the embeddings of two networks are; 1 means the same. \\ \hline
+\end{tabularx}}
+
+\section{Method}\label{sec:method}
+
+The loop is: SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ re-analysis (Figure~\ref{fig:loop}). The retraining algorithm is fixed in advance and is the same for every arm.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize, node distance=9mm,
+  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=13mm, minimum width=42mm, fill=GWBlue!6, line width=0.6pt},
+  arr/.style={-{Stealth[length=2mm]}, line width=0.7pt, draw=GWBlue}]
+\node[box] (a) {\textbf{1. SOM analysis}\\ 11 hotspot neurons,\\ 4{,}217 hard training images};
+\node[box, right=of a] (b) {\textbf{2. Targeted retraining}\\ curriculum or\\ augmented copies};
+\node[box, right=of b] (c) {\textbf{3. New SOMs}\\ trained on the retrained\\ CNNs, 15 maps};
+\draw[arr] (a)--(b); \draw[arr] (b)--(c);
+\draw[arr, dashed] (c.south) -- ++(0,-6mm) -| (a.south);
+\end{tikzpicture}
+\caption{The feedback loop of Phase 4. The dashed arrow marks the next round, which this report does not run.}
+\label{fig:loop}
+\end{figure}
 
 \begin{enumerate}[leftmargin=1.6em, itemsep=1pt]
   \item \textbf{Select hard images (training images only, true labels).} A training image is in the \emph{SOM pool} if its neuron is one of the 11 error hotspots, or its neuron's purity is below 0.95, or its distance to its neuron is above the 95th percentile. This gives 4{,}217 of 49{,}000 images (8.6\%). A smaller \emph{hotspot pool} (685 images) uses the first rule only.
@@ -66,51 +132,99 @@ The loop is: SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ re-ana
 
 \textbf{Success criteria} (written down before the test split was used): C1, curriculum\_som has lower overall error than standard; C2, curriculum\_som has lower hotspot error than curriculum\_random; A1, augmented\_som has lower hotspot error than augmented\_random; A2, augmented\_som has lower hotspot error than standard; A3, augmented\_som does not raise the error outside the hotspots by more than 0.2 points. C1, C2, A1 and A2 also need an interval that excludes 0 and a macro-F1 that does not fall by more than 0.0016.
 
-\section{Results}
+\subsection*{Re-analysis with new SOMs}
 
-Table~\ref{tab:arms} gives baseline and post-retraining accuracy; Table~\ref{tab:criteria} gives the verdicts. Figures~\ref{fig:cf_aug} and~\ref{fig:cf_cur} show CF1 and CF2, and Figure~\ref{fig:curves} the learning curves.
+The last step of the loop retrains nothing. For the \texttt{standard}, \texttt{augmented\_som} and \texttt{augmented\_random} arms and each of the 5 CNN seeds, we took the 84-dimensional embeddings of the training and validation images, trained a new 15$\times$15 SOM with the Phase 2 recipe (neighbourhood 11, 250 epochs, seed 42), and measured it on the validation split only; the test split was not read. That gives 15 new SOMs, plus the Phase 2 map as a read-only reference. The measures are weighted purity, the share of low-purity neurons ($<0.95$), a class scatter index, topographic error, the error rate on the 11 worst neurons (hotspots, picked by the lower Wilson bound of their error rate), the share of all errors that fall on those neurons, overall error, and linear CKA \parencite{kornblith2019cka} between networks. The first four follow the SOM quality measures surveyed by \textcite{forest2020somsurvey}; the class scatter index is our own implementation of their verbal description. Differences between arms are taken per seed, since the arms share seeds \parencite{bouthillier2021variance}, then averaged, with a 95\% $t$-interval over the 5 differences. The five statements below (R1 to R5) and the tolerance of 1.0 percentage point in R5 were written down before the run.
 
-\input{tables/arm_results.tex}
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt]
+  \item R1: purity is higher for \texttt{augmented\_som} than for \texttt{standard} (interval above 0).
+  \item R2: hotspot error rate is lower for \texttt{augmented\_som} than for \texttt{standard} (interval below 0).
+  \item R3: purity is higher for \texttt{augmented\_som} than for \texttt{augmented\_random}.
+  \item R4: hotspot error rate is lower for \texttt{augmented\_som} than for \texttt{augmented\_random}.
+  \item R5: topographic error of \texttt{augmented\_som} is not more than 1.0 point above \texttt{standard} (upper end of the interval at most 1.0).
+\end{itemize}
 
-\input{tables/criteria_results.tex}
+\section{Results of the retraining}
+
+Table~\ref{tab:arms} gives baseline and post-retraining accuracy; Table~\ref{tab:criteria} gives the verdicts. Figures~\ref{fig:cf_aug} and~\ref{fig:cf_cur} show CF1 and CF2 (the other arms are in the Appendix), and Figure~\ref{fig:curves} the learning curves.
+
+\input{tables/summary/arm_results.tex}
+
+\input{tables/summary/criteria_results.tex}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{cf_augmented_som.pdf}
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_som.pdf}
 \caption{CF1 (standard) and CF2 (augmented\_som): mean test confusion matrices over 5 seeds, and their difference (blue: fewer cases, red: more).}
 \label{fig:cf_aug}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{cf_curriculum_som.pdf}
+\includegraphics[width=\textwidth]{fig/hard_example_mining/curriculum_comparison/confusion_standard_vs_curriculum_som.pdf}
 \caption{CF1 (standard) and CF2 (curriculum\_som), as in Figure~\ref{fig:cf_aug}.}
 \label{fig:cf_cur}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{val_curve_curriculum.pdf}
-\includegraphics[width=\textwidth]{val_curve_augmentation.pdf}
+\includegraphics[width=\textwidth]{fig/hard_example_mining/curriculum_comparison/validation_accuracy_by_epoch.pdf}
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/validation_accuracy_by_epoch.pdf}
 \caption{Validation accuracy per epoch (mean of 5 seeds) for the curriculum arms (top) and the augmentation arms (bottom): all images, hotspot images, and images outside the hotspots.}
 \label{fig:curves}
 \end{figure}
 
-\section{What the results mean}
+\section{Re-analysis: new SOMs after retraining}\label{sec:reanalysis}
+
+Table~\ref{tab:reanalysis} gives all measures and Figures~\ref{fig:reanalysis_measures} and~\ref{fig:reanalysis_purity} show the spread over seeds and example maps. Two of the five statements hold (R2, R5) and three do not (R1, R3, R4).
+
+\input{tables/summary/reanalysis_results.tex}
 
 \begin{itemize}[leftmargin=1.4em, itemsep=2pt]
-  \item \textbf{SOM-guided augmentation helps where the SOM says the errors are.} Hotspot error dropped by 3.6 points against standard training (A2) and by 2.5 points against the same number of random images (A1), while the error elsewhere did not rise (A3). Overall accuracy went from 99.11\% to 99.21\%, a small gain that the paired interval still excludes from zero.
-  \item \textbf{The gain is not specific to the SOM.} Adding copies of the lowest-confidence images gave the same hotspot result (R1: the difference is $-0.7$ points, with an interval that includes 0). The SOM does not select better images than max-softmax here; its value is that it shows \emph{which regions} are weak. The hotspot-only pool did not beat its random control either (R3).
-  \item \textbf{Gradual pacing hurt.} Letting the copies in gradually made the hotspot result worse than adding them all at once (R2, $+3.4$ points).
-  \item \textbf{Curriculum learning lost to standard training (C1, C2 not met).} Both curricula that used a hard pool ended below standard training, and the learning curves (Figure~\ref{fig:curves}) show they stayed behind from the first epochs. A plausible reason, which we did not test, is that the proposed schedule only ever uses 40\% of the hard pool, so these models see fewer of the hard images; the random pool loses little because it mostly holds easy images. We report this result as measured.
+  \item \textbf{R1, not met.} Weighted purity of \texttt{augmented\_som} is the same as \texttt{standard} ($+0.0001$, interval $-0.0017$ to $+0.0019$). The class boundaries in the map did not become measurably sharper.
+  \item \textbf{R2, met.} Hotspot error rate is lower by 5.5 points ($-0.0545$, interval $-0.1008$ to $-0.0082$), and it was lower in all 5 seeds.
+  \item \textbf{R3, not met.} Against the random-image control the purity difference is $+0.0012$ with an interval from $-0.0016$ to $+0.0039$.
+  \item \textbf{R4, not met.} Against the random-image control the hotspot error rate is lower by 3.1 points, but the interval ($-0.0705$ to $+0.0075$) includes 0, so we cannot say the SOM-chosen images are better than random ones here.
+  \item \textbf{R5, met.} Topographic error did not rise ($-0.29$ points, interval $-1.11$ to $+0.54$; the upper end is below the 1.0 tolerance), so the map stayed as well ordered as after plain training.
+  \item \textbf{Also reported.} The low-purity share and the class scatter index show no clear change. The share of all errors that sit in hotspots is larger than for the random control by $+0.063$ (larger in 5 of 5 seeds), but not larger than for \texttt{standard}. Overall validation error is lower for \texttt{augmented\_som} than for both other arms (about 0.17 and 0.11 points). CKA between networks is 0.89 to 0.93 within an arm and 0.91 between arms, so the arms do not differ more from each other than seeds do within an arm, except that \texttt{augmented\_som} networks are somewhat less alike (0.893).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/som_reanalysis/map_measures_by_arm.pdf}
+\caption{Map measures per arm on validation images. Each dot is one CNN seed (grey lines join the same seed), the black bar is the mean over seeds, and the red dashed line is the Phase 2 map.}
+\label{fig:reanalysis_measures}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/som_reanalysis/purity_maps.pdf}
+\caption{Neuron purity on validation images for the Phase 2 map and the three arms (seed 1). Red squares mark the hotspot neurons of each map. The hotspots are picked again for every map.}
+\label{fig:reanalysis_purity}
+\end{figure}
+
+\textbf{How to read this.} Part of the hotspot drop comes from the network making fewer errors overall, not only on the weak regions. The hotspots are the worst neurons of each map, chosen again for every map, so the hotspot error rate of a new map is not measured on the same images as before. The retrained \texttt{standard} networks also have a higher hotspot error rate (0.229) than the Phase 2 map (0.195), so the Phase 2 map is not a fair baseline for the new ones; the comparison between arms is the one to use. With 5 seeds and one SOM seed the intervals are wide, and a clear result for one comparison next to an unclear one should not be over-read. All of this is on MNIST validation data.
+
+\section{What the results mean}\label{sec:meaning}
+
+\textbf{How to read the tables.} In Table~\ref{tab:arms}, a higher accuracy and a lower error are better. In Table~\ref{tab:criteria}, the difference is ``first arm minus second arm'' in percentage points of error, so a \emph{negative} number means the first arm made fewer mistakes. If the interval in brackets does not include 0, the difference is probably real. Our test set has 10{,}500 images, so 0.1 points is about 11 images; the hotspots hold only 146 test images, so one image is about 0.7 points.
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+  \item \textbf{Augmentation fixed some hotspot mistakes (A1, A2 met).} Normal training gets about 17 of the 146 hotspot images wrong; augmentation with SOM-chosen images gets about 11 wrong, i.e.\ about 5 fewer (3.6 points). It also beat the same number of random images by 2.5 points. The error on the other 10{,}354 images did not rise (A3), so the CNN did not pay for the gain elsewhere. Overall accuracy rose from 99.11\% to 99.21\%, about 11 fewer mistakes out of 10{,}500. This is a small but real gain.
+  \item \textbf{But the SOM was not better than ``least sure''.} Using the least-sure images (msp) gave almost the same result (R1 of Table~\ref{tab:criteria}: the difference $-0.7$ points, interval includes 0, so we cannot tell them apart). So the SOM is not a better \emph{picker}; it is a useful \emph{explainer}, because it shows which regions of the data are weak. The hotspot-only pool also could not be told apart from its random control (R3 of Table~\ref{tab:criteria}).
+  \item \textbf{Slow introduction of the copies made things worse (R2 of Table~\ref{tab:criteria}).} Adding the copies step by step gave a worse hotspot result than adding them all at once (+3.4 points).
+  \item \textbf{Curriculum learning lost to normal training (C1, C2 not met).} The curriculum CNNs made about 47 more mistakes out of 10{,}500 (+0.45 points), and the learning curves (Figure~\ref{fig:curves}) show they were behind from the first epochs and never caught up. A possible reason, which we did not test, is that the schedule only ever shows 40\% of the hard images, so the CNN sees fewer of them. We report this result as it is; a criterion that is not met is still a result.
+  \item \textbf{The new maps: smaller weak regions, not cleaner classes.} In the new SOMs, the hotspots of the \texttt{augmented\_som} networks hold fewer mistakes than after normal training (R2, 17.5\% against 22.9\%), but the neurons are not purer (R1) and, against random copies, the hotspot drop is not clear (R4). The map stays as well ordered as before (R5).
   \item \textbf{No sign of forgetting.} In every arm, the largest one-epoch fall in validation accuracy (mean over seeds) was about 0.6 points or less (curriculum\_msp was the largest), and for augmented\_som the error outside the hotspots stayed at the standard level (A3).
 \end{itemize}
 
-\textbf{Limits.} Only 146 test images fall on hotspot neurons, so one image is about 0.7 points and the hotspot intervals are wide. The hotspots are defined by the SOM, so SOM-based arms have a built-in advantage on hotspot error. The pools come from one SOM, so they do not vary across seeds, and 5 seeds give limited power to separate small differences \parencite{bouthillier2021variance}. Everything is on MNIST.
+\textbf{What this means for the project overall.} The Phase 4 loop is ``SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ new SOM structure''. All three steps are done, and the result is mixed but clear. Using the SOM to find weak regions and then adding altered copies of images from those regions \emph{does} reduce mistakes there without harming the rest (CF2 is better than CF1 in the hotspots), and a new SOM trained afterwards shows smaller weak regions. Slowly introducing hard images (curriculum) does not help, and the class regions of the map do not become cleaner. The gains are small because MNIST is already 99\% correct, and a simple confidence rule gets a similar gain, so we claim the SOM as a tool for \emph{finding and explaining} errors, not as a better selector.
+
+\textbf{Limits.} Only 146 test images fall on hotspots, so the hotspot intervals are wide. The hotspots are defined by the SOM, so SOM-based arms have a built-in advantage on hotspot error. The pools come from one SOM, so they do not vary across seeds, and 5 seeds give limited power to separate small differences \parencite{bouthillier2021variance}. Everything is on MNIST.
 
 \section{Deviation from the plan}
 
-The first set of augmentation ranges (shift up to 2 pixels) failed the check made before any arm was trained: the Phase 1 CNN's validation accuracy fell from 99.12\% on the original images to 95.83\% on the altered ones, a drop of 3.3 points against a limit of 2. The shift was lowered to 1 pixel (revision r2), which gave 98.21\% and passed. The failed check is kept; all augmentation results above use r2. No criterion, threshold or test comparison was changed after the test split was used.
+The first set of augmentation ranges (shift up to 2 pixels) failed the check made before any arm was trained: the Phase 1 CNN's validation accuracy fell from 99.12\% on the original images to 95.83\% on the altered ones, a drop of 3.3 points against a limit of 2. The shift was lowered to 1 pixel (revision r2), which gave 98.21\% and passed. The failed check is kept; all augmentation results above use r2. Examples of altered copies are in the Appendix. No criterion, threshold or test comparison was changed after the test split was used.
 
 \section{Leakage Control}
 
@@ -119,12 +233,49 @@ The first set of augmentation ranges (shift up to 2 pixels) failed the check mad
   \item The 11 hotspots were chosen from validation errors; this is declared, and it is why the final judgement is made on the test split.
   \item Criteria, thresholds and the guard value were written down and stamped (SHA-256 of the protocol and the configuration) before the test split was opened. It was opened once and not re-run.
   \item All arms use the same data, seeds and training recipe. Finished runs are never overwritten; the changed augmentation run got a new run ID.
+  \item The re-analysis uses training and validation images only; the test split was not read. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
 \end{itemize}
 
 \section{Still open}\label{sec:open}
 
-The last step of the loop is not yet measured: re-extracting embeddings from the retrained models, training new SOMs, and comparing them with the Phase 2 SOM (purity, hotspot error rate and share, topographic error \parencite{forest2020somsurvey}, and CKA \parencite{kornblith2019cka}). The same holds for the novelty AUROC after retraining. Both are \tbd{} and will be added once the run is finished. The arms for the re-analysis (standard, augmented\_som, augmented\_random) were chosen after the retraining results were known; this is stated in its protocol.
+The novelty AUROC after retraining (against max-softmax, energy and Mahalanobis on the same embeddings) is not measured yet and is \tbd{}. The arms for the re-analysis (standard, augmented\_som, augmented\_random) were chosen after the retraining results were known; this is stated in its protocol and in the deviations log.
 
 \printbibliography[title={References}]
+
+\clearpage
+\appendix
+\section{Further confusion matrices and examples}
+
+Each figure shows CF1 (standard), CF2 of the named arm, and their difference, as in Figure~\ref{fig:cf_aug}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_random.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_msp.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_hotspot.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_random_hotspot.pdf}
+\caption{CF2 of augmented\_random, augmented\_msp, augmented\_hotspot and augmented\_random\_hotspot (top to bottom).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_som_paced.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/targeted_augmentation/augmentation_comparison/confusion_standard_vs_augmented_random_paced.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/hard_example_mining/curriculum_comparison/confusion_standard_vs_curriculum_random.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/hard_example_mining/curriculum_comparison/confusion_standard_vs_curriculum_msp.pdf}
+\caption{CF2 of augmented\_som\_paced, augmented\_random\_paced, curriculum\_random and curriculum\_msp (top to bottom).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=0.55\textheight,keepaspectratio]{fig/targeted_augmentation/augmentation_comparison/augmentation_contact_sheet.pdf}
+\caption{Ten training images from the hard pool (left column) and their three altered copies (shift up to 1 pixel, revision r2).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/som_reanalysis/embedding_similarity_cka.pdf}
+\caption{Linear CKA between the embeddings of the 15 retrained networks (validation images).}
+\end{figure}
 
 \end{document}

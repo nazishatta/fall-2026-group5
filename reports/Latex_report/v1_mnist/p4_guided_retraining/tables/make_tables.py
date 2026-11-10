@@ -1,4 +1,8 @@
-"""Build the two LaTeX tables of the Phase 4 report from the saved result tables."""
+"""Build the two retraining LaTeX tables of the Phase 4 report from the saved result tables.
+
+Usage: python make_tables.py [TABLES_FOLDER]   (default: the current folder)
+The SOM re-analysis table is built by make_reanalysis_table.py.
+"""
 from __future__ import annotations
 
 import logging
@@ -101,12 +105,17 @@ def criteria_table(cur: pd.DataFrame, aug: pd.DataFrame, out: Path) -> None:
 
 
 def main(root: Path) -> None:
-    cur_s = pd.read_csv(root / "curriculum_test_summary.csv")
-    aug_s = pd.read_csv(root / "augmentation_test_summary.csv")
-    cur_c = pd.read_csv(root / "curriculum_test_comparisons.csv")
-    aug_c = pd.read_csv(root / "augmentation_test_comparisons.csv")
-    arm_table(cur_s, aug_s, root)
-    criteria_table(cur_c, aug_c, root)
+    """Read the copied result tables under `root` and write the LaTeX tables to `root/summary`."""
+    cur = root / "hard_example_mining" / "curriculum_comparison"
+    aug = root / "targeted_augmentation" / "augmentation_comparison"
+    out = root / "summary"
+    out.mkdir(parents=True, exist_ok=True)
+    cur_s = pd.read_csv(cur / "test_summary.csv")
+    aug_s = pd.read_csv(aug / "test_summary.csv")
+    cur_c = pd.read_csv(cur / "test_comparisons.csv")
+    aug_c = pd.read_csv(aug / "test_comparisons.csv")
+    arm_table(cur_s, aug_s, out)
+    criteria_table(cur_c, aug_c, out)
 
 
 if __name__ == "__main__":
