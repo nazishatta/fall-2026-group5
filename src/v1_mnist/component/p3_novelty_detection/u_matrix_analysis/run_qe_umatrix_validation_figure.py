@@ -14,6 +14,7 @@ from scipy.stats import spearmanr
 
 from src.v1_mnist.component.utils.figures import save_pdf
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 LOGGER = setup_logger(__name__, level=logging.INFO)
@@ -22,10 +23,7 @@ ROOT = Path(__file__).resolve().parents[5]
 
 def repository_path(value: str) -> Path:
     """Resolve a configured path within the repository."""
-    path = (ROOT / value).resolve()
-    if not path.is_relative_to(ROOT):
-        raise ValueError("Path outside repository")
-    return path
+    return resolve_inside(ROOT, value)
 
 
 def run(config_path: Path) -> Path:

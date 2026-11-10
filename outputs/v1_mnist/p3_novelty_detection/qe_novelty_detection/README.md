@@ -16,4 +16,4 @@ Each row is one thing the proposal asks for in this step.
 
 ## Ignore unless you are checking reproducibility
 
-The `reorg_20261101_..._v1` and `reorg_20261102_..._v2` folders repeat steps 1, 2 and 4 from the new code layout. They show the code reproduces the earlier results. Do not cite them as new results.
+The three `reorg_20261102_..._v2` folders repeat steps 1, 2 and 4 with today's code. They are the link between the original folders and the current code. Do not cite them as new results. Which code wrote each folder is in [`../run_manifest.csv`](../run_manifest.csv).

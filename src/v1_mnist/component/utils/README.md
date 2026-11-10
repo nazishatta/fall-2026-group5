@@ -17,6 +17,7 @@ The trees below follow the code's own layout: each **phase folder**, then its **
 | `run_settings.py`     | Which SOM the cluster and error-pattern analyses use, where their outputs go, and checks that the model and inputs are the right ones (SHA-256).                                         |
 | `som_data.py`         | Loads and checks the CNN embeddings from the configured folder only; fits the scaler on the training split only.                                                                         |
 | `som_figure_setup.py` | Shared start-up for the three SOM figure scripts: arguments, config, model, data, figure folders, figure manifest.                                                                       |
+| `repo_paths.py`       | Resolves a path from a config inside the repository and refuses paths that leave it (`resolve_inside`). Used by the Phase 3 scripts.                                                     |
 | `som_io.py`           | Loads the selected SOM and one split's embeddings; rebuilds BMU assignments; SHA-256 of files; writes CSV rows.                                                                          |
 | `som_neuron_maps.py`  | Per-neuron class and error statistics, and the simple grid map.                                                                                                                          |
 | `som_plotting.py`     | Runs an NNSOM plot and saves it (`save_nnsom_plot`); picks the most variable features.                                                                                                   |

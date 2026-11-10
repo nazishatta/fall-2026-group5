@@ -8,6 +8,7 @@ and integration with the shared project pipeline.
 
 ```text
 p3_novelty_detection/
+├── test_run_manifest.py   # every run folder is in run_manifest.csv; its script and config exist; recorded config hashes match
 ├── qe_novelty_detection/
 │   ├── test_novelty_figures.py
 │   ├── test_ood_metrics.py

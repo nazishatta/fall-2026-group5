@@ -1,4 +1,0 @@
-som_config: src/v1_mnist/component/configs/som.yaml
-threshold_percentile: 95.0
-output_dir: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
-run_id: reorg_20261101_qe_novelty_s42_v1

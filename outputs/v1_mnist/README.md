@@ -22,9 +22,9 @@ Weeks 12–14 (results, paper, release) have no folder because they produce docu
 | 5 | `error_pattern_analysis/` | Week 5: Error Pattern Analysis | Error-rate and complex error maps, error-pattern robustness results for 10x10 / 15x15 / 20x20 and the verdict |
 | — | `interactive_report/` | Weeks 3–5 together | `interactive_report.html` (map, classes, errors and samples in one page) |
 | **Phase 3: Novelty Detection** | `p3_novelty_detection/` | | |
-| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | *(empty)* |
-| 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | *(empty)* |
-| 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | *(empty)* |
+| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | QE scores with the frozen training-QE threshold, QE vs SVHN, cutoff sweep, random control |
+| 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | QE and U-Matrix statistics, U-Matrix grid and QE-vs-U-Matrix figures, SVHN on the SOM grid, gap analysis |
+| 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | QE and U-Matrix vs Isolation Forest, One-Class SVM, autoencoder, max-softmax, energy, Mahalanobis and kNN; paired comparisons; diagnostics. Every run folder and the code that wrote it: `p3_novelty_detection/run_manifest.csv` |
 | **Phase 4: Guided Retraining** | `p4_guided_retraining/` | | |
 | 9 | `hard_example_mining/` | Week 9: Hard Example Mining | *(empty)* |
 | 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | *(empty)* |
@@ -70,9 +70,10 @@ outputs/v1_mnist/
 │   └── interactive_report/interactive_report.html       # Weeks 3–5
 │
 ├── p3_novelty_detection/
-│   ├── qe_novelty_detection/                            # Week 6   (empty)
-│   ├── u_matrix_analysis/                               # Week 7   (empty)
-│   └── novelty_benchmark/                               # Week 8   (empty)
+│   ├── run_manifest.csv                                 # every run folder, its script, config and how that was checked
+│   ├── qe_novelty_detection/                            # Week 6   one folder per run ID
+│   ├── u_matrix_analysis/                               # Week 7   one folder per run ID
+│   └── novelty_benchmark/                               # Week 8   one folder per run ID
 │
 └── p4_guided_retraining/
     ├── hard_example_mining/                             # Week 9   (empty)

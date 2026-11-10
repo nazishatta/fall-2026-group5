@@ -228,10 +228,28 @@ resolve this naming deviation.
 - `reorg_20261102_ood_comparison_qe_s42_v1`: it only repeated QE numbers already saved
   in `mnist_svhn_qe_frozen_s42_initial`. Nothing referred to it.
 
-The five `reorg_20261101_` runs and the five configs that wrote them are kept. They are
-the first re-run of each step from its new folder. The `reorg_20261102_..._v2` runs are
-the second re-run. Keeping both shows that no run was overwritten, as the PR #17 review
-asked.
+**Cleanup, 2026-11-10.** Fifteen repeat run folders, the fifteen configs that wrote them and two
+unused copies of `base.yaml` were deleted, without re-running anything. Git history keeps them.
+
+- All five `reorg_20261101_` folders. The `reorg_20261102_` runs repeat the same steps with
+  the same numbers, so the first repeat added nothing.
+- Ten `reorg_20261102_` folders whose original is already traceable to today's code: for each,
+  the original records a config SHA-256 that equals today's config file (or, for the historical
+  baseline verification, today's config has the same run ID), and the repeat differs from the
+  original only in run ID, config hash and figure-file hash.
+
+Five `reorg_20261102_` folders and their five configs (in `configs/phase3_reorganization/reorg_20261102/`)
+are kept. They are the only runs made by today's code for results whose original config is not
+in git history (`mnist_svhn_qe_frozen_s42_initial`, `qe_random_control_evaluation_initial`,
+`qe_u_matrix_validation_s42_initial`), for the QE summary those three read, and for
+`mnist_svhn_five_method_comparison_s42_initial`, whose config was edited after it ran. The
+random-control repeat differs from its original in six per-seed counts; the five-method repeat
+differs in the U-Matrix FPR at 95% TPR (0.0701 vs 0.0703). Neither difference was hidden by
+the cleanup. The kept configs were not moved or renamed, because their recorded hashes and the
+paths inside them are part of the provenance.
+
+`outputs/v1_mnist/p3_novelty_detection/run_manifest.csv` now lists every remaining run folder
+with the script and config that wrote it and how that was checked.
 
 ### MNIST validation used in place of the held-out test split
 

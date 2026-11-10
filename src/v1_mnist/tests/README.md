@@ -40,7 +40,9 @@ tests/
 │   └── test_run_all.py                              # run_all.py --dry-run lists every step in order
 ├── utils/                                           # shared code in component/utils
 │   ├── test_config_run_names.py                     # old week-numbered run names are refused
-│   └── test_seed_from_config.py                     # training.seed comes only from the config
+│   ├── test_repo_paths.py                           # config paths cannot point outside the repository
+│   ├── test_seed_from_config.py                     # training.seed comes only from the config
+│   └── test_shared_provenance.py                    # Phase 3 frozen inputs match the shared SHA-256 manifest
 ├── p1_model_training_baseline/
 │   ├── data_pipeline/                               # Week 1
 │   │   ├── test_data_loader.py

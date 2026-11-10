@@ -17,6 +17,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
 )
 from src.v1_mnist.component.utils.figures import save_pdf
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.som_io import (
     load_selected_som,
     sha256_file,
@@ -29,10 +30,7 @@ ROOT = Path(__file__).resolve().parents[5]
 
 def repository_path(value: str) -> Path:
     """Resolve an artifact path inside the repository."""
-    path = (ROOT / value).resolve()
-    if not path.is_relative_to(ROOT):
-        raise ValueError("Path outside repository")
-    return path
+    return resolve_inside(ROOT, value)
 
 
 def hexagon_vertices(

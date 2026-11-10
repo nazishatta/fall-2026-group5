@@ -31,6 +31,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.unified_novel
     stratified_bootstrap,
 )
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -40,10 +41,7 @@ LOGGER = get_logger(__name__)
 
 def repo_path(value: str) -> Path:
     """Resolve only safe, repository-relative paths."""
-    relative = Path(value)
-    if relative.is_absolute() or ".." in relative.parts:
-        raise ValueError(f"Invalid relative path: {value}")
-    return ROOT / relative
+    return resolve_inside(ROOT, value)
 
 
 def read_config(config_path: Path) -> dict[str, Any]:

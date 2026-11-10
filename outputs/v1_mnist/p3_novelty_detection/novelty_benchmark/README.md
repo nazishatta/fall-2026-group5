@@ -34,4 +34,4 @@ The written explanation is in `src/v1_mnist/docs/p3_novelty_detection/novelty_be
 
 - `classical_`, `autoencoder_` and `mnist_validation_reproducibility_` folders (all `*_initial`) are the first baseline runs, kept as evidence.
 - `mnist_svhn_energy_knn_score_export_s42_v1` saves the energy and kNN scores that the paired comparisons read. Its `.npy` files are tracked with DVC.
-- `reorg_20261102_..._v1` folders repeat steps from the new code layout. Do not cite them as new results.
+- `reorg_20261102_svhn_score_export_s42_v1` repeats row 1 with today's code and holds the per-method score arrays (DVC). Do not cite it as a new result. Which code wrote each folder is in [`../run_manifest.csv`](../run_manifest.csv).

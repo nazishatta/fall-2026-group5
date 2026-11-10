@@ -14,6 +14,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.paired_bootst
     compare_auroc_paired,
 )
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 LOGGER = setup_logger(__name__, level=logging.INFO)
@@ -22,10 +23,7 @@ ROOT = Path(__file__).resolve().parents[5]
 
 def resolve_path(value: str) -> Path:
     """Allow only repository-contained configured paths."""
-    candidate = (ROOT / value).resolve()
-    if not candidate.is_relative_to(ROOT):
-        raise ValueError(f"Path outside repository: {value}")
-    return candidate
+    return resolve_inside(ROOT, value)
 
 
 def run(config_path: Path) -> Path:

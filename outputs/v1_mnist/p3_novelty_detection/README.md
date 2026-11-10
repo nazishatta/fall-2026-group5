@@ -38,85 +38,68 @@ Use this table when you only want a number. The "Date" column in the tables belo
 
 - A folder is never overwritten. A repeat of a step gets a new run ID, so several folders can belong to the same step.
 - **Cite the folders in the table above.** The reports and `CONSOLIDATED_EVIDENCE.md` use them.
-- **`reorg_` rows are repeat runs.** `reorg_20261101_..._v1` is the first repeat of a step from its new folder. `reorg_20261102_..._v2` is the second. They are kept as proof that the code reproduces the earlier results. Do not cite them as new results.
+- **`reorg_20261102_` folders are reproductions.** Five steps were repeated with today's code after the code was reorganised. Their names describe that event, not the content (see `src/v1_mnist/docs/DEVIATIONS.md`). Do not cite them as new results; the table below says which original each one reproduces.
 - **"historical" rows** were written before the current configs. Some are still the source of the headline numbers.
 - The newest results are the three analyses run on EC2 on 2026-11-03: the cutoff sweep, the SVHN overlay and the autoencoder scaling check.
 
-## Which step wrote which folder
+## Which code wrote which folder
 
-Each row is one run folder. The step names are the ones `run_all.py --to novelty_detection` (or the three runners in `src/v1_mnist/component/pipeline/p3_novelty_detection/`) use; the config is in `src/v1_mnist/component/configs/`. Nothing here is renamed or moved, because result files record the run ID they were written under.
+Every run folder is listed in [`run_manifest.csv`](run_manifest.csv), one row per folder, like Phase 2's `run_manifest.csv`. The tables below show the same rows. A test (`src/v1_mnist/tests/p3_novelty_detection/test_run_manifest.py`) checks that every folder has a row, that every script and config named here exists, and that recorded config hashes still match.
 
-Status meanings:
+Columns:
 
-- **current**: a step creates this folder from its config.
-- **reorganisation run**: repeat run made while the code was reorganised (names start with `reorg_` and a date). Kept as evidence that the code reproduces the earlier results. These names describe an event, not the content; see `src/v1_mnist/docs/DEVIATIONS.md`.
-- **historical**: written before the current configs; no config creates it any more.
-- **not yet run**: the config exists, the folder does not. New analyses run on EC2. The three reproduction steps are skipped by `run_all.py` unless `--with-reproductions` is given, because the reorganisation runs already reproduced the originals.
-
+- **Script** is in `src/v1_mnist/component/p3_novelty_detection/<step folder>/`; **config** is in `src/v1_mnist/component/configs/`.
+- **Config check** says how we know which config made the folder. The strongest case is "recorded config SHA-256 equals this file": the result stores a fingerprint of its config, and today's file has the same fingerprint.
+- **Role**: *result* is what the reports cite; *reproduction* is a repeat run made with today's code, kept because it is the only link between an older result and today's code; *historical* is an early run with no surviving code.
+- Folder names are never changed, because each result file records the run ID it was written under.
 
 ### `qe_novelty_detection/` (QE novelty scores; runner `run_qe_novelty_detection.py`)
 
-| Run folder | Date | Step | Config | Status |
-|---|---|---|---|---|
-| `mnist_svhn_qe_dev_initial` | not run | `qe_ood` | `qe_ood_evaluation.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
-| `mnist_svhn_qe_frozen_s42_initial` | 2026-10-12 | - | - | historical (kept as evidence); original run that step `qe_ood` repeats |
-| `mnist_svhn_qe_threshold_sweep_s42_v1` | 2026-11-03 | `qe_threshold_sweep` | `qe_threshold_sweep.yaml` | current (run on EC2, 2026-11-03) |
-| `qe_random_control_evaluation_initial` | 2026-10-12 | - | - | historical (kept as evidence); original run that step `qe_random_control` repeats |
-| `qe_random_control_reproduction_initial` | not run | `qe_random_control` | `qe_random_control.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
-| `qe_training_calibrated_initial` | 2026-10-12 | `qe_novelty` | `qe_novelty.yaml` | current |
-| `reorg_20261101_qe_novelty_s42_v1` | 2026-11-02 | - | `phase3_reorganization/qe_novelty.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261101_qe_ood_s42_v1` | 2026-11-02 | - | `phase3_reorganization/qe_ood_evaluation.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261101_random_control_s42_v1` | 2026-11-02 | - | `phase3_reorganization/qe_random_control.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_qe_novelty_s42_v2` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/qe_novelty_rerun.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_qe_ood_s42_v2` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/qe_ood_rerun.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_random_control_s42_v2` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/random_control_rerun.yaml` | reorganisation run (kept as evidence) |
+| Run folder | Role | Last commit | Step and script | Config | Config check | Used in |
+|---|---|---|---|---|---|---|
+| `mnist_svhn_qe_frozen_s42_initial` | result | 2026-10-12 | `qe_ood`, `run_qe_ood.py` | - | no config hash recorded; the original config was not found in git history; reproduced with identical numbers by reorg_20261102_qe_ood_s42_v2 | report tab:svhn_new and tab:unified (QE row); docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md |
+| `mnist_svhn_qe_threshold_sweep_s42_v1` | result | 2026-11-03 | `qe_threshold_sweep`, `run_qe_threshold_sweep.py` | `qe_threshold_sweep.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `qe_random_control_evaluation_initial` | result | 2026-10-12 | `qe_random_control`, `run_qe_random_control.py` | - | no config hash recorded; the original config was not found in git history; reproduced by reorg_20261102_random_control_s42_v2 (summary values match; six per-seed counts differ) | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md; docs/p3_novelty_detection/qe_novelty_detection/RANDOM_CONTROL_REPRODUCTION.md |
+| `qe_training_calibrated_initial` | result | 2026-10-12 | `qe_novelty`, `run_qe_novelty.py` | `qe_novelty.yaml` | no config hash recorded; the run ID matches this config | report fig:qe (qe_score_distribution.pdf, written by run_qe_novelty.py); docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md |
+| `reorg_20261102_qe_novelty_s42_v2` | reproduction | 2026-11-02 | `qe_novelty`, `run_qe_novelty.py` | `phase3_reorganization/reorg_20261102/qe_novelty_rerun.yaml` | no config hash recorded; the run ID matches this config | reproduces qe_training_calibrated_initial (identical numbers); input to the other reproductions |
+| `reorg_20261102_qe_ood_s42_v2` | reproduction | 2026-11-02 | `qe_ood`, `run_qe_ood.py` | `phase3_reorganization/reorg_20261102/qe_ood_rerun.yaml` | no config hash recorded; the run ID matches this config | reproduces mnist_svhn_qe_frozen_s42_initial (identical numbers) |
+| `reorg_20261102_random_control_s42_v2` | reproduction | 2026-11-02 | `qe_random_control`, `run_qe_random_control.py` | `phase3_reorganization/reorg_20261102/random_control_rerun.yaml` | recorded config SHA-256 equals this file | reproduces qe_random_control_evaluation_initial (six per-seed counts differ) |
 
 ### `u_matrix_analysis/` (U-Matrix analysis and figures; runner `run_u_matrix_analysis.py`)
 
-| Run folder | Date | Step | Config | Status |
-|---|---|---|---|---|
-| `mnist_qe_umatrix_validation_figure_s42_v1` | 2026-10-20 | `qe_umatrix_validation_figure` | `qe_umatrix_validation_figure.yaml` | current |
-| `mnist_svhn_proposal_gap_analysis_s42_v1` | 2026-11-02 | `proposal_gap_analysis` | `phase3_proposal_gap_analysis.yaml` | current |
-| `mnist_svhn_som_overlay_s42_v1` | 2026-11-03 | `svhn_som_overlay` | `svhn_som_overlay.yaml` | current (run on EC2, 2026-11-03) |
-| `mnist_umatrix_hex_grid_s42_v1` | 2026-10-20 | `u_matrix_grid_figure` | `u_matrix_grid_figure.yaml` | current |
-| `qe_u_matrix_validation_reproduction_initial` | not run | `qe_u_matrix` | `qe_u_matrix_reproduction.yaml` | reproduction, not yet run (skipped unless `--with-reproductions`) |
-| `qe_u_matrix_validation_s42_initial` | 2026-10-19 | - | - | historical (kept as evidence); original run that step `qe_u_matrix` repeats; later steps read it |
-| `reorg_20261101_gap_analysis_s42_v1` | 2026-11-02 | - | `phase3_reorganization/phase3_proposal_gap_analysis.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261101_u_matrix_s42_v1` | 2026-11-02 | - | `phase3_reorganization/qe_u_matrix_reproduction.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_gap_analysis_s42_v2` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/gap_analysis_rerun.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_qe_umatrix_validation_figure_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/qe_umatrix_validation_figure.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_u_matrix_grid_figure_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/u_matrix_grid_figure.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_u_matrix_s42_v2` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/u_matrix_rerun.yaml` | reorganisation run (kept as evidence) |
+| Run folder | Role | Last commit | Step and script | Config | Config check | Used in |
+|---|---|---|---|---|---|---|
+| `mnist_qe_umatrix_validation_figure_s42_v1` | result | 2026-10-20 | `qe_umatrix_validation_figure`, `run_qe_umatrix_validation_figure.py` | `qe_umatrix_validation_figure.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_proposal_gap_analysis_s42_v1` | result | 2026-11-02 | `proposal_gap_analysis`, `run_proposal_gap_analysis.py` | `phase3_proposal_gap_analysis.yaml` | recorded config SHA-256 equals this file | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md |
+| `mnist_svhn_som_overlay_s42_v1` | result | 2026-11-03 | `svhn_som_overlay`, `run_svhn_som_overlay.py` | `svhn_som_overlay.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `mnist_umatrix_hex_grid_s42_v1` | result | 2026-10-20 | `u_matrix_grid_figure`, `run_u_matrix_grid_figure.py` | `u_matrix_grid_figure.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `qe_u_matrix_validation_s42_initial` | result | 2026-10-19 | `qe_u_matrix`, `run_qe_u_matrix.py` | - | no config hash recorded; the original config was not found in git history; reproduced with identical statistics by reorg_20261102_u_matrix_s42_v2 | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md |
+| `reorg_20261102_u_matrix_s42_v2` | reproduction | 2026-11-02 | `qe_u_matrix`, `run_qe_u_matrix.py` | `phase3_reorganization/reorg_20261102/u_matrix_rerun.yaml` | recorded config SHA-256 equals this file | reproduces qe_u_matrix_validation_s42_initial (identical statistics) |
 
 ### `novelty_benchmark/` (comparison with the other novelty methods; runner `run_novelty_benchmark.py`)
 
-| Run folder | Date | Step | Config | Status |
-|---|---|---|---|---|
-| `autoencoder_mnist_validation_s42_initial` | 2026-10-19 | - | - | historical (kept as evidence); first autoencoder run, kept as evidence |
-| `classical_mnist_validation_s42_initial` | 2026-10-19 | - | - | historical (kept as evidence); first Isolation Forest / One-Class SVM run, kept as evidence |
-| `mnist_historical_baseline_verification_s42_v1` | 2026-10-19 | `historical_baseline_verification` | `historical_baseline_verification.yaml` | current |
-| `mnist_svhn_ae_train_standardized_s42_v1` | 2026-10-20 | `standardized_autoencoder` | `autoencoder_standardized_diagnostic.yaml` | current |
-| `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | 2026-11-03 | `autoencoder_scaling_diagnostic` | `autoencoder_scaling_diagnostic.yaml` | current (run on EC2, 2026-11-03) |
-| `mnist_svhn_consolidated_evidence_s42_v1` | 2026-10-20 | - | - | historical (kept as evidence); written by `consolidate_phase3_evidence` (own command, not a `run_all` step) |
-| `mnist_svhn_energy_knn_score_export_s42_v1` | 2026-11-02 | `svhn_score_export` | `svhn_score_export.yaml` | current |
-| `mnist_svhn_fair_budget_baselines_s42_46_v1` | 2026-10-20 | `fair_budget_baselines` | `fair_budget_baselines.yaml` | current |
-| `mnist_svhn_five_method_comparison_s42_initial` | 2026-10-12 | `svhn_benchmark` | `novelty_benchmark.yaml` | current |
-| `mnist_svhn_missed_qe_figure_s42_v1` | 2026-10-20 | `missed_svhn_figure` | `missed_svhn_figure.yaml` | current |
-| `mnist_svhn_qe_energy_knn_paired_s42_v1` | 2026-10-20 | `qe_energy_knn_paired` | `qe_energy_knn_paired.yaml` | current |
-| `mnist_svhn_qe_msp_reproduction_s42_v1` | 2026-10-19 | `qe_msp_paired_comparison` | `svhn_paired_comparison.yaml` | current |
-| `mnist_svhn_qe_umatrix_random_s42_v1` | 2026-10-20 | `qe_umatrix_random_ood` | `qe_u_matrix_random_ood.yaml` | current |
-| `mnist_svhn_required_baselines_knn_s42_v1` | 2026-10-19 | `required_baselines_knn` | `svhn_knn_baselines.yaml` | current |
-| `mnist_svhn_required_baselines_reproduction_initial` | 2026-10-19 | `required_baselines` | `required_ood_baselines.yaml` | current |
-| `mnist_svhn_unified_nine_methods_s42_46_v1` | 2026-10-27 | `unified_novelty_benchmark` | `unified_novelty_benchmark.yaml` | current |
-| `mnist_validation_reproducibility_s42_initial` | 2026-10-19 | - | - | historical (kept as evidence); early reproducibility check, kept as evidence |
-| `reorg_20261102_autoencoder_standardized_diagnostic_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/autoencoder_standardized_diagnostic.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_fair_budget_baselines_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/fair_budget_baselines.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_historical_baseline_verification_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/historical_baseline_verification.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_missed_svhn_figure_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/missed_svhn_figure.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_qe_energy_knn_paired_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/qe_energy_knn_paired.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_qe_u_matrix_random_ood_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/qe_u_matrix_random_ood.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_required_ood_baselines_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/required_ood_baselines.yaml` | reorganisation run (kept as evidence) |
-| `reorg_20261102_svhn_score_export_s42_v1` | 2026-11-02 | - | `phase3_reorganization/reorg_20261102/svhn_score_export.yaml` | reorganisation run (kept as evidence) |
-| `svhn_inverted_embedding_norm_s42_v1` | 2026-10-27 | `svhn_inverted_norm_diagnostic` | `svhn_inverted_norm_diagnostic.yaml` | current |
+| Run folder | Role | Last commit | Step and script | Config | Config check | Used in |
+|---|---|---|---|---|---|---|
+| `mnist_historical_baseline_verification_s42_v1` | result | 2026-10-19 | `historical_baseline_verification`, `run_historical_baseline_verification.py` | `historical_baseline_verification.yaml` | no config hash recorded; the run ID matches this config | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md |
+| `mnist_svhn_ae_train_standardized_s42_v1` | result | 2026-10-20 | `standardized_autoencoder`, `run_standardized_autoencoder.py` | `autoencoder_standardized_diagnostic.yaml` | recorded config SHA-256 equals this file | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md |
+| `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | result | 2026-11-03 | `autoencoder_scaling_diagnostic`, `run_autoencoder_scaling.py` | `autoencoder_scaling_diagnostic.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `mnist_svhn_consolidated_evidence_s42_v1` | result | 2026-10-20 | `consolidate_phase3_evidence.py` (own command) | - | no config: inputs are the run folders named in phase3_consolidation_provenance.json | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_energy_knn_score_export_s42_v1` | result | 2026-11-02 | `svhn_score_export`, `run_required_baselines.py` | `svhn_score_export.yaml` | recorded config SHA-256 equals this file | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md |
+| `mnist_svhn_fair_budget_baselines_s42_46_v1` | result | 2026-10-20 | `fair_budget_baselines`, `run_fair_budget_baselines.py` | `fair_budget_baselines.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `mnist_svhn_five_method_comparison_s42_initial` | result | 2026-10-12 | `svhn_benchmark`, `run_svhn_benchmark.py` | `novelty_benchmark.yaml` | recorded config SHA-256 equals this file at commit 7411c60; the file was edited later; reproduced with current code by reorg_20261102_svhn_score_export_s42_v1 (14 of 15 table values equal; U-Matrix FPR@95%TPR 0.0701 vs 0.0703) | report tab:svhn (all 15 values match); docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md; docs/p3_novelty_detection/novelty_benchmark/SVHN_BASELINE_DIAGNOSTIC.md |
+| `mnist_svhn_missed_qe_figure_s42_v1` | result | 2026-10-20 | `missed_svhn_figure`, `run_missed_svhn_figure.py` | `missed_svhn_figure.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_qe_energy_knn_paired_s42_v1` | result | 2026-10-20 | `qe_energy_knn_paired`, `run_qe_energy_knn_paired.py` | `qe_energy_knn_paired.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_qe_msp_reproduction_s42_v1` | result | 2026-10-19 | `qe_msp_paired_comparison`, `run_required_baselines.py` | `svhn_paired_comparison.yaml` | recorded config SHA-256 equals this file | docs/DEVIATIONS.md; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `mnist_svhn_qe_umatrix_random_s42_v1` | result | 2026-10-20 | `qe_umatrix_random_ood`, `run_qe_umatrix_random_ood.py` | `qe_u_matrix_random_ood.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_required_baselines_knn_s42_v1` | result | 2026-10-19 | `required_baselines_knn`, `run_required_baselines.py` | `svhn_knn_baselines.yaml` | recorded config SHA-256 equals this file | report tab:svhn_new (energy, MSP, kNN, Mahalanobis rows); docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/CONSOLIDATED_EVIDENCE.md |
+| `mnist_svhn_required_baselines_reproduction_initial` | result | 2026-10-19 | `required_baselines`, `run_required_baselines.py` | `required_ood_baselines.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md |
+| `mnist_svhn_unified_nine_methods_s42_46_v1` | result | 2026-10-27 | `unified_novelty_benchmark`, `unified_novelty_benchmark.py` | `unified_novelty_benchmark.yaml` | recorded config SHA-256 equals this file | report tab:unified; docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md |
+| `svhn_inverted_embedding_norm_s42_v1` | result | 2026-10-27 | `svhn_inverted_norm_diagnostic`, `svhn_inverted_norm_diagnostic.py` | `svhn_inverted_norm_diagnostic.yaml` | recorded config SHA-256 equals this file | docs/p3_novelty_detection/README.md; docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md |
+| `reorg_20261102_svhn_score_export_s42_v1` | reproduction | 2026-11-02 | `svhn_benchmark`, `run_svhn_benchmark.py` | `phase3_reorganization/reorg_20261102/svhn_score_export.yaml` | recorded config SHA-256 equals this file | reproduces mnist_svhn_five_method_comparison_s42_initial with current code; holds the per-method score arrays (DVC) |
+| `autoencoder_mnist_validation_s42_initial` | historical | 2026-10-19 | - | - | no script in the repository or its git history contains this file name; its numbers are recomputed by mnist_historical_baseline_verification_s42_v1 | docs/p3_novelty_detection/README.md |
+| `classical_mnist_validation_s42_initial` | historical | 2026-10-19 | - | - | no script in the repository or its git history contains this file name; its numbers are recomputed by mnist_historical_baseline_verification_s42_v1 | docs/p3_novelty_detection/README.md |
+| `mnist_validation_reproducibility_s42_initial` | historical | 2026-10-19 | - | - | no script in the repository or its git history contains this file name | docs/p3_novelty_detection/README.md |
+
+**Configs with no folder yet.** `qe_ood_evaluation.yaml` (`mnist_svhn_qe_dev_initial`), `qe_random_control.yaml` (`qe_random_control_reproduction_initial`) and `qe_u_matrix_reproduction.yaml` (`qe_u_matrix_validation_reproduction_initial`) are the configs the runners use for steps `qe_ood`, `qe_random_control` and `qe_u_matrix`. They have not been run, because the `reorg_20261102_` reproductions above already repeat these steps. `run_all.py` skips them unless `--with-reproductions` is given.
 
 Large `.npy` outputs are tracked with DVC and are not committed to git; small `.csv` and `.json` files stay in git. Figures are PDF only.

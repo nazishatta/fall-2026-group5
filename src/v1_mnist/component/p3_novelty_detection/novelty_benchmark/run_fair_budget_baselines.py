@@ -33,6 +33,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood
     read_settings,
 )
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.shared_provenance import (
     verify_shared_inputs,
 )
@@ -45,10 +46,7 @@ METHODS = ("isolation_forest", "one_class_svm", "autoencoder")
 
 def repository_path(value: str) -> Path:
     """Resolve an input within the repository."""
-    path = (ROOT / value).resolve()
-    if not path.is_relative_to(ROOT):
-        raise ValueError(f"Path escapes repository: {value}")
-    return path
+    return resolve_inside(ROOT, value)
 
 
 def validate_protocol(config: dict[str, Any]) -> None:

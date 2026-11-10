@@ -15,16 +15,14 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.novelty_overl
     save_novelty_overlay,
     summarize_qe_misses,
 )
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 
 ROOT = Path(__file__).resolve().parents[5]
 
 
 def resolve_repo_path(value: str) -> Path:
     """Resolve a repository-relative path and reject parent traversal."""
-    path = (ROOT / value).resolve()
-    if not path.is_relative_to(ROOT):
-        raise ValueError(f"Path escapes project root: {value}")
-    return path
+    return resolve_inside(ROOT, value)
 
 
 def sha256_file(path: Path) -> str:

@@ -56,6 +56,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
     sample_u_matrix,
 )
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.shared_provenance import (
     load_manifest,
     verify_shared_inputs,
@@ -70,10 +71,7 @@ FROZEN_NAMES = ("qe", "u_matrix", "max_softmax", "energy")
 
 def repo_path(value: str) -> Path:
     """Resolve only safe, repository-relative paths."""
-    relative = Path(value)
-    if relative.is_absolute() or ".." in relative.parts:
-        raise ValueError(f"Invalid relative path: {value}")
-    return ROOT / relative
+    return resolve_inside(ROOT, value)
 
 
 def check_protocol(config: dict[str, Any]) -> None:

@@ -18,4 +18,4 @@ Large files (figure PDFs, assignment arrays) are tracked with DVC and appear her
 
 ## Ignore unless you are checking reproducibility
 
-The `reorg_20261101_..._v1` and `reorg_20261102_..._v1/_v2` folders repeat the steps above from the new code layout. Do not cite them as new results.
+`reorg_20261102_u_matrix_s42_v2` repeats the QE and U-Matrix statistics with today's code. It is the link between `qe_u_matrix_validation_s42_initial` and the current code. Do not cite it as a new result. Which code wrote each folder is in [`../run_manifest.csv`](../run_manifest.csv).

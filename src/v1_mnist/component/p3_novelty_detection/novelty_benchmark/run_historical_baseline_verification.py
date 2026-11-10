@@ -21,6 +21,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.classical_bas
 )
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 
 ROOT = Path(__file__).resolve().parents[5]
 LOGGER = get_logger("v1_mnist.p3.historical_baseline_verification")
@@ -28,10 +29,7 @@ LOGGER = get_logger("v1_mnist.p3.historical_baseline_verification")
 
 def resolve_repo_path(relative: str) -> Path:
     """Resolve a repository-relative path while preventing directory escape."""
-    candidate = (ROOT / relative).resolve()
-    if not candidate.is_relative_to(ROOT):
-        raise ValueError(f"Path outside repository: {relative}")
-    return candidate
+    return resolve_inside(ROOT, relative)
 
 
 def compare_summaries(
