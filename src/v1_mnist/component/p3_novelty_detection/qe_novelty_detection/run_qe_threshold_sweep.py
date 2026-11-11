@@ -26,6 +26,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.qe_thresho
 )
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -43,8 +44,7 @@ def read_config(config_path: Path) -> dict[str, Any]:
     """Load the config and reject unsafe run IDs or percentile lists."""
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     run_id = config.get("run_id")
-    if not isinstance(run_id, str) or not run_id or not all(ch.isalnum() or ch in "-_" for ch in run_id):
-        raise ValueError("Unsafe run ID")
+    check_run_id(run_id)
     percentiles = check_percentiles(config["percentiles"])
     if HEADLINE_PERCENTILE not in percentiles:
         raise ValueError("The 95th percentile must stay in the list so the frozen cutoff is checked")

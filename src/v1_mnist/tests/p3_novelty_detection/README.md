@@ -9,6 +9,7 @@ and integration with the shared project pipeline.
 ```text
 p3_novelty_detection/
 ├── test_run_manifest.py   # every run folder is in run_manifest.csv; its script and config exist; recorded config hashes match
+├── test_report_figures.py # every report figure is the PDF its run wrote (checked against the recorded SHA-256)
 ├── qe_novelty_detection/
 │   ├── test_novelty_figures.py
 │   ├── test_ood_metrics.py
@@ -43,6 +44,7 @@ p3_novelty_detection/
     ├── test_standardized_autoencoder_diagnostic.py
     ├── test_svhn_canonical_location.py
     ├── test_svhn_inverted_norm_diagnostic.py
+    ├── test_qe_norm_dependence.py
     ├── test_svhn_knn_config.py
     └── test_unified_novelty_benchmark.py
 ```

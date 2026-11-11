@@ -57,8 +57,6 @@ def input_path(value: str) -> Path:
 def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     """Evaluate frozen samples without fitting or overwriting evaluation data."""
     import torch
-    from torch.utils.data import DataLoader
-    from torchvision.datasets import SVHN
 
     from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
         FeatureExtractor,
@@ -67,7 +65,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         LeNet5,
     )
     from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-        image_transform,
+        svhn_test_loader,
     )
 
     config = load_config(config_path)
@@ -142,17 +140,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     LOGGER.info("Frozen MNIST validation predictions verified")
 
     image_size = tuple(int(x) for x in config.inference.image_size)
-    dataset = SVHN(
-        root=str(inputs["svhn_file"].parent),
-        split="test",
-        download=False,
-        transform=image_transform("svhn", image_size),
-    )
-    loader = DataLoader(
-        dataset,
-        batch_size=int(config.inference.batch_size),
-        shuffle=False,
-    )
+    loader = svhn_test_loader(inputs['svhn_file'], image_size, int(config.inference.batch_size))
     extracted = FeatureExtractor(
         model, str(config.inference.feature_layer)
     ).extract(loader, torch.device("cpu"), return_metadata=True)

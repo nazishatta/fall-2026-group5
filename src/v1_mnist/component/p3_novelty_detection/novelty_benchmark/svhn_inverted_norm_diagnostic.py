@@ -9,8 +9,15 @@ from typing import Any
 
 import numpy as np
 
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.qe_norm_dependence import (
+    embedding_norms,
+)
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.qe_norm_dependence import (
+    norm_summary as summarize_norms,
+)
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.shared_provenance import (
     ROOT,
     load_manifest,
@@ -23,20 +30,7 @@ LOGGER = get_logger(__name__)
 
 def norm_summary(features: np.ndarray) -> dict[str, float | int]:
     """Summarize L2 norms of finite, two-dimensional embeddings."""
-    values = np.asarray(features, dtype=np.float64)
-    if values.ndim != 2 or not values.size:
-        raise ValueError("Expected a nonempty 2D embedding matrix")
-    if not np.isfinite(values).all():
-        raise ValueError("Nonfinite embedding values")
-    norms = np.linalg.norm(values, axis=1)
-    return {
-        "count": len(norms),
-        "mean": float(np.mean(norms)),
-        "median": float(np.median(norms)),
-        "sample_sd": float(np.std(norms, ddof=1)) if len(norms) > 1 else 0.0,
-        "p05": float(np.quantile(norms, 0.05)),
-        "p95": float(np.quantile(norms, 0.95)),
-    }
+    return summarize_norms(embedding_norms(features))
 
 
 def compare_norms(
@@ -63,9 +57,7 @@ def compare_norms(
 def run(config_path: Path) -> Path:
     """Run a new non-overwriting diagnostic on the frozen CNN."""
     import torch
-    from torch.utils.data import DataLoader
     from torchvision import transforms
-    from torchvision.datasets import SVHN
 
     from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
         FeatureExtractor,
@@ -75,13 +67,13 @@ def run(config_path: Path) -> Path:
     )
     from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
         image_transform,
+        svhn_test_loader,
     )
 
     config = load_config(config_path)
     manifest = load_manifest()
     run_id = str(config.run_id)
-    if not run_id or not all(c.isalnum() or c in "_-" for c in run_id):
-        raise ValueError("Invalid run ID")
+    check_run_id(run_id)
 
     destination = ROOT / str(config.output_root) / run_id
     if destination.exists():
@@ -115,25 +107,14 @@ def run(config_path: Path) -> Path:
     ])
 
     def extract(transform: Any) -> np.ndarray:
-        dataset = SVHN(
-            root=str(svhn_file.parent),
-            split="test",
-            transform=transform,
-            download=False,
-        )
-        loader = DataLoader(
-            dataset,
-            batch_size=int(config.batch_size),
-            shuffle=False,
-            num_workers=0,
-        )
+        loader = svhn_test_loader(svhn_file, size, int(config.batch_size), transform=transform)
         with torch.no_grad():
             extracted = FeatureExtractor(model, "fc2").extract(
                 loader, torch.device("cpu")
             )
         features = np.asarray(extracted[0])
         if features.shape != (
-            len(dataset), int(config.feature_dim)
+            len(loader.dataset), int(config.feature_dim)
         ):
             raise RuntimeError("Unexpected frozen CNN embedding shape")
         return features

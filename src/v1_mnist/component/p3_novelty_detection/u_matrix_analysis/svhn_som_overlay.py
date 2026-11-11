@@ -249,9 +249,8 @@ def save_svhn_overlay(
         ("Dominant MNIST class per neuron", classes, plt.get_cmap(class_map, class_count), "MNIST class", (-0.5, class_count - 0.5)),
     )
     fig, axes = plt.subplots(1, 3, figsize=(18, 5.8))
-    for ax, (title, values, cmap, label, limits) in zip(axes, panels):
-        colors = plt.get_cmap(cmap).copy()
-        colors.set_bad("lightgray")
+    for ax, (title, values, cmap, label, limits) in zip(axes, panels, strict=True):
+        colors = plt.get_cmap(cmap).with_extremes(bad="lightgray")
         layer = PolyCollection(
             vertices, array=np.ma.masked_invalid(values), cmap=colors,
             edgecolors="white", linewidths=0.25,

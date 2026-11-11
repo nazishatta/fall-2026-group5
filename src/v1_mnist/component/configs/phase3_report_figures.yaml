@@ -1,0 +1,28 @@
+# Which saved run each figure in the Phase 3 report comes from.
+# copy_report_figures.py copies each run's own PDF into the report folder. Where the
+# run recorded the figure's SHA-256 (figure_metrics.json), a file with a different
+# fingerprint is refused, and test_report_figures.py checks the report copy.
+# The framework diagram and the GWU logo are not run outputs and are not listed.
+report_dir: reports/Latex_report/v1_mnist/p3_novelty_detection
+report_tex: novelty_detection.tex
+figures:
+  - report_file: fig/qe_novelty_detection/qe_score_distribution.pdf
+    run_folder: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/qe_training_calibrated_initial
+    run_file: qe_score_distribution.pdf
+    hash_record: null  # this run did not record a figure fingerprint
+  - report_file: fig/u_matrix_analysis/u_matrix_novelty_som_grid.pdf
+    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_umatrix_hex_grid_s42_v1
+    run_file: u_matrix_novelty_som_grid.pdf
+    hash_record: figure_metrics.json
+  - report_file: fig/u_matrix_analysis/qe_u_matrix_validation_initial.pdf
+    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_qe_umatrix_validation_figure_s42_v1
+    run_file: qe_u_matrix_validation_initial.pdf
+    hash_record: figure_metrics.json
+  - report_file: fig/u_matrix_analysis/svhn_som_overlay.pdf
+    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_svhn_som_overlay_s42_v1
+    run_file: pdf/svhn_som_overlay.pdf
+    hash_record: null  # this run did not record a figure fingerprint
+  - report_file: fig/novelty_benchmark/qe_missed_svhn_examples.pdf
+    run_folder: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_missed_qe_figure_s42_v1
+    run_file: qe_missed_svhn_examples.pdf
+    hash_record: figure_metrics.json

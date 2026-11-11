@@ -35,6 +35,8 @@ p3_novelty_detection/
     ├── run_autoencoder_scaling.py        ▶ autoencoder / Isolation Forest by size and scaling
     ├── unified_novelty_benchmark.py      ▶ all nine detectors in one run
     ├── svhn_inverted_norm_diagnostic.py  ▶ SVHN embedding-norm diagnostic
+    ├── run_qe_norm_dependence.py         ▶ QE versus embedding norm (correlation, norm-matched AUROC)
+    ├── consolidate_phase3_evidence.py    ▶ headline numbers of three runs in one table
     ├── inspect_svhn_scores.py            ▶ read-only SVHN score inspection
     └── other Python modules              scoring and analysis helpers
 ```

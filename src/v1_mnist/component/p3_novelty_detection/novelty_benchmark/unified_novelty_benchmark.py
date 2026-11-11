@@ -10,8 +10,6 @@ import numpy as np
 import torch
 import yaml
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader
-from torchvision.datasets import SVHN
 
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
     FeatureExtractor,
@@ -45,7 +43,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.unified_novel
     subset_indices,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-    image_transform,
+    svhn_test_loader,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
     prepare,
@@ -57,6 +55,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
 )
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.shared_provenance import (
     load_manifest,
     verify_shared_inputs,
@@ -85,8 +84,7 @@ def check_protocol(config: dict[str, Any]) -> None:
         raise ValueError("Invalid training sample budget")
     if int(config["fitting"]["one_class_svm"]["max_training_samples"]) != budget:
         raise ValueError("One-Class SVM must use the common training budget")
-    if not isinstance(run_id, str) or not run_id or not all(ch.isalnum() or ch in "-_" for ch in run_id):
-        raise ValueError("Unsafe run ID")
+    check_run_id(run_id)
     if float(config["scoring"]["energy_temperature"]) <= 0:
         raise ValueError("Invalid energy temperature")
     if int(config["scoring"]["bootstrap_iterations"]) < 1:
@@ -99,9 +97,8 @@ def load_inputs(config: dict[str, Any]) -> tuple[np.ndarray, np.ndarray, np.ndar
     inputs = dict(manifest["inputs"])
     inputs["svhn_file"] = manifest["svhn_file"]
     verify_shared_inputs(inputs, required_keys=tuple(inputs))
-    label_path = repo_path(
-        "outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_labels.npy"
-    )
+    # Phase 1 saves each split's labels next to its features (embeddings/<split>_labels.npy).
+    label_path = repo_path(inputs["train_features"]).with_name("train_labels.npy")
     if not label_path.is_file():
         raise FileNotFoundError(label_path)
     train = np.load(repo_path(inputs["train_features"]), allow_pickle=False)
@@ -193,11 +190,7 @@ def run(config_path: Path) -> Path:
     manifest = load_manifest()
     svhn_path = repo_path(manifest["svhn_file"])
     ood_settings = read_settings(repo_path(config["qe_config"]))
-    dataset = SVHN(
-        root=str(svhn_path.parent), split="test", download=False,
-        transform=image_transform("svhn", tuple(ood_settings["image_size"])),
-    )
-    loader = DataLoader(dataset, batch_size=int(config["scoring"]["batch_size"]), shuffle=False)
+    loader = svhn_test_loader(svhn_path, tuple(ood_settings['image_size']), int(config['scoring']['batch_size']))
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     if svhn.shape != (int(config["expected"]["svhn_samples"]), int(config["expected"]["embedding_dimensions"])):
@@ -205,7 +198,7 @@ def run(config_path: Path) -> Path:
     joined = np.concatenate((validation, svhn), axis=0)
     n_id = len(validation)
     frozen = get_frozen_scores(config, model, som, validation, val_qe, svhn)
-    del model, som, loader, dataset
+    del model, som, loader
     seeds = [int(seed) for seed in config["fitting"]["seeds"]]
     rows: list[dict[str, Any]] = []
     frozen_metrics: dict[str, Any] = {}

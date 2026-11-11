@@ -15,6 +15,7 @@ from scipy.io import loadmat
 from src.v1_mnist.component.utils.figures import save_pdf
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 LOGGER = setup_logger(__name__, level=logging.WARNING)
@@ -32,10 +33,7 @@ def run(config_path: Path) -> Path:
         config = yaml.safe_load(stream)
 
     run_id = str(config["run_id"])
-    if not run_id or not all(
-        character.isalnum() or character in "_-" for character in run_id
-    ):
-        raise ValueError("Invalid run ID")
+    check_run_id(run_id)
 
     destination = repository_path(config["output_root"]) / run_id
     if destination.exists():

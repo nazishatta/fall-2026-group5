@@ -168,14 +168,13 @@ def prepare(config: dict[str, Any]) -> tuple[Any, Any, np.ndarray, dict[str, Any
 def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]:
     """Evaluate offline-cached OOD datasets without downloads or final MNIST test."""
     import torch
-    from torch.utils.data import DataLoader
-    from torchvision import datasets
 
     from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
         FeatureExtractor,
     )
     from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
         image_transform,
+        svhn_test_loader,
     )
 
     output_root = resolved(config["output_dir"])
@@ -205,13 +204,7 @@ def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]
             required_keys=("svhn_file",),
         )
         canonical_svhn = PROVENANCE_ROOT / svhn_relative
-        dataset = datasets.SVHN(
-            str(canonical_svhn.parent), split="test",
-            transform=transform, download=False,
-        )
-        loader = DataLoader(
-            dataset, batch_size=int(config["batch_size"]), shuffle=False
-        )
+        loader = svhn_test_loader(canonical_svhn, tuple(config['image_size']), int(config['batch_size']), transform=transform)
         features, _, _ = FeatureExtractor(model, str(config["feature_layer"])).extract(
             loader, torch.device("cpu")
         )

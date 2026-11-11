@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import math
 import os
 from pathlib import Path
 from typing import Any, Sequence
 import numpy as np
 from NNSOM.plots import SOMPlots
+
+from src.v1_mnist.component.utils.file_hash import sha256_file as sha256_file  # re-exported for existing importers
 
 SPLIT_FILES = {
     "features",
@@ -17,25 +18,6 @@ SPLIT_FILES = {
     "confidence",
     "correct",
 }
-
-
-def sha256_file(path: Path | str) -> str:
-    """Return SHA-256 hex digest for a file.
-
-    Args:
-        path: Path to the target file.
-
-    Returns:
-        Hexadecimal SHA-256 digest string.
-    """
-    path_obj = Path(path)
-    digest = hashlib.sha256()
-
-    with path_obj.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-
-    return digest.hexdigest()
 
 
 def json_float(value: float) -> float | None:
@@ -233,7 +215,7 @@ def reconstruct_assignments(
     assigned = np.zeros(n_samples, dtype=bool)
 
     for neuron_id, (sample_indices, distances) in enumerate(
-        zip(clusters, cluster_distances)
+        zip(clusters, cluster_distances, strict=True)
     ):
         s_indices = np.asarray(sample_indices, dtype=np.int64)
         s_distances = np.asarray(distances, dtype=np.float64)

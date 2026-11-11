@@ -13,8 +13,6 @@ import numpy as np
 import torch
 import yaml
 from sklearn.metrics import average_precision_score, roc_auc_score
-from torch.utils.data import DataLoader
-from torchvision.datasets import SVHN
 
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
     FeatureExtractor,
@@ -26,7 +24,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.classical_bas
     fit_classical_baselines,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-    image_transform,
+    svhn_test_loader,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
     prepare,
@@ -34,6 +32,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood
 )
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.shared_provenance import (
     verify_shared_inputs,
 )
@@ -124,10 +123,7 @@ def run(config_path: Path) -> Path:
     validate_protocol(config)
 
     run_id = str(config["run_id"])
-    if not run_id or not all(
-        char.isalnum() or char in "_-" for char in run_id
-    ):
-        raise ValueError("Invalid run ID")
+    check_run_id(run_id)
 
     destination = repository_path(config["output_root"]) / run_id
     if destination.exists():
@@ -190,22 +186,12 @@ def run(config_path: Path) -> Path:
     if float(provenance["qe_threshold"]) != float(expected["qe_threshold"]):
         raise RuntimeError("Frozen QE protocol mismatch")
 
-    dataset = SVHN(
-        root=str(svhn_file.parent),
-        split="test",
-        download=False,
-        transform=image_transform("svhn", (28, 28)),
-    )
-    loader = DataLoader(
-        dataset,
-        batch_size=int(ood_settings["batch_size"]),
-        shuffle=False,
-    )
+    loader = svhn_test_loader(svhn_file, tuple(ood_settings['image_size']), int(ood_settings['batch_size']))
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(
         loader, torch.device("cpu")
     )
-    del model, loader, dataset
+    del model, loader
     if svhn.shape != (int(expected["svhn_count"]), width):
         raise RuntimeError("Unexpected frozen SVHN embeddings")
 

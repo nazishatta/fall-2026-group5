@@ -13,8 +13,6 @@ from typing import Any
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
-from torchvision.datasets import SVHN
 
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
     FeatureExtractor,
@@ -30,7 +28,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
     evaluate_scores,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-    image_transform,
+    svhn_test_loader,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
     prepare,
@@ -143,14 +141,10 @@ def main() -> None:
         raise RuntimeError("STOP: Original MNIST split sizes changed")
 
     # SVHN is used for scoring ONLY; no fitting, threshold calibration or selection.
-    dataset = SVHN(
-        root=str(svhn_file.parent), split="test", download=False,
-        transform=image_transform("svhn", (28, 28)),
-    )
-    loader = DataLoader(dataset, batch_size=int(ood_config["batch_size"]), shuffle=False)
+    loader = svhn_test_loader(svhn_file, tuple(ood_config['image_size']), int(ood_config['batch_size']))
     torch.set_num_threads(1)
     features, labels, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
-    del model, loader, dataset
+    del model, loader
     if features.shape != (benchmark["expected"]["svhn_count"], benchmark["expected"]["feature_dim"]):
         raise RuntimeError(f"Unexpected SVHN embeddings: {features.shape}")
     if len(labels) != len(features):

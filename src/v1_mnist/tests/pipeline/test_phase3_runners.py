@@ -101,7 +101,8 @@ def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
 OTHER_PHASE_CONFIGS = {
     "base.yaml", "cnn_baseline.yaml", "som.yaml", "som_10x10_robustness.yaml", "som_20x20_robustness.yaml",
 }
-SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
+# Not steps: shared input fingerprints, and the report-figure list read by copy_report_figures.py.
+SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml", "phase3_report_figures.yaml"}
 
 
 def test_every_phase3_config_is_a_step_or_listed_as_supporting() -> None:
@@ -118,3 +119,5 @@ def test_a_step_never_comes_before_the_step_whose_results_it_reads() -> None:
     names = [step.name for step in run_novelty_benchmark.STEPS]
     assert names.index("svhn_score_export") < names.index("qe_energy_knn_paired")
     assert names.index("unified_novelty_benchmark") < names.index("autoencoder_scaling_diagnostic")
+    for source in ("svhn_benchmark", "required_baselines_knn", "qe_msp_paired_comparison"):
+        assert names.index(source) < names.index("consolidate_evidence")

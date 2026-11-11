@@ -18,6 +18,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
 from src.v1_mnist.component.utils.figures import save_pdf
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.som_io import (
     load_selected_som,
     sha256_file,
@@ -56,10 +57,7 @@ def run(config_path: Path) -> Path:
         config = yaml.safe_load(stream)
 
     run_id = str(config["run_id"])
-    if not run_id or not all(
-        char.isalnum() or char in "_-" for char in run_id
-    ):
-        raise ValueError("Invalid run ID")
+    check_run_id(run_id)
 
     destination = repository_path(config["output_root"]) / run_id
     if destination.exists():

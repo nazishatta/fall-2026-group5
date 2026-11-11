@@ -8,13 +8,14 @@ import logging
 from pathlib import Path
 from typing import Any
 
+import yaml
+
+from src.v1_mnist.component.utils.file_hash import sha256_file
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.run_ids import check_run_id
 
 LOGGER = setup_logger(__name__, level=logging.INFO)
-BASE = Path('outputs/v1_mnist/p3_novelty_detection/novelty_benchmark')
-HISTORICAL = 'mnist_svhn_five_method_comparison_s42_initial/comparison_metrics.json'
-ADDITIONAL = 'mnist_svhn_required_baselines_knn_s42_v1/required_baseline_metrics.json'
-PAIRED = 'mnist_svhn_qe_msp_reproduction_s42_v1/qe_msp_paired_metrics.json'
+CONFIG_PATH = Path('src/v1_mnist/component/configs/phase3_evidence_consolidation.yaml')
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -26,16 +27,29 @@ def load_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def settings_from_config(config: dict[str, Any]) -> dict[str, Any]:
+    """Turn the consolidation config into the keyword arguments of ``consolidate``."""
+    return {
+        'source_root': Path(config['source_root']),
+        'historical': str(config['sources']['historical']),
+        'additional': str(config['sources']['additional']),
+        'paired_source': str(config['sources']['paired']),
+        'expected_id_count': int(config['expected']['id_count']),
+        'expected_ood_count': int(config['expected']['ood_count']),
+        'tolerance': float(config['tolerance']),
+    }
+
+
 def consolidate(
     root: Path,
     *,
-    source_root: Path = BASE,
-    historical: str = HISTORICAL,
-    additional: str = ADDITIONAL,
-    paired_source: str = PAIRED,
-    expected_id_count: int = 10500,
-    expected_ood_count: int = 26032,
-    tolerance: float = 1e-10,
+    source_root: Path,
+    historical: str,
+    additional: str,
+    paired_source: str,
+    expected_id_count: int,
+    expected_ood_count: int,
+    tolerance: float,
 ) -> tuple[list[dict[str, str]], dict[str, Any]]:
     """Join historical U-Matrix and required baselines without refitting models."""
     historical_data = load_json(root / source_root / historical)
@@ -102,28 +116,17 @@ def consolidate(
 def main() -> None:
     """Write small metrics and documentation into a new non-overwriting output folder."""
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--config', type=Path, default=CONFIG_PATH)
     parser.add_argument('--root', type=Path, default=Path.cwd())
-    parser.add_argument('--destination', type=Path, required=True)
-    parser.add_argument('--source-root', type=Path, default=BASE)
-    parser.add_argument('--historical', default=HISTORICAL)
-    parser.add_argument('--additional', default=ADDITIONAL)
-    parser.add_argument('--paired', default=PAIRED)
-    parser.add_argument('--expected-id-count', type=int, default=10500)
-    parser.add_argument('--expected-ood-count', type=int, default=26032)
-    parser.add_argument('--tolerance', type=float, default=1e-10)
     args = parser.parse_args()
+    with args.config.open(encoding='utf-8') as stream:
+        config = yaml.safe_load(stream)
+    run_id = check_run_id(config['run_id'])
 
-    rows, metadata = consolidate(
-        args.root,
-        source_root=args.source_root,
-        historical=args.historical,
-        additional=args.additional,
-        paired_source=args.paired,
-        expected_id_count=args.expected_id_count,
-        expected_ood_count=args.expected_ood_count,
-        tolerance=args.tolerance,
-    )
-    destination = args.destination.resolve()
+    rows, metadata = consolidate(args.root, **settings_from_config(config))
+    metadata['run_id'] = run_id
+    metadata['config_sha256'] = sha256_file(args.config)
+    destination = (args.root / config['output_root'] / run_id).resolve()
     if destination.exists():
         raise FileExistsError(f'Refusing to overwrite output: {destination}')
     destination.mkdir(parents=True, exist_ok=False)

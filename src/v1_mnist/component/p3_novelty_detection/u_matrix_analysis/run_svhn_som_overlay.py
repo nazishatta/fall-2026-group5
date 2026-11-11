@@ -28,6 +28,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.svhn_som_over
 )
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
+from src.v1_mnist.component.utils.run_ids import check_run_id
 from src.v1_mnist.component.utils.som_io import sha256_file
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -44,8 +45,7 @@ def read_config(config_path: Path) -> dict[str, Any]:
     """Load the config and reject unsafe run IDs."""
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     run_id = config.get("run_id")
-    if not isinstance(run_id, str) or not run_id or not all(ch.isalnum() or ch in "-_" for ch in run_id):
-        raise ValueError("Unsafe run ID")
+    check_run_id(run_id)
     if int(config["min_validation_hits"]) < 1 or int(config["top_missed_neurons"]) < 1:
         raise ValueError("Counts in the config must be positive")
     return config
@@ -69,8 +69,6 @@ def load_reference(config: dict[str, Any]) -> dict[str, NDArray[Any]]:
 def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
     """Score SVHN test with the frozen CNN and SOM (needs torch, nnsom and the SVHN files)."""
     import torch
-    from torch.utils.data import DataLoader
-    from torchvision.datasets import SVHN
 
     from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
         FeatureExtractor,
@@ -79,7 +77,7 @@ def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
         score_som,
     )
     from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-        image_transform,
+        svhn_test_loader,
     )
     from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
         prepare,
@@ -103,11 +101,7 @@ def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
     if provenance["qe_threshold"] != float(expected["frozen_training_qe_threshold"]):
         raise RuntimeError("Frozen QE threshold mismatch")
     svhn_path = repo_path(manifest["svhn_file"])
-    dataset = SVHN(
-        root=str(svhn_path.parent), split="test", download=False,
-        transform=image_transform("svhn", tuple(settings["image_size"])),
-    )
-    loader = DataLoader(dataset, batch_size=int(config["batch_size"]), shuffle=False)
+    loader = svhn_test_loader(svhn_path, tuple(settings['image_size']), int(config['batch_size']))
     torch.set_num_threads(1)
     features, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     if features.shape != (int(expected["svhn_samples"]), int(expected["embedding_dimensions"])):

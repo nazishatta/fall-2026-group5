@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -15,6 +14,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.novelty_overl
     save_novelty_overlay,
     summarize_qe_misses,
 )
+from src.v1_mnist.component.utils.file_hash import sha256_file
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -23,15 +23,6 @@ ROOT = Path(__file__).resolve().parents[5]
 def resolve_repo_path(value: str) -> Path:
     """Resolve a repository-relative path and reject parent traversal."""
     return resolve_inside(ROOT, value)
-
-
-def sha256_file(path: Path) -> str:
-    """Read-only provenance hash for this standalone diagnostic."""
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def run(config_path: Path) -> dict[str, Any]:

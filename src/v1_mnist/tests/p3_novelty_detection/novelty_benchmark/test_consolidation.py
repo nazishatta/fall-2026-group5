@@ -5,14 +5,19 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.consolidate_phase3_evidence import (
-    ADDITIONAL,
-    BASE,
-    HISTORICAL,
-    PAIRED,
+    CONFIG_PATH,
     consolidate,
+    settings_from_config,
 )
+
+ROOT = Path(__file__).resolve().parents[5]
+SETTINGS = settings_from_config(yaml.safe_load((ROOT / CONFIG_PATH).read_text(encoding="utf-8")))
+HISTORICAL = SETTINGS["historical"]
+ADDITIONAL = SETTINGS["additional"]
+PAIRED = SETTINGS["paired_source"]
 
 
 def test_consolidation_detects_verified_values(tmp_path: Path) -> None:
@@ -32,10 +37,10 @@ def test_consolidation_detects_verified_values(tmp_path: Path) -> None:
                  'difference_ci_95': [-0.019, -0.015]},
     }
     for name, obj in fixtures.items():
-        path = tmp_path / BASE / name
+        path = tmp_path / SETTINGS["source_root"] / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(obj), encoding='utf-8')
-    rows, metadata = consolidate(tmp_path)
+    rows, metadata = consolidate(tmp_path, **SETTINGS)
     assert {row['method'] for row in rows} == {'qe', 'u_matrix', 'max_softmax'}
     assert metadata['headline_baseline_source'] == ADDITIONAL
     assert metadata['qe_minus_msp'] == pytest.approx(-0.017)
@@ -91,9 +96,27 @@ def test_consolidation_accepts_alternative_source_paths(
         paired_source="paired.json",
         expected_id_count=3,
         expected_ood_count=2,
+        tolerance=1e-10,
     )
 
     assert {row["method"] for row in rows} == {"qe", "max_softmax"}
     assert metadata["headline_baseline_source"] == "additional.json"
     assert metadata["id_count"] == 3
     assert metadata["ood_count"] == 2
+
+
+def test_config_matches_the_recorded_consolidation_run() -> None:
+    """The config holds the same sources the existing consolidated run recorded."""
+    config = yaml.safe_load((ROOT / CONFIG_PATH).read_text(encoding="utf-8"))
+    recorded = json.loads(
+        (ROOT / config["output_root"] / config["run_id"] / "phase3_consolidation_provenance.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert recorded["historical_u_matrix_source"] == HISTORICAL
+    assert recorded["headline_baseline_source"] == ADDITIONAL
+    assert recorded["paired_qe_msp_source"] == PAIRED
+    assert (recorded["id_count"], recorded["ood_count"]) == (
+        SETTINGS["expected_id_count"],
+        SETTINGS["expected_ood_count"],
+    )

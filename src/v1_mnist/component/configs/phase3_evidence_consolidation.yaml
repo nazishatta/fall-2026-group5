@@ -1,0 +1,16 @@
+# Inputs and checks for consolidate_phase3_evidence.py, which joins the headline
+# numbers of three saved runs into one table without refitting anything.
+# mnist_svhn_consolidated_evidence_s42_v1 was written with these same values, given
+# on the command line; its phase3_consolidation_provenance.json lists the three sources.
+# A new consolidation needs a new run_id.
+run_id: mnist_svhn_consolidated_evidence_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+source_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+sources:
+  historical: mnist_svhn_five_method_comparison_s42_initial/comparison_metrics.json
+  additional: mnist_svhn_required_baselines_knn_s42_v1/required_baseline_metrics.json
+  paired: mnist_svhn_qe_msp_reproduction_s42_v1/qe_msp_paired_metrics.json
+expected:
+  id_count: 10500
+  ood_count: 26032
+tolerance: 1.0e-10

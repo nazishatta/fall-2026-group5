@@ -15,8 +15,6 @@ import numpy as np
 import torch
 import yaml
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader
-from torchvision.datasets import SVHN
 
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
     FeatureExtractor,
@@ -28,7 +26,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.ood_compariso
     evaluate_scores,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
-    image_transform,
+    svhn_test_loader,
 )
 from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood import (
     prepare,
@@ -111,19 +109,13 @@ def run(config_path: Path) -> Path:
     model, _, frozen_id_qe, provenance = prepare(qecfg)
     if len(frozen_id_qe) != len(val):
         raise RuntimeError("Frozen validation features not aligned")
-    dataset = SVHN(
-        root=str(paths["svhn_file"].parent), split="test", download=False,
-        transform=image_transform("svhn", (28, 28)),
-    )
-    loader = DataLoader(
-        dataset, batch_size=int(settings["inference"]["batch_size"]), shuffle=False
-    )
+    loader = svhn_test_loader(paths['svhn_file'], tuple(qecfg['image_size']), int(settings['inference']['batch_size']))
     svhn, labels, _ = FeatureExtractor(model, "fc2").extract(
         loader, torch.device("cpu")
     )
     if svhn.shape != (int(expected["svhn_samples"]), dim) or len(labels) != len(svhn):
         raise RuntimeError("Unexpected SVHN feature count/order")
-    del model, dataset, loader
+    del model, loader
 
     train_scaled, scoring_scaled = scaled_embeddings(train, val, svhn)
     config = {"seed": int(settings["seed"]), "autoencoder": settings["autoencoder"]}

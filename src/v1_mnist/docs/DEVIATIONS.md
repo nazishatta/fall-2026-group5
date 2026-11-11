@@ -251,6 +251,54 @@ paths inside them are part of the provenance.
 `outputs/v1_mnist/p3_novelty_detection/run_manifest.csv` now lists every remaining run folder
 with the script and config that wrote it and how that was checked.
 
+**Further cleanup, 2026-11-10.** Done without re-running any experiment.
+
+- `score_export_metrics_validated.json` was removed from
+  `mnist_svhn_energy_knn_score_export_s42_v1`. It was a byte-identical copy of
+  `score_export_metrics.json` that no script writes or reads.
+- `mnist_validation_reproducibility_s42_initial` was removed. It was a hand-written record of
+  an early EC2 rerun check; no script wrote it, and `mnist_historical_baseline_verification_s42_v1`
+  recomputes the same baselines with code. Git history keeps both files.
+- `consolidate_phase3_evidence.py` now reads `configs/phase3_evidence_consolidation.yaml`
+  instead of run IDs, paths and counts written in the code. The config was written after
+  `mnist_svhn_consolidated_evidence_s42_v1` ran; its values equal the sources and counts that
+  run recorded, and `test_consolidation.py` checks this.
+- Three SVHN scripts took the image size from a literal `(28, 28)` and the unified benchmark
+  wrote out the training-label path. Both now come from the validated settings and the shared
+  provenance manifest. Nine scripts share one SVHN loader and one run-ID check instead of
+  their own copies. No config that produced a saved result was edited.
+
+### Proposal thresholds and owners
+
+Recorded: 2026-11-10.
+
+**RQ4 margin.** "Competitive" now means within 0.01 AUROC of the best baseline: the lower
+end of the 95% paired bootstrap interval for (SOM AUROC minus best-baseline AUROC) must be
+above -0.01. This was fixed on 2026-11-10, after the development results (MNIST validation
+versus SVHN) had been seen: QE trails energy by about 0.019 AUROC and max-softmax by 0.0174
+(paired interval -0.0194 to -0.0154). The strict value was chosen so that it could not be read
+as fitted to let QE pass. It is larger than the bootstrap noise (QE's 95% interval is about
++/-0.002) and equals about one more misranked pair in a hundred at AUROC near 0.98. On the
+development numbers QE would not count as competitive. The margin will not change before or
+after the held-out test split is used.
+
+**Still open.** The RQ2 and RQ5 thresholds and the RQ3 to RQ6 owners in section 7 are still
+`[TBD]`; the owners are not decided yet. The thresholds must be fixed, with a written reason,
+before the held-out test split is used for those questions.
+
+### QE-norm dependence check
+
+Recorded: 2026-11-10.
+
+SVHN embeddings are much shorter than MNIST ones, and a length-only score already separates
+them almost perfectly (`mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1`). To test whether
+part of QE's AUROC is a length effect, `qe_norm_dependence` (config `qe_norm_dependence.yaml`,
+run ID `mnist_svhn_qe_norm_dependence_s42_v1`) reports the QE-length correlation and QE's AUROC
+among images whose length lies between the 5th and 95th percentiles of MNIST training
+lengths. The band and every other setting were fixed in the config before the first run. The
+run stops unless QE reproduces the recorded AUROC (0.9811068). It is exploratory, because SVHN
+has been examined.
+
 ### MNIST validation used in place of the held-out test split
 
 Recorded: 2026-11-03.
