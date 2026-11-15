@@ -1,0 +1,7 @@
+run_id: svhn_inverted_embedding_norm_s42_v1
+seed: 42
+batch_size: 256
+image_size: 28
+feature_dim: 84
+classes: 10
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark

@@ -1,0 +1,106 @@
+{
+  "run_id": "mnist_svhn_qe_norm_dependence_s42_v1",
+  "analysis_status": "post_hoc_exploratory",
+  "id_set": "MNIST validation",
+  "ood_set": "SVHN test",
+  "feature_layer": "fc2",
+  "seed": 42,
+  "norms": {
+    "mnist_train": {
+      "count": 49000,
+      "mean": 40.473917837966226,
+      "median": 40.23373953897342,
+      "sample_sd": 9.521870379472029,
+      "p05": 25.603071154257492,
+      "p95": 56.785886030915236
+    },
+    "mnist_validation": {
+      "count": 10500,
+      "mean": 40.28457250745059,
+      "median": 39.99013826018471,
+      "sample_sd": 9.542648434617979,
+      "p05": 25.432751313393883,
+      "p95": 56.55823384840907
+    },
+    "svhn_test": {
+      "count": 26032,
+      "mean": 5.824533989455396,
+      "median": 5.2107656088871686,
+      "sample_sd": 2.532754030486864,
+      "p05": 3.085332562728871,
+      "p95": 10.643861377222814
+    }
+  },
+  "qe_reference": {
+    "id_count": 10500,
+    "ood_count": 26032,
+    "auroc": 0.9811068135920624,
+    "aupr_ood": 0.9765546547573345,
+    "fpr_at_target_tpr": 0.04533333333333334,
+    "target_tpr": 0.95,
+    "ood_detection_rate": 0.9617393976644131,
+    "id_false_positive_rate": 0.051333333333333335,
+    "auroc_ci": [
+      0.9790482559011618,
+      0.983088752762168
+    ],
+    "threshold": 1.5690279077294162,
+    "threshold_source": "frozen MNIST training-QE 95th percentile"
+  },
+  "qe_norm_spearman": {
+    "mnist_validation": 0.2639866044080417,
+    "svhn_test": -0.6565053108761363,
+    "pooled": -0.8253346065189839
+  },
+  "norm_matched_qe": {
+    "band_percentiles": [
+      5.0,
+      95.0
+    ],
+    "band_norms": [
+      25.603071154257492,
+      56.785886030915236
+    ],
+    "id_count": 9447,
+    "ood_count": 8,
+    "qe": {
+      "id_count": 9447,
+      "ood_count": 8,
+      "auroc": 0.721657669101302,
+      "aupr_ood": 0.0018465539247801744,
+      "fpr_at_target_tpr": 0.6931300942098021,
+      "target_tpr": 0.95,
+      "ood_detection_rate": 0.0,
+      "id_false_positive_rate": 0.048269291838678945,
+      "auroc_ci": [
+        0.5835705118026887,
+        0.8412750079390281
+      ]
+    }
+  },
+  "provenance": {
+    "config_sha256": "580b1147943644913438a405f692bcdfea5bf103575b173c4a490f634de7cb6a",
+    "input_sha256": {
+      "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+      "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+      "validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+    },
+    "frozen_som": {
+      "qe_threshold": 1.5690279077294162,
+      "som_model": "som_15x15_nb11_ep250_s42_v2",
+      "som_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+      "cnn_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+      "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+      "train_qe_sha256": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+      "val_qe_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186"
+    }
+  },
+  "leakage_control": "The QE threshold and the norm band come from MNIST training embeddings only. MNIST validation and SVHN test are scored only. Nothing is fitted or tuned. The held-out MNIST test split is never opened.",
+  "limitations": [
+    "SVHN was examined in earlier runs, so this check is exploratory.",
+    "Fashion-MNIST and other OOD sets are not included.",
+    "Correlation with the norm does not show that the norm causes the QE ranking.",
+    "The norm band keeps only SVHN images with MNIST-like norms, which may be unusual SVHN images."
+  ]
+}

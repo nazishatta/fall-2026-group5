@@ -1,0 +1,51 @@
+{
+  "evaluation": "cnn_error_enrichment_vs_uniform_random_selection",
+  "validation_samples": 10500,
+  "qe_flagged_samples": 539,
+  "cnn_errors": 92,
+  "qe_captured_errors": 22,
+  "qe_error_capture_rate": 0.2391304347826087,
+  "wilson_95_interval": [
+    0.16355145893303868,
+    0.33562143982467696
+  ],
+  "random_expected_errors": 4.722666666666667,
+  "random_exact_one_sided_p_value": 8.834306580361853e-10,
+  "random_seeded_control": {
+    "seeds": [
+      11,
+      23,
+      37,
+      47,
+      59
+    ],
+    "captured_errors": [
+      6,
+      5,
+      5,
+      5,
+      5
+    ],
+    "mean": 5.2,
+    "sampling": "numpy.default_rng(seed).choice without replacement",
+    "historical_counts_not_assumed_reproduced": true
+  },
+  "leakage_control": {
+    "threshold_source": "train_only",
+    "final_test_used": false,
+    "external_ood_evaluated": false
+  },
+  "limitations": [
+    "Uniform random selection is a control, not an OOD detector.",
+    "The selected sample count is held equal to QE's flag count.",
+    "No final MNIST test samples or external OOD samples were used."
+  ],
+  "run_id": "reorg_20261102_random_control_s42_v2",
+  "source_summary_run_id": "reorg_20261102_qe_novelty_s42_v2",
+  "input_sha256": {
+    "val_bmu_distance": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+    "val_correct": "708271197be47a028bb3b87cd5afaa813fbec83c68ad13553c2b142e11147edf"
+  },
+  "source_summary_sha256": "f9cf92c9ce5fbcb1686dcfa9c69c788202992efa87078039ccf78c116663561f",
+  "config_sha256": "291762b5e2455f90afd853e1f390b8565bcf785cda4be4bde503578e71de8d89"
+}

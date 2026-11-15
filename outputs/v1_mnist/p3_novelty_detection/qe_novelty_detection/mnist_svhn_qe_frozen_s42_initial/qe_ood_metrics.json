@@ -1,0 +1,32 @@
+{
+  "run_id": "mnist_svhn_qe_frozen_s42_initial",
+  "id_dataset": "mnist",
+  "id_split": "val",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "development_only": true,
+  "final_mnist_test_used": false,
+  "metrics": {
+    "id_count": 10500,
+    "ood_count": 26032,
+    "auroc": 0.9811068135920626,
+    "aupr_ood": 0.9765546499418931,
+    "fpr_at_target_tpr": 0.04533333333333334,
+    "target_tpr": 0.95,
+    "ood_detection_rate": 0.9617393976644131,
+    "id_false_positive_rate": 0.051333333333333335
+  },
+  "auroc_bootstrap_interval": [
+    0.9790482566328621,
+    0.9830887456280913
+  ],
+  "provenance": {
+    "qe_threshold": 1.5690279077294162,
+    "som_model": "som_15x15_nb11_ep250_s42_v2",
+    "som_sha256": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+    "cnn_sha256": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_qe_sha256": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+    "val_qe_sha256": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186"
+  }
+}

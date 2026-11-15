@@ -1,0 +1,35 @@
+{
+  "run_id": "mnist_svhn_qe_umatrix_random_s42_v1",
+  "dataset": "MNIST validation vs SVHN test",
+  "paired_qe_vs_u_matrix": {
+    "qe_auroc": 0.9811068135920626,
+    "u_matrix_auroc": 0.9696289713027191,
+    "qe_minus_u_matrix": 0.011477842289343565,
+    "difference_ci_95": [
+      0.008637340672286114,
+      0.014999420859308657
+    ],
+    "bootstrap_iterations": 500
+  },
+  "random_score_null": {
+    "mean_auroc": 0.5001979066423742,
+    "simulation_interval_95": [
+      0.49380321573082214,
+      0.5065389688881083
+    ],
+    "simulations": 500,
+    "interval_type": "Monte Carlo simulation interval"
+  },
+  "seed": 42,
+  "n_id": 10500,
+  "n_ood": 26032,
+  "input_sha256": {
+    "qe_mnist_val_scores.npy": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+    "qe_svhn_test_scores.npy": "88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265",
+    "u_matrix_mnist_val_scores.npy": "f22e0dd1f2456012856709d8b4586b3ef59ae9be58d44638e2e457b4bb1f121f",
+    "u_matrix_svhn_test_scores.npy": "1a160ff294b7fc40d7b7f4822cb7d04a223a19e6ecf8b53016b9f009623ee8fe"
+  },
+  "config_sha256": "3d99318f4d68eb1b330490b92d01581df9f9ecf61339ff60688b2200e2012cb3",
+  "leakage_control": "Historical frozen scores only; no model fitting, no threshold tuning, no official MNIST final test.",
+  "limitation": "Paired inference assumes identical sample order within the historical score arrays; both methods share one run."
+}

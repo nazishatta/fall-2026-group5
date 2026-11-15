@@ -33,12 +33,17 @@ tests/
 ├── README.md
 ├── conftest.py                                      # adds the code root to the import path
 ├── test_repository_rules.py                         # whole-repo rules: no figures or large files in git, PDF only,
-│                                                    #   no overwrite options, no seeds in code, no digit-first names
+│                                                    #   no overwrite options, no seeds in code, no digit-first names,
+│                                                    #   every Phase 3 result traces to its run and code
 ├── pipeline/                                        # the runners in component/pipeline
-│   └── test_run_all.py                              # run_all.py --dry-run lists every step in order
+│   └── test_run_all.py                              # run_all.py order (Phases 1-3) and the Phase 3 runners (--dry-run)
 ├── utils/                                           # shared code in component/utils
 │   ├── test_config_run_names.py                     # old week-numbered run names are refused
-│   └── test_seed_from_config.py                     # training.seed comes only from the config
+│   ├── test_file_hash.py                            # SHA-256 fingerprints of files
+│   ├── test_repo_paths.py                           # config paths cannot point outside the repository
+│   ├── test_run_ids.py                              # unsafe run IDs are refused
+│   ├── test_seed_from_config.py                     # training.seed comes only from the config
+│   └── test_shared_provenance.py                    # Phase 3 frozen inputs match the shared SHA-256 manifest
 ├── p1_model_training_baseline/
 │   ├── data_pipeline/                               # Week 1
 │   │   ├── test_data_loader.py

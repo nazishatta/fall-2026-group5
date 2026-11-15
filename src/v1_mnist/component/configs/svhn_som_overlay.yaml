@@ -1,0 +1,28 @@
+# New standalone analysis; historical runs are never overwritten.
+# Saves the SVHN-to-SOM assignments that earlier Phase 3 runs did not keep, then
+# describes where the missed SVHN images land. Descriptive only: nothing is tuned.
+# MNIST validation is used for reference, SVHN test is the novel set, and the
+# final MNIST test split is never opened.
+run_id: mnist_svhn_som_overlay_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis
+qe_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+batch_size: 256
+hex_radius: 0.56
+class_count: 10
+# Cells with fewer MNIST validation digits than this are left out of the
+# "typical digit" comparison. Fixed before the run, not tuned afterwards.
+min_validation_hits: 5
+top_missed_neurons: 10
+# Reconstructed SVHN QE must match the saved historical scores within this.
+max_abs_qe_difference: 1.0e-4
+expected:
+  svhn_samples: 26032
+  validation_samples: 10500
+  embedding_dimensions: 84
+  som_units: 225
+  frozen_training_qe_threshold: 1.5690279077294162
+inputs:
+  train_class_neuron: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/tables/train_class_neuron_intersection.csv
+  validation_bmu: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu.npy
+  validation_qe: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments/val_bmu_distance.npy
+  historical_svhn_qe: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial/score_arrays/qe_svhn_test_scores.npy

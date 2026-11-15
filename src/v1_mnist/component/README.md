@@ -23,9 +23,9 @@ python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_cluster
 | | 4 | `p2_som_training_visualization/cluster_analysis/` | BMU assignment, purity, entropy, class–neuron intersection (NNSOM), class maps, Week 4 heatmaps |
 | | 5 | `p2_som_training_visualization/error_pattern_analysis/` | Error geography, hotspots (one rule, `utils/hotspots.py`) and their images, error maps, Week 5 heatmaps, error-pattern robustness and verdict |
 | | 3–5 | `p2_som_training_visualization/interactive_report/` | Interactive HTML report of the SOM |
-| **3: Novelty Detection** | 6 | `p3_novelty_detection/qe_novelty_detection/` | *(empty)* |
-| | 7 | `p3_novelty_detection/u_matrix_analysis/` | *(empty)* |
-| | 8 | `p3_novelty_detection/novelty_benchmark/` | *(empty)* |
+| **3: Novelty Detection** | 6 | `p3_novelty_detection/qe_novelty_detection/` | Implemented |
+| | 7 | `p3_novelty_detection/u_matrix_analysis/` | Implemented |
+| | 8 | `p3_novelty_detection/novelty_benchmark/` | Implemented |
 | **4: Guided Retraining** | 9 | `p4_guided_retraining/hard_example_mining/` | *(empty)* |
 | | 10 | `p4_guided_retraining/targeted_augmentation/` | *(empty)* |
 | | 11 | `p4_guided_retraining/som_reanalysis/` | *(empty)* |

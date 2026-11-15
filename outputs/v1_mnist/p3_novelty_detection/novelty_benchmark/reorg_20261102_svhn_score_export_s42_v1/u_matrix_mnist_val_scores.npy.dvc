@@ -1,0 +1,5 @@
+outs:
+- md5: 080b40169d512eda494fff56d4c87f26
+  size: 84128
+  hash: md5
+  path: u_matrix_mnist_val_scores.npy

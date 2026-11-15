@@ -1,0 +1,10 @@
+# Repeats the qe_novelty step (run_qe_novelty.py) with qe_novelty.yaml's settings under a
+# new run ID, to keep the QE score-distribution PDF that qe_training_calibrated_initial
+# did not save. It re-reads the same saved training and validation distances; no model
+# is fitted and the test split is not used. qe_novelty.yaml is left unchanged because
+# later steps read the initial run's qe_summary.json through it.
+som_config: src/v1_mnist/component/configs/som.yaml
+threshold_percentile: 95.0
+output_dir: outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection
+# Unique semantic identifier; must not already exist in output_dir.
+run_id: qe_training_calibrated_v2
