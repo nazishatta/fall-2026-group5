@@ -99,7 +99,7 @@ The example-level U-Matrix signal uses the score of an example's BMU neighborhoo
 \par\medskip
 \begin{minipage}{0.98\linewidth}\centering
 \includegraphics[width=0.48\linewidth,height=4.5cm,keepaspectratio]{fig/u_matrix_analysis/u_matrix_novelty_som_grid.pdf}
-\captionof{figure}{Recorded U-Matrix overview for the $15\times15$ SOM. Larger local prototype separations do not by themselves prove that individual samples are OOD. Source run: \runcap{mnist_umatrix_hex_grid_s42_v1}.}\label{fig:umatrix}
+\captionof{figure}{Recorded U-Matrix overview for the $15\times15$ SOM. Larger local prototype separations do not by themselves prove that individual samples are OOD. Source run: \runcap{mnist_umatrix_hex_grid_s42_v2}.}\label{fig:umatrix}
 \end{minipage}\par\medskip
 
 \section{Quantitative Evaluation}
@@ -190,7 +190,7 @@ Across 10,500 MNIST validation samples, QE and the U-Matrix BMU score have a rec
 \par\medskip
 \begin{minipage}{0.98\linewidth}\centering
 \includegraphics[width=0.60\linewidth,height=4.0cm,keepaspectratio]{fig/u_matrix_analysis/qe_u_matrix_validation_initial.pdf}
-\captionof{figure}{Recorded QE versus U-Matrix association on MNIST validation; the figure is a development-only comparison. Source run: \runcap{mnist_qe_umatrix_validation_figure_s42_v1}.}\label{fig:association}
+\captionof{figure}{Recorded QE versus U-Matrix association on MNIST validation; the figure is a development-only comparison. Source run: \runcap{mnist_qe_umatrix_validation_figure_s42_v2}.}\label{fig:association}
 \end{minipage}\par\medskip
 The historical QE experiment missed 996 SVHN samples at its frozen threshold. Several low-scoring examples have clean, MNIST-like numeral strokes; this visual pattern is a hypothesis about representation similarity, not a causal explanation.
 
@@ -214,7 +214,7 @@ Whether part of QE's own AUROC is a length effect is tested by \run{mnist_svhn_q
 \par\medskip
 \begin{minipage}{0.98\linewidth}\centering
 \includegraphics[width=0.72\linewidth,height=5.8cm,keepaspectratio]{fig/novelty_benchmark/qe_missed_svhn_examples.pdf}
-\captionof{figure}{Recorded lowest-QE SVHN examples missed at the original frozen threshold. These examples are descriptive, not a complete explanation of model behavior. Source run: \runcap{mnist_svhn_missed_qe_figure_s42_v1}.}\label{fig:missed}
+\captionof{figure}{Recorded lowest-QE SVHN examples missed at the original frozen threshold. These examples are descriptive, not a complete explanation of model behavior. Source run: \runcap{mnist_svhn_missed_qe_figure_s42_v2}.}\label{fig:missed}
 \end{minipage}\par\medskip
 
 \section{Leakage Control and Reproducibility}

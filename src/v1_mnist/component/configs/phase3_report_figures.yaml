@@ -11,11 +11,11 @@ figures:
     run_file: qe_score_distribution.pdf
     hash_record: null  # this run did not record a figure fingerprint
   - report_file: fig/u_matrix_analysis/u_matrix_novelty_som_grid.pdf
-    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_umatrix_hex_grid_s42_v1
+    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_umatrix_hex_grid_s42_v2
     run_file: u_matrix_novelty_som_grid.pdf
     hash_record: figure_metrics.json
   - report_file: fig/u_matrix_analysis/qe_u_matrix_validation_initial.pdf
-    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_qe_umatrix_validation_figure_s42_v1
+    run_folder: outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/mnist_qe_umatrix_validation_figure_s42_v2
     run_file: qe_u_matrix_validation_initial.pdf
     hash_record: figure_metrics.json
   - report_file: fig/u_matrix_analysis/svhn_som_overlay.pdf
@@ -23,6 +23,6 @@ figures:
     run_file: pdf/svhn_som_overlay.pdf
     hash_record: null  # this run did not record a figure fingerprint
   - report_file: fig/novelty_benchmark/qe_missed_svhn_examples.pdf
-    run_folder: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_missed_qe_figure_s42_v1
+    run_folder: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_missed_qe_figure_s42_v2
     run_file: qe_missed_svhn_examples.pdf
     hash_record: figure_metrics.json

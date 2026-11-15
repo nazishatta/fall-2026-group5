@@ -1,4 +1,5 @@
-run_id: mnist_svhn_missed_qe_figure_s42_v1
+# _v2 redraws this figure from the same saved scores: the PDF of the _v1 run was not kept.
+run_id: mnist_svhn_missed_qe_figure_s42_v2
 output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/
 historical_run: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/mnist_svhn_five_method_comparison_s42_initial
 svhn_file: data/ood_svhn/test_32x32.mat
