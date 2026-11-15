@@ -1,0 +1,28 @@
+# Is part of the QE novelty result an embedding-norm effect?
+# The norm-only score is already saved as the length-only control of
+# mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1. This run adds the QE-norm
+# correlation and QE's AUROC among images whose norm lies inside a training-norm band.
+# Exploratory: SVHN was examined in earlier runs. The band and the other settings
+# below were fixed before the first run and are not tuned. MNIST training sets every
+# reference value; MNIST validation and SVHN test are scored only; the held-out
+# MNIST test split is never opened.
+run_id: mnist_svhn_qe_norm_dependence_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+# Frozen CNN, SOM and QE threshold (the same config the QE and overlay steps use).
+qe_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+seed: 42
+batch_size: 256
+target_tpr: 0.95
+bootstrap_iterations: 2000
+confidence: 0.95
+# QE is also scored on images whose norm lies inside this training-norm band.
+norm_matched_band: [5, 95]
+expected:
+  train_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  frozen_training_qe_threshold: 1.5690279077294162
+  # QE must reproduce the recorded AUROC (mnist_svhn_qe_frozen_s42_initial).
+  qe_reference_auroc: 0.9811068135920626
+  qe_auroc_tolerance: 1.0e-6

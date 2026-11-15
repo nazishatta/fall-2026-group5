@@ -1,0 +1,103 @@
+{
+  "run_id": "mnist_svhn_qe_threshold_sweep_s42_v1",
+  "analysis": "qe_threshold_sweep",
+  "headline_percentile": 95.0,
+  "threshold_sweep": [
+    {
+      "percentile": 90.0,
+      "threshold": 1.4066070680412641,
+      "training_flag_rate": 0.1,
+      "id_false_alarm_rate": 0.1040952380952381,
+      "id_false_alarm_low": 0.09839813247870527,
+      "id_false_alarm_high": 0.11008192383266979,
+      "ood_detection_rate": 0.9920866625691457,
+      "ood_detection_low": 0.9909353520992651,
+      "ood_detection_high": 0.993092763163366,
+      "ood_missed": 206,
+      "detection_minus_false_alarm": 0.8879914244739076
+    },
+    {
+      "percentile": 95.0,
+      "threshold": 1.5690279077294162,
+      "training_flag_rate": 0.05,
+      "id_false_alarm_rate": 0.051333333333333335,
+      "id_false_alarm_low": 0.047274054685814616,
+      "id_false_alarm_high": 0.055720784208312855,
+      "ood_detection_rate": 0.9617393976644131,
+      "ood_detection_low": 0.9593402157245374,
+      "ood_detection_high": 0.964002324904411,
+      "ood_missed": 996,
+      "detection_minus_false_alarm": 0.9104060643310797
+    },
+    {
+      "percentile": 97.5,
+      "threshold": 1.7136842422953469,
+      "training_flag_rate": 0.025,
+      "id_false_alarm_rate": 0.02542857142857143,
+      "id_false_alarm_low": 0.02258661042651118,
+      "id_false_alarm_high": 0.02861765240716259,
+      "ood_detection_rate": 0.8377765826674862,
+      "ood_detection_low": 0.8332484776417314,
+      "ood_detection_high": 0.8422050131860842,
+      "ood_missed": 4223,
+      "detection_minus_false_alarm": 0.8123480112389148
+    },
+    {
+      "percentile": 99.0,
+      "threshold": 1.8943551380844785,
+      "training_flag_rate": 0.01,
+      "id_false_alarm_rate": 0.009523809523809525,
+      "id_false_alarm_low": 0.007837162004957342,
+      "id_false_alarm_high": 0.011569210379834934,
+      "ood_detection_rate": 0.1800860479409957,
+      "ood_detection_low": 0.17546548812522444,
+      "ood_detection_high": 0.18480101117944442,
+      "ood_missed": 21344,
+      "detection_minus_false_alarm": 0.17056223841718618
+    },
+    {
+      "percentile": 99.5,
+      "threshold": 2.035213650630275,
+      "training_flag_rate": 0.005,
+      "id_false_alarm_rate": 0.005142857142857143,
+      "id_false_alarm_low": 0.003944008781153283,
+      "id_false_alarm_high": 0.00670366324047403,
+      "ood_detection_rate": 7.682851874615857e-05,
+      "ood_detection_low": 2.1069403820625184e-05,
+      "ood_detection_high": 0.0002801099851035424,
+      "ood_missed": 26030,
+      "detection_minus_false_alarm": -0.0050660286241109844
+    }
+  ],
+  "threshold_free_metrics": {
+    "auroc": 0.9811068135920626,
+    "auroc_bootstrap_interval": [
+      0.9790482566328621,
+      0.9830887456280913
+    ],
+    "bootstrap_confidence": 0.95,
+    "aupr_ood": 0.9765546499418931,
+    "fpr_at_target_tpr": 0.04533333333333334,
+    "target_tpr": 0.95
+  },
+  "label_permutation_null": {
+    "observed_auroc": 0.9811068135920626,
+    "shuffled_mean": 0.4999471120050048,
+    "shuffled_low": 0.49334956857128226,
+    "shuffled_high": 0.5065102027358269,
+    "shuffled_max": 0.5105025353411186,
+    "iterations": 1000,
+    "p_value": 0.000999000999000999
+  },
+  "note": "AUROC and AUPR do not depend on the percentile cutoff; only the rates in threshold_sweep do. The 95th percentile remains the headline cutoff, and no percentile is chosen from SVHN results.",
+  "provenance": {
+    "config_sha256": "4cee6236af69eb5c67d1d9856fca3dacef08387e8015300f0ca679278088710d",
+    "input_sha256": {
+      "train_qe": "10f86df34b5677776e202dde1e59b49d5df0d8126ea3acca28043748908a238d",
+      "validation_qe": "b0983bc8dba74998195d88011eabd1431bec449958932203c2beb3d4ec136186",
+      "svhn_qe": "88970f8ec58f702a8d4f4089e10fa94b6fb70e411eee7b0ecee3e0d28c59b265",
+      "qe_summary": "34494fdfdec3b9d0205ac694adda5c36f13eea44a13890dbcff00897304713c4"
+    }
+  },
+  "leakage_control": "Cutoffs come from MNIST training QE only. MNIST validation is the in-distribution set and SVHN test is the novel set, both used for evaluation only. SVHN was examined in earlier runs, so this is a post-hoc sensitivity analysis. The final MNIST test split is never opened."
+}

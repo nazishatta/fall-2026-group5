@@ -1,0 +1,21 @@
+{
+  "dataset": "mnist",
+  "split": "validation",
+  "training_samples": 49000,
+  "validation_samples": 10500,
+  "feature_dimensions": 84,
+  "seed": 42,
+  "isolation_forest": {
+    "mean_novelty_score": 0.46247232017280354,
+    "std_novelty_score": 0.03118293845333112
+  },
+  "one_class_svm": {
+    "mean_novelty_score": -8.99389425780593,
+    "std_novelty_score": 5.639534677249335,
+    "training_sample_budget": 10000
+  },
+  "ood_auroc": "[TBD]",
+  "ood_aupr": "[TBD]",
+  "ood_fpr_at_95_tpr": "[TBD]",
+  "leakage_control": "Baselines fitted on MNIST training embeddings; MNIST validation used for scoring only. No official test or OOD samples accessed."
+}

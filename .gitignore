@@ -7,6 +7,7 @@ __pycache__/
 # Environments
 .venv/
 venv/
+.env
 env/
 ENV/
 
@@ -21,6 +22,8 @@ data/processed/*
 !data/processed/.gitkeep
 data/ood/*
 !data/ood/.gitkeep
+data/ood_svhn/*
+!data/ood_svhn/.gitkeep
 
 # Embeddings & Heavy Arrays (.npy, .pt, .h5)
 data/embeddings/**/*.npy

@@ -1,0 +1,5 @@
+outs:
+- md5: 4eaf4bc54c8f270859bd6cff25811d18
+  size: 208384
+  hash: md5
+  path: u_matrix_svhn_test_scores.npy

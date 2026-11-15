@@ -1,0 +1,5 @@
+outs:
+- md5: e358b4998acbb9503416c38c5f1391c7
+  size: 84128
+  hash: md5
+  path: isolation_forest_mnist_val_scores.npy

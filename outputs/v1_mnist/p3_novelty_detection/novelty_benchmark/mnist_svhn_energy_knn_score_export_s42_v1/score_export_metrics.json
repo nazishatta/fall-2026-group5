@@ -1,0 +1,24 @@
+{
+  "run_id": "mnist_svhn_energy_knn_score_export_s42_v1",
+  "mode": "frozen_score_export_only",
+  "auroc": {
+    "energy": 0.9997974068545674,
+    "knn": 0.9765607091638131
+  },
+  "n_id": 10500,
+  "n_ood": 26032,
+  "knn_neighbors": 5,
+  "energy_temperature": 1.0,
+  "input_sha256": {
+    "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_labels": "34459b6379469ff1d1c8b542c8d2e0b5123e31e38f5f2438b988d36c04a4fae6",
+    "validation_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "validation_predictions": "d16f146f25d970993e463db274ff85bbeb846df23f639a440ca525604385dab4",
+    "validation_confidence": "bef98e4a9cdb9e7bbc2b12c775b0db4562e5954a250db3ae3e86b230d3db9b04",
+    "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "config_sha256": "8594fbffe391c5c5e96300ee3c88c7e344b1997f7cbedf928f75ac1dca2c0f2c",
+  "leakage_control": "Frozen CNN, original MNIST train/validation and SVHN test. No model retraining, threshold selection, or MNIST final test.",
+  "alignment_limitation": "Unshuffled torchvision SVHN test ordering; historical QE arrays do not contain independently verifiable sample IDs."
+}

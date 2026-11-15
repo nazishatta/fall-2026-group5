@@ -1,0 +1,67 @@
+{
+  "all_numeric_metrics_agree": true,
+  "comparison": {
+    "autoencoder": {
+      "final_training_loss": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 0.11244814694414333,
+        "observed": 0.11244814694414333
+      },
+      "initial_training_loss": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 7.2162517681705705,
+        "observed": 7.2162517681705705
+      },
+      "validation_mean_reconstruction_error": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 0.11096985942453501,
+        "observed": 0.11096985942453501
+      }
+    },
+    "classical": {
+      "isolation_forest.mean_novelty_score": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 0.46247232017280354,
+        "observed": 0.46247232017280354
+      },
+      "isolation_forest.std_novelty_score": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 0.03118293845333112,
+        "observed": 0.03118293845333112
+      },
+      "one_class_svm.mean_novelty_score": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": -8.99389425780593,
+        "observed": -8.99389425780593
+      },
+      "one_class_svm.std_novelty_score": {
+        "absolute_difference": 0.0,
+        "agrees": true,
+        "historical": 5.639534677249335,
+        "observed": 5.639534677249335
+      }
+    }
+  },
+  "frozen_embedding_sha256": {
+    "train": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "validation": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
+  },
+  "historical_input_sha256": {
+    "autoencoder": "c8c4ec9f93eb04e3f4f3e5b098fb3673237b0b2ff8ab362d2fe71def7757ccd3",
+    "classical": "89923dc4dc679f669ba5b5469149272a7c87515983f614be6a32bd91f223aa13"
+  },
+  "limitations": [
+    "Recomputed summaries are not proof of an identical original checkpoint.",
+    "Original historical package versions were not preserved.",
+    "Method configuration is based on currently committed settings.",
+    "The original historical JSON artifacts remain immutable."
+  ],
+  "run_id": "mnist_historical_baseline_verification_s42_v1",
+  "scope": "training-fit and MNIST-validation-only comparison; no final test or OOD access"
+}

@@ -23,9 +23,28 @@ The proposal week is shown for orientation only; the code uses the step names.
 | 4 | (protocol) | 9–10 | `p4_guided_retraining/run_protocol_stamp.py` | Freeze the retraining protocol once every open item is filled | ✅ Once |
 | – | – | – | `run_all.py` | Runs the steps above in order (default: `som_nnsom_training` to `error_pattern_analysis`, then the report) | ✅ Yes |
 
-The order is set in `common.py` (`STEP_RUNNERS`). `p3_novelty_detection/` gets its runners when that code exists. The Phase 4 runner is standalone for now and is not yet in `STEP_RUNNERS`.
+The order is set in `common.py` (`STEP_RUNNERS`). Phase 3 has its own runners (see below); `run_all.py` runs them as the last step, `novelty_detection`, when asked. The Phase 4 runner is standalone for now and is not yet in `STEP_RUNNERS`.
 
 `data_pipeline` and `cnn_baseline_training` made the checkpoint and embeddings that every SOM result uses. Running them again would replace those files and change every result, so their runners refuse. A new CNN run needs a new `run.id` (see `configs/cnn_baseline.yaml`).
+
+## Phase 3 runners
+
+`p3_novelty_detection/` has one runner per component folder and nothing else. Each Phase 3 script has its own config (its own run ID), so these runners take `--only STEP` and `--dry-run` instead of one shared `--config`; their shared code (`P3Step`, `run_phase3`) is in `common.py`, next to the Phase 1 and 2 helpers.
+
+| Runner | Steps |
+|---|---|
+| `p3_novelty_detection/run_qe_novelty_detection.py` | `qe_novelty`, `qe_score_distribution_figure`, `qe_ood`, `qe_random_control`, `qe_threshold_sweep` |
+| `p3_novelty_detection/run_u_matrix_analysis.py` | `qe_u_matrix`, `qe_umatrix_validation_figure`, `u_matrix_grid_figure`, `proposal_gap_analysis`, `svhn_som_overlay` |
+| `p3_novelty_detection/run_novelty_benchmark.py` | `svhn_benchmark`, `historical_baseline_verification`, `required_baselines`, `required_baselines_knn`, `qe_msp_paired_comparison`, `svhn_score_export`, `qe_energy_knn_paired`, `qe_umatrix_random_ood`, `standardized_autoencoder`, `fair_budget_baselines`, `unified_novelty_benchmark`, `svhn_inverted_norm_diagnostic`, `qe_norm_dependence`, `autoencoder_scaling_diagnostic`, `missed_svhn_figure`, `historical_svhn_inspection`, `consolidate_evidence` |
+
+`run_all.py --to novelty_detection` (or `--from novelty_detection` for Phase 3 alone) runs the three runners in the order their results depend on each other, defined by `ORDER` in `run_all.py`: `qe_novelty` and `qe_score_distribution_figure`, then the whole `run_novelty_benchmark.py` (its `svhn_benchmark` writes the SVHN score arrays that later steps read), then `qe_threshold_sweep`, then the whole `run_u_matrix_analysis.py`. It passes each runner `--steps`, which skips any step whose results exist. `qe_ood`, `qe_random_control` and `qe_u_matrix` only repeat historical results (the `reorg_…` runs already reproduced them), so they run only with `--with-reproductions`.
+
+A step whose results folder (output folder plus `run_id`, from its config) already exists is skipped; results are never overwritten. To repeat a step, copy its config, give it a new `run_id`, and run `--only STEP --config NEW_CONFIG`.
+
+```bash
+python src/v1_mnist/component/pipeline/p3_novelty_detection/run_novelty_benchmark.py --dry-run
+python src/v1_mnist/component/pipeline/p3_novelty_detection/run_qe_novelty_detection.py --only qe_ood --dry-run
+```
 
 ## Options every runner has
 
@@ -43,7 +62,7 @@ Extra options:
 | `run_som_nnsom_training.py` | `--run-id` (also used for the figures and convergence charts), `--skip-training` |
 | `run_error_pattern_analysis.py` | `--robustness-configs`, `--mnist-root` |
 | `run_interactive_report.py` | `--split` |
-| `run_all.py` | `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report` |
+| `run_all.py` | `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report`, `--with-reproductions` |
 
 ## Common commands
 
@@ -57,6 +76,10 @@ python src/v1_mnist/component/pipeline/run_all.py --skip-training
 
 # Only the two analyses
 python src/v1_mnist/component/pipeline/run_all.py --from cluster_analysis --to error_pattern_analysis
+
+# Phase 3 after the report (steps whose results exist are skipped), or only Phase 3
+python src/v1_mnist/component/pipeline/run_all.py --to novelty_detection --dry-run
+python src/v1_mnist/component/pipeline/run_all.py --from novelty_detection --dry-run
 
 # One step at a time
 python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_som_nnsom_training.py --skip-training

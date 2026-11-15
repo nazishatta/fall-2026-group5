@@ -1,0 +1,5 @@
+outs:
+- md5: 091c4808d749acd33e3a5596b57254db
+  size: 84128
+  hash: md5
+  path: one_class_svm_mnist_val_scores.npy
