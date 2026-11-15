@@ -17,6 +17,7 @@ p2_som_training_visualization/
 │   ├── run_cluster_analysis.py    ▶ BMUs, purity, entropy, label-shuffle check
 │   ├── cluster_figures.py         ▶ class maps, purity map, pie/stem
 │   ├── cluster_heatmaps.py        ▶ hit, purity, entropy, dominant-class heatmaps
+│   ├── confusion_overlay.py       ▶ most frequent confusions drawn on the SOM map
 │   └── cluster_metrics.py         the metrics themselves
 ├── error_pattern_analysis/        3. proposal week 5
 │   ├── error_patterns.py          ▶ error geography, hotspots, confusion pairs

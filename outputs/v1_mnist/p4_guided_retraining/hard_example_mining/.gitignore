@@ -1,0 +1,8 @@
+# Small results (results.json, metrics/*.json, tables/*.csv) stay in git. Checkpoints, predictions,
+# figures and the per-image difficulty table are DVC-tracked (dvc add <run folder>/<name>).
+# Smoke-test folders are throw-away.
+/*/difficulty
+/*/checkpoints
+/*/predictions
+/*/figures
+/*_smoke
