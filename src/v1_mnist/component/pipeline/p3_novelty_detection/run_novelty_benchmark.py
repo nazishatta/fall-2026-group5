@@ -34,11 +34,6 @@ Needs the frozen CNN checkpoint and embeddings (Phase 1), the trained SOM (Phase
 and the SVHN test file (DVC). A step whose results folder already exists is skipped
 (results are never overwritten); to repeat a step, give it a new run_id in a new
 config and run it with --only STEP --config.
-
-Not a step, because its command line differs (it takes explicit file arguments):
-  - run_ood_comparison: compares two score files (needs --id-scores, --ood-scores,
-    --output, --run-id, --detector and --config).
-Run it with python -m src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.<name>.
 """
 
 from __future__ import annotations

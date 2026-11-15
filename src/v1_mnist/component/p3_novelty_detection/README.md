@@ -24,7 +24,6 @@ p3_novelty_detection/
 │   └── u_matrix_novelty.py, novelty_overlay.py, svhn_som_overlay.py
 └── novelty_benchmark/
     ├── run_svhn_benchmark.py             ▶ SVHN benchmark
-    ├── run_ood_comparison.py             ▶ OOD comparison
     ├── run_required_baselines.py         ▶ required baselines
     ├── run_qe_energy_knn_paired.py       ▶ paired comparisons
     ├── run_qe_umatrix_random_ood.py      ▶ QE/U-Matrix control

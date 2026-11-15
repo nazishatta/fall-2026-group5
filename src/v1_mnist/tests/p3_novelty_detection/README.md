@@ -33,7 +33,6 @@ p3_novelty_detection/
     ├── test_historical_svhn_inspection.py
     ├── test_knn_baseline.py
     ├── test_ood_comparison.py
-    ├── test_ood_comparison_cli.py
     ├── test_paired_bootstrap.py
     ├── test_provenance_validation.py
     ├── test_qe_energy_knn_paired.py

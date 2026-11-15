@@ -65,8 +65,7 @@ per implementation folder: `run_qe_novelty_detection.py`, `run_u_matrix_analysis
 and `run_novelty_benchmark.py`. Each lists its steps with `--dry-run`, runs one step
 with `--only STEP` (with `--config` for a new run ID), and skips steps whose results
 already exist. `run_all.py --to novelty_detection` runs Phase 3 in the order its results
-depend on each other (`ORDER` in `run_all.py`). To compare two score files outside these steps,
-run `novelty_benchmark/run_ood_comparison.py` directly.
+depend on each other (`ORDER` in `run_all.py`).
 
 Tests are in `src/v1_mnist/tests/p3_novelty_detection/` (one folder per step),
 `src/v1_mnist/tests/pipeline/test_run_all.py` (runners and their order) and `src/v1_mnist/tests/utils/` (shared code).
