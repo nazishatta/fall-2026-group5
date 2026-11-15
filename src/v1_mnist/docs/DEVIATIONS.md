@@ -299,6 +299,12 @@ lengths. The band and every other setting were fixed in the config before the fi
 run stops unless QE reproduces the recorded AUROC (0.9811068). It is exploratory, because SVHN
 has been examined.
 
+Result (run 2026-11-15): QE reproduced 0.9811068. The QE-length Spearman correlation is
+-0.83 pooled, -0.66 within SVHN and 0.26 within MNIST validation. Only 8 SVHN images fall in
+the training-length band (against 9,447 MNIST validation images); on them QE's AUROC is 0.72
+(95% interval 0.58 to 0.84). With so few SVHN images this is very uncertain, but it suggests
+that much of QE's separation of SVHN comes from embedding length.
+
 ### MNIST validation used in place of the held-out test split
 
 Recorded: 2026-11-03.
@@ -322,9 +328,9 @@ still being developed, and the test split should stay a one-time final check for
 - Results are development results, not final ones. SVHN results are post-hoc
   exploratory, because SVHN was inspected earlier.
 - RQ3 and RQ4 are not called "supported" or "not supported" yet.
-- The `[TBD]` thresholds in `reports/Proposal.md` section 6 (for example the RQ4
-  "within `[TBD]` AUROC" margin) were due 2026-10-06 and are still empty. They
-  will be filled, with a written reason, before the test split is used for them.
+- The `[TBD]` thresholds in `reports/Proposal.md` section 6 were due 2026-10-06. The
+  RQ4 margin was fixed on 2026-11-10 (see "Proposal thresholds and owners"); the
+  others will be filled, with a written reason, before the test split is used for them.
 - For the Phase 3 and 4 research questions, the test split will be used once, at
   the end, for all of them together, under a new run ID.
 
@@ -374,6 +380,10 @@ same saved inputs under a new run ID; the original folders were not changed.
 | SVHN images QE misses | `mnist_svhn_missed_qe_figure_s42_v1` | `mnist_svhn_missed_qe_figure_s42_v2` | `missed_svhn_figure.yaml` |
 | Training and validation QE distributions | `qe_training_calibrated_initial` | `qe_training_calibrated_v2` | `qe_score_distribution_figure.yaml` |
 
+- Each new run's numbers equal the original's; only the run ID and the config and PDF
+  fingerprints differ. The three `_v1` figure folders held only that metrics file, without
+  their PDF, so they were removed as duplicates (git history keeps them).
+  `qe_training_calibrated_initial` is kept, because later steps read it.
 - The new runs' PDFs are tracked with DVC, so they cannot be lost the same way.
 - `qe_novelty.yaml` still names `qe_training_calibrated_initial`, because later steps
   read that run's `qe_summary.json` through it; the figure run has its own config.

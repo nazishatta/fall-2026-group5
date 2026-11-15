@@ -9,7 +9,7 @@ Each row is one thing the proposal asks for in this step.
 
 | # | The proposal asks | Folder | File |
 |---|---|---|---|
-| 1 | Compute QE for each sample and fit a cutoff on the training QE (95th percentile) | `qe_training_calibrated_initial` | `qe_summary.json` (cutoff, how many training and validation images are flagged, flagged vs CNN errors) |
+| 1 | Compute QE for each sample and fit a cutoff on the training QE (95th percentile) | `qe_training_calibrated_initial` | `qe_summary.json` (cutoff, how many training and validation images are flagged, flagged vs CNN errors). The score-distribution figure is in `qe_training_calibrated_v2/pdf/` (DVC): the same step repeated with identical numbers, because the initial run did not keep its PDF. |
 | 2 | Flag images above the cutoff and measure the SVHN detection rate | `mnist_svhn_qe_frozen_s42_initial` | `qe_ood_metrics.json` (AUROC 0.981 with interval, AUPR, FPR at 95% TPR, detection rate, false-alarm rate) |
 | 3 | Check how the cutoff choice matters (90th to 99.5th percentile) | `mnist_svhn_qe_threshold_sweep_s42_v1` | `qe_threshold_sweep.json`, `tables/qe_threshold_sweep.csv` |
 | 4 | Check that QE beats a random score (control) | `qe_random_control_evaluation_initial` | `qe_random_control_metrics.json` (errors captured by QE vs random, Wilson interval, p-value) |

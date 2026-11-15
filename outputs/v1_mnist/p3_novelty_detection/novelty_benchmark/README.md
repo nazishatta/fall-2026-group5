@@ -15,7 +15,7 @@ The proposal asks for AUROC, AUPR and FPR at 95% TPR for every method.
 | 4 | All methods side by side, with a random-score null | `mnist_svhn_unified_nine_methods_s42_46_v1` | `unified_nine_method_metrics.json`, `README.md` |
 | 5 | Baselines given the same tuning budget | `mnist_svhn_fair_budget_baselines_s42_46_v1` | `fair_budget_metrics.json` |
 | 6 | Paired differences with intervals: QE vs max-softmax (-0.0174), QE vs energy and kNN | `mnist_svhn_qe_msp_reproduction_s42_v1`, `mnist_svhn_qe_energy_knn_paired_s42_v1` | `qe_msp_paired_metrics.json`, `paired_comparison_metrics.json` |
-| 7 | Failure modes: which SVHN images does QE miss? | `mnist_svhn_missed_qe_figure_s42_v1` | `figure_metrics.json` (the written analysis is in `../u_matrix_analysis/`, row 4) |
+| 7 | Failure modes: which SVHN images does QE miss? | `mnist_svhn_missed_qe_figure_s42_v2` | `figure_metrics.json`, `pdf/` (DVC; the written analysis is in `../u_matrix_analysis/`, row 4) |
 | 8 | All headline numbers in one table | `mnist_svhn_consolidated_evidence_s42_v1` | `phase3_consolidated_metrics.csv` |
 
 ## Why Isolation Forest and the autoencoder look odd on SVHN
@@ -27,6 +27,7 @@ They score SVHN as more normal than MNIST. These checks look into it.
 | Embedding norms of MNIST and SVHN | `svhn_inverted_embedding_norm_s42_v1` | `embedding_norm_metrics.json` |
 | Autoencoder with and without standardised inputs, five seeds | `mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `autoencoder_scaling_metrics.json`, `tables/` |
 | Autoencoder trained on standardised embeddings | `mnist_svhn_ae_train_standardized_s42_v1` | `standardized_autoencoder_metrics.json` |
+| Does QE depend on embedding length? (correlation, and AUROC among images of MNIST-like length) | `mnist_svhn_qe_norm_dependence_s42_v1` | `qe_norm_dependence_metrics.json`, `tables/qe_auroc_by_norm_subset.csv` |
 
 The written explanation is in `src/v1_mnist/docs/p3_novelty_detection/novelty_benchmark/BASELINE_SCORE_ANALYSIS.md`.
 

@@ -8,7 +8,7 @@ The U-Matrix shows distances between neighbouring SOM neurons. High values mark 
 | # | The proposal asks | Folder | File |
 |---|---|---|---|
 | 1 | Compute the U-Matrix from the trained SOM and compare it with QE | `qe_u_matrix_validation_s42_initial` | `qe_u_matrix_validation_initial.json` (mean QE, mean U-Matrix value, correlation 0.44; validation only, no SVHN here) |
-| 2 | Show the U-Matrix on the grid | `mnist_umatrix_hex_grid_s42_v1`, `mnist_qe_umatrix_validation_figure_s42_v1` | `figure_metrics.json` (the figure PDFs are tracked with DVC) |
+| 2 | Show the U-Matrix on the grid | `mnist_umatrix_hex_grid_s42_v2`, `mnist_qe_umatrix_validation_figure_s42_v2` | `figure_metrics.json`, `pdf/` (tracked with DVC) |
 | 3 | Show novelty scores overlaid on the SOM grid | `mnist_svhn_som_overlay_s42_v1` | `analysis.json`, `tables/svhn_neuron_summary.csv`, `tables/svhn_class_landing_profile.csv` |
 | 4 | Say which SVHN images the map misses, and where | `mnist_svhn_som_overlay_s42_v1`, `mnist_svhn_proposal_gap_analysis_s42_v1` | `analysis.json` in each (996 missed of 26,032; neurons that hold the misses) |
 
