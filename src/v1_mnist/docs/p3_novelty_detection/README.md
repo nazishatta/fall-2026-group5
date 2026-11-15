@@ -35,7 +35,7 @@ names its results folder; a new or re-tuned run always gets a new `run_id`. The
 `outputs/v1_mnist/p3_novelty_detection/run_manifest.csv` lists every Phase 3 run folder
 with the step, script and config that wrote it, how that link was checked, and the docs
 and report items that use it. The tables in `outputs/v1_mnist/p3_novelty_detection/README.md`
-show the same rows. `src/v1_mnist/tests/p3_novelty_detection/test_run_manifest.py`
+show the same rows. `src/v1_mnist/tests/test_repository_rules.py`
 fails if a folder has no row, if a listed script or config is missing, or if a result's
 recorded config SHA-256 no longer matches its config.
 
@@ -48,8 +48,8 @@ the [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUD
 
 Each figure in the Phase 3 report is the PDF written by a saved run.
 `configs/phase3_report_figures.yaml` names the run for each figure,
-`pipeline/p3_novelty_detection/copy_report_figures.py` copies it, and
-`tests/p3_novelty_detection/test_report_figures.py` checks each report copy against the
+`component/utils/report_figures.py` copies it, and
+`tests/test_repository_rules.py` checks each report copy against the
 SHA-256 its run recorded.
 
 ## Execution and verification
@@ -59,11 +59,11 @@ per implementation folder: `run_qe_novelty_detection.py`, `run_u_matrix_analysis
 and `run_novelty_benchmark.py`. Each lists its steps with `--dry-run`, runs one step
 with `--only STEP` (with `--config` for a new run ID), and skips steps whose results
 already exist. `run_all.py --to novelty_detection` runs Phase 3 in the order its results
-depend on each other (`phase3_plan.py`). To compare two score files outside these steps,
+depend on each other (`ORDER` in `run_all.py`). To compare two score files outside these steps,
 run `novelty_benchmark/run_ood_comparison.py` directly.
 
 Tests are in `src/v1_mnist/tests/p3_novelty_detection/` (one folder per step),
-`src/v1_mnist/tests/pipeline/` (runners) and `src/v1_mnist/tests/utils/` (shared code).
+`src/v1_mnist/tests/pipeline/test_run_all.py` (runners and their order) and `src/v1_mnist/tests/utils/` (shared code).
 Run the full suite with `pytest src/v1_mnist/tests` from the repository root; every test
 must pass before a merge. A passing suite verifies the code, not a numerical rerun of
 every saved experiment.

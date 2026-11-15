@@ -8,8 +8,6 @@ and integration with the shared project pipeline.
 
 ```text
 p3_novelty_detection/
-├── test_run_manifest.py   # every run folder is in run_manifest.csv; its script and config exist; recorded config hashes match
-├── test_report_figures.py # every report figure is the PDF its run wrote (checked against the recorded SHA-256)
 ├── qe_novelty_detection/
 │   ├── test_novelty_figures.py
 │   ├── test_ood_metrics.py
@@ -52,8 +50,9 @@ p3_novelty_detection/
 Shared provenance tests are maintained separately under
 `tests/utils/test_shared_provenance.py`.
 
-The pipeline runner tests (Phase 1/2 in `test_run_all.py`, Phase 3 in
-`test_phase3_runners.py`, the run_all order in `test_phase3_plan.py`) are under `tests/pipeline/`.
+The Phase 3 runner tests and the run_all order are in `tests/pipeline/test_run_all.py`.
+The checks that every Phase 3 result folder and report figure traces to its run and code
+are in `tests/test_repository_rules.py`.
 
 ## Test responsibilities
 

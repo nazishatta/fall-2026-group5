@@ -31,7 +31,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 
-from src.v1_mnist.component.pipeline.p3_novelty_detection.phase3_steps import P3Step, run_phase3  # noqa: E402
+from src.v1_mnist.component.pipeline.common import P3Step, run_phase3  # noqa: E402
 
 FOLDER = "u_matrix_analysis"
 STEPS = [

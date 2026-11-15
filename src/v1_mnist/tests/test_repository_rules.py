@@ -11,9 +11,20 @@
   importable names; order lives in a runner or a list, not in file names).
 - Component code writes no random seed as a number; seeds come from the
   configs (project rule: set and record random seeds, no hard-coded settings).
+- Every Phase 3 run folder has a row in run_manifest.csv naming the script and
+  config that wrote it; where a result stores its config's SHA-256, today's config
+  still has it (every output traces to its code).
+- Every figure in the Phase 3 report is the PDF its run wrote, checked against the
+  SHA-256 the run recorded (configs/phase3_report_figures.yaml lists them).
 """
 
 from __future__ import annotations
+
+from collections.abc import Iterator
+import csv
+import hashlib
+import json
+from typing import Any
 
 from pathlib import Path
 import shutil
@@ -22,6 +33,9 @@ import subprocess
 import re
 
 import pytest
+import yaml
+
+from src.v1_mnist.component.utils.report_figures import copy_figures, load_figures
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MAX_OUTPUT_FILE_BYTES = 1_000_000
@@ -104,3 +118,132 @@ def test_no_order_numbers_in_file_names() -> None:
         if "__pycache__" not in path.parts and path.name[:1].isdigit()
     ]
     assert not offenders, f"Names must not start with a digit: {offenders}"
+
+
+# ---- Phase 3: every output traces to its code -------------------------------
+
+P3_OUTPUTS = REPO_ROOT / "outputs/v1_mnist/p3_novelty_detection"
+P3_MANIFEST = P3_OUTPUTS / "run_manifest.csv"
+COMPONENT = REPO_ROOT / "src/v1_mnist/component"
+CONFIGS = COMPONENT / "configs"
+STEP_FOLDERS = ("qe_novelty_detection", "u_matrix_analysis", "novelty_benchmark")
+ROLES = {"result", "reproduction", "historical"}
+HASH_MATCH = "recorded config SHA-256 equals this file"
+
+
+def manifest_rows() -> list[dict[str, str]]:
+    """Read the manifest rows."""
+    with P3_MANIFEST.open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def run_folders_on_disk() -> set[tuple[str, str]]:
+    """Return (step folder, run folder) for every Phase 3 run folder."""
+    return {
+        (step, path.name)
+        for step in STEP_FOLDERS
+        for path in (P3_OUTPUTS / step).iterdir()
+        if path.is_dir() and not path.name.startswith((".", "__"))
+    }
+
+
+def recorded_config_hashes(value: Any) -> Iterator[str]:
+    """Yield every config_sha256 value stored in a result file."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key == "config_sha256" and isinstance(item, str):
+                yield item
+            else:
+                yield from recorded_config_hashes(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from recorded_config_hashes(item)
+
+
+def test_every_run_folder_has_exactly_one_row() -> None:
+    """No folder is missing from the manifest and no row points to a missing folder."""
+    keys = [(row["step_folder"], row["run_folder"]) for row in manifest_rows()]
+    assert len(keys) == len(set(keys)), "a run folder is listed twice"
+    assert set(keys) == run_folders_on_disk()
+
+
+def test_roles_are_known_and_reproductions_are_marked() -> None:
+    """Repeat runs made during the code reorganisation are never cited as results."""
+    for row in manifest_rows():
+        assert row["role"] in ROLES, row["run_folder"]
+        if row["run_folder"].startswith("reorg_"):
+            assert row["role"] == "reproduction", row["run_folder"]
+            assert row["used_in"].startswith("reproduces "), row["run_folder"]
+
+
+@pytest.mark.parametrize("column, base", [("script", COMPONENT), ("config", CONFIGS)])
+def test_named_scripts_and_configs_exist(column: str, base: Path) -> None:
+    """Every script and config the manifest names is in the repository."""
+    missing = [
+        row[column]
+        for row in manifest_rows()
+        if row[column] != "-" and not (base / row[column]).is_file()
+    ]
+    assert not missing
+
+
+def test_recorded_config_hashes_still_match() -> None:
+    """Where a result stores its config fingerprint, today's config file still has it."""
+    checked = 0
+    for row in manifest_rows():
+        if row["config_check"] != HASH_MATCH:
+            continue
+        expected = hashlib.sha256((CONFIGS / row["config"]).read_bytes()).hexdigest()
+        folder = P3_OUTPUTS / row["step_folder"] / row["run_folder"]
+        recorded: set[str] = set()
+        for result_file in folder.glob("*.json"):
+            recorded.update(
+                recorded_config_hashes(
+                    json.loads(result_file.read_text(encoding="utf-8"))
+                )
+            )
+        assert expected in recorded, row["run_folder"]
+        checked += 1
+    assert checked > 0
+
+
+def test_every_kept_reproduction_config_is_used() -> None:
+    """Configs kept under phase3_reorganization/ each wrote a listed run folder."""
+    used = {row["config"] for row in manifest_rows()}
+    kept = {
+        path.relative_to(CONFIGS).as_posix()
+        for path in (CONFIGS / "phase3_reorganization").rglob("*.yaml")
+    }
+    assert kept <= used
+
+
+# ---- Phase 3: every report figure is the PDF its run wrote ---------------------
+
+REPORT_FIGURES = CONFIGS / "phase3_report_figures.yaml"
+FIGURE_LIST = yaml.safe_load(REPORT_FIGURES.read_text(encoding="utf-8"))
+REPORT_DIR = REPO_ROOT / FIGURE_LIST["report_dir"]
+NOT_RUN_OUTPUTS = {
+    "fig/gwu_logo.pdf",
+    "fig/novelty_framework/phase3_novelty_framework.pdf",
+}
+
+
+def test_every_report_figure_is_listed() -> None:
+    """Each figure the report includes is either listed with its run or is the logo/diagram."""
+    tex = (REPORT_DIR / FIGURE_LIST["report_tex"]).read_text(encoding="utf-8")
+    included = set(re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", tex))
+    listed = {entry["report_file"] for entry in FIGURE_LIST["figures"]}
+    assert included - NOT_RUN_OUTPUTS == listed
+
+
+def test_every_source_run_folder_is_in_the_repository() -> None:
+    """Each figure points at a run folder that exists and has a manifest row."""
+    manifest = P3_MANIFEST.read_text(encoding="utf-8")
+    for figure in load_figures(REPORT_FIGURES):
+        assert figure["run_folder"].is_dir(), figure["run_folder"]
+        assert f",{figure['run_folder'].name}," in manifest
+
+
+def test_report_copies_match_their_runs() -> None:
+    """Report copies exist and, where the run recorded a fingerprint, match it."""
+    assert copy_figures(load_figures(REPORT_FIGURES), check_only=True) == []

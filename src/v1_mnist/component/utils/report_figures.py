@@ -1,12 +1,13 @@
-"""Copy each Phase 3 report figure from the run folder that produced it.
+"""Copy each report figure from the run folder that produced it.
 
-Every figure in reports/Latex_report/v1_mnist/p3_novelty_detection/fig/ is the PDF a
-saved run wrote (listed in configs/phase3_report_figures.yaml). Where the run recorded
-the figure's SHA-256, the copy is refused unless the run folder's file still has it,
-so the report shows exactly what the run produced. Figures are never regenerated here.
+A figure list (for Phase 3: configs/phase3_report_figures.yaml) names, for every figure
+in a LaTeX report, the saved run that wrote it. Where the run recorded the figure's
+SHA-256, the copy is refused unless the run folder's file still has it, so the report
+shows exactly what the run produced. Figures are never regenerated here.
 
-Run on the machine that holds the run folders' PDFs (they are not in git):
-  python src/v1_mnist/component/pipeline/p3_novelty_detection/copy_report_figures.py [--check]
+Run from the code root, on the machine that holds the run folders' PDFs (not in git):
+  python -m src.v1_mnist.component.utils.report_figures \
+      --config src/v1_mnist/component/configs/phase3_report_figures.yaml [--check]
 --check only compares the report copies with the recorded fingerprints.
 """
 
@@ -21,21 +22,15 @@ from typing import Any
 
 import yaml
 
-CODE_ROOT = Path(__file__).resolve().parents[5]
-if str(CODE_ROOT) not in sys.path:
-    sys.path.insert(0, str(CODE_ROOT))
+from src.v1_mnist.component.utils.file_hash import sha256_file
+from src.v1_mnist.component.utils.logging import get_logger
+from src.v1_mnist.component.utils.repo_paths import resolve_inside
 
-from src.v1_mnist.component.utils.file_hash import sha256_file  # noqa: E402
-from src.v1_mnist.component.utils.logging import get_logger  # noqa: E402
-from src.v1_mnist.component.utils.repo_paths import resolve_inside  # noqa: E402
-
-CONFIG_PATH = CODE_ROOT / "src/v1_mnist/component/configs/phase3_report_figures.yaml"
+CODE_ROOT = Path(__file__).resolve().parents[4]
 LOGGER = get_logger(__name__)
 
 
-def load_figures(
-    config_path: Path = CONFIG_PATH, root: Path = CODE_ROOT
-) -> list[dict[str, Any]]:
+def load_figures(config_path: Path, root: Path = CODE_ROOT) -> list[dict[str, Any]]:
     """Read the figure list and resolve every path inside the repository."""
     config = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
     report_dir = resolve_inside(root, config["report_dir"])
@@ -98,7 +93,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--config", type=Path, default=CONFIG_PATH)
+    parser.add_argument("--config", type=Path, required=True, help="figure list, e.g. configs/phase3_report_figures.yaml")
     parser.add_argument(
         "--check", action="store_true", help="only compare report copies with the runs"
     )

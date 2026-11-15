@@ -43,7 +43,7 @@ reproduction in `HISTORICAL_PROVENANCE_AUDIT.md`. 95% bootstrap intervals for AU
 
 ## Pipeline scope
 
-The Phase 3 step runners in `pipeline/p3_novelty_detection/` list every step with its own config in a dry run (checked by `tests/pipeline/test_phase3_runners.py`). Shared `pipeline/common.py` and `pipeline/run_all.py` require teammate agreement; a dedicated follow-up PR was previously agreed for those shared files. Do not imply that the Phase 3 runners mean shared end-to-end pipeline integration.
+The Phase 3 step runners in `pipeline/p3_novelty_detection/` list every step with its own config in a dry run, and `pipeline/run_all.py --from novelty_detection` runs them in dependency order (both checked by `tests/pipeline/test_run_all.py`).
 
 ## Multi-seed fitting-budget diagnostic
 

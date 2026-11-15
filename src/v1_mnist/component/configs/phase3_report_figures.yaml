@@ -1,7 +1,7 @@
 # Which saved run each figure in the Phase 3 report comes from.
-# copy_report_figures.py copies each run's own PDF into the report folder. Where the
+# utils/report_figures.py copies each run's own PDF into the report folder. Where the
 # run recorded the figure's SHA-256 (figure_metrics.json), a file with a different
-# fingerprint is refused, and test_report_figures.py checks the report copy.
+# fingerprint is refused, and tests/test_repository_rules.py checks the report copy.
 # The framework diagram and the GWU logo are not run outputs and are not listed.
 report_dir: reports/Latex_report/v1_mnist/p3_novelty_detection
 report_tex: novelty_detection.tex

@@ -41,7 +41,7 @@ p3_novelty_detection/
     └── other Python modules              scoring and analysis helpers
 ```
 
-**Order (set in `pipeline/p3_novelty_detection/phase3_plan.py`):** `qe_novelty`, then
+**Order (set by `ORDER` in `pipeline/run_all.py`):** `qe_novelty`, then
 the whole `novelty_benchmark` runner (its `svhn_benchmark` writes the SVHN score arrays
 that later steps read), then `qe_threshold_sweep`, then the whole `u_matrix_analysis`
 runner. Select the appropriate configuration for each experiment. ▶ = runnable script.

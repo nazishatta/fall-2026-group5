@@ -24,7 +24,7 @@ The order is set in `common.py` (`STEP_RUNNERS`). `p4_guided_retraining/` gets i
 
 ## Phase 3 runners
 
-`p3_novelty_detection/` has one runner per component folder. Each Phase 3 script has its own config (its own run ID), so these runners take `--only STEP` and `--dry-run` instead of one shared `--config`.
+`p3_novelty_detection/` has one runner per component folder and nothing else. Each Phase 3 script has its own config (its own run ID), so these runners take `--only STEP` and `--dry-run` instead of one shared `--config`; their shared code (`P3Step`, `run_phase3`) is in `common.py`, next to the Phase 1 and 2 helpers.
 
 | Runner | Steps |
 |---|---|
@@ -32,9 +32,9 @@ The order is set in `common.py` (`STEP_RUNNERS`). `p4_guided_retraining/` gets i
 | `p3_novelty_detection/run_u_matrix_analysis.py` | `qe_u_matrix`, `qe_umatrix_validation_figure`, `u_matrix_grid_figure`, `proposal_gap_analysis`, `svhn_som_overlay` |
 | `p3_novelty_detection/run_novelty_benchmark.py` | `svhn_benchmark`, `historical_baseline_verification`, `required_baselines`, `required_baselines_knn`, `qe_msp_paired_comparison`, `svhn_score_export`, `qe_energy_knn_paired`, `qe_umatrix_random_ood`, `standardized_autoencoder`, `fair_budget_baselines`, `unified_novelty_benchmark`, `svhn_inverted_norm_diagnostic`, `qe_norm_dependence`, `autoencoder_scaling_diagnostic`, `missed_svhn_figure`, `historical_svhn_inspection`, `consolidate_evidence` |
 
-`run_all.py --to novelty_detection` (or `--from novelty_detection` for Phase 3 alone) runs the three runners in the order their results depend on each other, defined in `p3_novelty_detection/phase3_plan.py`: `qe_novelty`, then the whole `run_novelty_benchmark.py` (its `svhn_benchmark` writes the SVHN score arrays that later steps read), then `qe_threshold_sweep`, then the whole `run_u_matrix_analysis.py`. It passes each runner `--steps`, which skips any step whose results exist. `qe_ood`, `qe_random_control` and `qe_u_matrix` only repeat historical results (the `reorg_…` runs already reproduced them), so they run only with `--with-reproductions`.
+`run_all.py --to novelty_detection` (or `--from novelty_detection` for Phase 3 alone) runs the three runners in the order their results depend on each other, defined by `ORDER` in `run_all.py`: `qe_novelty`, then the whole `run_novelty_benchmark.py` (its `svhn_benchmark` writes the SVHN score arrays that later steps read), then `qe_threshold_sweep`, then the whole `run_u_matrix_analysis.py`. It passes each runner `--steps`, which skips any step whose results exist. `qe_ood`, `qe_random_control` and `qe_u_matrix` only repeat historical results (the `reorg_…` runs already reproduced them), so they run only with `--with-reproductions`.
 
-`p3_novelty_detection/copy_report_figures.py` copies each Phase 3 report figure from the run folder that wrote it and checks it against the SHA-256 the run recorded (`--check` only compares); the figure list is `configs/phase3_report_figures.yaml`.
+Report figures are not a pipeline step: `python -m src.v1_mnist.component.utils.report_figures --config src/v1_mnist/component/configs/phase3_report_figures.yaml` copies each Phase 3 report figure from the run folder that wrote it and checks it against the SHA-256 the run recorded (`--check` only compares).
 
 A step whose results folder (output folder plus `run_id`, from its config) already exists is skipped; results are never overwritten. To repeat a step, copy its config, give it a new `run_id`, and run `--only STEP --config NEW_CONFIG`.
 
