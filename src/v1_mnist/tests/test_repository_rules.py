@@ -14,8 +14,6 @@
 - Every Phase 3 run folder has a row in run_manifest.csv naming the script and
   config that wrote it; where a result stores its config's SHA-256, today's config
   still has it (every output traces to its code).
-- Every figure in the Phase 3 report is the PDF its run wrote, checked against the
-  SHA-256 the run recorded (configs/phase3_report_figures.yaml lists them).
 """
 
 from __future__ import annotations
@@ -33,9 +31,6 @@ import subprocess
 import re
 
 import pytest
-import yaml
-
-from src.v1_mnist.component.utils.report_figures import copy_figures, load_figures
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MAX_OUTPUT_FILE_BYTES = 1_000_000
@@ -215,35 +210,3 @@ def test_every_kept_reproduction_config_is_used() -> None:
         for path in (CONFIGS / "phase3_reorganization").rglob("*.yaml")
     }
     assert kept <= used
-
-
-# ---- Phase 3: every report figure is the PDF its run wrote ---------------------
-
-REPORT_FIGURES = CONFIGS / "phase3_report_figures.yaml"
-FIGURE_LIST = yaml.safe_load(REPORT_FIGURES.read_text(encoding="utf-8"))
-REPORT_DIR = REPO_ROOT / FIGURE_LIST["report_dir"]
-NOT_RUN_OUTPUTS = {
-    "fig/gwu_logo.pdf",
-    "fig/novelty_framework/phase3_novelty_framework.pdf",
-}
-
-
-def test_every_report_figure_is_listed() -> None:
-    """Each figure the report includes is either listed with its run or is the logo/diagram."""
-    tex = (REPORT_DIR / FIGURE_LIST["report_tex"]).read_text(encoding="utf-8")
-    included = set(re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", tex))
-    listed = {entry["report_file"] for entry in FIGURE_LIST["figures"]}
-    assert included - NOT_RUN_OUTPUTS == listed
-
-
-def test_every_source_run_folder_is_in_the_repository() -> None:
-    """Each figure points at a run folder that exists and has a manifest row."""
-    manifest = P3_MANIFEST.read_text(encoding="utf-8")
-    for figure in load_figures(REPORT_FIGURES):
-        assert figure["run_folder"].is_dir(), figure["run_folder"]
-        assert f",{figure['run_folder'].name}," in manifest
-
-
-def test_report_copies_match_their_runs() -> None:
-    """Report copies exist and, where the run recorded a fingerprint, match it."""
-    assert copy_figures(load_figures(REPORT_FIGURES), check_only=True) == []

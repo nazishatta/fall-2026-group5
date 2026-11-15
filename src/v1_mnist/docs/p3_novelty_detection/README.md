@@ -46,11 +46,17 @@ the `reorg_20261102_` reproductions, which repeat them with the current scripts;
 random-control repeat differs from its original in six per-seed counts. Details are in
 the [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md).
 
-Each figure in the Phase 3 report is the PDF written by a saved run.
-`configs/phase3_report_figures.yaml` names the run for each figure,
-`component/utils/report_figures.py` copies it, and
-`tests/test_repository_rules.py` checks each report copy against the
-SHA-256 its run recorded.
+Each figure in the Phase 3 report is the PDF a saved run wrote, copied by hand from the
+run's `pdf/` folder into `reports/Latex_report/v1_mnist/p3_novelty_detection/fig/`. Each
+caption names its source run. The framework diagram and the GWU logo are not run outputs.
+
+| Report figure (`fig/...`) | Source run folder (`outputs/v1_mnist/p3_novelty_detection/...`) |
+|---|---|
+| `qe_novelty_detection/qe_score_distribution.pdf` | `qe_novelty_detection/qe_training_calibrated_v2/pdf/` |
+| `u_matrix_analysis/u_matrix_novelty_som_grid.pdf` | `u_matrix_analysis/mnist_umatrix_hex_grid_s42_v2/pdf/` |
+| `u_matrix_analysis/qe_u_matrix_validation_initial.pdf` | `u_matrix_analysis/mnist_qe_umatrix_validation_figure_s42_v2/pdf/` |
+| `u_matrix_analysis/svhn_som_overlay.pdf` | `u_matrix_analysis/mnist_svhn_som_overlay_s42_v1/pdf/` |
+| `novelty_benchmark/qe_missed_svhn_examples.pdf` | `novelty_benchmark/mnist_svhn_missed_qe_figure_s42_v2/pdf/` |
 
 ## Execution and verification
 

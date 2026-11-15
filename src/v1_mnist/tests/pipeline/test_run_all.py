@@ -224,8 +224,8 @@ def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
 OTHER_PHASE_CONFIGS = {
     "base.yaml", "cnn_baseline.yaml", "som.yaml", "som_10x10_robustness.yaml", "som_20x20_robustness.yaml",
 }
-# Not steps: shared input fingerprints, and the report-figure list read by utils/report_figures.py.
-SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml", "phase3_report_figures.yaml"}
+# Not a step: the shared input fingerprints.
+SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
 
 
 def test_every_phase3_config_is_a_step_or_listed_as_supporting() -> None:

@@ -15,7 +15,6 @@ The trees below follow the code's own layout: each **phase folder**, then its **
 | `heatmaps.py`         | Reads per-neuron tables and draws the cluster and error heatmaps.                                                                                                                        |
 | `hotspots.py`         | The project's one error-hotspot rule: top max(5, 5% of neurons) by Wilson lower bound.                                                                                                   |
 | `logging.py`          | Loggers: `setup_logger` (console and log file), `get_logger`, `get_console_logger` (the runners' plain console output).                                                                  |
-| `report_figures.py`   | Copies each report figure from the run folder that wrote it and checks it against the SHA-256 the run recorded (`python -m src.v1_mnist.component.utils.report_figures --config ...`).   |
 | `run_ids.py`          | Refuses run IDs that are empty or contain anything but letters, digits, `_` and `-` (`check_run_id`). Used by the Phase 3 scripts.                                                      |
 | `run_settings.py`     | Which SOM the cluster and error-pattern analyses use, where their outputs go, and checks that the model and inputs are the right ones (SHA-256).                                         |
 | `som_data.py`         | Loads and checks the CNN embeddings from the configured folder only; fits the scaler on the training split only.                                                                         |

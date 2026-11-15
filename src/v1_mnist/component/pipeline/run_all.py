@@ -74,7 +74,7 @@ RUNNER_STEPS: dict[str, list[P3Step]] = {
 }
 # (runner, steps to run from it; None means all of its steps), in dependency order.
 ORDER: tuple[tuple[str, tuple[str, ...] | None], ...] = (
-    ("run_qe_novelty_detection.py", ("qe_novelty",)),
+    ("run_qe_novelty_detection.py", ("qe_novelty", "qe_score_distribution_figure")),
     ("run_novelty_benchmark.py", None),
     ("run_qe_novelty_detection.py", ("qe_ood", "qe_random_control", "qe_threshold_sweep")),
     ("run_u_matrix_analysis.py", None),

@@ -358,3 +358,24 @@ Git history keeps all of them.
 - The facts that the original autoencoder checkpoint and package versions cannot
   be recovered moved into `HISTORICAL_PROVENANCE_AUDIT.md`.
 - No output, config or run ID was changed.
+
+### Four report figures redrawn under new run IDs
+
+Recorded: 2026-11-15.
+
+The PDFs written by four runs were not kept (run PDFs are not stored in git), so the
+report copies could not be checked against them. Each figure was drawn again from the
+same saved inputs under a new run ID; the original folders were not changed.
+
+| Figure | Original run | New run | Config |
+|---|---|---|---|
+| U-Matrix on the SOM grid | `mnist_umatrix_hex_grid_s42_v1` | `mnist_umatrix_hex_grid_s42_v2` | `u_matrix_grid_figure.yaml` |
+| QE versus U-Matrix on validation | `mnist_qe_umatrix_validation_figure_s42_v1` | `mnist_qe_umatrix_validation_figure_s42_v2` | `qe_umatrix_validation_figure.yaml` |
+| SVHN images QE misses | `mnist_svhn_missed_qe_figure_s42_v1` | `mnist_svhn_missed_qe_figure_s42_v2` | `missed_svhn_figure.yaml` |
+| Training and validation QE distributions | `qe_training_calibrated_initial` | `qe_training_calibrated_v2` | `qe_score_distribution_figure.yaml` |
+
+- The new runs' PDFs are tracked with DVC, so they cannot be lost the same way.
+- `qe_novelty.yaml` still names `qe_training_calibrated_initial`, because later steps
+  read that run's `qe_summary.json` through it; the figure run has its own config.
+- The report copies are taken by hand from these runs' `pdf/` folders; each caption
+  names its source run.

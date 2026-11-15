@@ -3,10 +3,12 @@
 Steps (scripts in p3_novelty_detection/qe_novelty_detection/):
   1. qe_novelty: score MNIST samples by quantization error (QE), with the
      decision threshold frozen from the training QE.
-  2. qe_ood: evaluate the QE score on MNIST validation versus SVHN (AUROC with a
+  2. qe_score_distribution_figure: the same scoring under a new run ID, which saves the
+     training and validation QE distribution figure used in the report.
+  3. qe_ood: evaluate the QE score on MNIST validation versus SVHN (AUROC with a
      bootstrap interval). The held-out MNIST test split is never used.
-  3. qe_random_control: compare the QE flags with random selection.
-  4. qe_threshold_sweep: the QE score at several training-percentile cutoffs (90 to 99.5),
+  4. qe_random_control: compare the QE flags with random selection.
+  5. qe_threshold_sweep: the QE score at several training-percentile cutoffs (90 to 99.5),
      with threshold-free AUROC and a label-shuffle control.
 
 Results go to outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/<run_id>/.
@@ -16,7 +18,7 @@ Usage (from the code root, the folder that holds src/ and outputs/):
       [--only STEP [--config CONFIG]] [--dry-run]
 
 Every step has its own config in src/v1_mnist/component/configs/ (shown by --dry-run).
-Needs the trained SOM and its cluster-analysis distances (Phase 2). Step 4 also reads
+Needs the trained SOM and its cluster-analysis distances (Phase 2). Step 5 also reads
 the SVHN QE score array written by the svhn_benchmark step of run_novelty_benchmark.py.
 A step whose results folder already exists is skipped (results are never overwritten);
 to repeat a step, give it a new run_id in a new config and run it with --only STEP --config.
@@ -35,6 +37,8 @@ FOLDER = "qe_novelty_detection"
 STEPS = [
     P3Step("qe_novelty", "QE novelty detection with the frozen training-QE threshold",
            f"{FOLDER}/run_qe_novelty.py", "qe_novelty.yaml", ("--save",)),
+    P3Step("qe_score_distribution_figure", "Figure: training and validation QE distributions",
+           f"{FOLDER}/run_qe_novelty.py", "qe_score_distribution_figure.yaml", ("--save",)),
     P3Step("qe_ood", "QE evaluation: MNIST validation versus SVHN",
            f"{FOLDER}/run_qe_ood.py", "qe_ood_evaluation.yaml", ("--evaluate", "--save")),
     P3Step("qe_random_control", "Random-selection control for the QE flags",
