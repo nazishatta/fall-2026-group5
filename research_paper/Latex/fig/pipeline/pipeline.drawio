@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-11-15T00:00:00.000Z" agent="ChatGPT" version="24.7.17" type="device">
+  <diagram id="finalmnistpipeline" name="CNN NNSOM MNIST Final Pipeline">
+    <mxGraphModel dx="1480" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1240" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="data" value="&lt;b&gt;MNIST data&lt;/b&gt;&lt;br&gt;49,000 train · 10,500 validation&lt;br&gt;10,500 held-out test" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F6FA;strokeColor=#5B7490;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="70" y="132" width="355" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="cnn" value="&lt;b&gt;Phase 1 · LeNet-5&lt;/b&gt;&lt;br&gt;Train and evaluate CNN&lt;br&gt;Confusion matrix, metrics" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F6FA;strokeColor=#5B7490;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="515" y="132" width="355" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="emb" value="&lt;b&gt;Frozen CNN representation&lt;/b&gt;&lt;br&gt;84-D fc2 embeddings&lt;br&gt;Train-only feature scaling" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F6FA;strokeColor=#5B7490;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="960" y="132" width="355" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="som" value="&lt;b&gt;Phase 2 · NNSOM training&lt;/b&gt;&lt;br&gt;15 × 15 grid; training embeddings&lt;br&gt;250 epochs · seed 42" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F6FA;strokeColor=#5B7490;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1405" y="132" width="420" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="diag" value="&lt;b&gt;SOM diagnostic analysis&lt;/b&gt;&lt;br&gt;BMUs, purity, U-Matrix&lt;br&gt;Class structure and error hotspots" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9F1F9;strokeColor=#38698C;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1405" y="349" width="420" height="136" as="geometry" />
+        </mxCell>
+        <mxCell id="cnnscores" value="&lt;b&gt;Frozen CNN scoring&lt;/b&gt;&lt;br&gt;Logits → MSP / energy&lt;br&gt;Scores from original classifier" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F2FA;strokeColor=#6F6793;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="95" y="575" width="390" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="somscores" value="&lt;b&gt;Frozen SOM scoring&lt;/b&gt;&lt;br&gt;Per-image QE / U-Matrix&lt;br&gt;Frozen map + CNN features" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F2FA;strokeColor=#6F6793;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="585" y="575" width="390" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="ood" value="&lt;b&gt;Phase 3 · Novelty benchmark&lt;/b&gt;&lt;br&gt;MNIST validation (ID) vs SVHN test (OOD)&lt;br&gt;AUROC, AUPR and FPR@95 TPR; detector baselines" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F2FA;strokeColor=#6F6793;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="190" y="838" width="740" height="136" as="geometry" />
+        </mxCell>
+        <mxCell id="selection" value="&lt;b&gt;Phase 4 · Training-image selection&lt;/b&gt;&lt;br&gt;Hotspots OR purity &amp;lt; 0.95&lt;br&gt;OR BMU distance &amp;gt; training 95th percentile" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF7F2;strokeColor=#59806A;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1330" y="575" width="495" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="arms" value="&lt;b&gt;Controlled training comparisons&lt;/b&gt;&lt;br&gt;Standard · SOM · random · MSP pools&lt;br&gt;Curriculum and targeted augmentation" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF7F2;strokeColor=#59806A;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1330" y="754" width="495" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="evaluate" value="&lt;b&gt;Retrained CNN evaluations&lt;/b&gt;&lt;br&gt;5 seeds; accuracy, CF1 vs CF2&lt;br&gt;Hotspot and non-hotspot test errors" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF7F2;strokeColor=#59806A;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1330" y="940" width="495" height="107" as="geometry" />
+        </mxCell>
+        <mxCell id="newmap" value="&lt;b&gt;Post-retraining SOM re-analysis&lt;/b&gt;&lt;br&gt;New fc2 embeddings → 15 new SOMs" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF7F2;strokeColor=#59806A;strokeWidth=1.6;fontSize=18;fontFamily=Helvetica;fontColor=#182334;align=center;verticalAlign=middle;spacing=8;">
+          <mxGeometry x="1330" y="1110" width="495" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_0" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=1.00000;exitY=0.49600;exitDx=0;exitDy=0;entryX=0.00000;entryY=0.49600;entryDx=0;entryDy=0;" edge="1" parent="1" source="data" target="cnn">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_1" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=1.00000;exitY=0.49600;exitDx=0;exitDy=0;entryX=0.00000;entryY=0.49600;entryDx=0;entryDy=0;" edge="1" parent="1" source="cnn" target="emb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_2" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=1.00000;exitY=0.49600;exitDx=0;exitDy=0;entryX=0.00000;entryY=0.49600;entryDx=0;entryDy=0;" edge="1" parent="1" source="emb" target="som">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_3" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50000;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.50000;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="som" target="diag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_4" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.49296;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.50000;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="cnn" target="cnnscores">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690" y="455" />
+              <mxPoint x="290" y="455" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_5" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.00000;exitY=0.50000;exitDx=0;exitDy=0;entryX=0.50000;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="diag" target="somscores">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="417" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_6" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50000;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.33784;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="cnnscores" target="ood">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="770" />
+              <mxPoint x="440" y="770" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_7" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50000;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.67568;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="somscores" target="ood">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="770" />
+              <mxPoint x="690" y="770" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_8" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50000;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.57576;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="diag" target="selection">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_9" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50101;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.50101;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="selection" target="arms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_10" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50101;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.50101;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="arms" target="evaluate">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_11" value="" style="edgeStyle=none;rounded=0;html=1;strokeColor=#364658;strokeWidth=1.6;endArrow=block;endFill=1;endSize=8;exitX=0.50101;exitY=1.00000;exitDx=0;exitDy=0;entryX=0.50101;entryY=0.00000;entryDx=0;entryDy=0;" edge="1" parent="1" source="evaluate" target="newmap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
