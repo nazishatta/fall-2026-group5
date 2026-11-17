@@ -49,7 +49,7 @@ Phase 4 asks one question: \emph{can the SOM help us train a better CNN?} The SO
   \item \textbf{Curriculum learning did not help.} It made the CNN slightly worse (98.66\% and 98.69\% correct, against 99.11\% for normal training).
   \item \textbf{The SOM is not the only way to pick hard images.} Picking the images the CNN is least sure about worked about as well. The SOM's real value is that it shows \emph{where} the errors are.
   \item \textbf{The new SOMs have smaller weak regions, but are not cleaner.} After augmentation the hotspots of a new SOM hold fewer mistakes than after normal training (17.5\% against 22.9\% on validation images). The neurons did not become purer, and against random copies the hotspot difference is not clear (Section~\ref{sec:reanalysis}).
-  \item \textbf{Not measured yet:} the novelty AUROC after retraining is \tbd{} (Section~\ref{sec:open}).
+  \item \textbf{The SOM still detects novel images after retraining.} Every retrained network's SOM separates SVHN from MNIST (AUROC 0.965 to 0.993). Whether SOM-guided retraining changes this could not be decided with 5 seeds (Section~\ref{sec:novelty_after}).
 \end{itemize}
 
 \subsection*{Where each item of the plan is covered}
@@ -64,7 +64,7 @@ Targeted augmentation and its effect on the rest of the data & Tables~\ref{tab:a
 Re-extract features, re-train the SOM, compare old and new maps & Section~\ref{sec:reanalysis}, Table~\ref{tab:reanalysis}, Figures~\ref{fig:reanalysis_measures}--\ref{fig:reanalysis_purity} \\ \hline
 Feedback loop: SOM analysis $\rightarrow$ retraining $\rightarrow$ new SOM structure & Figure~\ref{fig:loop}, Section~\ref{sec:meaning} \\ \hline
 Table: baseline accuracy, post-retraining accuracy & Table~\ref{tab:arms} \\ \hline
-Table: novelty detection AUROC after retraining & \tbd{} (Section~\ref{sec:open}) \\ \hline
+Table: novelty detection AUROC after retraining & Section~\ref{sec:novelty_after}, Table~\ref{tab:novelty_after} \\ \hline
 Monitor forgetting of easy examples & Section~\ref{sec:meaning} (last item), Figure~\ref{fig:curves} \\ \hline
 Before/after comparison and learning curves & Figures~\ref{fig:cf_aug}--\ref{fig:curves} \\ \hline
 \end{tabularx}}
@@ -217,6 +217,21 @@ Two questions from the reviews are answered here. Both were added on 2026-11-17,
 
 \input{tables/summary/per_class_error.tex}
 
+\section{Novelty detection after retraining}\label{sec:novelty_after}
+
+Phase 3 showed that the SOM's quantization error (QE) can tell novel images from normal ones. Here we ask whether that still holds after retraining, and whether SOM-guided retraining changes it. We repeat the Phase 3 test on each of the 15 retrained networks (\texttt{standard}, \texttt{augmented\_som} and \texttt{augmented\_random}, 5 seeds each), each with the new SOM from Section~\ref{sec:reanalysis}. MNIST validation images are the normal set and SVHN test images the novel set. Each network is also scored with max-softmax \parencite{hendrycks2017baseline}, energy \parencite{liu2020energy} and Mahalanobis distance \parencite{lee2018mahalanobis}, the last with a shrinkage covariance \parencite{ledoit2004wellconditioned}. Everything is fitted on training images only, and the MNIST test split is not read. The statements, the margin of 0.01 AUROC and the rule that a result can be ``inconclusive'' \parencite{walker2011noninferiority} were written down before the run.
+
+As a check of the code, the Phase 1 network reproduces the Phase 3 results exactly (QE AUROC 0.981, QE minus max-softmax $-0.017$).
+
+\input{tables/summary/novelty_after_retraining.tex}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+  \item \textbf{The SOM still detects novelty (shown).} In all 10 networks retrained with augmentation, the QE AUROC is clearly above chance (0.965 to 0.993).
+  \item \textbf{Whether SOM-guided retraining changes it: inconclusive.} On average, SOM-guided retraining raised the QE AUROC by 0.008 against normal training (higher in 4 of 5 seeds), but the 95\% interval is $-0.014$ to $+0.030$: it includes both a drop larger than the margin and a clear gain. Against random augmentation the difference is $+0.001$ ($-0.016$ to $+0.017$), and the QE gap to max-softmax changed by $+0.008$ ($-0.013$ to $+0.029$). None of these could be decided with 5 seeds.
+  \item \textbf{Max-softmax and energy stay better.} They are almost perfect in every network; QE comes within 0.01 AUROC of the best of them in only 2 of the 15 networks. Mahalanobis stays far behind.
+  \item \textbf{The SVHN result is mostly a length effect.} The length of the embedding alone separates SVHN almost perfectly in every network, and QE follows length closely (Spearman correlation about $-0.9$). This was found in Phase 3 and holds after retraining. SVHN digits look very different from MNIST, so this test says little about the map itself; a near-novelty test is needed for that \parencite{nalisnick2019deep}.
+\end{itemize}
+
 \section{What the results mean}\label{sec:meaning}
 
 \textbf{How to read the tables.} In Table~\ref{tab:arms}, a higher accuracy and a lower error are better. In Table~\ref{tab:criteria}, the difference is ``first arm minus second arm'' in percentage points of error, so a \emph{negative} number means the first arm made fewer mistakes. If the interval in brackets does not include 0, the difference is probably real. Our test set has 10{,}500 images, so 0.1 points is about 11 images; the hotspots hold only 146 test images, so one image is about 0.7 points.
@@ -245,12 +260,18 @@ The first set of augmentation ranges (shift up to 2 pixels) failed the check mad
   \item The 11 hotspots were chosen from validation errors; this is declared, and it is why the final judgement is made on the test split.
   \item Criteria, thresholds and the guard value were written down and stamped (SHA-256 of the protocol and the configuration) before the test split was opened. It was opened once and not re-run.
   \item All arms use the same data, seeds and training recipe. Finished runs are never overwritten; the changed augmentation run got a new run ID.
-  \item The re-analysis uses training and validation images only; the test split was not read. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
+  \item The re-analysis uses training and validation images only; the test split was not read.
+  \item The novelty test after retraining fits everything on training images, uses MNIST validation and SVHN test images for scoring only, and does not read the MNIST test split. Its statements and margin were fixed before the run. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
 \end{itemize}
 
-\section{Still open}\label{sec:open}
+\section{Limitations and future work}\label{sec:open}
 
-The novelty AUROC after retraining (against max-softmax, energy and Mahalanobis on the same embeddings) is not measured yet and is \tbd{}. The arms for the re-analysis (standard, augmented\_som, augmented\_random) were chosen after the retraining results were known; this is stated in its protocol and in the deviations log.
+All items of the Phase 4 plan are done. Two limits of the results are stated here.
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+  \item \textbf{Which arms were re-analysed.} The three arms of the SOM re-analysis (\texttt{standard}, \texttt{augmented\_som}, \texttt{augmented\_random}) were chosen after the retraining results were known. This is stated in the re-analysis protocol and in the deviations log.
+  \item \textbf{Far novelty only.} The novelty test after retraining uses SVHN, where embedding length explains most of the result. A near-novelty test, for example Fashion-MNIST images shown to the MNIST network, would test the map itself; it is future work.
+\end{itemize}
 
 \printbibliography[title={References}]
 

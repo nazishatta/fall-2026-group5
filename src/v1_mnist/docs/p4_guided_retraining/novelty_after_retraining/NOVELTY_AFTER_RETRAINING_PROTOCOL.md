@@ -121,14 +121,45 @@ Phase 4 result or criterion.
 
 ## 9. Recorded outcome
 
-Filled in after the run, without changing sections 1 to 8. Each statement is recorded as shown, opposite shown or inconclusive.
+Filled in on 2026-11-17 from `results.json` of run `novelty_after_retraining_som_15x15_nb11_ep250_s42_v2`
+(commit cacd8bd). Sections 1 to 8 are unchanged. The run recorded the SHA-256 of this file before this
+section was filled in, as expected. The MNIST test split was not read.
 
-| Statement | Result |
-|---|---|
-| N1 | [TBD] |
-| N2 | [TBD] |
-| N3 | [TBD] |
-| N4 | [TBD] |
+**Check of the code.** The reference cell (Phase 1 network, Phase 2 SOM) reproduces the Phase 3 results
+exactly: S1 AUROC 0.9811 [0.9790, 0.9831], S1 minus S2 -0.0174 [-0.0194, -0.0154], and 96.17% of SVHN
+images detected with 5.13% false alarms at the training-QE threshold.
+
+**AUROC per arm** (mean ± SD over 5 seeds; MNIST validation normal, SVHN test novel):
+
+| Arm | S1 QE | S2 max-softmax | S3 energy | S4 Mahalanobis | D1 length | Cells competitive (RQ4 rule) |
+|---|---|---|---|---|---|---|
+| reference (Phase 1/2) | 0.9811 | 0.9985 | 0.9998 | 0.7764 | 0.9999 | no |
+| standard | 0.9759 ± 0.0089 | 0.9979 ± 0.0007 | 0.9996 ± 0.0002 | 0.8024 ± 0.0282 | 0.9998 ± 0.0002 | 0 of 5 |
+| augmented_som | 0.9839 ± 0.0086 | 0.9978 ± 0.0006 | 0.9995 ± 0.0003 | 0.7896 ± 0.0766 | 0.9999 ± 0.0001 | 1 of 5 |
+| augmented_random | 0.9833 ± 0.0111 | 0.9978 ± 0.0007 | 0.9996 ± 0.0001 | 0.7814 ± 0.0767 | 0.9999 ± 0.0001 | 1 of 5 |
+
+**Statements** (paired over seeds, 95% t-interval, margin -0.01):
+
+| Statement | Mean difference [95% interval] | Seeds where the first arm is higher | Result |
+|---|---|---|---|
+| N1: the SOM still detects novelty | every S1 AUROC interval of the 10 retrained cells above 0.5 (lowest AUROC 0.965) | n/a | **shown** |
+| N2: S1, `augmented_som` minus `standard` | +0.0080 [-0.0137, +0.0297] | 4 of 5 | **inconclusive** |
+| N3: S1, `augmented_som` minus `augmented_random` | +0.0005 [-0.0163, +0.0174] | 3 of 5 | **inconclusive** |
+| N4: (S1 minus S2), `augmented_som` minus `standard` | +0.0081 [-0.0130, +0.0293] | 4 of 5 | **inconclusive** |
+
+**What this means.**
+
+- The SOM still separates SVHN from MNIST after every kind of retraining (N1).
+- On average, SOM-guided retraining slightly raised the SOM's AUROC (+0.008) and narrowed its gap to
+  max-softmax, but S1 varies between seeds (SD about 0.009 to 0.011), so with 5 seeds the intervals include
+  both a drop larger than the margin and a clear gain. N2 to N4 are therefore neither shown nor contradicted.
+- Max-softmax and energy stay near 0.998 and 0.9996 in every network and remain better than S1; S1 is
+  "competitive" by the RQ4 rule in only 2 of the 15 retrained cells. Mahalanobis stays far behind and varies
+  more after augmentation.
+- **The length effect persists.** Embedding length alone (D1) separates SVHN almost perfectly in every network
+  (AUROC 0.9998 to 0.9999), and QE and length are strongly related (mean Spearman -0.90 to -0.91 per arm;
+  -0.83 for the reference). As stated in section 6, the SVHN result says more about SVHN's short embeddings than
+  about the map; a near-novelty set is needed to test the SOM's own contribution.
 
 ## 10. References
 
