@@ -270,4 +270,5 @@
 * [ ] Poster
 * [ ] Final presentation
 * [ ] Ask the instructor: ResNet comparison (11-10 note) and one Jupyter notebook per phase (proposal, Week 14) in the time left
-* [ ] Feature-layer ablation (fc1 against fc2; proposal, paper section 5) or a written reason it is left out
+* [x] Feature-layer ablation: protocol, code and tests (fc1 against fc2, 5 SOM seeds)
+* [ ] Feature-layer ablation results (EC2)

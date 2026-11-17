@@ -21,6 +21,7 @@ Whether the Week 5 error-pattern findings also hold on other grid sizes is in th
 | 5 | `GRID_COMPARISON_RESULTS.md` | Results of that fair test. |
 | 6 | `figures/grid_comparison_results.pdf` | The chart for file 5. |
 | 7 | `OPTUNA_TUNING_PROTOCOL.md` | Optuna tuning of the starting neighbourhood and the number of epochs for all three grid sizes, with the same budget, written before the runs. Its "Recorded outcome" section gives the result: 15x15 confirmed (no clear difference), so the headline map is unchanged. Results: `outputs/v1_mnist/p2_som_training_visualization/som_optuna_tuning/`. |
+| 8 | `FEATURE_LAYER_ABLATION_PROTOCOL.md` | The feature-layer ablation (fc1 against fc2, same SOM recipe, 5 SOM seeds), written before the run. The proposal's paper outline asks for it. Results: `outputs/v1_mnist/p2_som_training_visualization/feature_layer_ablation/`. |
 
 ## Why some files are never edited
 

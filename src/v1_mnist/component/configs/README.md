@@ -20,6 +20,7 @@ Every setting lives here, never in the code: paths, run IDs, seeds, grid sizes, 
 | `error_detector_budget.yaml` | Phase 2: same-budget comparison of the error detectors (exploratory). |
 | `error_pattern_baselines.yaml` | Phase 2: SOM error cells against k-means cells, kNN impurity and max-softmax. |
 | `fair_budget_baselines.yaml` | Phase 3: the classical baselines re-run with the same training budget over seeds 42 to 46. |
+| `feature_layer_ablation.yaml` | Phase 2: feature-layer ablation, SOMs on fc1 and fc2 with the same recipe and 5 SOM seeds. |
 | `held_out_class_novelty.yaml` | Phase 3: held-out-digit novelty test (6 known digits, 4 new, 5 splits). |
 | `historical_baseline_verification.yaml` | Phase 3: re-checks the early baseline results on validation data; old result files stay read-only. |
 | `historical_svhn_inspection.yaml` | Phase 3: reads the scores of the early five-method SVHN run for inspection. |

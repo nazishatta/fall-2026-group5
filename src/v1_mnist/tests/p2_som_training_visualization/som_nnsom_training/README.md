@@ -2,6 +2,12 @@
 
 Tests for the code in `component/p2_som_training_visualization/som_nnsom_training/`. Run them with `python -m pytest src/v1_mnist/tests/p2_som_training_visualization/som_nnsom_training -q` from the code root.
 
+## Folders
+
+| Folder | What is inside |
+|---|---|
+| [`layer_ablation/`](layer_ablation/README.md) | Tests for the code in `component/p2_som_training_visualization/som_nnsom_training/layer_ablation/`. |
+
 ## Files
 
 | File | What it is |
