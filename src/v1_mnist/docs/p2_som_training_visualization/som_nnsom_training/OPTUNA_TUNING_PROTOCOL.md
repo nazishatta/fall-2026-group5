@@ -119,10 +119,51 @@ optimistic (it was picked because they were good). Stage 2 removes both problems
 
 ## 10. Recorded outcome
 
-Filled in after the runs, without changing sections 1 to 9.
+Written 2026-11-17 from the committed result files (commit 7c78e21). Sections 1 to 9 are unchanged.
+The runs recorded the SHA-256 of this file as it was before this section was filled in
+(`1d287c0f8c03…`, commit 4a3d6f6); filling in this section changes the file's SHA-256, as expected.
+Every result file records `labels_used: false` and `test_evaluated: false`.
 
-| Grid | 3-point choice | Optuna choice | Stage 2: QE | Stage 2: TE1 | Stage 2: TE1+2 | Overall |
-|---|---|---|---|---|---|---|
-| 10x10 | nb 7, 250 epochs | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| 15x15 | nb 11, 250 epochs | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| 20x20 | nb 15, 250 epochs | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
+**Stage 1 (search, seed 42).** Distinct settings trained out of 20 trials: 17 (10x10), 17 (15x15), 19 (20x20).
+
+| Grid | 3-point choice | Optuna choice | Search-seed scores of the Optuna choice (QE / TE1 % / TE1+2 %) |
+|---|---|---|---|
+| 10x10 | nb 7, 250 epochs | nb 8, 100 epochs (trial 12) | 1.1565 / 3.37 / 1.13 |
+| 15x15 | nb 11, 250 epochs | nb 15, 250 epochs (trial 9) | 1.0305 / 5.13 / 2.95 |
+| 20x20 | nb 15, 250 epochs | nb 15, 200 epochs (trial 19) | 0.9622 / 6.90 / 4.50 |
+
+**Stage 2 (seeds 1 to 5).** Mean ± SD over the 5 seeds, then the paired difference (Optuna minus 3-point)
+with its 95% t-interval. Lower is better for every metric.
+
+| Grid | Metric | 3-point setting | Optuna setting | Difference [95% interval] | Verdict |
+|---|---|---|---|---|---|
+| 10x10 | QE | 1.1937 ± 0.0005 | 1.1566 ± 0.0004 | −0.0371 [−0.0382, −0.0360] | Optuna better |
+| 10x10 | TE1 % | 4.96 ± 0.10 | 3.41 ± 0.05 | −1.55 [−1.63, −1.47] | Optuna better |
+| 10x10 | TE1+2 % | 1.85 ± 0.02 | 1.10 ± 0.04 | −0.75 [−0.78, −0.72] | Optuna better |
+| 15x15 | QE | 1.0429 ± 0.0011 | 1.0479 ± 0.0066 | +0.0050 [−0.0025, +0.0126] | no clear difference |
+| 15x15 | TE1 % | 6.35 ± 0.11 | 6.21 ± 0.47 | −0.14 [−0.81, +0.53] | no clear difference |
+| 15x15 | TE1+2 % | 3.46 ± 0.05 | 3.45 ± 0.31 | −0.01 [−0.43, +0.42] | no clear difference |
+| 20x20 | QE | 0.9696 ± 0.0007 | 0.9661 ± 0.0047 | −0.0035 [−0.0095, +0.0025] | no clear difference |
+| 20x20 | TE1 % | 6.37 ± 0.26 | 7.01 ± 0.28 | +0.64 [+0.03, +1.26] | Optuna worse |
+| 20x20 | TE1+2 % | 4.16 ± 0.27 | 4.69 ± 0.17 | +0.53 [+0.14, +0.92] | Optuna worse |
+
+**Overall (section 6 rule).**
+
+| Grid | Overall |
+|---|---|
+| 10x10 | **Optuna setting better** (nb 8, 100 epochs) |
+| 15x15 | **3-point search confirmed: no clear difference** |
+| 20x20 | **3-point setting better** |
+
+**What this means (section 7 rule, fixed before the runs).**
+
+- **15x15, the headline grid:** the setting used for every Phase 2 to 4 result (`som_15x15_nb11_ep250_s42_v2`)
+  is confirmed. The Optuna choice looked better on the search seed (TE1 5.13% against 6.18% for the v2 model)
+  but not on new seeds, where it was also less stable (TE1 SD 0.47 against 0.11).
+- **20x20:** the 3-point setting is better on topographic error. The Optuna choice won on the search seed only.
+  This is why stage 2 exists: a setting picked for its scores on one seed looks better than it is.
+- **10x10:** Optuna found a better setting, on all three metrics and with fewer epochs. 10x10 is used only as a
+  robustness map for the Phase 2 error-geography result, which held on it (`ERROR_PATTERN_ROBUSTNESS_RESULTS.md`).
+  This is reported as a limitation; the robustness check is not re-run, because the headline result does not
+  depend on it.
+- This does not compare grid sizes (section 7). The headline grid and model stay as they are.
