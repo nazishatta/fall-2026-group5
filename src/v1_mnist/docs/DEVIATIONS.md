@@ -28,6 +28,7 @@ Week 3 rows refer to `p2_som_training_visualization/som_nnsom_training/SOM_GRID_
 | 2026-11-15 | Phase 2 | 4a3d6f6 | The 10-06 session asked for the SOM grids to be tuned with Optuna, including the learning rate (alpha). Until now each grid was tuned by a 3-point neighbourhood search instead. | Not a rule fixed in advance; a session request left open for 6 weeks. | Added equal-budget Optuna tuning for all three grids (20 trials each, TPE seed 42, neighbourhood searched as a fraction of the side length, validation features only), followed by a check of the chosen setting against the 3-point choice on 5 new SOM seeds, with the protocol `p2_som_training_visualization/som_nnsom_training/OPTUNA_TUNING_PROTOCOL.md` written before any real run. NNSOM's batch SOM has no learning rate, so `init_neighborhood` and `epochs` are tuned instead. The headline model stays `som_15x15_nb11_ep250_s42_v2`; the Optuna result is reported as a check on the 3-point search. |
 | 2026-11-17 | Phase 2 | 7c78e21 | Optuna tuning finished (protocol `OPTUNA_TUNING_PROTOCOL.md`, written before the runs). | Not a deviation: the rules and their use were fixed in advance. | 5-seed check, Optuna choice against the 3-point choice: 15x15 (headline) confirmed, no clear difference; 20x20 3-point setting better (Optuna worse on TE1 and TE1+2); 10x10 Optuna setting better (nb 8, 100 epochs, better on QE, TE1 and TE1+2). Headline model unchanged. The 10x10 robustness map is reported as tuned below its best setting; the robustness check is not re-run. |
 | 2026-11-17 | Phase 4 | defa188 | Added an exploratory `breakdown` stage after the single test pass (Reviews #8 and #9): test errors fixed and newly made per seed against `standard`, and test error per digit with the same paired comparisons as the test pass. | Not a deviation: no criterion, threshold, setting or run changed; nothing was retrained or re-run. The breakdown reads the saved test predictions and stops unless they reproduce `test_results.json` exactly. | Reported as exploratory in the Phase 4 report (section "Errors fixed, and error per digit"). The SOM-vs-MSP test comparison asked for in Review #8 already existed (row R1 of the criteria table). |
+| 2026-11-17 | Proposal | – | Moved `reports/Project_proposal.md` and `reports/Proposal.md` into a new top-level `proposals/` folder with `git mv`, and renamed `Proposal.md` to `Group_proposal.md`. The READMEs that link them were updated. | Not a deviation: no rule, criterion or threshold changed. | The two protocols fingerprinted by their runs (`HELD_OUT_CLASS_NOVELTY_PROTOCOL.md`, `NOVELTY_AFTER_RETRAINING_PROTOCOL.md`) and the older rows of this file still name `reports/Proposal.md`; they are left as written, because editing a stamped protocol would change its SHA-256. `proposals/README.md` maps the old paths to the new ones. |
 
 ## Phase 3 — novelty threshold and OOD benchmark
 
@@ -136,6 +137,13 @@ or exploratory and do not replace any earlier result. Outcome of (1): the least-
 show no clear hotspot drop against normal training (S1 not met), and SOM guidance is not clearly better than
 confidence guidance (S2, S3 not met); the shared cells reproduce the primary run exactly
 (`MSP_ARM_ADDENDUM.md`, section 7).
+
+**2026-11-17: feature-layer ablation added (Phase 2).** The proposal's paper outline asks for an ablation of
+the feature layer; until now only `fc2` was used. Protocol `p2_som_training_visualization/som_nnsom_training/
+FEATURE_LAYER_ABLATION_PROTOCOL.md`, written before any `fc1` embedding was extracted. It compares SOMs on
+`fc1` and `fc2` of the frozen Phase 1 network with the same recipe and 5 new SOM seeds. Not a deviation: the
+headline layer stays `fc2` whatever the result, and no earlier result is re-run or replaced. The SOM recipe was
+tuned on `fc2`, which may favour `fc2`; this is declared in the protocol.
 
 ### Historical SOM configuration
 

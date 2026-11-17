@@ -1,6 +1,6 @@
 # Documents (`src/v1_mnist/docs/`)
 
-The documents follow the project proposal (`reports/Project_proposal.md`): one folder per **phase**, and inside it one folder per **step**, with the same names as `component/`, `tests/` and `outputs/v1_mnist/`. A step folder exists here only once that step has a document.
+The documents follow the project proposal (`proposals/Project_proposal.md`): one folder per **phase**, and inside it one folder per **step**, with the same names as `component/`, `tests/` and `outputs/v1_mnist/`. A step folder exists here only once that step has a document.
 
 > **Naming:** the `p` in `p1_…`, `p2_…` means **phase**.
 

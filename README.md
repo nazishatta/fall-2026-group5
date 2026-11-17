@@ -33,7 +33,7 @@ unsupported by evidence will be reported as unsupported.
 
 ## Project phases
 
-The phases and weeks follow the project proposal ([`reports/Project_proposal.md`](reports/Project_proposal.md)).
+The phases and weeks follow the project proposal ([`proposals/Project_proposal.md`](proposals/Project_proposal.md)).
 
 | Phase                               | Weeks | What is done                                                                                                | Main outputs                                                                           |
 | ----------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -173,7 +173,8 @@ src/v1_mnist/
   shellscripts/                      kept for shell scripts (empty; the Python runners are used)
   tests/                             pytest tests, same phase/step folders as component/
 outputs/v1_mnist/    results, in the same phase/step folders (see "Data and results" below)
-reports/             LaTeX reports (one per phase + final report), progress report, proposals, Word report
+proposals/           the project proposal and our group proposal
+reports/             LaTeX reports (one per phase + final report), progress report, Word report
 research_paper/      the journal paper (draft on branch feature/integrated-research-paper)
 presentation/        slides
 demo/                pipeline diagram and interactive HTML plots

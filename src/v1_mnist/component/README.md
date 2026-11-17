@@ -1,6 +1,6 @@
 # Code (`src/v1_mnist/component/`)
 
-The code is arranged by **project phase** and, inside each phase, by **step**, in the order of the project proposal (`reports/Project_proposal.md`). `tests/`, `docs/` and `outputs/v1_mnist/` use the same folder names, so each step's code, tests, documents and results line up.
+The code is arranged by **project phase** and, inside each phase, by **step**, in the order of the project proposal (`proposals/Project_proposal.md`). `tests/`, `docs/` and `outputs/v1_mnist/` use the same folder names, so each step's code, tests, documents and results line up.
 
 > **Naming:** the `p` in `p1_…`, `p2_…`, `p3_…`, `p4_…` means **phase**.
 

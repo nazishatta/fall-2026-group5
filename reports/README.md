@@ -1,11 +1,9 @@
 # Reports (`reports/`)
 
-Every written deliverable except the paper (which is in `research_paper/`).
+Every written deliverable except the paper (which is in `research_paper/`). The project proposal and our group proposal are in [`proposals/`](../proposals/README.md).
 
 | Path | What it is |
 |---|---|
-| `Project_proposal.md` | The instructor's project proposal. Phase and step names in the whole repository follow it. |
-| `Proposal.md` | Our group's proposal: research questions, roles and plan |
 | [`Latex_report/`](Latex_report/README.md) | The LaTeX reports: one per phase and the final report |
 | [`Progress_Report/`](Progress_Report/README.md) | The running progress report |
 | [`Word_Report/`](Word_Report/README.md) | The early CNN baseline report as a Word file |
