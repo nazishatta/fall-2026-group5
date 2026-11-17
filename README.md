@@ -23,6 +23,12 @@ a model is safe to deploy, and it is what this project tries to recover.
 This is treated as a hypothesis to test, not a conclusion to prove. Components
 unsupported by evidence will be reported as unsupported.
 
+The group proposal ([`proposals/Group_proposal.md`](proposals/Group_proposal.md)) turns this into three questions:
+
+1. **Where** on the SOM do the CNN's mistakes concentrate?
+2. Can the SOM **flag inputs unlike anything the model has seen** (novelty detection)?
+3. Can the SOM **choose which samples to retrain on**, and does that beat choosing at random?
+
 ## Pipeline Architecture
 
 <p align="center">
@@ -275,6 +281,10 @@ Every reported number traces back through
 Each run has an ID, and its results record the seed, config, library versions and input hashes.
 SOM run IDs encode their settings: `som_15x15_nb11_ep250_s42_v2` is a 15x15 grid,
 neighborhood 11, 250 epochs, seed 42, version 2.
+
+## GitHub settings (`.github/`)
+
+[`workflows/`](.github/workflows/README.md) holds the automatic checks GitHub runs on every push and pull request.
 
 ## Technologies
 
