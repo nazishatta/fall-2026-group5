@@ -17,6 +17,7 @@
 \begin{abstract}
 \noindent We ask where a convolutional network (CNN) fails and whether a self-organizing map (SOM) trained on its internal features can help. A LeNet-5 reaches 99.18\% test accuracy on MNIST. On a 15$\times$15 SOM its few mistakes gather in 11 cells that hold 11.1 times their fair share, but the CNN's own confidence finds mistakes better than the map does (AUROC 0.981 against 0.685).
 As a novelty detector, the SOM's quantization error separates SVHN images from MNIST well (AUROC 0.981), yet energy (0.9998) and max-softmax (0.9985) do better. What the SOM adds is a picture of \emph{where}: the SVHN images land on only 28 of the 225 cells.
+In a harder test, where the networks are trained on 6 digits and the other 4 are new, the SOM still detects the new digits (mean AUROC 0.912 over five class splits), but plain nearest-neighbor distance does better in every split (0.966), and the comparison with max-softmax (0.944) is inconclusive.
 Used to guide retraining, SOM-chosen hard images with altered copies cut the mistakes in the error cells from 11.4\% to 7.8\% over five seeds, without raising the error elsewhere. Choosing the images the CNN is least sure about worked about as well, and letting the hard images in slowly (curriculum learning) made the CNN worse.
 New SOMs trained on the retrained CNNs have smaller weak regions but not purer cells, and the SOM still detects SVHN after retraining.
 Our main contribution is to show that, as a guide for retraining, the SOM does as well as the CNN's own confidence, and that unlike that confidence it also shows where the errors cluster and why: in a few cells where two digit classes overlap.
@@ -139,6 +140,7 @@ A random score serves as the null.
 
 We report the AUROC, which tells how well a score ranks novel images above normal ones (1 is perfect, 0.5 is chance), the AUPR (novel images are the positive class), and the false-positive rate when 95\% of the novel images are caught (FPR at 95\% TPR). Intervals are bootstrap intervals from 2,000 resamples.
 For the QE detector the alarm threshold is the 95th percentile of the QE of the training images (1.569), fixed before looking at SVHN. We did not change any setting after seeing the SVHN results.
+\textbf{Near novelty: held-out digits.} SVHN is very unlike MNIST, and its embeddings are much shorter, so it is an easy test. For a harder one we follow the open-set setup for MNIST \parencite{neal2018open}: in each of five class splits, 6 digits are known and 4 are unknown, drawn at random once and fixed before any run. For each split we train a new LeNet-5 (Phase 1 recipe) and a new 15$\times$15 SOM (Phase 2 recipe) on the training images of the known digits only. The normal images are the validation images of the known digits; the novel images are the validation images of the unknown digits. We compare QE with max-softmax, energy, Mahalanobis and nearest-neighbor distance. Max-softmax is the strong baseline in this setting \parencite{vaze2022openset}. The protocol, the splits and the four statements were written down before the run: (H1) the SOM detects the held-out digits; (H2, the main one) it is better than max-softmax; (H3) it is no more than 0.01 AUROC worse than max-softmax, energy or Mahalanobis; (H4) it is better than nearest-neighbor distance. Each is tested with a 95\% t-interval over the five splits and can be shown, shown to be the opposite, or inconclusive.
 Fashion-MNIST is left for the next datasets and is not part of these results.
 
 \subsection{Phase 4: Guided retraining}
@@ -180,7 +182,7 @@ For a fair comparison, CF1 is not the single Phase 1 model but the average over 
 All development choices use the training and validation images only. The scaler, the SOM, k-means and the nearest-neighbor reference set are fitted on training embeddings. All error statistics are computed on validation images.
 The test images were used once, to score the baseline CNN, and the SOM analysis does not use them. The evaluation rules (grid comparison, hotspot rule, number of splits and shuffles, seeds) were set before the results were looked at.
 One caution: we chose the CNN checkpoint using the validation images, so these images are not completely untouched by model development.
-In Phase 3 the CNN and SOM stay frozen, the alarm threshold comes from the training images, the MNIST test split is not used, and the SVHN images are used only for scoring, never for fitting or choosing a setting. Because the SVHN results were seen before the extra comparisons were run, those comparisons are labelled exploratory.
+In Phase 3 the CNN and SOM stay frozen, the alarm threshold comes from the training images, the MNIST test split is not used, and the SVHN images are used only for scoring, never for fitting or choosing a setting. Because the SVHN results were seen before the extra comparisons were run, those comparisons are labelled exploratory. The held-out-digit test was fixed before it was run; its unknown digits are never used for training, choosing an epoch, fitting or setting a threshold.
 In Phase 4 the hard pools, the altered copies and the training use training images only. The 11 hotspots were chosen from validation errors, which is why the final judgement uses the test split. The success criteria and thresholds were written down and stamped before the test split was opened, and it was opened once. The new SOMs in the re-analysis are measured on validation images only.
 
 \subsection{Phase 1: Baseline CNN}
@@ -275,6 +277,32 @@ Autoencoder (unscaled inputs)$^\dagger$ & 0.0077 & 0.4979 & 0.9999 \\ \hline
 \label{fig:overlay}
 \end{figure}
 
+\textbf{Near novelty: held-out digits.} Table~\ref{tab:heldout} gives the results. The networks reach 99.1--99.4\% accuracy on the known digits. The SOM detects digits it has never seen in every split (H1 shown; AUROC 0.860 to 0.957, every interval above 0.5; a label-shuffle control gives 0.500). Here the result is not a length effect: embedding length alone gives only 0.63 to 0.89, and QE and length are weakly related (Spearman $-0.32$ to $+0.01$).
+But the SOM is not shown to beat max-softmax: it is lower in 4 of the 5 splits, by 0.032 AUROC on average (95\% interval $-0.095$ to $+0.032$), so H2 is inconclusive. It is also not shown to be within 0.01 of max-softmax, energy or Mahalanobis (H3 inconclusive for all three); the splits vary too much for five values to settle these. Plain nearest-neighbor distance on the same embeddings beats QE in all five splits ($-0.054$, interval $-0.084$ to $-0.024$; H4 shown in the opposite direction): the 225 cells of the map lose detail that the training embeddings keep.
+As with SVHN, the map shows where new inputs land: 90\% of the novel images fall in 33 to 55 of the 225 cells, while 90\% of the normal images need 166 to 174.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{Split} & \textbf{Unknown} & \textbf{SOM QE} & \textbf{Max-} & \textbf{Energy} & \textbf{Maha-} & \textbf{Nearest} \\
+ & \textbf{digits} & & \textbf{softmax} & & \textbf{lanobis} & \textbf{neighbor} \\ \hline
+1 & 0, 1, 5, 6 & 0.907 & 0.956 & 0.947 & 0.874 & 0.961 \\ \hline
+2 & 2, 3, 5, 8 & 0.957 & 0.917 & 0.893 & 0.965 & 0.979 \\ \hline
+3 & 1, 5, 6, 7 & 0.860 & 0.958 & 0.959 & 0.916 & 0.948 \\ \hline
+4 & 2, 5, 6, 8 & 0.931 & 0.940 & 0.890 & 0.954 & 0.977 \\ \hline
+5 & 0, 4, 5, 8 & 0.905 & 0.948 & 0.944 & 0.929 & 0.965 \\ \hline
+\multicolumn{2}{|c|}{\textbf{Mean}} & \textbf{0.912} & \textbf{0.944} & \textbf{0.927} & \textbf{0.927} & \textbf{0.966} \\ \hline
+\multicolumn{2}{|c|}{QE minus score} & -- & $-0.032$ & $-0.015$ & $-0.015$ & $-0.054$ \\
+\multicolumn{2}{|c|}{(95\% interval)} & & ($-0.095$, $+0.032$) & ($-0.097$, $+0.068$) & ($-0.056$, $+0.025$) & ($-0.084$, $-0.024$) \\ \hline
+\end{tabular}
+\caption{Near novelty: AUROC for detecting the 4 held-out digits (about 4,100 validation images per split) among the 6 known digits (about 6,400), with a new LeNet-5 and a new 15$\times$15 SOM trained on the known digits of each split. Within a split, the bootstrap intervals are about $\pm0.005$ wide. The protocol, splits and statements were fixed before the run; the MNIST test split was not used.}
+\label{tab:heldout}
+\end{table}
+
 \subsection{Phase 4: Guided retraining}\label{sec:p4results}
 
 Table~\ref{tab:retraining} gives the main results. \textbf{Targeted augmentation helped where the SOM pointed.} The SOM-guided arm cut the error on the 146 test images in the hotspots from 11.4\% to 7.8\%. In numbers of images this is about 17 wrong for normal training and about 11 for the guided arm.
@@ -334,7 +362,7 @@ On MNIST the SOM turns the 84 numbers of each embedding into a map where the dig
 But if the only goal were to find likely mistakes, the maximum softmax probability would be the better tool. So the value of the SOM lies in the picture it gives, and possibly in novelty detection and retraining.
 Mistakes are also farther from their cell than correct images are (average distance 1.349 against 0.960), which may help find unfamiliar inputs.
 
-This held up in Phase 3: the SOM's quantization error separates SVHN from MNIST well (AUROC 0.981), but energy and max-softmax separate them better, and part of the SOM's result may come from the short SVHN embeddings. As in Phase 2, the CNN's own confidence is the stronger signal, and the SOM adds a view of where the novel images and the missed ones land.
+This held up in Phase 3: the SOM's quantization error separates SVHN from MNIST well (AUROC 0.981), but energy and max-softmax separate them better, and part of the SOM's result may come from the short SVHN embeddings. On held-out digits, where length is not the explanation and max-softmax is far from perfect, the SOM still did not win: it was not shown to beat max-softmax, and plain nearest-neighbor distance beat it in every split. So even the setting in which a map-based detector was expected to have its best chance does not favor it on MNIST. As in Phase 2, the CNN's own confidence is the stronger signal, and the SOM adds a view of where the novel images and the missed ones land.
 In Phase 4 the SOM's hotspots were a useful guide for retraining: augmenting the hard images from those cells lowered the mistakes there without hurting the rest, and the new map has smaller weak regions. But picking the least confident images gave about the same gain, so the SOM is a good \emph{explainer} of where to look, not a better \emph{selector}.
 Letting the hard images in slowly (curriculum) did not help, and the cells of the new map did not become purer. The whole loop (analyze, retrain, analyze again) works, but the gains on MNIST are small because the CNN is already 99\% correct.
 
@@ -344,7 +372,7 @@ Letting the hard images in slowly (curriculum) did not help, and the cells of th
 (3)~The grid comparison could not separate the three grid sizes, so the choice of 15$\times$15 rests on a trade-off between purity and topological error, not on a clear winner.
 (4)~The baseline comparison covers only the 15$\times$15 map and uses three k-means starts per seed.
 (5)~We also used the validation images to choose the CNN checkpoint.
-(6)~The novelty results use one pair of datasets (MNIST against SVHN), one CNN and one SOM, so the intervals show only sampling noise. SVHN embeddings are much shorter than MNIST ones, so the results may not carry over to sets that look more like MNIST, such as Fashion-MNIST. The Phase 3 comparisons were set up after the SVHN results were seen.
+(6)~The SVHN results use one CNN and one SOM, so their intervals show only sampling noise, and the SVHN comparisons were set up after the SVHN results were seen. The held-out-digit test uses five class splits with one network and one SOM each; the splits share images and digits, so its t-intervals may be too narrow, and the random draw left the digits unbalanced (5 is unknown in four splits, 9 in none).
 (7)~In Phase 4 only 146 test images lie in the hotspots, so the hotspot intervals are wide. The hotspots come from the SOM, which gives the SOM-guided arms a built-in advantage on hotspot error. The pools come from one SOM, and five seeds can only separate fairly large differences.
 (8)~The first set of augmentation settings (shifts of up to 2 pixels) failed a check made before training: the validation accuracy of the CNN fell from 99.12\% to 95.83\% on the altered images. We lowered the shift to 1 pixel, which passed (98.21\%), and all augmentation results use this version.
 (9)~After retraining, the novelty test again uses only SVHN, whose short embeddings make it easy to detect, and five seeds cannot separate AUROC differences of about 0.01.
@@ -353,7 +381,7 @@ Letting the hard images in slowly (curriculum) did not help, and the cells of th
 
 On MNIST, a SOM trained on a CNN's embeddings shows where the CNN's few mistakes gather: in a small set of cells where digits overlap, far beyond chance. The map does not find mistakes or novel inputs better than simple scores, and the CNN's own confidence and energy score do better at both jobs (mistakes: 0.981 against 0.685 AUROC; SVHN: 0.9985 and 0.9998 against 0.981).
 Its value is that it shows where. SVHN collapses onto 28 of 225 cells, and the hotspot cells could be used to pick images for retraining. Augmenting the hard images from the hotspots lowered the mistakes there from 11.4\% to 7.8\% without hurting the rest, and the new SOM has smaller weak regions. Curriculum learning did not help, and the cells of the new map did not become purer.
-After retraining the SOM still detects SVHN, but no better than before. The next step is to repeat the whole study on Fashion-MNIST, where the CNN makes more mistakes and the gains may be larger, and to add a novel set that looks more like the training data.
+After retraining the SOM still detects SVHN, but no better than before. On held-out digits it detects new classes too, but plain nearest-neighbor distance does better and it is not shown to beat max-softmax. The next step is to repeat the whole study on Fashion-MNIST, where the CNN makes more mistakes and the gains may be larger.
 
 \clearpage
 \printbibliography[title={References}]

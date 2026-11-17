@@ -8,7 +8,8 @@ Flagging out-of-distribution samples with the SOM. Phase 3 novelty detection res
 p3_novelty_detection/
 ├── qe_novelty_detection/          # quantization-error novelty scores
 ├── u_matrix_analysis/             # U-Matrix novelty scores and figures
-└── novelty_benchmark/             # comparison with the other novelty methods
+├── novelty_benchmark/             # comparison with the other novelty methods
+└── held_out_class_novelty/        # near novelty: networks trained on 6 digits, the other 4 are novel
 ```
 
 ## Start here: where to find each result
@@ -34,6 +35,7 @@ Use this table when you only want a number. The "Date" column in the tables belo
 | Autoencoder scaling check | `novelty_benchmark/mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1` | `autoencoder_scaling_metrics.json`, `tables/` |
 | Does QE depend on embedding length? | `novelty_benchmark/mnist_svhn_qe_norm_dependence_s42_v1` | `qe_norm_dependence_metrics.json`, `tables/` |
 | All headline numbers in one table | `novelty_benchmark/mnist_svhn_consolidated_evidence_s42_v1` | `phase3_consolidated_metrics.csv` |
+| Near novelty: held-out digits, 5 class splits (QE mean AUROC 0.912) | `held_out_class_novelty/held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42` | `results.json`, `tables/`, `splits/split<k>/metrics.json` |
 
 **How to read the run folders**
 
@@ -41,7 +43,7 @@ Use this table when you only want a number. The "Date" column in the tables belo
 - **Cite the folders in the table above.** The reports and `CONSOLIDATED_EVIDENCE.md` use them.
 - **`reorg_20261102_` folders are reproductions.** Five steps were repeated with today's code after the code was reorganised. Their names describe that event, not the content (see `src/v1_mnist/docs/DEVIATIONS.md`). Do not cite them as new results; the table below says which original each one reproduces.
 - **"historical" rows** were written before the current configs. Some are still the source of the headline numbers.
-- The newest result is the QE embedding-length check (run on EC2 on 2026-11-15). The four figure folders named `..._v2` (and `qe_training_calibrated_v2`) on the same day redraw report figures whose first PDFs were not kept; their numbers equal the originals'.
+- The newest result is the held-out-class (near-novelty) test, run on EC2 on 2026-11-17. Before it, the QE embedding-length check (2026-11-15). The four figure folders named `..._v2` (and `qe_training_calibrated_v2`) on the same day redraw report figures whose first PDFs were not kept; their numbers equal the originals'.
 
 ## Which code wrote which folder
 
@@ -105,3 +107,11 @@ Columns:
 **Configs with no folder yet.** `qe_ood_evaluation.yaml` (`mnist_svhn_qe_dev_initial`), `qe_random_control.yaml` (`qe_random_control_reproduction_initial`) and `qe_u_matrix_reproduction.yaml` (`qe_u_matrix_validation_reproduction_initial`) are the configs the runners use for steps `qe_ood`, `qe_random_control` and `qe_u_matrix`. They have not been run, because the `reorg_20261102_` reproductions above already repeat these steps. `run_all.py` skips them unless `--with-reproductions` is given. 
 
 Large `.npy` outputs are tracked with DVC and are not committed to git; small `.csv` and `.json` files stay in git. Figures are PDF only.
+
+### `held_out_class_novelty/` (near novelty; runner `pipeline/p3_novelty_detection/run_held_out_class_novelty.py`)
+
+| Run folder | Role | Last commit | Step and script | Config | Config check | Used in |
+|---|---|---|---|---|---|---|
+| `held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42` | result | 2026-11-17 | `held_out_class_novelty`, `run_held_out_class_novelty.py` | `held_out_class_novelty.yaml` | config SHA-256 recorded in metadata/inputs.json; every stage of the run stops if the config differs | final report tab:heldout; docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md section 11 |
+
+Checkpoints, embeddings, SOMs and score arrays of each split are tracked with DVC (`splits/split<k>/*.dvc`).

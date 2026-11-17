@@ -225,6 +225,7 @@ OTHER_PHASE_CONFIGS = {
     "base.yaml", "cnn_baseline.yaml", "som.yaml", "som_10x10_robustness.yaml", "som_20x20_robustness.yaml",
     "error_pattern_baselines.yaml", "som_optuna.yaml", "retraining.yaml", "som_reanalysis.yaml",
     "novelty_after_retraining.yaml", "held_out_class_novelty.yaml",
+    "som_reanalysis_msp_arm.yaml", "error_detector_budget.yaml",
 }
 # Not a step: the shared input fingerprints.
 SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}

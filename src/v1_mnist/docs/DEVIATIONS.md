@@ -127,6 +127,13 @@ the novel images, over 5 class splits. This stays inside the 2026-10-19 scope (M
 protocol, splits and statements were committed before any network or map of the step was trained. It
 trains new networks, so its results do not change any earlier Phase 3 result.
 
+**2026-11-17: two secondary analyses, added after the results were seen.** (1) The SOM re-analysis is
+repeated with the least-confident (max-softmax) augmentation arm, which the primary re-analysis protocol
+had left out (`docs/p4_guided_retraining/som_reanalysis/MSP_ARM_ADDENDUM.md`, new run ID; the primary run is
+unchanged). (2) A same-budget comparison of the error detectors (`error_detector_budget.yaml`, change log in
+`docs/p2_som_training_visualization/error_pattern_analysis/baselines/PLAN.md`). Both are labelled secondary
+or exploratory and do not replace any earlier result.
+
 ### Historical SOM configuration
 
 Phase 3 uses the frozen 15x15 SOM employed by the previous analysis.

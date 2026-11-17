@@ -153,7 +153,59 @@ accuracy on known digits (Vaze et al. link open-set performance to closed-set ac
 
 ## 11. Recorded outcome
 
-[TBD: filled in after the run, from `results.json`; sections 1 to 10 stay unchanged.]
+Filled in on 2026-11-17 from `results.json` and the five `splits/split<k>/metrics.json` of run
+`held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42` (commit 5d80e2a). Sections 1 to 10 are unchanged.
+The run recorded the SHA-256 of this file before this section was written, as expected. The MNIST test
+split was not read. Each split took about 6 minutes on EC2 (about 30 minutes in total).
+
+**Networks.** Accuracy on the known digits of the validation split: 0.991 to 0.994 (best epochs 13 to 18).
+Per split: about 29,100 to 30,200 training images, 6,250 to 6,470 normal and 4,030 to 4,250 novel images.
+
+**AUROC per split** (unknown digits as the positive class):
+
+| Split | Unknown digits | S1 QE [95% interval] | S2 max-softmax | S3 energy | S4 Mahalanobis | S5 kNN | D1 length |
+|---|---|---|---|---|---|---|---|
+| 1 | 0, 1, 5, 6 | 0.907 [0.902, 0.913] | 0.956 | 0.947 | 0.874 | 0.961 | 0.826 |
+| 2 | 2, 3, 5, 8 | 0.957 [0.953, 0.960] | 0.917 | 0.893 | 0.965 | 0.979 | 0.739 |
+| 3 | 1, 5, 6, 7 | 0.860 [0.852, 0.866] | 0.958 | 0.959 | 0.916 | 0.948 | 0.889 |
+| 4 | 2, 5, 6, 8 | 0.931 [0.927, 0.936] | 0.940 | 0.890 | 0.954 | 0.977 | 0.630 |
+| 5 | 0, 4, 5, 8 | 0.905 [0.899, 0.911] | 0.948 | 0.944 | 0.929 | 0.965 | 0.819 |
+| Mean (SD) | | 0.912 (0.036) | 0.944 (0.017) | 0.927 (0.032) | 0.927 (0.036) | 0.966 (0.013) | 0.781 (0.100) |
+
+**Statements** (difference per split, mean and 95% t-interval over the 5 splits):
+
+| Statement | Mean difference [95% interval] | Splits where S1 is higher | Result |
+|---|---|---|---|
+| H1: the SOM detects held-out digits | every S1 interval above 0.5 (lowest lower end 0.852) | n/a | **shown** |
+| H2 (primary): S1 minus S2 (max-softmax) above 0 | -0.032 [-0.095, +0.032] | 1 of 5 | **inconclusive** |
+| H3: S1 minus S2 above -0.01 | -0.032 [-0.095, +0.032] | 1 of 5 | **inconclusive** |
+| H3: S1 minus S3 (energy) above -0.01 | -0.015 [-0.097, +0.068] | 2 of 5 | **inconclusive** |
+| H3: S1 minus S4 (Mahalanobis) above -0.01 | -0.015 [-0.056, +0.025] | 1 of 5 | **inconclusive** |
+| H4: S1 minus S5 (kNN) above 0 | -0.054 [-0.084, -0.024] | 0 of 5 | **opposite shown** |
+
+**Controls and descriptive results.**
+
+- Label-shuffle control: the S1 AUROC with shuffled labels averaged 0.500 in every split.
+- RQ4 "competitive" rule: S1 is competitive with the best of S2 to S4 in 0 of 5 splits.
+- Length check: embedding length alone gives AUROC 0.63 to 0.89 (against 0.9999 for SVHN in Phase 3), and
+  QE and length are only weakly related (Spearman -0.32 to +0.01). Here QE's separation is **not** a length
+  effect.
+- Threshold rule (95th percentile of training QE): 45% to 79% of the novel images are flagged, with 4.9% to
+  5.7% false alarms on known digits.
+- Where the novel digits land: 90% of the novel images fall in 33 to 55 of the 225 cells; 90% of the normal
+  images need 166 to 174 cells.
+- Per unknown digit, S1 AUROC ranges from 0.754 (digit 1 in split 3) to 0.978 (digit 0 in split 5).
+
+**What this means.**
+
+- The SOM detects digits it never saw (H1), and on this near-novelty task the separation does not come from
+  embedding length, unlike SVHN.
+- It is not shown to be better than max-softmax (H2) nor within 0.01 of it, of energy or of Mahalanobis (H3).
+  It is lower than max-softmax in 4 of 5 splits; the splits vary too much for 5 values to settle it.
+- Plain nearest-neighbour distance on the same embeddings beats QE in every split (H4, opposite shown): the
+  map's 225 prototypes lose information that the training embeddings themselves keep.
+- Which digits are held out matters as much as the detector: S1 ranges from 0.860 to 0.957 over the splits.
+- The novel digits gather in a few cells (33 to 55), so the map still shows *where* new inputs land.
 
 ## 12. References
 
