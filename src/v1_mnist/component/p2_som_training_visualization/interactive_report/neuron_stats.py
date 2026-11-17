@@ -30,7 +30,7 @@ def assign_bmus(som: SOMModel, features: np.ndarray) -> tuple[list, np.ndarray, 
     bmu = np.full(n, -1, dtype=np.int64)
     bmu_dist = np.full(n, np.nan, dtype=np.float64)
 
-    for neuron, (idx, d) in enumerate(zip(clust, dist)):
+    for neuron, (idx, d) in enumerate(zip(clust, dist, strict=True)):
         idx = to_numpy(idx).astype(np.int64).ravel()
         d = to_numpy(d).astype(np.float64).ravel()
         if idx.size:
@@ -86,7 +86,7 @@ def split_summary(
 
     # Confusion pairs (true -> pred) of the misclassified samples per neuron
     confusion = [dict() for _ in range(num_neurons)]
-    for b, t, p in zip(bmu[wrong], labels[wrong], preds[wrong]):
+    for b, t, p in zip(bmu[wrong], labels[wrong], preds[wrong], strict=True):
         key = f"{t}>{p}"
         confusion[b][key] = confusion[b].get(key, 0) + 1
 
@@ -121,4 +121,4 @@ def neighbour_edges(som: SOMModel, weights: np.ndarray) -> list[list[float]]:
     ndist = to_numpy(som.neuron_dist)
     ii, jj = np.where(np.triu(ndist <= 1.001, k=1))
     d = np.linalg.norm(weights[ii] - weights[jj], axis=1)
-    return [[int(i), int(j), round(float(x), 5)] for i, j, x in zip(ii, jj, d)]
+    return [[int(i), int(j), round(float(x), 5)] for i, j, x in zip(ii, jj, d, strict=True)]

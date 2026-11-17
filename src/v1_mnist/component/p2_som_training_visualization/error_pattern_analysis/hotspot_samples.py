@@ -135,7 +135,8 @@ def plot_hotspot(neuron: int, rows: list[dict], train: datasets.MNIST, test: dat
     for ax in axes:
         ax.axis("off")
 
-    for ax, row in zip(axes, selected):
+    # The grid pads its last row with empty panels, so there can be more axes than samples.
+    for ax, row in zip(axes, selected, strict=False):
         verify_label(row, train, test)
 
         image = get_image(row["sample_id"], train, test)
@@ -173,7 +174,7 @@ def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) 
 
     representatives = []
 
-    for neuron, neuron_rows in sorted(by_neuron.items()):
+    for _neuron, neuron_rows in sorted(by_neuron.items()):
         # Select highest BMU-distance error as a representative difficult case.
         representative = max(
             neuron_rows,
@@ -200,7 +201,8 @@ def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) 
     for ax in axes:
         ax.axis("off")
 
-    for ax, row in zip(axes, representatives):
+    # The grid pads its last row with empty panels, so there can be more axes than samples.
+    for ax, row in zip(axes, representatives, strict=False):
         verify_label(row, train, test)
 
         image = get_image(row["sample_id"], train, test)

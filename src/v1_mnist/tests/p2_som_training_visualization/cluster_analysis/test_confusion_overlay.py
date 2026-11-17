@@ -123,7 +123,7 @@ class TestFigureAndRun(unittest.TestCase):
             with (base / "assignments" / "val_bmu_assignments.csv").open("w", newline="") as handle:
                 writer = csv.writer(handle)
                 writer.writerow(["label", "prediction", "bmu_index"])
-                writer.writerows(zip(a.labels.tolist(), a.predictions.tolist(), a.neurons.tolist()))
+                writer.writerows(zip(a.labels.tolist(), a.predictions.tolist(), a.neurons.tolist(), strict=True))
             support = np.bincount(a.neurons, minlength=NUM_NEURONS)
             with (base / "tables" / "val_cluster_metrics.csv").open("w", newline="") as handle:
                 writer = csv.writer(handle)
