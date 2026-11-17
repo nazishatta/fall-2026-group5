@@ -1,0 +1,53 @@
+{
+  "run_id": "som_optuna_confirm_10x10_seeds5_v1",
+  "search_run_id": "som_optuna_10x10_t20_s42_v1",
+  "grid": "10x10",
+  "settings": {
+    "three_point": {
+      "init_neighborhood": 7,
+      "epochs": 250
+    },
+    "optuna": {
+      "init_neighborhood": 8,
+      "epochs": 100
+    }
+  },
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "ci_level": 0.95,
+  "optuna_minus_three_point": {
+    "val_qe": {
+      "mean": -0.03710041957261887,
+      "ci_low": -0.03821646954819736,
+      "ci_high": -0.035984369597040385,
+      "n": 5,
+      "verdict": "optuna better"
+    },
+    "val_te1_pct": {
+      "mean": -1.5485714285714287,
+      "ci_low": -1.6263856072956573,
+      "ci_high": -1.4707572498472001,
+      "n": 5,
+      "verdict": "optuna better"
+    },
+    "val_te12_pct": {
+      "mean": -0.7523809523809524,
+      "ci_low": -0.7825298521722219,
+      "ci_high": -0.7222320525896828,
+      "n": 5,
+      "verdict": "optuna better"
+    }
+  },
+  "overall": "Optuna setting better",
+  "protocol_sha256": "1d287c0f8c03ee275333692ec4a79afcb43908fe41064bc57a9560aaae2fcde0",
+  "train_features_sha256": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+  "val_features_sha256": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+  "labels_used": false,
+  "test_evaluated": false,
+  "smoke_test": false
+}
