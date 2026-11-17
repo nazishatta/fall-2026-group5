@@ -33,18 +33,22 @@ unsupported by evidence will be reported as unsupported.
 
 ## Project phases
 
-The phases and weeks follow the project proposal ([`reports/Project_proposal.md`](reports/Project_proposal.md)).
+The phases follow the project proposal ([`proposals/Project_proposal.md`](proposals/Project_proposal.md)).
 
-| Phase                               | Weeks | What is done                                                                                                | Main outputs                                                                           |
-| ----------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| **1: Model Training Baseline**      | 1–2   | Data pipeline; train a baseline CNN; extract feature embeddings for every split                             | Accuracy, precision, recall, F1; 84-D fc2 embeddings                                   |
-| **2: SOM Training & Visualization** | 3–5   | Week 3: train the SOM with NNSOM. Week 4: Cluster Analysis. Week 5: Error Pattern Analysis                  | SOM maps, cluster purity, class–cluster intersection, error hotspots and their images  |
-| **3: Novelty Detection**            | 6–8   | Week 6: novelty detection via quantization error. Week 7: U-Matrix analysis. Week 8: Comparative Evaluation | AUROC, AUPR, FPR at 95% TPR against Isolation Forest, One-Class SVM and an autoencoder |
-| **4: Guided Retraining**            | 9–11  | Week 9: hard example mining. Week 10: targeted data augmentation. Week 11: iterative SOM re-analysis        | Retrained model vs. baseline; old vs. new SOM maps                                     |
-| **5: Paper Writing & Code Release** | 12–14 | Final results and figures, paper draft, code release                                                        | Paper, documented code                                                                 |
+| Phase                               | What is done                                                                                                | Main outputs                                                                           |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **1: Model Training Baseline**      | Data pipeline; train a baseline CNN; extract feature embeddings for every split                             | Accuracy, precision, recall, F1; 84-D fc2 embeddings                                   |
+| **2: SOM Training & Visualization** | Train the SOM with NNSOM; Cluster Analysis; Error Pattern Analysis                                          | SOM maps, cluster purity, class–cluster intersection, error hotspots and their images  |
+| **3: Novelty Detection**            | Novelty detection via quantization error; U-Matrix analysis; Comparative Evaluation                         | AUROC, AUPR, FPR at 95% TPR against Isolation Forest, One-Class SVM and an autoencoder |
+| **4: Guided Retraining**            | Hard example mining; targeted data augmentation; iterative SOM re-analysis                                  | Retrained model vs. baseline; old vs. new SOM maps                                     |
+| **5: Paper Writing & Code Release** | Final results and figures, paper draft, code release                                                        | Paper, documented code                                                                 |
 
-Success criteria are fixed **before** the test set is examined
-(to be written in `reports/`).
+Success criteria and thresholds are fixed **before** the test set is used, in the protocol of each step
+(`src/v1_mnist/docs/`). Every change to a written rule is logged in
+[`src/v1_mnist/docs/DEVIATIONS.md`](src/v1_mnist/docs/DEVIATIONS.md).
+
+**Datasets:** MNIST is finished (this branch). The whole study will be repeated on Fashion-MNIST with the same
+pipeline, in its own versioned folders. SVHN is the outside (novelty) dataset for MNIST.
 
 ## Key results
 
@@ -61,20 +65,67 @@ Success criteria are fixed **before** the test set is examined
 
 **Phase 2: SOM on the fc2 embeddings (training and validation data only; the test split is not used):**
 
-- **Week 3, SOM training:** the official model is a 15x15 SOM, `som_15x15_nb11_ep250_s42_v2`.
+- **SOM training:** the official model is a 15x15 SOM, `som_15x15_nb11_ep250_s42_v2`.
   Why 15x15, and how the grid choice was checked:
   [`src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md`](src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md).
-- **Week 4, Cluster Analysis:** every one of the 225 neurons is used, and neurons are almost pure.
+- **Feature-layer ablation:** SOMs on the earlier layer fc1 (120 numbers) locate the CNN's mistakes worse
+  than SOMs on fc2 (error-cell AUROC 0.622 against 0.685, 5 SOM seeds each) and have less pure cells, which
+  supports the choice of fc2. fc1 separates SVHN slightly better (+0.005 AUROC).
+- **Cluster Analysis:** every one of the 225 neurons is used, and neurons are almost pure.
   The validation purity is 0.9819, against 0.1738 when the class labels are shuffled
   (1,000 shuffles, p = 0.001).
-- **Week 5, Error Pattern Analysis (error geography):** CNN errors concentrate in a few hotspot
+- **Error Pattern Analysis (error geography):** CNN errors concentrate in a few hotspot
   neurons (about 5% of the map holds 10–13 times its fair share of mistakes) and in neurons
   where digit classes mix. Both findings also hold on 10x10 and 20x20 SOMs
   ([`ERROR_PATTERN_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/p2_som_training_visualization/error_pattern_analysis/ERROR_PATTERN_ROBUSTNESS_RESULTS.md)).
 
-Results for Phases 3–4 (novelty detection, guided retraining) are `[TBD]` until the experiments are run.
-Nothing is reported before it is measured. Changes to the original plan are logged in
-[`src/v1_mnist/docs/DEVIATIONS.md`](src/v1_mnist/docs/DEVIATIONS.md).
+**Phase 3: Novelty Detection — experimental evaluation**
+
+Phase 3 includes quantization-error novelty detection, U-Matrix
+analysis, external SVHN evaluation, and comparisons with classical
+and neural novelty-detection baselines.
+
+The development evaluation uses MNIST validation (10,500 samples)
+as the in-distribution reference and SVHN test (26,032 samples)
+as the external out-of-distribution dataset.
+
+Selected measured AUROC results:
+
+| Method | AUROC |
+|---|---:|
+| Energy | 0.999797 |
+| Max-softmax probability | 0.998495 |
+| Quantization Error (QE) | 0.981107 |
+| k-Nearest Neighbors (kNN) | 0.976561 |
+| U-Matrix | 0.969629 |
+| Mahalanobis | 0.776437 |
+
+These values come from different historical benchmark executions
+and must not be interpreted as a single equal-budget experiment.
+
+The comparisons use one frozen CNN/SOM realization. They do not
+establish independent multi-seed robustness. The official MNIST
+final-test split has not been used for Phase 3 evaluation.
+
+A harder test trains new networks on 6 digits and treats the other 4 as new (5 class splits). The SOM's QE still
+detects the new digits (mean AUROC 0.912), but plain nearest-neighbour distance does better in every split (0.966),
+and the comparison with max-softmax (0.944) is inconclusive.
+
+Detailed results, historical baseline investigations, reproducibility limitations and leakage controls are in the
+Phase 3 report and [`outputs/v1_mnist/p3_novelty_detection/README.md`](outputs/v1_mnist/p3_novelty_detection/README.md).
+
+**Phase 4: Guided Retraining (5 seeds per arm, test split used once, after the protocol was frozen):**
+
+- **Targeted augmentation:** adding altered copies of the SOM-chosen hard images cut the error in the 11 hotspot
+  cells from 11.4% to 7.8% without raising the error elsewhere. Choosing the images the CNN is least sure about
+  (max-softmax) worked about as well.
+- **Curriculum:** letting the hard images in slowly made the CNN worse.
+- **SOM re-analysis:** new SOMs on the retrained CNNs have smaller weak regions, but not purer cells. The
+  least-confident arm, re-analysed later as a secondary run, shows no clear drop, and SOM guidance is not clearly better than it.
+- **Novelty after retraining:** the SOM still detects SVHN, but no better than before.
+
+**In short:** the SOM shows *where* the CNN fails (a few cells where two digits overlap) and is as good a guide for
+retraining as the CNN's own confidence, but it does not find mistakes or novel images better than simple scores.
 
 ## Reports
 
@@ -84,45 +135,58 @@ the compiled PDF and a `fig/` folder with the figures it uses.
 | Phase | Report                                                                                                        | Status                                       |
 | ----- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | 1     | [`cnn_baseline_report.pdf`](reports/Latex_report/v1_mnist/p1_model_training_baseline/cnn_baseline_report.pdf) | Done                                         |
-| 2     | [`som_cluster_error.pdf`](reports/Latex_report/v1_mnist/p2_som_training_visualization/som_cluster_error.pdf)  | In progress; its figures are ready in `fig/` |
-| 3–4   | `reports/Latex_report/v1_mnist/p3_novelty_detection/`, `p4_guided_retraining/`                                | Not started                                  |
-| Final | `reports/Latex_report/v1_mnist/Final_report/`                                                                 | Not started                                  |
+| 2     | [`som_cluster_error.pdf`](reports/Latex_report/v1_mnist/p2_som_training_visualization/som_cluster_error.pdf)  | Done                                         |
+| 3     | [`novelty_detection.pdf`](reports/Latex_report/v1_mnist/p3_novelty_detection/novelty_detection.pdf)           | Done                                         |
+| 4     | [`guided_retraining.pdf`](reports/Latex_report/v1_mnist/p4_guided_retraining/guided_retraining.pdf)           | Done                                         |
+| Final | [`final_report.pdf`](reports/Latex_report/v1_mnist/Final_report/final_report.pdf)                             | Done                                         |
 
+Progress report: [`reports/Progress_Report/v1_mnist/`](reports/Progress_Report/v1_mnist/README.md).
 Technical notes: [`cnn_baseline.md`](src/v1_mnist/docs/p1_model_training_baseline/cnn_baseline_training/cnn_baseline.md)
 and the other notes in [`src/v1_mnist/docs/`](src/v1_mnist/docs/).
 
 ## Repository structure
 
+Every folder has a README that says what is in it.
+
 ```
 src/v1_mnist/
-  component/                         code, by project phase and week (p = phase)
-    configs/                         YAML settings (base, cnn_baseline, som, dataset/)
+  component/                         code, by project phase and step (p = phase)
+    configs/                         every setting, as YAML
     pipeline/                        one runner per step, grouped by phase, + run_all.py
     p1_model_training_baseline/
-      data_pipeline/                 Week 1: MNIST split, class distributions
-      cnn_baseline_training/         Week 2: LeNet-5, evaluation, fc2 embeddings
+      data_pipeline/                 MNIST split, class distributions
+      cnn_baseline_training/         LeNet-5, evaluation, fc2 embeddings
     p2_som_training_visualization/
-      som_nnsom_training/            Week 3: NNSOM training, quality metrics, SOM figures
-      cluster_analysis/              Week 4: BMUs, purity, cluster maps
-      error_pattern_analysis/        Week 5: error hotspots, robustness check
-      interactive_report/            Weeks 3-5: interactive SOM HTML report
-    p3_novelty_detection/            Weeks 6-8 (planned): QE novelty, U-Matrix, benchmark
-    p4_guided_retraining/            Weeks 9-11 (planned): hard examples, augmentation, re-analysis
-    utils/                           config, logging, run settings, shared I/O, stats, figures
-  docs/                              technical notes, SOM grid-selection protocol, deviation log
-  shellscripts/                      run scripts
-  tests/                             pytest tests, same phase/week folders as component/
-outputs/v1_mnist/    results, in the same phase/week folders (see "Data and results" below)
-reports/             LaTeX reports (figures in each report's fig/ folder), Word report,
-                     progress reports, proposal
-demo/                interactive HTML plots (convergence plots, SOM report) and the pipeline diagram
-cookbooks/           walkthrough notebooks (none yet; results are in the LaTeX reports)
+      som_nnsom_training/            NNSOM training, map quality, SOM figures, Optuna tuning
+      cluster_analysis/              best-matching neurons, purity, cluster maps
+      error_pattern_analysis/        error hotspots, robustness, comparison with simpler detectors
+      interactive_report/            interactive SOM HTML report (all of Phase 2)
+    p3_novelty_detection/
+      qe_novelty_detection/          quantization error as a novelty score
+      u_matrix_analysis/             U-Matrix novelty score, SVHN on the map
+      novelty_benchmark/             comparison with seven other detectors
+      held_out_class_novelty/        harder test: 6 known digits, 4 new
+    p4_guided_retraining/
+      hard_example_mining/           hard-image pools, curriculum comparison
+      targeted_augmentation/         retraining with altered copies of the hard images
+      som_reanalysis/                new SOMs on the retrained CNNs
+      novelty_after_retraining/      SVHN novelty on the retrained networks
+    utils/                           config, logging, run IDs and SHA-256 checks, stats, figures, retraining
+  docs/                              protocols, results, DEVIATIONS.md
+  shellscripts/                      kept for shell scripts (empty; the Python runners are used)
+  tests/                             pytest tests, same phase/step folders as component/
+outputs/v1_mnist/    results, in the same phase/step folders (see "Data and results" below)
+proposals/           the project proposal and our group proposal
+reports/             LaTeX reports (one per phase + final report), progress report, Word report
+research_paper/      the journal paper (draft on branch feature/integrated-research-paper)
 presentation/        slides
-research_paper/      paper drafts
+demo/                pipeline diagram and interactive HTML plots
+cookbooks/           kept for walkthrough notebooks (none yet)
+.github/workflows/   the automatic test run on every push and pull request
 ```
 
 Figures are saved as PDF only, with fonts embedded as TrueType (`pdf.fonttype` 42), by `utils/figures.py`.
-No SVG, PNG or JPG files are kept in git (the one exception is the draw.io pipeline diagram).
+No SVG, PNG or JPG files are kept in git; the one exception is draw.io diagrams, whose `.drawio.svg` export is kept next to the `.drawio` source.
 
 ## Installation
 
@@ -144,7 +208,7 @@ dvc pull
 
 ## Data and results
 
-MNIST downloads automatically via torchvision on first run. Fashion-MNIST and CIFAR-10 are planned.
+MNIST downloads automatically via torchvision on first run. Phase 3 uses MNIST validation images as the familiar set and the SVHN test set (26,032 images, file `data/ood_svhn/test_32x32.mat`) as the outside set. Fashion-MNIST is the next dataset.
 
 Results in `outputs/v1_mnist/` are split between git and DVC:
 
@@ -163,6 +227,8 @@ Results in `outputs/v1_mnist/` are split between git and DVC:
 | 2     | `p2_som_training_visualization/cluster_analysis/figures`, `error_pattern_analysis/figures` | cluster and error figures (PDF)              |
 | 2     | `p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42_v2/assignments`   | best-matching-unit assignments               |
 | 2     | `p2_som_training_visualization/interactive_report`                                         | interactive SOM HTML report                  |
+| 3     | `p3_novelty_detection/<step>/<run ID>/` (`*.dvc` inside)                                   | score arrays, figures, held-out-digit networks and SOMs |
+| 4     | `p4_guided_retraining/<step>/<run ID>/` (`*.dvc` inside)                                   | retrained checkpoints, predictions, embeddings, new SOMs, figures |
 
 ### Adding or updating results
 
@@ -216,12 +282,19 @@ PyTorch, [NNSOM](https://amir-jafari.github.io/SOM/), scikit-learn, NumPy, Matpl
 
 ## Limitations
 
-`[TBD - written from actual findings, not anticipated ones]`
+These are the limitations found in the results (full list in the final report):
+
+- Only 92 validation mistakes, so intervals are wide and AUROC differences below about 0.1 cannot be seen.
+- MNIST is easy; Fashion-MNIST is needed before drawing general conclusions.
+- The grid comparison could not separate 10x10, 15x15 and 20x20; 15x15 was chosen as a trade-off between purity and topographic error.
+- The SVHN results use one CNN and one SOM, and the SVHN comparisons were set up after SVHN results had been seen. The held-out-digit test uses one network per split, and its splits share digits.
+- Only 146 test images lie in the hotspots, and the hotspots come from the SOM, which gives the SOM-guided arms a built-in advantage on hotspot error.
+- The first augmentation settings (shifts of up to 2 pixels) failed a check made before training; all reported augmentation results use 1-pixel shifts.
 
 ## Team
 
-- **Fyrooz Khan** - Project setup and repository structure, data pipeline and CNN baseline, DVC/S3 versioning, official 15x15 SOM and grid comparison, error-pattern robustness check, SOM figures and interactive report, code quality, documentation, LaTeX reports
-- **Nazish Atta** - CNN evaluation and embedding extraction, initial NNSOM pipeline, cluster analysis, error-pattern and hotspot analysis, interactive convergence plots, pipeline diagram, LaTeX reports
+- **Fyrooz Anika Khan** - Project setup and repository structure, data pipeline and CNN baseline, DVC/S3 versioning, official 15x15 SOM, grid comparison and Optuna tuning, error-pattern robustness check and error-detector baselines, SOM figures and interactive report, Phase 4 guided retraining, held-out-digit novelty test, code quality, documentation, LaTeX reports and final report
+- **Nazish Atta** - CNN evaluation and embedding extraction, initial NNSOM pipeline, cluster analysis, error-pattern and hotspot analysis, interactive convergence plots, pipeline diagram, Phase 3 novelty detection, LaTeX reports
 
 Advisor: Dr. Amir Jafari, The George Washington University, Data Science Program.
 Developed as a capstone project in the GWU MS Data Science program.

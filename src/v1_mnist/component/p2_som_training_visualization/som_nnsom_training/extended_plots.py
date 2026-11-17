@@ -1,4 +1,4 @@
-"""Week 3 extended NNSOM plots (dense hist / box / violin / scatter / weight plots).
+"""Extended NNSOM plots (dense hist / box / violin / scatter / weight plots).
 
 Split from visualize_som.py (2026-10-10). Drawn only with visualize_som.py
 --extended (or the config switch): they are hard to read on large maps.
@@ -30,7 +30,7 @@ def attempt_extended_plots(
 ) -> tuple[list[str], dict[str, str]]:
     """Attempt dense NNSOM plots, recording any failures instead of aborting.
 
-    The class-composition plots (class pie and stem) are Week 4 and are drawn
+    The class-composition plots (class pie and stem) are cluster analysis and are drawn
     by cluster_analysis/cluster_figures.py.
     """
 

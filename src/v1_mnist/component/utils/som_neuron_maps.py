@@ -1,5 +1,5 @@
 """Per-neuron class and error statistics, and the simple grid map used by the
-Week 4 and Week 5 figure scripts (cluster_figures.py, error_figures.py).
+Cluster analysis and error pattern analysis figure scripts (cluster_figures.py, error_figures.py).
 
 Split from utils/som_plotting.py (2026-10-10).
 """

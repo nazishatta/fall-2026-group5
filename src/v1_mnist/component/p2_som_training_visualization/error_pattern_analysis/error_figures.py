@@ -1,4 +1,4 @@
-"""Week 5 figures for the selected SOM (Error Pattern Analysis).
+"""Figures for the selected SOM (Error Pattern Analysis).
 
 Draws the error maps on the validation split: the error-rate map
 (colour: error rate, size: support) and the complex error map.
@@ -127,7 +127,7 @@ def save_complex_error_map(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Week 5 error-pattern figures for the selected SOM."
+        description="Error-pattern figures for the selected SOM."
     )
     add_common_args(parser)
     return parser.parse_args()
@@ -161,7 +161,7 @@ def main() -> None:
     failed = {}
 
     logger.info("=" * 72)
-    logger.info("SOM Visualizations: Week 5 (error pattern analysis)")
+    logger.info("SOM Visualizations: Error Pattern Analysis")
     logger.info("=" * 72)
     logger.info("Model: %s", model_name)
     logger.info(

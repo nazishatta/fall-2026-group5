@@ -1,12 +1,18 @@
-# Phase 4: Guided Retraining (Weeks 9–11) — Tests
+# Phase 4 tests (`src/v1_mnist/tests/p4_guided_retraining/`)
 
-> `p4` in the folder name means **Phase 4**.
+Tests for the Phase 4 code, one folder per step, with the same names as `component/p4_guided_retraining/`. `synthetic_data.py` is a tiny made-up dataset the Phase 4 tests share. Run them with `python -m pytest src/v1_mnist/tests/p4_guided_retraining -q`.
 
-Empty for now.
+## Folders
 
-```
-p4_guided_retraining/
-├── hard_example_mining/           # Week 9: hard-example pool, curriculum schedule
-├── targeted_augmentation/         # Week 10: augmentation only in hotspot neurons
-└── som_reanalysis/                # Week 11: old vs. new SOM comparison
-```
+| Folder | What is inside |
+|---|---|
+| [`hard_example_mining/`](hard_example_mining/README.md) | Tests for the code in `component/p4_guided_retraining/hard_example_mining/`. |
+| [`targeted_augmentation/`](targeted_augmentation/README.md) | Tests for the code in `component/p4_guided_retraining/targeted_augmentation/`. |
+| [`som_reanalysis/`](som_reanalysis/README.md) | Tests for the code in `component/p4_guided_retraining/som_reanalysis/`. |
+| [`novelty_after_retraining/`](novelty_after_retraining/README.md) | Tests for the code in `component/p4_guided_retraining/novelty_after_retraining/`. |
+
+## Files
+
+| File | What it is |
+|---|---|
+| `synthetic_data.py` | A tiny made-up RetrainingData for the Phase 4 tests (no MNIST files, no PyTorch). |

@@ -1,0 +1,38 @@
+{
+  "run_id": "svhn_inverted_embedding_norm_s42_v1",
+  "analysis_status": "post_hoc_exploratory",
+  "dataset": "SVHN test",
+  "sample_count": 26032,
+  "feature_layer": "fc2",
+  "feature_dim": 84,
+  "inversion": "1.0 - grayscale tensor intensity",
+  "metrics": {
+    "original": {
+      "count": 26032,
+      "mean": 5.824533989455396,
+      "median": 5.2107656088871686,
+      "sample_sd": 2.532754030486864,
+      "p05": 3.085332562728871,
+      "p95": 10.643861377222814
+    },
+    "inverted": {
+      "count": 26032,
+      "mean": 6.092579927740367,
+      "median": 5.421223305922181,
+      "sample_sd": 2.6053254230161746,
+      "p05": 3.3763267103582963,
+      "p95": 11.17219061765481
+    },
+    "paired_delta_mean": 0.2680459382849717,
+    "paired_delta_median": 0.23952944946001642,
+    "inverted_greater_fraction": 0.5527811923786109
+  },
+  "input_sha256": {
+    "checkpoint": "0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d",
+    "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "config_sha256": "10ea2262af3be249bd496261ecb0c304cc5c5ebb4779d967aedbef529de34a78",
+  "seed": 42,
+  "leakage_control": "Frozen CNN evaluated only. No model fitting, threshold selection, MNIST final-test access or benchmark retuning.",
+  "limitations": "Exploratory comparison of embedding magnitude, not novelty-detection accuracy or a causal explanation."
+}

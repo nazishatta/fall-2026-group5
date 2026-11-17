@@ -1,4 +1,4 @@
-"""Week 3 (SOM Setup with NNSOM): figures are saved as one PDF each, with embedded
+"""SOM Setup with NNSOM: figures are saved as one PDF each, with embedded
 TrueType fonts (pdf.fonttype 42), and dense plots rasterize their data layer only.
 
 Split from the former tests/som/test_figure_dual_format.py.

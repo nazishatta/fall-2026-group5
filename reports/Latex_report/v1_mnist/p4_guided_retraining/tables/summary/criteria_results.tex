@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\small
+{\setlength{\tabcolsep}{3pt}\begin{tabular}{|C{0.06\textwidth}|>{\raggedright\arraybackslash}p{0.38\textwidth}|C{0.22\textwidth}|C{0.14\textwidth}|C{0.10\textwidth}|}
+\hline
+\textbf{ID} & \textbf{Comparison (error on)} & \textbf{Difference in points [95\% CI]} & \textbf{Macro-F1 guard} & \textbf{Verdict} \\ \hline
+C1 & curriculum\_som $-$ standard (all test images) & +0.45 [+0.33, +0.57] & $-$0.0044 (fails) & \textbf{not met} \\ \hline
+C2 & curriculum\_som $-$ curriculum\_random (hotspots) & +9.18 [+5.48, +13.02] & $-$0.0040 (fails) & \textbf{not met} \\ \hline
+A1 & augmented\_som $-$ augmented\_random (hotspots) & $-$2.47 [$-$4.52, $-$0.68] & +0.0003 (holds) & \textbf{met} \\ \hline
+A2 & augmented\_som $-$ standard (hotspots) & $-$3.56 [$-$5.75, $-$1.37] & +0.0010 (holds) & \textbf{met} \\ \hline
+A3 & augmented\_som $-$ standard (non-hotspot images; limit: upper end $\le 0.2$) & $-$0.05 [$-$0.13, +0.02] &  & \textbf{met} \\ \hline
+\multicolumn{5}{|l|}{\textit{Also reported (not success criteria)}} \\ \hline
+R1 & augmented\_som $-$ augmented\_msp (hotspots) & $-$0.68 [$-$2.88, +1.23] &  & \textbf{tie} \\ \hline
+R2 & augmented\_som\_paced $-$ augmented\_som (hotspots) & +3.42 [+1.64, +5.34] &  & \textbf{worse} \\ \hline
+R3 & augmented\_hotspot $-$ augmented\_random\_hotspot (hotspots) & $-$2.19 [$-$4.52, +0.14] &  & \textbf{tie} \\ \hline
+\end{tabular}}
+\caption{The success criteria, fixed before the test split was used. Negative differences mean fewer errors for the first arm; 1 test hotspot image is about 0.7 points. Intervals: paired bootstrap over test images, mean of 5 seeds. The macro-F1 guard is the first arm's macro-F1 minus the second arm's; it may not fall below $-0.0016$.}
+\label{tab:criteria}
+\end{table}

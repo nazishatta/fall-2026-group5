@@ -1,12 +1,14 @@
-# Phase 4: Guided Retraining (Weeks 9–11)
+# Phase 4 results: Guided Retraining (`outputs/v1_mnist/p4_guided_retraining/`)
 
 > `p4` in the folder name means **Phase 4**.
 
-Retraining the CNN using what the SOM revealed. Empty for now.
+Retraining the CNN using what the SOM showed, and checking the result with a new SOM. Every arm is trained with 5 seeds and compared with standard training and with a random-selection control. Protocol: `src/v1_mnist/docs/p4_guided_retraining/RETRAINING_PROTOCOL.md`.
 
-```
-p4_guided_retraining/
-├── hard_example_mining/           # Week 9: hard-example pool, curriculum results
-├── targeted_augmentation/         # Week 10: augmentation of hotspot regions
-└── som_reanalysis/                # Week 11: old vs. new SOM comparison
-```
+| Folder | Proposal week | What is inside |
+|---|---|---|
+| [`hard_example_mining/`](hard_example_mining/README.md) | 9 | The pools of hard training images, and the curriculum comparison |
+| [`targeted_augmentation/`](targeted_augmentation/README.md) | 10 | Retraining with altered copies of the hard images |
+| [`som_reanalysis/`](som_reanalysis/README.md) | 11 | New SOMs on the retrained CNNs, old map against new |
+| [`novelty_after_retraining/`](novelty_after_retraining/README.md) | – | SVHN novelty scores on the retrained networks |
+
+Git keeps only the small files here (`.json`, `.csv`, `.dvc` pointers and READMEs). Larger files are downloaded with `dvc pull`; figures are made again by the pipeline. Checkpoints, predictions, embeddings and figures are kept with DVC.

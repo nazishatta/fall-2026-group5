@@ -14,7 +14,7 @@ We asked: if we know each cell's error rate, how well can we predict which image
 
 The range includes zero, so neither grid wins. The range is also too wide to say the grids are "the same" (it would need to fit inside ±0.02). The reason is that the CNN made only **92 mistakes** out of 10,500 validation images, which is too few to detect small differences.
 
-**What this means for the project:** there is no evidence that 20x20 is better for the Week 5 error pattern analysis (finding where the CNN makes mistakes). Using 15x15, as the instructor requested, is supported by the data.
+**What this means for the project:** there is no evidence that 20x20 is better for the error pattern analysis (finding where the CNN makes mistakes). Using 15x15, as the instructor requested, is supported by the data.
 
 ## How the test worked
 

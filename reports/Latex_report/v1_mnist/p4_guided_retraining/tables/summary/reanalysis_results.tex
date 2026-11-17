@@ -1,0 +1,18 @@
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\footnotesize
+{\setlength{\tabcolsep}{3pt}\begin{tabular}{|>{\raggedright\arraybackslash}p{0.18\textwidth}|C{0.08\textwidth}|C{0.085\textwidth}|C{0.09\textwidth}|C{0.09\textwidth}|C{0.185\textwidth}|C{0.185\textwidth}|}
+\hline
+\textbf{Measure (validation)} & \textbf{Phase 2 map} & \textbf{standard} & \textbf{augm.\ som} & \textbf{augm.\ random} & \textbf{augm.\ som $-$ standard} & \textbf{augm.\ som $-$ augm.\ random} \\ \hline
+Weighted purity (R1, R3) & 0.9819 & 0.9824 & 0.9824 & 0.9813 & +0.0001 [$-$0.0017, +0.0019] & +0.0012 [$-$0.0016, +0.0039] \\ \hline
+Share of neurons with purity $<0.95$ & 0.0801 & 0.0718 & 0.0795 & 0.0758 & +0.0077 [$-$0.0045, +0.0199] & +0.0037 [$-$0.0114, +0.0188] \\ \hline
+Class scatter index & 1.10 & 1.12 & 1.20 & 1.12 & +0.08 [$-$0.14, +0.30] & +0.08 [$-$0.12, +0.28] \\ \hline
+Topographic error, \% (R5) & 6.18 & 7.04 & 6.76 & 6.66 & $-$0.29 [$-$1.11, +0.54] & +0.10 [$-$1.04, +1.25] \\ \hline
+Hotspot error rate (R2, R4) & 0.1954 & 0.2292 & 0.1746 & 0.2061 & \textbf{$-$0.0545 [$-$0.1008, $-$0.0082]} & $-$0.0315 [$-$0.0705, +0.0075] \\ \hline
+Share of errors in hotspots & 0.3696 & 0.3669 & 0.3833 & 0.3204 & +0.0163 [$-$0.0613, +0.0939] & \textbf{+0.0628 [+0.0359, +0.0897]} \\ \hline
+Overall validation error & 0.0088 & 0.0092 & 0.0075 & 0.0086 & \textbf{$-$0.0017 [$-$0.0022, $-$0.0011]} & \textbf{$-$0.0011 [$-$0.0018, $-$0.0005]} \\ \hline
+\end{tabular}}
+\caption{SOM re-analysis on the validation split. Columns 2 to 5 are means over the 5 CNN seeds (the Phase 2 map is a single map). The last two columns are the paired difference per seed, averaged, with its 95\% $t$-interval (4 degrees of freedom); bold means the interval excludes 0. Linear CKA between the networks' embeddings: 0.931 within standard, 0.893 within augmented\_som, 0.917 within augmented\_random, 0.910 between arms.}
+\label{tab:reanalysis}
+\end{table}

@@ -52,7 +52,7 @@ def _load_split(
 
     if missing:
         raise FileNotFoundError(
-            "Missing Week 2 embedding artifacts:\n"
+            "Missing baseline CNN training embedding artifacts:\n"
             + "\n".join(missing)
         )
 

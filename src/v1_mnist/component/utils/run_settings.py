@@ -1,4 +1,4 @@
-"""Which SOM the Week 4-5 analysis uses, and checks that it is the right one.
+"""Which SOM the cluster and error pattern analysis uses, and checks that it is the right one.
 
 Everything comes from a SOM config (som.yaml or a robustness config):
 grid size, the selected model's run ID, and the embeddings folder.
@@ -26,7 +26,7 @@ DEFAULT_CONFIG = "src/v1_mnist/component/configs/som.yaml"
 
 @dataclass(frozen=True)
 class AnalysisSettings:
-    """Everything the Week 4-5 analysis needs to know about the selected SOM."""
+    """Everything the cluster and error pattern analysis needs to know about the selected SOM."""
 
     config_path: Path
     grid_height: int
@@ -143,13 +143,13 @@ def selected_model_from_config(config_path: str | Path | None, repo_root: Path) 
 
 
 def cluster_output_dir(config_path: str | Path | None, repo_root: Path) -> Path:
-    """Week 4 (cluster analysis) outputs of the config's SOM: <paths.cluster_dir>/<selected_model>/."""
+    """Cluster Analysis outputs of the config's SOM: <paths.cluster_dir>/<selected_model>/."""
     config = load_config(str(_resolve(repo_root, config_path or DEFAULT_CONFIG)))
     return _resolve(repo_root, config.paths.cluster_dir) / str(config.visualization.selected_model)
 
 
 def error_output_dir(config_path: str | Path | None, repo_root: Path) -> Path:
-    """Week 5 (error pattern analysis) outputs of the config's SOM: <paths.error_dir>/<selected_model>/."""
+    """Error Pattern Analysis outputs of the config's SOM: <paths.error_dir>/<selected_model>/."""
     config = load_config(str(_resolve(repo_root, config_path or DEFAULT_CONFIG)))
     return _resolve(repo_root, config.paths.error_dir) / str(config.visualization.selected_model)
 

@@ -1,4 +1,4 @@
-"""Week 5 (Error Pattern Analysis): the project's one hotspot rule (utils/hotspots.py)."""
+"""Error Pattern Analysis: the project's one hotspot rule (utils/hotspots.py)."""
 
 import numpy as np
 
@@ -23,7 +23,7 @@ def test_vectorized_wilson_matches_scalar() -> None:
     errors = np.array([0, 1, 3, 10, 0])
     total = np.array([10, 7, 20, 10, 0])
     vec = wilson_lower_bound_array(errors.astype(float), total)
-    for e, t, v in zip(errors, total, vec):
+    for e, t, v in zip(errors, total, vec, strict=True):
         if t == 0:
             assert v == -np.inf          # empty neurons always rank last
         else:
@@ -40,7 +40,7 @@ def test_top_hotspots_ranking_and_ties() -> None:
 
 
 def test_error_rate_matches_nnsom_get_perc_misclassified() -> None:
-    """Week 5 error rates equal NNSOM's own per-neuron misclassification percentage."""
+    """Error pattern analysis error rates equal NNSOM's own per-neuron misclassification percentage."""
     rng = np.random.default_rng(1)
     num_neurons = 9
     labels = rng.integers(0, 10, size=600)
@@ -58,7 +58,7 @@ def test_error_rate_matches_nnsom_get_perc_misclassified() -> None:
     )
     clusters = [np.flatnonzero(bmu == n) for n in range(num_neurons)]
     nnsom_percent = get_perc_misclassified(labels, preds, clusters)
-    for row, pct in zip(rows, nnsom_percent):
+    for row, pct in zip(rows, nnsom_percent, strict=True):
         if row["support"]:
             assert np.isclose(100 * row["error_rate"], pct)
         else:

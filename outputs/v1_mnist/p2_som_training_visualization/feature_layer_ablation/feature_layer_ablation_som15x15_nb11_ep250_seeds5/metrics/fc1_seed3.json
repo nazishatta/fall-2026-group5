@@ -1,0 +1,43 @@
+{
+  "A1_error_cell_auroc": {
+    "high": 0.6723816911322394,
+    "low": 0.5671013935768472,
+    "mean": 0.6261427768773185
+  },
+  "A2_weighted_purity": 0.9608571428571429,
+  "A3_qe_novelty_auroc": 0.986543122750022,
+  "cell": "fc1_seed3",
+  "hotspot_error_rate": 0.1380952380952381,
+  "hotspot_error_share": 0.31521739130434784,
+  "hotspots": [
+    176,
+    165,
+    127,
+    93,
+    18,
+    199,
+    63,
+    5,
+    179,
+    175,
+    80
+  ],
+  "layer": "fc1",
+  "occupied_neurons": 225,
+  "som_seed": 3,
+  "svhn_qe_mean": 2.638173203187779,
+  "val_qe_mean": 1.399389738702137,
+  "validation_errors": 92,
+  "validation_quality": {
+    "empty_neurons": 0,
+    "max_hits_per_neuron": 154,
+    "mean_hits_per_occupied_neuron": 46.666666666666664,
+    "n_samples": 10500,
+    "occupancy_rate": 1.0,
+    "occupied_neurons": 225,
+    "quantization_error": 1.481802137357112,
+    "topological_error_1st_2nd_order_pct": 3.8666666666666667,
+    "topological_error_1st_order_pct": 5.447619047619048,
+    "total_neurons": 225
+  }
+}

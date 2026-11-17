@@ -67,7 +67,7 @@ def main() -> None:
     ]
     # Robustness results are never overwritten: existing ones are kept and reused.
     robustness_dir = error_dir / "robustness"
-    for cfg, m in zip([args.config, *args.robustness_configs], [model, *robustness_models]):
+    for cfg, m in zip([args.config, *args.robustness_configs], [model, *robustness_models], strict=True):
         if (robustness_dir / f"{m}_error_pattern_robustness.json").exists():
             log.info(f"Robustness result for {m} already exists; kept (step skipped).")
             continue

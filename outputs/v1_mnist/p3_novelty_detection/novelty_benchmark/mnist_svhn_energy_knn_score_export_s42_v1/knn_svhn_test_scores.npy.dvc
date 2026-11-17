@@ -1,0 +1,5 @@
+outs:
+- md5: 8f6ab7bed02be410127133e6620ef73f
+  size: 208384
+  hash: md5
+  path: knn_svhn_test_scores.npy

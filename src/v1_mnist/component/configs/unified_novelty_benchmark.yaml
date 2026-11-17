@@ -1,0 +1,37 @@
+# Post-hoc exploratory run; SVHN was already inspected in historical experiments.
+run_id: mnist_svhn_unified_nine_methods_s42_46_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+qe_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+fitting:
+  seeds: [42, 43, 44, 45, 46]
+  mnist_training_budget: 10000
+  isolation_forest:
+    n_estimators: 200
+    max_samples: 256
+    contamination: 0.05
+  one_class_svm:
+    kernel: rbf
+    nu: 0.05
+    gamma: scale
+    max_training_samples: 10000
+  autoencoder:
+    input_dim: 84
+    hidden_dim: 32
+    latent_dim: 16
+    epochs: 20
+    batch_size: 256
+    learning_rate: 0.001
+  knn_neighbors: 5
+scoring:
+  batch_size: 256
+  energy_temperature: 1.0
+  target_tpr: 0.95
+  bootstrap_iterations: 200
+  bootstrap_seed: 42
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  embedding_dimensions: 84
+  som_units: 225
+  frozen_training_qe_threshold: 1.5690279077294162

@@ -1,0 +1,19 @@
+{
+  "scope": "descriptive side-by-side consolidation, not a newly run or equal-budget experiment",
+  "headline_baseline_source": "mnist_svhn_required_baselines_knn_s42_v1/required_baseline_metrics.json",
+  "historical_u_matrix_source": "mnist_svhn_five_method_comparison_s42_initial/comparison_metrics.json",
+  "paired_qe_msp_source": "mnist_svhn_qe_msp_reproduction_s42_v1/qe_msp_paired_metrics.json",
+  "qe_minus_msp": -0.01738819255421875,
+  "qe_minus_msp_ci_95": [
+    -0.019406191738373175,
+    -0.015417952812655348
+  ],
+  "id_count": 10500,
+  "ood_count": 26032,
+  "limitations": [
+    "Historical method fitting budgets differ; this table does not imply matched fitting protocols.",
+    "Historical QE score arrays lack per-image IDs; paired analysis assumes deterministic order.",
+    "SVHN was already examined; new diagnostics are exploratory.",
+    "No MNIST final-test set was used or evaluated by this consolidation."
+  ]
+}

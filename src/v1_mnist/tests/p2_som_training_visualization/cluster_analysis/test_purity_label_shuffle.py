@@ -1,4 +1,4 @@
-"""Week 4: label-shuffle comparison for the sample-weighted cluster purity."""
+"""Cluster analysis: label-shuffle comparison for the sample-weighted cluster purity."""
 
 from __future__ import annotations
 

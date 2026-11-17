@@ -1,6 +1,6 @@
-"""Week 5: Error Pattern Analysis.
+"""Error Pattern Analysis.
 
-Uses the Week 4 BMU assignments of the validation images (run
+Uses the cluster analysis BMU assignments of the validation images (run
 run_cluster_analysis.py with the same config first) and the CNN's predictions
 to find where on the map the CNN makes its mistakes:
   - per neuron: error count, error rate, 95% Wilson lower bound of the error
@@ -14,7 +14,7 @@ to find where on the map the CNN makes its mistakes:
 The hotspot counts here are descriptive: the same images are used to choose
 the hotspots and to count their errors, which overstates the concentration.
 The tested, held-out result is written by error_pattern_robustness.py.
-Distances to the BMU (wrong vs correct images) belong to Week 6 (novelty
+Distances to the BMU (wrong vs correct images) belong to QE novelty detection (novelty
 detection) and are not compared here.
 
 Validation split only; the test split is never used.
@@ -169,7 +169,7 @@ def write_metadata(folder: Path, input_hashes: dict[str, str]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Week 5 SOM error pattern analysis.")
+    parser = argparse.ArgumentParser(description="SOM error pattern analysis.")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the grid and selected model.")
     args = parser.parse_args()
@@ -177,12 +177,12 @@ def main() -> None:
     settings = load_analysis_settings(args.config, REPO_ROOT)
     model_hash = verify_selected_model(settings)
 
-    cluster_dir = cluster_output_dir(settings.config_path, REPO_ROOT)  # Week 4 inputs (read only)
-    output_dir = error_output_dir(settings.config_path, REPO_ROOT)     # Week 5 outputs
+    cluster_dir = cluster_output_dir(settings.config_path, REPO_ROOT)  # Cluster analysis inputs (read only)
+    output_dir = error_output_dir(settings.config_path, REPO_ROOT)     # Error pattern analysis outputs
     analysis = analysis_config(settings.config_path, REPO_ROOT)
     hotspot_fraction, min_hotspots = float(analysis.hotspot_fraction), int(analysis.min_hotspots)
 
-    # Week 4 must exist, come from the same model, and its files must be unchanged.
+    # Cluster analysis outputs must exist, come from the same model, and its files must be unchanged.
     summary_path = cluster_dir / "cluster_summary.json"
     if not summary_path.is_file():
         raise FileNotFoundError(
@@ -191,7 +191,7 @@ def main() -> None:
     cluster_info = json.loads(summary_path.read_text(encoding="utf-8"))
     if cluster_info.get("model_sha256") != model_hash:
         raise RuntimeError(
-            f"Week 4 outputs in {cluster_dir} were made from a different model "
+            f"Cluster analysis outputs in {cluster_dir} were made from a different model "
             f"({cluster_info.get('model_sha256')}) than {settings.selected_model} ({model_hash})."
         )
     cluster_hashes = json.loads((cluster_dir / "metadata" / "artifact_hashes.json").read_text(encoding="utf-8"))
@@ -200,7 +200,7 @@ def main() -> None:
     for rel in cluster_inputs:
         observed = sha256_file(cluster_dir / rel)
         if cluster_hashes.get(rel) != observed:
-            raise RuntimeError(f"Week 4 file {rel} changed since Week 4 wrote it.")
+            raise RuntimeError(f"Cluster analysis file {rel} changed since cluster analysis wrote it.")
         input_hashes[f"cluster_analysis/{rel}"] = observed
 
     if output_dir.exists():
@@ -226,7 +226,7 @@ def main() -> None:
         n = len(arrays["labels"])
         num_neurons = settings.num_neurons
         if bmu.shape != (n,) or distance.shape != (n,) or coordinates.shape != (2, num_neurons):
-            raise RuntimeError("Week 4 validation files do not match the validation data or the grid.")
+            raise RuntimeError("Cluster analysis validation files do not match the validation data or the grid.")
 
         correct = arrays["correct"].astype(bool)
         error = ~correct
@@ -305,11 +305,11 @@ def main() -> None:
         temp_dir.rename(output_dir)
 
     except Exception as exc:
-        logger.error("Week 5 error pattern analysis FAILED: %s", exc)
+        logger.error("Error pattern analysis FAILED: %s", exc)
         logger.info("Temporary files kept for inspection: %s", temp_dir)
         raise
 
-    logger.info("Week 5 error pattern analysis COMPLETE")
+    logger.info("Error pattern analysis COMPLETE")
     logger.info("Validation samples: %d, errors: %d", n, total_errors)
     logger.info("Hotspots (k=%d, rank order): %s", k, hotspots)
     logger.info("Errors inside hotspots (descriptive): %d of %d", hot_errors, total_errors)

@@ -97,8 +97,8 @@ def train_som_pipeline(
             h_str, w_str = grid_size.lower().split("x")
             grid_override_h = int(h_str)
             grid_override_w = int(w_str)
-        except ValueError:
-            raise ValueError(f"--grid-size must be in HxW format, got: '{grid_size}'")
+        except ValueError as err:
+            raise ValueError(f"--grid-size must be in HxW format, got: '{grid_size}'") from err
         if grid_override_h <= 0 or grid_override_w <= 0:
             raise ValueError(f"--grid-size dimensions must be positive, got: {grid_size}")
         config.som.grid_height = grid_override_h

@@ -1,4 +1,4 @@
-"""Quality metrics for Week 3 NNSOM experiments."""
+"""Quality metrics for the NNSOM training experiments."""
 
 from __future__ import annotations
 

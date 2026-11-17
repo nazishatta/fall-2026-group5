@@ -1,0 +1,50 @@
+# ==============================================================================
+# Novelty detection after retraining (Phase 4): Phase 3's novelty scores on the retrained networks.
+# Protocol: src/v1_mnist/docs/p4_guided_retraining/novelty_after_retraining/NOVELTY_AFTER_RETRAINING_PROTOCOL.md
+#
+# Normal images: MNIST validation. Novel images: SVHN test (Phase 3 provenance). MNIST test is never read.
+# Do not change after the first run; a change needs a new run.revision.
+# ==============================================================================
+
+run:
+  name: novelty_after_retraining
+  # Run folder: <name>_<selected SOM run ID>[_<revision>]. Empty for the first run.
+  revision: ""
+
+inputs:
+  # The 15 cells, their checkpoints, new SOMs and embeddings come from the SOM re-analysis run.
+  som_reanalysis_config: src/v1_mnist/component/configs/som_reanalysis.yaml
+  # SVHN file and its SHA-256 come from Phase 3's shared provenance.
+  phase3_provenance_config: src/v1_mnist/component/configs/phase3_shared_provenance.yaml
+
+paths:
+  output_root: ./outputs/v1_mnist/p4_guided_retraining/novelty_after_retraining
+
+protocol:
+  document: src/v1_mnist/docs/p4_guided_retraining/novelty_after_retraining/NOVELTY_AFTER_RETRAINING_PROTOCOL.md
+
+cells:
+  arms: [standard, augmented_som, augmented_random]
+  seeds: [1, 2, 3, 4, 5]
+  reference: baseline          # Phase 1 network + Phase 2 SOM, scored by the same code
+
+ood:
+  dataset: svhn
+  image_size: [28, 28]         # Phase 3's fixed transform: grayscale, bilinear resize, [0, 1]
+  batch_size: 1000
+  device: auto
+
+scores:
+  energy_temperature: 1.0
+  qe_threshold_percentile: 95  # Phase 3's training-QE rule; detection and false-alarm rates are reported only
+
+statistics:
+  bootstrap_resamples: 2000    # within-cell paired bootstrap, stratified by normal/novel (Phase 3)
+  bootstrap_seed: 42
+  confidence: 0.95             # between-arm paired t-interval over seeds (4 degrees of freedom)
+  auroc_margin: 0.01           # the proposal's "competitive" margin (N2, N3, N4)
+
+comparison:
+  pairs:                       # [first arm, second arm]; the difference is taken per seed
+    - [augmented_som, standard]
+    - [augmented_som, augmented_random]

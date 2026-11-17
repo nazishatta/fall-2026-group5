@@ -1,0 +1,52 @@
+# ==============================================================================
+# SOM re-analysis (Phase 4): re-train the SOM on the retrained CNNs' embeddings and compare the maps.
+# Protocol: src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/SOM_REANALYSIS_PROTOCOL.md
+#
+# Training and validation images only; the MNIST test split is never read.
+# The SOM recipe (grid, neighbourhood, epochs, steps, seed, scaling) is read from som.yaml,
+# so the new maps are trained exactly like the Phase 2 map.
+# ==============================================================================
+
+run:
+  name: som_reanalysis
+  # Run folder: <name>_<selected SOM run ID>[_<revision>]. Leave empty for the first run; set a new
+  # one (r2, r3, ...) for every new or changed run. Results are never overwritten.
+  revision: ""
+
+inputs:
+  retraining_config: src/v1_mnist/component/configs/retraining.yaml
+  retraining_section: augmentation    # the retraining run whose checkpoints are re-analysed
+  som_config: src/v1_mnist/component/configs/som.yaml
+
+paths:
+  output_root: ./outputs/v1_mnist/p4_guided_retraining/som_reanalysis
+
+protocol:
+  document: src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/SOM_REANALYSIS_PROTOCOL.md
+
+cells:
+  arms: [standard, augmented_som, augmented_random]   # protocol section 7
+  seeds: [1, 2, 3, 4, 5]
+  reference: baseline        # the Phase 2 SOM on the Phase 1 embeddings (loaded, not retrained)
+
+extraction:
+  layer: fc2                 # the layer Phase 1 used for the embeddings
+  batch_size: 1000
+  device: auto               # "auto", "cuda" or "cpu"
+  # The predictions found during the extraction must match the saved validation predictions of the
+  # retraining run for at least this share of images; otherwise the cell stops.
+  min_prediction_agreement: 0.999
+
+measures:
+  adjacency_distance: 1.1    # neurons closer than this on the map are neighbours (same as topographic error)
+
+comparison:
+  # [first arm, second arm]; the difference is taken per seed.
+  pairs:
+    - [augmented_som, standard]
+    - [augmented_som, augmented_random]
+  confidence: 0.95
+  organisation_tolerance_pct: 1.0    # statement R5: upper end of the topographic-error interval
+
+figures:
+  example_seed: 1

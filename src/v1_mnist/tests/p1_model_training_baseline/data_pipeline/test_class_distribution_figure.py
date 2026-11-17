@@ -1,4 +1,4 @@
-"""Week 1 (Data Pipeline): class-distribution figure is saved as one PDF (no SVG).
+"""Environment Setup & Data Pipeline: class-distribution figure is saved as one PDF (no SVG).
 
 Split from the former tests/som/test_figure_dual_format.py.
 """

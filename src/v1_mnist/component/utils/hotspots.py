@@ -1,4 +1,4 @@
-"""The project's error-hotspot rule (Week 5, Error Pattern Analysis).
+"""The project's error-hotspot rule (Error Pattern Analysis).
 
 One rule everywhere (docs/p2_som_training_visualization/error_pattern_analysis/HOTSPOT_RULE.md):
 rank the occupied neurons by the 95% Wilson lower bound of their error rate
@@ -7,7 +7,7 @@ k = max(5, round(5% of neurons)): 5 on 10x10, 11 on 15x15, 20 on 20x20.
 
 This is the rule fixed in advance in ERROR_PATTERN_ROBUSTNESS_CRITERIA.md
 (section 3, step 2). The robustness test (error_pattern_robustness.py) applies it
-to half-splits of the validation images; Week 5 (error_patterns.py) applies it to
+to half-splits of the validation images; error pattern analysis (error_patterns.py) applies it to
 the full validation split to list the hotspots. The code was moved here unchanged
 from error_pattern_robustness.py.
 """

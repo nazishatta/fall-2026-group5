@@ -45,7 +45,7 @@ Baseline Model Training \& Latent Feature Extraction\par}
 
 \vspace{0.08in}
 
-{\large\bfseries Fyrooz Khan\par}
+{\large\bfseries Fyrooz Anika Khan\par}
 {\large\bfseries Nazish Atta\par}
 
 \vspace{0.30in}
@@ -65,9 +65,9 @@ Baseline Model Training \& Latent Feature Extraction\par}
 
 \setcounter{page}{2}
 
-\section{Week 2 Overview}
+\section{Overview}
 
-Week 2 completed the baseline modeling stage of the capstone. The MNIST
+Phase 1 completed the baseline modeling stage of the capstone. The MNIST
 dataset was prepared using a stratified 70/15/15 train-validation-test
 split, a LeNet-5 convolutional neural network was trained and evaluated,
 and 84-dimensional feature embeddings were extracted from the
@@ -120,7 +120,7 @@ keeping the contribution empirically testable against established baselines.
 
 \begin{tabular}{|p{0.42\textwidth}|p{0.48\textwidth}|}
 \hline
-\textbf{Item} & \textbf{Week 2 Setup} \\
+\textbf{Item} & \textbf{Phase 1 Setup} \\
 \hline
 Dataset & MNIST, 70,000 grayscale images ($28 \times 28$) \\
 \hline
@@ -137,7 +137,7 @@ Feature layer & \texttt{fc2} penultimate layer, 84 dimensions \\
 
 The best validation checkpoint was used for final test evaluation and
 feature extraction. The saved \texttt{fc2} embeddings from all three
-splits provide the input for NNSOM in Week 3.
+splits provide the input for NNSOM in Phase 2 (SOM training).
 
 \begin{figure}[H]
 \centering
@@ -210,7 +210,7 @@ with NNSOM.
 \label{fig:pca}
 \end{figure}
 
-The PCA view is only a preliminary 2D visualization; Week 3 will use
+The PCA view is only a preliminary 2D visualization; SOM training (Phase 2) will use
 the full 84-dimensional training embeddings as the actual input to
 NNSOM.
 
@@ -238,10 +238,10 @@ The test split was kept out of every development decision:
     follows uses the training and validation embeddings only.
 \end{itemize}
 
-\section{Conclusion and Week 3 Transition}
+\section{Conclusion and Transition to SOM Training}
 
-Week 2 established a reproducible MNIST baseline and produced the
-feature embeddings required for the next phase. In Week 3, NNSOM~\cite{jafari_nnsom} will
+Phase 1 established a reproducible MNIST baseline and produced the
+feature embeddings required for the next phase. In Phase 2, NNSOM~\cite{jafari_nnsom} will
 be configured and trained on the 49,000 training embeddings to map
 samples to Best Matching Units, monitor quantization error, and
 visualize class organization using SOM-based plots such as hit maps

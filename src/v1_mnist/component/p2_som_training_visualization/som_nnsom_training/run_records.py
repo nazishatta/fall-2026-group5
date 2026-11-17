@@ -116,6 +116,7 @@ def save_qe_history(
                 history.epoch,
                 history.quantization_error,
                 history.neighborhood_radius,
+                strict=True,
             )
         )
 

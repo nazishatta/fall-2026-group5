@@ -1,7 +1,7 @@
-# CNN Baseline Results (Week 2: Train Baseline CNN)
+# CNN Baseline Results (Train Baseline CNN)
 
-Week 1 outputs (class-distribution charts, sample images, split sizes) are in `../data_pipeline/`.
-The Week 1 log `prepare_data.log` stays in `logs/` here because DVC tracks the three Phase 1 logs as one folder.
+Data pipeline outputs (class-distribution charts, sample images, split sizes) are in `../data_pipeline/`.
+The data pipeline log `prepare_data.log` stays in `logs/` here because DVC tracks the three Phase 1 logs as one folder.
 
 ## Run IDs
 

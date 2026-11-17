@@ -1,4 +1,4 @@
-"""Shared setup for the SOM figure scripts of Weeks 3, 4 and 5.
+"""Shared setup for the SOM figure scripts of SOM training, cluster analysis and error pattern analysis.
 
 Loads the config, the saved SOM (grid size from its metrics file) and the
 frozen embeddings with the train-fitted scaler, makes the pdf/
