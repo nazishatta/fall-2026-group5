@@ -233,6 +233,7 @@ Spearman, error rate vs.\ digit mix (entropy) & $+0.778$ & $+0.816$ & $+0.768$ \
 Table~\ref{tab:error-pattern-baselines} compares the SOM with the baselines on the same validation images. A SOM cell and a k-means cell find mistakes equally well (AUROC 0.685 and 0.693, with overlapping ranges).
 Nearest-neighbor impurity does much better (0.874), and the CNN's own confidence does best (0.981). The SOM's hotspots are smaller than those of k-means (1.6\% of the images against 3.8\%), and they catch a similar share of the mistakes (18\% against 20\%).
 This is why the SOM has a higher concentration ratio. The hotspot-size numbers are exploratory.
+The gap to the per-image scores is large when they get the same budget: flagging the 1.6\% of images with the lowest confidence catches 53.3\% of the mistakes (95\% interval 44.5--64.3\%), and kNN impurity catches 48.7\%, against 18.1\% in the SOM's hotspot cells (exploratory, added after the results were seen).
 
 {\setlength{\tabcolsep}{3pt}\input{tables/error_pattern_baselines.tex}}
 

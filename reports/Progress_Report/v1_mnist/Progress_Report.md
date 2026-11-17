@@ -235,7 +235,8 @@
   - Novelty detection after retraining: scored the 15 retrained models with quantization error, maximum softmax probability, energy and Mahalanobis on MNIST against SVHN. The SOM still detects SVHN after every kind of retraining (lowest AUROC 0.965); SOM-guided retraining did not change it clearly, and maximum softmax probability and energy remain better.
   - **PHASE 5: PAPER WRITING & CODE RELEASE**
   - Completed the final report: a figure explaining how the SOM works (with the Competitive Networks chapter cited), the contribution statement in the abstract, the Optuna and novelty-after-retraining results, all diagrams redrawn in draw.io, and clearer result tables.
-  - Plan for the rest of the MNIST work: re-analyse the SOM of the least-confident retraining arm, and compare the error detectors at the same share of flagged images.
+  - Same-budget comparison of the error detectors: flagging the same 1.6% of validation images as the SOM's hotspot cells, the least-confident images hold 53.3% of the CNN's mistakes and kNN impurity 48.7%, against 18.1% in the hotspot cells (exploratory).
+  - Plan for the rest of the MNIST work: re-analyse the SOM of the least-confident retraining arm (running on EC2).
   - Plan after that: run Phases 2 to 4 on Fashion-MNIST (technical freeze on November 22), merge develop into main through a reviewed pull request, and write the research paper with one results table per dataset.
 
 - Action Items:
@@ -245,7 +246,7 @@
 * [x] Held-out-class novelty: protocol, code and tests
 * [x] Held-out-class novelty results
 * [ ] SOM re-analysis of the least-confident retraining arm
-* [ ] Same-budget comparison of the error detectors
+* [x] Same-budget comparison of the error detectors
 * [ ] Merge develop into main
 * [ ] Fashion-MNIST pipeline and results
 * [ ] Research paper draft
