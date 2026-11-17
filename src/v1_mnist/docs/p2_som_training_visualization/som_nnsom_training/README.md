@@ -1,6 +1,6 @@
-# Week 3: choosing the SOM grid size (MNIST)
+# Choosing the SOM grid size (MNIST)
 
-Phase 2 (SOM Training & Visualization), Week 3 (SOM Setup with NNSOM). The proposal asks us to "configure SOM hyperparameters: grid size (e.g., 10x10 or 15x15)".
+Phase 2 (SOM Training & Visualization), step: SOM Setup with NNSOM. The proposal asks us to "configure SOM hyperparameters: grid size (e.g., 10x10 or 15x15)".
 
 ## What this folder is about
 
@@ -8,7 +8,7 @@ Our project trains a CNN to recognise handwritten digits (MNIST). We then use a 
 
 A SOM needs a grid size (10x10, 15x15, 20x20, ...). This folder answers: **which grid size should we use, and was the choice fair?** It also records honestly what went wrong earlier in the project and how we fixed it.
 
-Whether the Week 5 error-pattern findings also hold on other grid sizes is in the Week 5 folder: `../error_pattern_analysis/README.md`.
+Whether the error-pattern findings also hold on other grid sizes is in the error pattern analysis folder: `../error_pattern_analysis/README.md`.
 
 ## Read the files in this order
 
@@ -39,5 +39,5 @@ Files 3, 4 and the rules part of file 1 were written **before** the results. The
 
 - **Grid used: 15x15** (model `som_15x15_nb11_ep250_s42_v2`), as the instructor requested.
 - **Fair test:** 15x15 and 20x20 were equally good at predicting where the CNN makes mistakes (AUROC 0.629 vs 0.630). With only 92 CNN mistakes the test cannot spot very small differences, but **nothing showed that a bigger grid is better**.
-- The Week 5 error-pattern findings also hold on 20x20 and 10x10 (see `../error_pattern_analysis/`), so **our main findings do not depend on the grid size we chose**.
+- The error-pattern findings also hold on 20x20 and 10x10 (see `../error_pattern_analysis/`), so **our main findings do not depend on the grid size we chose**.
 - **Optuna tuning (2026-11-17):** with the same budget for all three grids and a 5-seed check, the Optuna setting for 15x15 was not clearly different from ours, so the headline map stays. For 20x20 our setting was better; for 10x10 the Optuna setting was better (the 10x10 robustness map is therefore slightly below its best setting).
