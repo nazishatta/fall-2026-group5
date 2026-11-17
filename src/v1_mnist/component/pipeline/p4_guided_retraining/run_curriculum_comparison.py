@@ -4,6 +4,7 @@ Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_curriculum_comparison.py --stage train
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_curriculum_comparison.py --stage summary
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_curriculum_comparison.py --stage final_test
+  python src/v1_mnist/component/pipeline/p4_guided_retraining/run_curriculum_comparison.py --stage breakdown
 
 Options: --arm NAME, --seed N (run part of the work), --smoke (quick 2-epoch trial in a separate
 folder). Training and summary use validation images only; final_test needs the frozen protocol.

@@ -1,0 +1,343 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{lecun1998gradient}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=6a1aa6b7eab12b931ca7c7e3f927231d}{%
+           family={LeCun},
+           familyi={L\bibinitperiod},
+           given={Yann},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=179581647e37c19b9a3deb51a1cfc5b0}{%
+           family={Bottou},
+           familyi={B\bibinitperiod},
+           given={Leon},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=40a8e4774982146adc2688546f54efb2}{%
+           family={Bengio},
+           familyi={B\bibinitperiod},
+           given={Yoshua},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=844e183692f08a63f99285330fcf90cc}{%
+           family={Haffner},
+           familyi={H\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9e4c6012409dc8dd9b2aa198a2059804}
+      \strng{fullhash}{37f0b2ba997248cf7513a12b4be7c55a}
+      \strng{fullhashraw}{37f0b2ba997248cf7513a12b4be7c55a}
+      \strng{bibnamehash}{37f0b2ba997248cf7513a12b4be7c55a}
+      \strng{authorbibnamehash}{37f0b2ba997248cf7513a12b4be7c55a}
+      \strng{authornamehash}{9e4c6012409dc8dd9b2aa198a2059804}
+      \strng{authorfullhash}{37f0b2ba997248cf7513a12b4be7c55a}
+      \strng{authorfullhashraw}{37f0b2ba997248cf7513a12b4be7c55a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the IEEE}
+      \field{number}{11}
+      \field{title}{Gradient-Based Learning Applied to Document Recognition}
+      \field{volume}{86}
+      \field{year}{1998}
+      \field{pages}{2278\bibrangedash 2324}
+      \range{pages}{47}
+      \verb{doi}
+      \verb 10.1109/5.726791
+      \endverb
+    \endentry
+    \entry{kingma2015adam}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=b6fbd171848aad4edf3925543f1f1522}{%
+           family={Kingma},
+           familyi={K\bibinitperiod},
+           given={Diederik\bibnamedelima P.},
+           giveni={D\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8aa66e8231cc2fdbe67aa4f18ca970c6}{%
+           family={Ba},
+           familyi={B\bibinitperiod},
+           given={Jimmy},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{fullhash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{fullhashraw}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{bibnamehash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{authorbibnamehash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{authornamehash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{authorfullhash}{a09df9f123146b8e2c7f1134c9496932}
+      \strng{authorfullhashraw}{a09df9f123146b8e2c7f1134c9496932}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Learning Representations}
+      \field{title}{Adam: A Method for Stochastic Optimization}
+      \field{year}{2015}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/1412.6980
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/1412.6980
+      \endverb
+    \endentry
+    \entry{kornblith2019cka}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=7fc0edf04cce351dda404579ede3d0d1}{%
+           family={Kornblith},
+           familyi={K\bibinitperiod},
+           given={Simon},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e34c5aa67281924804d54d88e58ca38a}{%
+           family={Norouzi},
+           familyi={N\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d09ea8631bf43468107b5ef02c5195aa}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Honglak},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9a8750ccdb2a4cf14d2655face1ce016}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{85d441f32944674f6dd87a3cae8f2d38}
+      \strng{fullhash}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \strng{fullhashraw}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \strng{bibnamehash}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \strng{authorbibnamehash}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \strng{authornamehash}{85d441f32944674f6dd87a3cae8f2d38}
+      \strng{authorfullhash}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \strng{authorfullhashraw}{91ab27d387c86b37d5cad66ed3c2dfa3}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 36th International Conference on Machine Learning}
+      \field{title}{Similarity of Neural Network Representations Revisited}
+      \field{year}{2019}
+      \field{pages}{3519\bibrangedash 3529}
+      \range{pages}{11}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/1905.00414
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/1905.00414
+      \endverb
+    \endentry
+    \entry{forest2020somsurvey}{misc}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=d32b0bedd4093d060fc28d2076ca0b05}{%
+           family={Forest},
+           familyi={F\bibinitperiod},
+           given={Florent},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cf705749f07e3030e6b29f2b8fe73ff0}{%
+           family={Lebbah},
+           familyi={L\bibinitperiod},
+           given={Mustapha},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ec38dcdf96280b7d4af68612058fae04}{%
+           family={Azzag},
+           familyi={A\bibinitperiod},
+           given={Hanane},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=27ca3f2fa7a3f5b75425ec1186b52755}{%
+           family={Lacaille},
+           familyi={L\bibinitperiod},
+           given={Jérôme},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{e1c1625f84cd62f7a630ffbb6500f5dd}
+      \strng{fullhash}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \strng{fullhashraw}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \strng{bibnamehash}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \strng{authorbibnamehash}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \strng{authornamehash}{e1c1625f84cd62f7a630ffbb6500f5dd}
+      \strng{authorfullhash}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \strng{authorfullhashraw}{fe1acdabf5057e5ffd31bcdb16c2b571}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{arXiv preprint arXiv:2011.05847}
+      \field{title}{A Survey and Implementation of Performance Metrics for Self-Organized Maps}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2011.05847
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2011.05847
+      \endverb
+    \endentry
+    \entry{bouthillier2021variance}{inproceedings}{}{}
+      \name{author}{16}{}{%
+        {{un=0,uniquepart=base,hash=076aa55db09da89f22951e76275f5a3a}{%
+           family={Bouthillier},
+           familyi={B\bibinitperiod},
+           given={Xavier},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4ad151f697635f33f3241b073721e802}{%
+           family={Delaunay},
+           familyi={D\bibinitperiod},
+           given={Pierre},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=60aa9e03ce46a77936812716d80773d9}{%
+           family={Bronzi},
+           familyi={B\bibinitperiod},
+           given={Mirko},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=18e381ef2b1db09dc0841f8d73a7aa0a}{%
+           family={Trofimov},
+           familyi={T\bibinitperiod},
+           given={Assya},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8b6bb769c58e91d2ca2097af4aeae5f5}{%
+           family={Nichyporuk},
+           familyi={N\bibinitperiod},
+           given={Brennan},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=aa2880cdc7557df829cff1485332c231}{%
+           family={Szeto},
+           familyi={S\bibinitperiod},
+           given={Justin},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=93f883796faa940b1f4b0550ad1b0896}{%
+           family={Sepahvand},
+           familyi={S\bibinitperiod},
+           given={Nazanin\bibnamedelima Mohammadi},
+           giveni={N\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=db35e12d9d15263d499e410761247d51}{%
+           family={Raff},
+           familyi={R\bibinitperiod},
+           given={Edward},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=13f5b69775f62263be6d3e19ddbbb86a}{%
+           family={Madan},
+           familyi={M\bibinitperiod},
+           given={Kanika},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=91a7e601d3c2748605fc149072676547}{%
+           family={Voleti},
+           familyi={V\bibinitperiod},
+           given={Vikram},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=dfde180dc4ce66a2c48b1d190846eaa6}{%
+           family={Kahou},
+           familyi={K\bibinitperiod},
+           given={Samira\bibnamedelima Ebrahimi},
+           giveni={S\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ced1b1012187a89d9506463ab279a4a7}{%
+           family={Michalski},
+           familyi={M\bibinitperiod},
+           given={Vincent},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=43fa0a1835ef7557ed75fa3413507dcf}{%
+           family={Arbel},
+           familyi={A\bibinitperiod},
+           given={Tal},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8aa7cbba50b308a24e8ecf9881586f75}{%
+           family={Pal},
+           familyi={P\bibinitperiod},
+           given={Chris},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8dfd6b3615de2946b6e0c1772b3b5827}{%
+           family={Varoquaux},
+           familyi={V\bibinitperiod},
+           given={Gael},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=da21e966c02c3cfd33d74369c7435c1a}{%
+           family={Vincent},
+           familyi={V\bibinitperiod},
+           given={Pascal},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{99faaa808ff467a066ded4aba812372a}
+      \strng{fullhash}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \strng{fullhashraw}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \strng{bibnamehash}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \strng{authorbibnamehash}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \strng{authornamehash}{99faaa808ff467a066ded4aba812372a}
+      \strng{authorfullhash}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \strng{authorfullhashraw}{7fa1a7620d76a75ccfd874edfe2e68cb}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of Machine Learning and Systems}
+      \field{title}{Accounting for Variance in Machine Learning Benchmarks}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2103.03098
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2103.03098
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

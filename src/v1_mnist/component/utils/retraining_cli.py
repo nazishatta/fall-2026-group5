@@ -4,6 +4,8 @@ Stages (run them in this order):
   train        train every arm and seed that is not finished yet (validation images only)
   summary      validation summary of all runs; prints the suggested macro-F1 guard
   final_test   the single test pass; refuses until the protocol is stamped
+  breakdown    exploratory, after final_test: errors fixed per seed and error per class, from the
+               saved test predictions (no model is run)
 Options: --arm NAME / --seed N to run part of the work, --smoke for a quick 2-epoch, 1-seed trial
 that writes to a separate "_smoke" folder (delete it afterwards).
 """
@@ -21,6 +23,7 @@ from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings im
     DEFAULT_CONFIG,
 )
 from src.v1_mnist.component.utils.logging import setup_logger
+from src.v1_mnist.component.utils.retraining_breakdown import run_breakdown
 from src.v1_mnist.component.utils.retraining_data import load_retraining_data
 from src.v1_mnist.component.utils.retraining_final import run_final_test
 from src.v1_mnist.component.utils.retraining_plans import BuildArm
@@ -37,7 +40,7 @@ from src.v1_mnist.component.utils.retraining_summary import write_validation_sum
 from src.v1_mnist.component.utils.run_provenance import write_json
 
 LOGGER = logging.getLogger("v1_mnist.retraining_cli")
-STAGES = ("train", "summary", "final_test")
+STAGES = ("train", "summary", "final_test", "breakdown")
 
 
 def smoke_settings(settings: ExperimentSettings) -> ExperimentSettings:
@@ -69,7 +72,7 @@ def run_experiment_cli(
 
     settings = load_experiment_settings(section, args.config, repo_root)
     if args.smoke:
-        if args.stage == "final_test":
+        if args.stage in ("final_test", "breakdown"):
             sys.exit("--smoke never touches the test split.")
         settings = smoke_settings(settings)
     setup_logger("v1_mnist", settings.output_dir / "logs" / f"{args.stage}.log")
@@ -89,5 +92,7 @@ def run_experiment_cli(
                         arm_name, numbers["largest_drop_overall"]["mean"],
                         numbers["largest_drop_non_hotspot"]["mean"])
         LOGGER.info("Macro-F1 guard suggestion (2 x standard-arm std): %s", summary.get("macro_f1_guard_suggestion"))
-    else:
+    elif args.stage == "final_test":
         run_final_test(settings, repo_root)
+    else:
+        run_breakdown(settings)

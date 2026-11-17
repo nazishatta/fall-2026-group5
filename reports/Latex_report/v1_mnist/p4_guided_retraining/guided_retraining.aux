@@ -1,2 +1,78 @@
 \relax 
-\gdef \@abspage@last{1}
+\abx@aux@refcontext{none/global//global/global/global}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Summary}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Key terms in plain words}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{2}{section.3}\protected@file@percent }
+\newlabel{sec:method}{{3}{2}{Method}{section.3}{}}
+\abx@aux@cite{0}{lecun1998gradient}
+\abx@aux@segm{0}{0}{lecun1998gradient}
+\abx@aux@cite{0}{kingma2015adam}
+\abx@aux@segm{0}{0}{kingma2015adam}
+\abx@aux@cite{0}{kornblith2019cka}
+\abx@aux@segm{0}{0}{kornblith2019cka}
+\abx@aux@cite{0}{forest2020somsurvey}
+\abx@aux@segm{0}{0}{forest2020somsurvey}
+\abx@aux@cite{0}{bouthillier2021variance}
+\abx@aux@segm{0}{0}{bouthillier2021variance}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The feedback loop of Phase 4. The dashed arrow marks the next round, which this report does not run.}}{3}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:loop}{{1}{3}{The feedback loop of Phase 4. The dashed arrow marks the next round, which this report does not run}{figure.caption.1}{}}
+\abx@aux@page{1}{3}
+\abx@aux@page{2}{3}
+\abx@aux@page{3}{3}
+\abx@aux@page{4}{3}
+\abx@aux@page{5}{3}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results of the retraining}{4}{section.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Test results, mean (standard deviation) over 5 seeds. Hotspot error is measured on the 146 test images that fall on hotspot neurons, non-hotspot error on the other 10,354. Both experiments use the same \texttt  {standard} arm.}}{4}{table.caption.2}\protected@file@percent }
+\newlabel{tab:arms}{{1}{4}{Test results, mean (standard deviation) over 5 seeds. Hotspot error is measured on the 146 test images that fall on hotspot neurons, non-hotspot error on the other 10,354. Both experiments use the same \texttt {standard} arm}{table.caption.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The success criteria, fixed before the test split was used. Negative differences mean fewer errors for the first arm; 1 test hotspot image is about 0.7 points. Intervals: paired bootstrap over test images, mean of 5 seeds. The macro-F1 guard is the first arm's macro-F1 minus the second arm's; it may not fall below $-0.0016$.}}{5}{table.caption.3}\protected@file@percent }
+\newlabel{tab:criteria}{{2}{5}{The success criteria, fixed before the test split was used. Negative differences mean fewer errors for the first arm; 1 test hotspot image is about 0.7 points. Intervals: paired bootstrap over test images, mean of 5 seeds. The macro-F1 guard is the first arm's macro-F1 minus the second arm's; it may not fall below $-0.0016$}{table.caption.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces CF1 (standard) and CF2 (augmented\_som): mean test confusion matrices over 5 seeds, and their difference (blue: fewer cases, red: more).}}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:cf_aug}{{2}{5}{CF1 (standard) and CF2 (augmented\_som): mean test confusion matrices over 5 seeds, and their difference (blue: fewer cases, red: more)}{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces CF1 (standard) and CF2 (curriculum\_som), as in Figure~\ref {fig:cf_aug}.}}{5}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:cf_cur}{{3}{5}{CF1 (standard) and CF2 (curriculum\_som), as in Figure~\ref {fig:cf_aug}}{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Validation accuracy per epoch (mean of 5 seeds) for the curriculum arms (top) and the augmentation arms (bottom): all images, hotspot images, and images outside the hotspots.}}{6}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:curves}{{4}{6}{Validation accuracy per epoch (mean of 5 seeds) for the curriculum arms (top) and the augmentation arms (bottom): all images, hotspot images, and images outside the hotspots}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Re-analysis: new SOMs after retraining}{6}{section.5}\protected@file@percent }
+\newlabel{sec:reanalysis}{{5}{6}{Re-analysis: new SOMs after retraining}{section.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces SOM re-analysis on the validation split. Columns 2 to 5 are means over the 5 CNN seeds (the Phase 2 map is a single map). The last two columns are the paired difference per seed, averaged, with its 95\% $t$-interval (4 degrees of freedom); bold means the interval excludes 0. Linear CKA between the networks' embeddings: 0.931 within standard, 0.893 within augmented\_som, 0.917 within augmented\_random, 0.910 between arms.}}{6}{table.caption.7}\protected@file@percent }
+\newlabel{tab:reanalysis}{{3}{6}{SOM re-analysis on the validation split. Columns 2 to 5 are means over the 5 CNN seeds (the Phase 2 map is a single map). The last two columns are the paired difference per seed, averaged, with its 95\% $t$-interval (4 degrees of freedom); bold means the interval excludes 0. Linear CKA between the networks' embeddings: 0.931 within standard, 0.893 within augmented\_som, 0.917 within augmented\_random, 0.910 between arms}{table.caption.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Map measures per arm on validation images. Each dot is one CNN seed (grey lines join the same seed), the black bar is the mean over seeds, and the red dashed line is the Phase 2 map.}}{7}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:reanalysis_measures}{{5}{7}{Map measures per arm on validation images. Each dot is one CNN seed (grey lines join the same seed), the black bar is the mean over seeds, and the red dashed line is the Phase 2 map}{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Neuron purity on validation images for the Phase 2 map and the three arms (seed 1). Red squares mark the hotspot neurons of each map. The hotspots are picked again for every map.}}{7}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:reanalysis_purity}{{6}{7}{Neuron purity on validation images for the Phase 2 map and the three arms (seed 1). Red squares mark the hotspot neurons of each map. The hotspots are picked again for every map}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Errors fixed, and error per digit (exploratory)}{8}{section.6}\protected@file@percent }
+\newlabel{sec:breakdown}{{6}{8}{Errors fixed, and error per digit (exploratory)}{section.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Test errors as counts (mean over the 5 seeds) and the net number of standard's errors each arm removed, per seed (seeds 1 to 5; positive means fewer errors than \texttt  {standard} with the same seed). Net fixed = errors of \texttt  {standard} that the arm gets right, minus new errors the arm makes. Exploratory, computed after the test pass from the saved predictions; all arms in the \texttt  {test\_errors\_fixed.csv} files of the two comparison folders under \texttt  {tables/}.}}{8}{table.caption.10}\protected@file@percent }
+\newlabel{tab:errors_fixed}{{4}{8}{Test errors as counts (mean over the 5 seeds) and the net number of standard's errors each arm removed, per seed (seeds 1 to 5; positive means fewer errors than \texttt {standard} with the same seed). Net fixed = errors of \texttt {standard} that the arm gets right, minus new errors the arm makes. Exploratory, computed after the test pass from the saved predictions; all arms in the \texttt {test\_errors\_fixed.csv} files of the two comparison folders under \texttt {tables/}}{table.caption.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Test error (\%) per digit, mean over 5 seeds. Each digit has 947 to 1,181 test images, so 0.1 points is about one image. Exploratory; paired intervals for every comparison are in the \texttt  {test\_per\_class\_comparisons.csv} files of the two comparison folders under \texttt  {tables/}.}}{8}{table.caption.11}\protected@file@percent }
+\newlabel{tab:per_class}{{5}{8}{Test error (\%) per digit, mean over 5 seeds. Each digit has 947 to 1,181 test images, so 0.1 points is about one image. Exploratory; paired intervals for every comparison are in the \texttt {test\_per\_class\_comparisons.csv} files of the two comparison folders under \texttt {tables/}}{table.caption.11}{}}
+\abx@aux@cite{0}{bouthillier2021variance}
+\abx@aux@segm{0}{0}{bouthillier2021variance}
+\@writefile{toc}{\contentsline {section}{\numberline {7}What the results mean}{9}{section.7}\protected@file@percent }
+\newlabel{sec:meaning}{{7}{9}{What the results mean}{section.7}{}}
+\abx@aux@page{6}{9}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Deviation from the plan}{10}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Leakage Control}{10}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Still open}{10}{section.10}\protected@file@percent }
+\newlabel{sec:open}{{10}{10}{Still open}{section.10}{}}
+\abx@aux@page{7}{10}
+\abx@aux@page{8}{10}
+\abx@aux@page{9}{10}
+\abx@aux@page{10}{10}
+\abx@aux@page{11}{10}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Further confusion matrices and examples}{11}{appendix.A}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces CF2 of augmented\_random, augmented\_msp, augmented\_hotspot and augmented\_random\_hotspot (top to bottom).}}{11}{figure.caption.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces CF2 of augmented\_som\_paced, augmented\_random\_paced, curriculum\_random and curriculum\_msp (top to bottom).}}{12}{figure.caption.13}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Ten training images from the hard pool (left column) and their three altered copies (shift up to 1 pixel, revision r2).}}{13}{figure.caption.14}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Linear CKA between the embeddings of the 15 retrained networks (validation images).}}{14}{figure.caption.15}\protected@file@percent }
+\abx@aux@read@bbl@mdfivesum{BD3AE7F4589794546DF585CCD448EB70}
+\abx@aux@defaultrefcontext{0}{lecun1998gradient}{none/global//global/global/global}
+\abx@aux@defaultrefcontext{0}{kingma2015adam}{none/global//global/global/global}
+\abx@aux@defaultrefcontext{0}{kornblith2019cka}{none/global//global/global/global}
+\abx@aux@defaultrefcontext{0}{forest2020somsurvey}{none/global//global/global/global}
+\abx@aux@defaultrefcontext{0}{bouthillier2021variance}{none/global//global/global/global}
+\gdef \@abspage@last{15}

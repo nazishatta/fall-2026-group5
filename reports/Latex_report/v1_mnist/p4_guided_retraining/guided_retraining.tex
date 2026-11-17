@@ -205,6 +205,18 @@ Table~\ref{tab:reanalysis} gives all measures and Figures~\ref{fig:reanalysis_me
 
 \textbf{How to read this.} Part of the hotspot drop comes from the network making fewer errors overall, not only on the weak regions. The hotspots are the worst neurons of each map, chosen again for every map, so the hotspot error rate of a new map is not measured on the same images as before. The retrained \texttt{standard} networks also have a higher hotspot error rate (0.229) than the Phase 2 map (0.195), so the Phase 2 map is not a fair baseline for the new ones; the comparison between arms is the one to use. With 5 seeds and one SOM seed the intervals are wide, and a clear result for one comparison next to an unclear one should not be over-read. All of this is on MNIST validation data.
 
+\section{Errors fixed, and error per digit (exploratory)}\label{sec:breakdown}
+
+Two questions from the reviews are answered here. Both were added on 2026-11-17, after the single test pass, from the test predictions saved by that pass: no network was retrained or re-run, and no criterion or threshold changed. They are descriptive, not success criteria.
+
+\textbf{How many errors does retraining actually fix?} Percentages hide how few mistakes MNIST leaves, so Table~\ref{tab:errors_fixed} gives counts. Normal training makes about 93 errors on the 10{,}500 test images, 17 of them on the 146 hotspot images. Retraining moves many individual errors: \texttt{augmented\_som} fixes about 40 of \texttt{standard}'s errors per seed and makes about 30 new ones. On the hotspot images the net effect is consistent: \texttt{augmented\_som} has fewer hotspot errors than \texttt{standard} in all 5 seeds (1 to 8 fewer, about 5 on average), while \texttt{augmented\_random} and \texttt{augmented\_msp} each have at least one seed with more. Over all images the net gain (about 11 errors) varies from $-12$ to $+31$ between seeds, so it is not reliable at this sample size. Curriculum training adds 29 to 64 errors in every seed.
+
+\input{tables/summary/errors_fixed.tex}
+
+\textbf{Is the gain only on the SOM's own cells?} Hotspot error favours SOM-guided arms, because the SOM defines the hotspots. Digits are defined by no arm, so Table~\ref{tab:per_class} gives error per digit. No arm helps one digit clearly more than the others. \texttt{augmented\_som} has lower error than \texttt{standard} on 7 of the 10 digits, and its gain is clear only for digit 9 ($-0.33$ points, interval $-0.67$ to $-0.04$). Against its controls, 3 of the 20 per-digit intervals exclude 0, in both directions: \texttt{augmented\_som} is better than \texttt{augmented\_random} on digit 3 and worse on digit 8, and worse than \texttt{augmented\_msp} on digit 1. With 20 intervals about one would exclude 0 by chance alone, so we read these as noise, not as digit-specific effects.
+
+\input{tables/summary/per_class_error.tex}
+
 \section{What the results mean}\label{sec:meaning}
 
 \textbf{How to read the tables.} In Table~\ref{tab:arms}, a higher accuracy and a lower error are better. In Table~\ref{tab:criteria}, the difference is ``first arm minus second arm'' in percentage points of error, so a \emph{negative} number means the first arm made fewer mistakes. If the interval in brackets does not include 0, the difference is probably real. Our test set has 10{,}500 images, so 0.1 points is about 11 images; the hotspots hold only 146 test images, so one image is about 0.7 points.
