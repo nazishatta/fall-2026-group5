@@ -46,6 +46,19 @@ python src/v1_mnist/component/pipeline/p3_novelty_detection/run_novelty_benchmar
 python src/v1_mnist/component/pipeline/p3_novelty_detection/run_qe_novelty_detection.py --only qe_ood --dry-run
 ```
 
+## Standalone runners (not in `run_all.py`)
+
+These steps each have their own config and run ID and are run by hand, in the order shown, after the steps above.
+
+| Phase | Runner | Config | What it does |
+|---|---|---|---|
+| 2 | `p2_som_training_visualization/run_error_pattern_baselines.py` | `error_pattern_baselines.yaml` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots (`--stage som`, `kmeans`, `final`) |
+| 2 | `p2_som_training_visualization/run_error_detector_budget.py` | `error_detector_budget.yaml` | Same-budget comparison: mistakes caught when every score flags the same share of images (exploratory; reads the baseline run) |
+| 2 | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py` (in the component folder, not in `pipeline/`) | `som_optuna.yaml` | Optuna tuning of the three grids and the 5-seed confirmation |
+| 3 | `p3_novelty_detection/run_held_out_class_novelty.py` | `held_out_class_novelty.yaml` | Near novelty: train on 6 digits, the other 4 are novel, 5 class splits (`--stage run`, then `compare`) |
+| 4 | `p4_guided_retraining/run_som_reanalysis.py --config configs/som_reanalysis_msp_arm.yaml` | `som_reanalysis_msp_arm.yaml` | Secondary SOM re-analysis with the least-confident (max-softmax) arm |
+| 4 | `p4_guided_retraining/run_novelty_after_retraining.py` | `novelty_after_retraining.yaml` | Phase 3's novelty scores on the retrained networks (`--stage score`, then `compare`) |
+
 ## Options every runner has
 
 | Option | Meaning |

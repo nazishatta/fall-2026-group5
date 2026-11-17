@@ -1,15 +1,10 @@
-# Phase 1: Model Training Baseline (Weeks 1–2) — Tests
+# Phase 1 tests (`src/v1_mnist/tests/p1_model_training_baseline/`)
 
-> `p1` in the folder name means **Phase 1**.
+Tests for the Phase 1 code, one folder per step, with the same names as `component/p1_model_training_baseline/`. Run them with `python -m pytest src/v1_mnist/tests/p1_model_training_baseline -q`.
 
-Tests for the data split and the LeNet-5 CNN.
+## Folders
 
-```
-p1_model_training_baseline/
-├── data_pipeline/                 # Week 1: split sizes, image properties, class-distribution figure
-│   ├── test_data_loader.py
-│   └── test_class_distribution_figure.py
-└── cnn_baseline_training/         # Week 2: LeNet-5 shape and fc2 layer, 84-D feature extraction
-    ├── test_lenet5.py
-    └── test_feature_extractor.py
-```
+| Folder | What is inside |
+|---|---|
+| [`data_pipeline/`](data_pipeline/README.md) | Tests for the code in `component/p1_model_training_baseline/data_pipeline/`. |
+| [`cnn_baseline_training/`](cnn_baseline_training/README.md) | Tests for the code in `component/p1_model_training_baseline/cnn_baseline_training/`. |

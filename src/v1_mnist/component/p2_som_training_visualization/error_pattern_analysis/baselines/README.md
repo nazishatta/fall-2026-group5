@@ -13,6 +13,7 @@ Plan and deviations: `src/v1_mnist/docs/p2_som_training_visualization/error_patt
 | `result_tables.py` | Summary CSV and the LaTeX table for the report |
 | `baseline_stages.py` | The three stages (`som`, `kmeans`, `final`) |
 | `run_preflight.py` | Refuses to overwrite a finished run |
+| `budget.py`, `budget_stage.py` | Same-budget comparison (exploratory): share of mistakes caught when kNN impurity and max-softmax flag as many images as the hotspot cells hold; runner `run_error_detector_budget.py`, config `error_detector_budget.yaml`, results in `error_detector_budget/` |
 
 Run it with `src/v1_mnist/component/pipeline/p2_som_training_visualization/run_error_pattern_baselines.py` (see its docstring).
 Results go to `outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/error_pattern_baselines/<run_id>/` (for the 15x15 map: `error_pattern_baselines_som_15x15`).

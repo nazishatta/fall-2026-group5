@@ -1,24 +1,27 @@
-# MNIST v1 Source Code (`src/v1_mnist/`)
+# MNIST code, tests and documents (`src/v1_mnist/`)
 
-This directory contains the core source code, pipelines, and tests for the MNIST baseline and NNSOM post-training analysis.
+Everything needed to run the MNIST study: the code, its tests and the written protocols and results. `v1_mnist` is the first versioned code folder; the Fashion-MNIST study will get its own folder next to it.
 
-## Structure
+| Folder | What is inside |
+|---|---|
+| [`component/`](component/README.md) | The code, one folder per project phase and step, plus `pipeline/` (one runner per step and `run_all.py`), `configs/` (every setting) and `utils/` (shared helpers) |
+| [`tests/`](tests/README.md) | pytest tests, in the same phase and step folders as `component/` |
+| [`docs/`](docs/README.md) | Protocols written before the runs, results, explanations, and `DEVIATIONS.md` (every change to a written rule) |
+| [`shellscripts/`](shellscripts/README.md) | Kept for shell scripts; empty for now (the Python runners in `component/pipeline/` are used instead) |
 
-- **`component/`**: the code, arranged by project phase and week (`p` = phase; see `component/README.md`)
-  - `pipeline/`: one runner per week, plus `run_all.py` (see `component/pipeline/README.md`)
-  - `p1_model_training_baseline/`: `data_pipeline/` (Week 1), `cnn_baseline_training/` (Week 2)
-  - `p2_som_training_visualization/`: `som_nnsom_training/` (Week 3), `cluster_analysis/` (Week 4), `error_pattern_analysis/` (Week 5), `interactive_report/` (Weeks 3–5)
-  - `p3_novelty_detection/`, `p4_guided_retraining/`: week folders for Weeks 6–11 (empty for now)
-  - `configs/`: YAML configurations (`base.yaml`, `cnn_baseline.yaml`, `som.yaml`, robustness configs)
-  - `utils/`: config loader, logging, run settings, shared SOM I/O, statistics and heatmap helpers
-- **`tests/`**: unit and regression tests, in the same phase/week folders (see `tests/README.md`)
-  - `p1_model_training_baseline/`: `data_pipeline/` (Week 1), `cnn_baseline_training/` (Week 2)
-  - `p2_som_training_visualization/`: `som_nnsom_training/` (Week 3), `cluster_analysis/` (Week 4), `error_pattern_analysis/` (Week 5)
-  - `p3_novelty_detection/`, `p4_guided_retraining/`: ready for upcoming tests
-- **`docs/`**: documents, in the same phase/week folders (see `docs/README.md`)
-  - `p1_model_training_baseline/cnn_baseline_training/`: `cnn_baseline.md` (Week 2)
-  - `p2_som_training_visualization/som_nnsom_training/`: SOM grid-size protocol, pre-registered fair test and results (Week 3)
-  - `p2_som_training_visualization/error_pattern_analysis/`: error-pattern robustness criteria and results (Week 5)
-  - `DEVIATIONS.md`: project-wide log of rule deviations and changes
-- **`shellscripts/`**: Convenience shell scripts
-  - `run_cnn_baseline.sh`: runs the Week 1 and Week 2 runners
+The results of the code are written to `outputs/v1_mnist/`, in the same phase and step folders.
+
+## The four phases
+
+| Phase | Code folder | Steps, in order |
+|---|---|---|
+| 1: Model Training Baseline | `component/p1_model_training_baseline/` | `data_pipeline`, `cnn_baseline_training` |
+| 2: SOM Training & Visualization | `component/p2_som_training_visualization/` | `som_nnsom_training`, `cluster_analysis`, `error_pattern_analysis`, `interactive_report` |
+| 3: Novelty Detection | `component/p3_novelty_detection/` | `qe_novelty_detection`, `u_matrix_analysis`, `novelty_benchmark`, `held_out_class_novelty` |
+| 4: Guided Retraining | `component/p4_guided_retraining/` | `hard_example_mining`, `targeted_augmentation`, `som_reanalysis`, `novelty_after_retraining` |
+
+Run the tests from the code root (the folder that holds `src/` and `outputs/`):
+
+```bash
+python -m pytest src/v1_mnist/tests -q
+```
