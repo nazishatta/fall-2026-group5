@@ -1,0 +1,31 @@
+{
+  "config_sha256": "08fd844bb46c41079ad821529da98877d3aad7849babae3f5b2c3875ecd6cff6",
+  "frozen_split_sha256": {
+    "train_features.npy": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "train_labels.npy": "34459b6379469ff1d1c8b542c8d2e0b5123e31e38f5f2438b988d36c04a4fae6",
+    "train_sample_ids.npy": "1ff83cdd6fc192167faa2027ee8436cdcb1925e191e08a1c878b5d6b24844734",
+    "val_features.npy": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d",
+    "val_labels.npy": "71b77973655a26f2b69b47a2c5f2234986f144deab02d45b623de44fe5d788ac",
+    "val_preds.npy": "d16f146f25d970993e463db274ff85bbeb846df23f639a440ca525604385dab4",
+    "val_sample_ids.npy": "3f1b5cfbc01232a33bb7f8ecb88b59ff01672a641ae0048569f3dd353f30c4fa"
+  },
+  "input_configs_sha256": {
+    "baselines_config": "e6ad188ff478d3b566d8154c05cdf1fd8ce6ae2decb0f1a24d8f0c0d67b8b519",
+    "cnn_config": "7f277507f9f327e804f281a0f6804dbb43e50e207546db641c7dcda6f01e40e5",
+    "phase3_provenance_config": "3b25158b6f7d6a2916c694650a9aae7d42518f7712f0091564cd437752b7e493",
+    "som_config": "6594eb79bef8df4fb1f4215f5a5704a7bddb39acf540e869ac7954e4a37d7d72"
+  },
+  "layers": [
+    "fc1",
+    "fc2"
+  ],
+  "protocol_sha256": "03a42dec56e57bde7a7584592a4c20ed3eeedf8d1afb972cf037a180bc573720",
+  "run_id": "feature_layer_ablation_som15x15_nb11_ep250_seeds5",
+  "som_seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ]
+}
