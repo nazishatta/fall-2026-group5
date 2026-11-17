@@ -10,7 +10,7 @@
 {\Large\bfseries Where Do Neural Networks Fail?\par}
 {\large\bfseries Post-Training Analysis and Novelty Detection Using\\ Neural Network Self-Organizing Maps (NNSOM)\par}
 \vspace{6pt}
-{\normalsize Capstone Group 5: Fyrooz Khan, Nazish Atta\par}
+{\normalsize Capstone Group 5: Fyrooz Anika Khan, Nazish Atta\par}
 {\small DATS 6501 Capstone, Fall 2026, The George Washington University. Supervised by Dr.\ Amir Jafari.\par}
 \end{center}
 
@@ -18,7 +18,9 @@
 \noindent We ask where a convolutional network (CNN) fails and whether a self-organizing map (SOM) trained on its internal features can help. A LeNet-5 reaches 99.18\% test accuracy on MNIST. On a 15$\times$15 SOM its few mistakes gather in 11 cells that hold 11.1 times their fair share, but the CNN's own confidence finds mistakes better than the map does (AUROC 0.981 against 0.685).
 As a novelty detector, the SOM's quantization error separates SVHN images from MNIST well (AUROC 0.981), yet energy (0.9998) and max-softmax (0.9985) do better. What the SOM adds is a picture of \emph{where}: the SVHN images land on only 28 of the 225 cells.
 Used to guide retraining, SOM-chosen hard images with altered copies cut the mistakes in the error cells from 11.4\% to 7.8\% over five seeds, without raising the error elsewhere. Choosing the images the CNN is least sure about worked about as well, and letting the hard images in slowly (curriculum learning) made the CNN worse.
-New SOMs trained on the retrained CNNs have smaller weak regions but not purer cells. Every result is compared with a control or a chance level, and unmeasured items are marked.
+New SOMs trained on the retrained CNNs have smaller weak regions but not purer cells, and the SOM still detects SVHN after retraining.
+Our main contribution is to show that, as a guide for retraining, the SOM does as well as the CNN's own confidence, and that unlike that confidence it also shows where the errors cluster and why: in a few cells where two digit classes overlap.
+Every result is compared with a control or a chance level, and unmeasured items are marked.
 \par\smallskip
 \noindent\textbf{Keywords:} self-organizing map, post-training analysis, error analysis, novelty detection, MNIST.
 \end{abstract}
@@ -81,39 +83,24 @@ We rescale them to the range $-1$ to $1$, using the training data only (Figure~\
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  font=\scriptsize, node distance=5mm and 4mm,
-  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=10mm, text width=30mm, fill=GWBlue!6, line width=0.6pt},
-  todo/.style={box, dashed, fill=white, draw=GWBlue!70},
-  tag/.style={font=\bfseries\scriptsize, text=GWBlue, anchor=south west, inner sep=1pt},
-  arr/.style={-{Stealth[length=2mm]}, line width=0.6pt, draw=GWBlue}]
-\node[box] (data) {MNIST\\70,000 images};
-\node[box, right=of data] (split) {Stratified split\\49,000 / 10,500 / 10,500};
-\node[box, right=of split] (cnn) {Baseline LeNet-5\\99.18\% test accuracy};
-\node[box, right=of cnn] (emb) {fc2 embeddings\\84 dimensions};
-\node[tag] at (data.north west) {Phase 1: Model Training Baseline};
-\node[box, below=9mm of emb] (som) {SOM training\\NNSOM 15$\times$15};
-\node[box, left=of som] (viz) {SOM visualization\\U-matrix, hit histogram};
-\node[box, left=of viz] (cluster) {Cluster analysis\\purity, class overlap};
-\node[box, left=of cluster] (err) {Error pattern analysis\\hotspots, baseline checks};
-\node[tag] at (err.north west) {Phase 2: SOM Training and Visualization};
-\node[box, below=9mm of err] (nov) {Novelty detection\\quantization error, U-matrix};
-\node[box, right=of nov] (cmp) {Comparative evaluation\\max-softmax, energy, Mahalanobis, \dots};
-\node[box, right=of cmp] (retrain) {Guided retraining\\hard examples, augmentation};
-\node[box, right=of retrain] (rean) {Iterative SOM re-analysis\\before / after};
-\node[tag, anchor=north west] at (nov.south west) {Phases 3 and 4};
-\draw[arr] (data) -- (split); \draw[arr] (split) -- (cnn); \draw[arr] (cnn) -- (emb);
-\draw[arr] (emb) -- (som); \draw[arr] (som) -- (viz); \draw[arr] (viz) -- (cluster); \draw[arr] (cluster) -- (err);
-\draw[arr] (err) -- (nov); \draw[arr] (nov) -- (cmp);
-\draw[arr] (cmp) -- (retrain); \draw[arr] (retrain) -- (rean);
-\end{tikzpicture}
+% Diagrams are drawn in draw.io: each has an editable .drawio source, a .drawio.svg export and the PDF used here, all in fig/diagrams/.
+\includegraphics[width=\linewidth]{diagrams/project_pipeline.pdf}
 \caption{The project pipeline, from the baseline CNN (Phase 1) and the SOM (Phase 2) to novelty detection (Phase 3) and guided retraining with a new SOM (Phase 4).}
 \label{fig:pipeline}
 \end{figure}
 
 \subsection{Self-Organizing Map}
 
-We train a 15$\times$15 map (225 cells) on the 49,000 training embeddings. Each image is assigned to the cell whose weights are closest to it, called its best-matching neuron (BMU).
+A SOM is a competitive network: a layer of neurons, each with a weight vector of the same length as the input, arranged on a grid \parencite{kohonen1990som,hagan2014nnd_ch16}. For each input, the neurons compete, and the one whose weights are closest wins. The winner and the neurons near it on the grid then move their weights toward the input. Because neighbours learn together, neighbouring cells end up holding similar inputs, so the grid becomes a flat picture of the data. Figure~\ref{fig:som_explained} shows these steps for our project.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{diagrams/som_explained.pdf}
+\caption{How the self-organizing map works in this project, following the competitive-network chapter of \textcite{hagan2014nnd_ch16} and its batch version \parencite{hagan2014nnd_ch26}. (a)~Each image is turned into an 84-number embedding by the fixed CNN. (b)~The neuron whose weight vector is closest wins, and the winner and its grid neighbours move toward the embedding, so neighbouring cells end up holding similar images. (c)~After training, each cell is labelled by its images: their most common digit, how mixed the digits are, and how often the CNN is wrong there (hotspots). An image far from its best cell (large quantization error, QE) is unlike the training data. The grids are schematic; the real map has 15$\times$15 hexagonal cells.}
+\label{fig:som_explained}
+\end{figure}
+
+We train a 15$\times$15 map (225 cells) on the 49,000 training embeddings with the batch rule of NNSOM \parencite{jafari_nnsom,hagan2014nnd_ch26}. Each image is assigned to the cell whose weights are closest to it, called its best-matching neuron (BMU).
 We judge the map with two numbers. The quantization error (QE) is the average distance between an image and its cell. The topological error (TE1) is the share of images whose two closest cells are not neighbors on the grid.
 
 We tried three grid sizes (10$\times$10, 15$\times$15 and 20$\times$20) under the same conditions: the same data, three starting neighborhood sizes, ten maps per grid, and validation data only.
@@ -121,6 +108,7 @@ Larger grids fit the data more closely (QE 1.21, 1.06 and 0.98) and have slightl
 The grids are not clearly different at predicting the CNN's mistakes: the AUROC difference between 20$\times$20 and 15$\times$15 is $+0.001$ (95\% range $-0.100$ to $+0.089$), so the comparison is inconclusive.
 Since no grid is clearly better, we use the 15$\times$15 map for the main analysis. It has good purity and a lower topological error than the 20$\times$20 map.
 We repeat the error analysis on the other two grids to check that the conclusions do not depend on this choice.
+As a further check on the settings, we tuned the starting neighbourhood size and the number of epochs of each grid with Optuna's TPE sampler \parencite{akiba2019optuna}: 20 trials per grid, scored on validation QE and TE1 only, followed by five new training seeds for the best setting. For the 15$\times$15 map the tuned setting was not clearly better than ours (QE $+0.005$, 95\% interval $-0.003$ to $+0.013$; TE1 $-0.14$ points, $-0.81$ to $+0.53$), so the map used in this report stays the same. Tuning did find a better 10$\times$10 setting; that grid is used only for the robustness check.
 
 \subsection{Finding where mistakes gather}
 
@@ -140,7 +128,7 @@ We also compute the Spearman correlation between a cell's error rate and its pur
 We repeat the analysis with three simple methods: (a)~k-means with 225 clusters (the same number as SOM cells); (b)~the impurity of the 15 nearest training embeddings; and
 (c)~the network's maximum softmax probability \parencite{hendrycks2017baseline}, meaning how sure the network is of its answer.
 Each score is judged on the same validation images by the area under the ROC curve (AUROC), which says how well the score separates mistakes from correct answers (1 is perfect, 0.5 is chance). We give bootstrap confidence intervals.
-None of these methods depends on the dataset, so they can also be used on Fashion-MNIST and CIFAR-10.
+None of these methods depends on the dataset, so they can also be used on Fashion-MNIST.
 
 \subsection{Phase 3: Novelty detection}
 
@@ -163,16 +151,7 @@ The test images were used once.
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  font=\scriptsize, node distance=9mm,
-  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=11mm, minimum width=38mm, fill=GWBlue!6, line width=0.6pt},
-  arr/.style={-{Stealth[length=2mm]}, line width=0.7pt, draw=GWBlue}]
-\node[box] (a) {\textbf{1. SOM analysis}\\ 11 hotspot cells,\\ 4,217 hard images};
-\node[box, right=of a] (b) {\textbf{2. Targeted retraining}\\ curriculum or\\ augmented copies};
-\node[box, right=of b] (c) {\textbf{3. New SOMs}\\ trained on the retrained\\ CNNs (15 maps)};
-\draw[arr] (a)--(b); \draw[arr] (b)--(c);
-\draw[arr, dashed] (c.south) -- ++(0,-6mm) -| (a.south);
-\end{tikzpicture}
+\includegraphics[width=0.9\linewidth]{diagrams/guided_retraining_loop.pdf}
 \caption{The feedback loop of Phase 4. The dashed arrow marks a next round, which we did not run.}
 \label{fig:loop}
 \end{figure}
@@ -188,27 +167,7 @@ For a fair comparison, CF1 is not the single Phase 1 model but the average over 
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  font=\scriptsize, node distance=6mm,
-  box/.style={draw=GWBlue, rounded corners=2pt, align=center, minimum height=9mm, minimum width=19mm, fill=GWBlue!6, line width=0.6pt},
-  som/.style={box, dashed, fill=white},
-  cf/.style={draw=GWBlue, fill=white, minimum width=22mm, minimum height=14mm, align=center, line width=0.6pt},
-  arr/.style={-{Stealth[length=2mm]}, line width=0.6pt, draw=GWBlue}]
-\node[box] (s1) {Sample};
-\node[box, right=of s1] (c1) {CNN};
-\node[box, right=of c1] (p1) {Prediction};
-\node[cf, right=of p1] (m1) {CF1\\confusion matrix\\(as in Phase 1)};
-\node[box, below=14mm of s1] (s2) {Sample};
-\node[som, right=of s2] (g2) {SOM-guided\\retraining};
-\node[box, right=of g2] (c2) {CNN};
-\node[box, right=of c2] (p2) {Prediction};
-\node[cf, right=of p2] (m2) {CF2\\confusion matrix\\(after retraining)};
-\draw[arr] (s1)--(c1); \draw[arr] (c1)--(p1); \draw[arr] (p1)--(m1);
-\draw[arr] (s2)--(g2); \draw[arr] (g2)--(c2); \draw[arr] (c2)--(p2); \draw[arr] (p2)--(m2);
-\node[font=\bfseries\scriptsize, text=GWBlue, anchor=south west] at (s1.north west) {Path 1: CNN only};
-\node[font=\bfseries\scriptsize, text=GWBlue, anchor=south west] at (s2.north west) {Path 2: SOM-assisted CNN};
-\draw[arr, dashed] (m1.south) -- ++(0,-5mm) -| node[pos=0.25, above, font=\scriptsize\itshape] {comparison of predictions} (m2.north);
-\end{tikzpicture}
+\includegraphics[width=0.9\linewidth]{diagrams/end_to_end_comparison.pdf}
 \caption{End-to-end comparison: sample $\rightarrow$ CNN $\rightarrow$ prediction (CF1) against sample $\rightarrow$ SOM-guided retraining $\rightarrow$ CNN $\rightarrow$ prediction (CF2), on the same test samples. The dashed box is the step that uses the SOM.}
 \label{fig:endtoend}
 \end{figure}
@@ -305,7 +264,7 @@ Mahalanobis distance & 0.7764 & 0.7859 & 0.3131 \\ \hline
 Isolation Forest$^\dagger$ & 0.2383 & 0.5552 & 0.8718 \\ \hline
 Autoencoder (unscaled inputs)$^\dagger$ & 0.0077 & 0.4979 & 0.9999 \\ \hline
 \end{tabular}
-\caption{Novelty detection with 10,500 MNIST validation images as normal data and 26,032 SVHN test images as novel data. Rows marked $^\dagger$ come from the original benchmark (one recorded seed); the others come from a later run on the same images. A random score gives AUROC 0.505. FPR at 95\% TPR is a proportion. The CNN and SOM are fixed, so the intervals (QE: 0.979--0.983; energy: 0.9997--0.9999) show sampling uncertainty only, not variation between trainings. These comparisons were set up after the SVHN results were seen, so they are exploratory.}
+\caption{Novelty detection with 10,500 MNIST validation images as normal data and 26,032 SVHN test images as novel data. Rows marked $^\dagger$ come from the original benchmark (one recorded seed); the others come from a later run on the same images. A random score gives AUROC 0.505. FPR at 95\% TPR is a proportion. The CNN and SOM are fixed, so the intervals (QE: 0.979--0.983; energy: 0.9997--0.9999) show sampling uncertainty only, not variation between trainings. For that variation: on the 15 CNNs retrained in Phase 4 (each with its own new SOM), QE's AUROC on the same images ranged from 0.965 to 0.993 (Section~\ref{sec:p4results}). These comparisons were set up after the SVHN results were seen, so they are exploratory.}
 \label{tab:novelty}
 \end{table}
 
@@ -330,22 +289,24 @@ Forgetting was not a problem: in every arm the largest drop in validation accura
 \centering
 \renewcommand{\arraystretch}{1.12}
 \small
-\begin{tabular}{|p{0.31\textwidth}|C{0.14\textwidth}|C{0.14\textwidth}|C{0.15\textwidth}|C{0.13\textwidth}|}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.31\textwidth}|C{0.14\textwidth}|C{0.14\textwidth}|C{0.15\textwidth}|C{0.13\textwidth}|}
 \hline
  & \multicolumn{2}{c|}{\textbf{Test images}} & \multicolumn{2}{c|}{\textbf{New SOM (validation)}} \\ \hline
 \textbf{Selection of hard images} & \textbf{Accuracy (\%)} & \textbf{Hotspot error (\%)} & \textbf{Hotspot error rate} & \textbf{Purity} \\ \hline
 None (normal training, CF1) & 99.11 & 11.4 & 0.229 & 0.982 \\ \hline
 Random (augmentation) & 99.18 & 10.3 & 0.206 & 0.981 \\ \hline
-Least confident (augmentation) & 99.25 & 8.5 & not run & not run \\ \hline
+Least confident (augmentation) & 99.25 & 8.5 & n/a & n/a \\ \hline
 SOM-guided (augmentation, CF2) & 99.21 & 7.8 & 0.175 & 0.982 \\ \hline
-SOM-guided (curriculum) & 98.66 & 21.4 & not run & not run \\ \hline
+SOM-guided (curriculum) & 98.66 & 21.4 & n/a & n/a \\ \hline
 \end{tabular}
-\caption{Retraining results, mean over 5 seeds. Test columns: accuracy on all 10,500 test images and error on the 146 test images in the hotspots. New SOM columns: error rate in the 11 worst cells and purity of a new 15$\times$15 SOM trained on each retrained CNN, measured on validation images (the hotspots are chosen again for each map). The Phase 1 model (99.18\%) is a single run and is not in this table. Novelty AUROC after retraining is [TBD].}
+\caption{Retraining results, mean over 5 seeds. Test columns: accuracy on all 10,500 test images and error on the 146 test images in the hotspots. New SOM columns: error rate in the 11 worst cells and purity of a new 15$\times$15 SOM trained on each retrained CNN, measured on validation images (the hotspots are chosen again for each map). The Phase 1 model (99.18\%) is a single run and is not in this table. n/a: not re-analysed. The SOM re-analysis protocol fixed in advance to re-analyse only normal training and the two augmentation arms with a measured effect (SOM-guided and random); the least-confident and curriculum arms were not part of it. Novelty detection after retraining is reported in the text below.}
 \label{tab:retraining}
 \end{table}
 
 \textbf{What the new maps show.} The hotspots of the new SOM after SOM-guided augmentation hold fewer mistakes than after normal training (error rate 0.175 against 0.229, lower in all 5 seeds). But the cells are not purer (0.982 for both), so the class boundaries did not get sharper by our measure. Against random augmentation the hotspot drop (0.175 against 0.206) is not clear, since its interval includes zero.
 The map stayed as well ordered as before (topographic error did not rise). Figure~\ref{fig:reanalysis} shows the measures for each seed. So the map after retraining has smaller weak regions, but it does not have cleaner classes.
+
+\textbf{Novelty detection after retraining.} We repeated the Phase 3 test (MNIST validation images against SVHN) on every retrained CNN, with a new SOM for each one and the same four detectors as before. The SOM still separates SVHN from MNIST in every retrained network (lowest AUROC 0.965). SOM-guided retraining raised its AUROC slightly on average (0.984 against 0.976 for normal training), but the difference is not clear ($+0.008$, 95\% interval $-0.014$ to $+0.030$), and the same holds against random augmentation ($+0.0005$, $-0.016$ to $+0.017$). Max-softmax (about 0.998) and energy (about 0.9996) stay better in every network. Embedding length alone still separates SVHN almost perfectly (0.9998 to 0.9999), so, as in Phase 3, the SVHN result says more about SVHN's short embeddings than about the map.
 
 \begin{figure}[H]
 \centering
@@ -379,20 +340,20 @@ Letting the hard images in slowly (curriculum) did not help, and the cells of th
 
 \textbf{Limitations.}
 (1)~We have only 92 validation mistakes, so the intervals are wide, and differences below about 0.1 AUROC cannot be seen.
-(2)~MNIST is easy. Harder datasets (Fashion-MNIST, CIFAR-10) are needed before we can draw general conclusions.
+(2)~MNIST is easy. A harder dataset (Fashion-MNIST) is needed before we can draw general conclusions.
 (3)~The grid comparison could not separate the three grid sizes, so the choice of 15$\times$15 rests on a trade-off between purity and topological error, not on a clear winner.
 (4)~The baseline comparison covers only the 15$\times$15 map and uses three k-means starts per seed.
 (5)~We also used the validation images to choose the CNN checkpoint.
 (6)~The novelty results use one pair of datasets (MNIST against SVHN), one CNN and one SOM, so the intervals show only sampling noise. SVHN embeddings are much shorter than MNIST ones, so the results may not carry over to sets that look more like MNIST, such as Fashion-MNIST. The Phase 3 comparisons were set up after the SVHN results were seen.
 (7)~In Phase 4 only 146 test images lie in the hotspots, so the hotspot intervals are wide. The hotspots come from the SOM, which gives the SOM-guided arms a built-in advantage on hotspot error. The pools come from one SOM, and five seeds can only separate fairly large differences.
 (8)~The first set of augmentation settings (shifts of up to 2 pixels) failed a check made before training: the validation accuracy of the CNN fell from 99.12\% to 95.83\% on the altered images. We lowered the shift to 1 pixel, which passed (98.21\%), and all augmentation results use this version.
-(9)~We have not measured the novelty AUROC of the retrained CNNs. It is [TBD].
+(9)~After retraining, the novelty test again uses only SVHN, whose short embeddings make it easy to detect, and five seeds cannot separate AUROC differences of about 0.01.
 
 \section{Conclusion}
 
 On MNIST, a SOM trained on a CNN's embeddings shows where the CNN's few mistakes gather: in a small set of cells where digits overlap, far beyond chance. The map does not find mistakes or novel inputs better than simple scores, and the CNN's own confidence and energy score do better at both jobs (mistakes: 0.981 against 0.685 AUROC; SVHN: 0.9985 and 0.9998 against 0.981).
 Its value is that it shows where. SVHN collapses onto 28 of 225 cells, and the hotspot cells could be used to pick images for retraining. Augmenting the hard images from the hotspots lowered the mistakes there from 11.4\% to 7.8\% without hurting the rest, and the new SOM has smaller weak regions. Curriculum learning did not help, and the cells of the new map did not become purer.
-The next steps are to measure the novelty AUROC of the retrained CNNs, which is still [TBD], and to repeat the tests on Fashion-MNIST and CIFAR-10, where the CNN makes more mistakes and the gains may be larger.
+After retraining the SOM still detects SVHN, but no better than before. The next step is to repeat the whole study on Fashion-MNIST, where the CNN makes more mistakes and the gains may be larger, and to add a novel set that looks more like the training data.
 
 \clearpage
 \printbibliography[title={References}]
