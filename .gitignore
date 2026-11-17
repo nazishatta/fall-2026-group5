@@ -87,3 +87,28 @@ outputs/**
 reports/Latex_report/**/fig/*.pdf
 reports/Latex_report/**/figures/**/*.pdf
 !reports/Latex_report/**/gwu_logo.pdf
+# The final report's figures are small (under 300 KB each) and are kept in git, so the
+# report builds from a clean clone (Reviews #5 to #9).
+!reports/Latex_report/v1_mnist/Final_report/fig/*.pdf
+
+# LaTeX build files, in every report and in the paper (the compiled .pdf stays in git).
+reports/**/*.aux
+reports/**/*.bbl
+reports/**/*.bcf
+reports/**/*.blg
+reports/**/*.fdb_latexmk
+reports/**/*.fls
+reports/**/*.out
+reports/**/*.run.xml
+reports/**/*.synctex.gz
+reports/**/*.toc
+research_paper/**/*.aux
+research_paper/**/*.bbl
+research_paper/**/*.bcf
+research_paper/**/*.blg
+research_paper/**/*.fdb_latexmk
+research_paper/**/*.fls
+research_paper/**/*.out
+research_paper/**/*.run.xml
+research_paper/**/*.synctex.gz
+research_paper/**/*.toc
