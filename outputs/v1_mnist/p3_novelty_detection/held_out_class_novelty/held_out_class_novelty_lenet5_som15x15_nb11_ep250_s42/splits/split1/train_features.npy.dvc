@@ -1,0 +1,5 @@
+outs:
+- md5: a02c910fd8c93584d88b41f2ee22f07e
+  size: 9885920
+  hash: md5
+  path: train_features.npy
