@@ -93,7 +93,7 @@ def top_confusion_pairs(
     """
     wrong = labels != predictions
     tally: dict[tuple[int, int], int] = {}
-    for true_class, predicted in zip(labels[wrong].tolist(), predictions[wrong].tolist()):
+    for true_class, predicted in zip(labels[wrong].tolist(), predictions[wrong].tolist(), strict=True):
         tally[(true_class, predicted)] = tally.get((true_class, predicted), 0) + 1
     ranked = sorted(tally.items(), key=lambda item: (-item[1], item[0][0], item[0][1]))
     return [(pair[0], pair[1], errors) for pair, errors in ranked[:count]]
@@ -126,7 +126,7 @@ def overlay_rows(
     return [
         {"true_class": true_class, "predicted_class": predicted, "pair_errors": errors,
          "neuron_id": int(neuron), "count": int(per_neuron[neuron])}
-        for (true_class, predicted, errors), per_neuron in zip(pairs, counts)
+        for (true_class, predicted, errors), per_neuron in zip(pairs, counts, strict=True)
         for neuron in np.flatnonzero(per_neuron)
     ]
 
@@ -239,7 +239,7 @@ def main() -> None:
     if not pairs:
         raise RuntimeError("There are no validation errors, so there is no confusion to draw.")
     counts = [pair_neuron_counts(assignments, t, p, len(table_rows)) for t, p, _ in pairs]
-    for (true_class, predicted, errors), per_neuron in zip(pairs, counts):
+    for (true_class, predicted, errors), per_neuron in zip(pairs, counts, strict=True):
         if int(per_neuron.sum()) != errors:
             raise RuntimeError(f"Pair {true_class}->{predicted}: neuron counts do not add up to {errors}.")
 

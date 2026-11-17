@@ -47,12 +47,10 @@ if TYPE_CHECKING:
     from src.v1_mnist.component.utils.som_types import SOMModel
 
 import argparse
-import csv
 import json
 from importlib.metadata import version
 from pathlib import Path
 import shutil
-import subprocess
 import sys
 
 import numpy as np
@@ -71,11 +69,15 @@ from src.v1_mnist.component.utils.som_io import (  # noqa: E402
     write_sample_assignments,
 )
 from src.v1_mnist.component.p2_som_training_visualization.cluster_analysis.cluster_metrics import (  # noqa: E402
-    ClusterMetrics,
     compute_cluster_metrics,
     purity_label_shuffle,
     weighted_cluster_purity,
     weighted_mean_entropy,
+)
+from src.v1_mnist.component.p2_som_training_visualization.cluster_analysis.cluster_outputs import (  # noqa: E402
+    git_commit,
+    write_cluster_table,
+    write_metadata,
 )
 from src.v1_mnist.component.utils.run_settings import (  # noqa: E402
     DEFAULT_CONFIG,
@@ -118,45 +120,6 @@ def check_quantization_error(split: str, recomputed: float, training_run: float,
         "relative_difference": relative_difference,
         "relative_tolerance": rtol,
     }
-
-
-def write_cluster_table(
-    path: Path, metrics: list[ClusterMetrics], coordinates: np.ndarray, num_classes: int,
-) -> None:
-    """One row per neuron, in neuron order, with the neuron's position on the map."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    fieldnames = [
-        "neuron_id",
-        "pos_0",
-        "pos_1",
-        "support",
-        "dominant_class",
-        "dominant_count",
-        "purity",
-        "normalized_entropy",
-    ] + [f"class_{i}_count" for i in range(num_classes)]
-
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-
-        for metric in metrics:
-            row = {
-                "neuron_id": metric.neuron_id,
-                "pos_0": float(coordinates[0, metric.neuron_id]),
-                "pos_1": float(coordinates[1, metric.neuron_id]),
-                "support": metric.support,
-                "dominant_class": metric.dominant_class,
-                "dominant_count": metric.dominant_count,
-                "purity": metric.purity,
-                "normalized_entropy": metric.normalized_entropy,
-            }
-
-            for class_id, count in enumerate(metric.class_counts):
-                row[f"class_{class_id}_count"] = count
-
-            writer.writerow(row)
 
 
 def purity_null_settings(config_path: Path) -> tuple[int, int]:
@@ -283,32 +246,6 @@ def analyze_split(
         )
 
     return summary
-
-
-def git_commit(repo_root: Path) -> str:
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=repo_root, text=True, stderr=subprocess.DEVNULL,
-        ).strip()
-    except Exception:
-        return "unknown"
-
-
-def write_metadata(folder: Path, input_hashes: dict[str, str]) -> None:
-    """metadata/input_hashes.json and metadata/artifact_hashes.json (every other file in folder)."""
-    metadata_dir = folder / "metadata"
-    metadata_dir.mkdir(parents=True, exist_ok=True)
-    (metadata_dir / "input_hashes.json").write_text(
-        json.dumps(input_hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8",
-    )
-    artifact_hashes = {
-        p.relative_to(folder).as_posix(): sha256_file(p)
-        for p in sorted(folder.rglob("*"))
-        if p.is_file() and p.name != "artifact_hashes.json"
-    }
-    (metadata_dir / "artifact_hashes.json").write_text(
-        json.dumps(artifact_hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8",
-    )
 
 
 def main() -> None:
