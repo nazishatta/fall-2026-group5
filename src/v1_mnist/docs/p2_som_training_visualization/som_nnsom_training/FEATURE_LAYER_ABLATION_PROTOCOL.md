@@ -93,4 +93,25 @@ validation for A3. Nothing is tuned on any measure. The MNIST test split is not 
 
 ## 8. Recorded outcome
 
-[TBD: filled in after the run, from `tables/`; sections 1 to 7 stay unchanged.]
+Run `feature_layer_ablation_som15x15_nb11_ep250_seeds5`, finished 2026-11-17 on EC2 (protocol committed
+before the run in `de5c268`). Source: `tables/statements.csv`, `tables/cell_measures.csv` and `results.json`.
+Differences are fc1 minus fc2, mean over SOM seeds 1 to 5, with the 95% paired t-interval.
+
+| Statement | fc1 | fc2 | fc1 − fc2 | 95% interval | Seeds with fc1 larger | Verdict |
+|---|---|---|---|---|---|---|
+| L1 (primary): A1 error-cell AUROC | 0.622 | 0.685 | −0.062 | −0.073 to −0.052 | 0 of 5 | **fc2 better** |
+| L2: A2 weighted purity | 0.961 | 0.982 | −0.021 | −0.022 to −0.020 | 0 of 5 | **fc2 better** |
+| L3: A3 QE novelty AUROC (SVHN) | 0.986 | 0.981 | +0.005 | +0.003 to +0.006 | 5 of 5 | **fc1 better** |
+
+Reported, not judged: hotspot error share 0.317 (fc1) against 0.376 (fc2), −0.059 (−0.085 to −0.032);
+hotspot error rate 0.130 against 0.196; first-order topographic error 5.45% against 6.35%; all 225 neurons
+occupied in every map.
+
+**Reading (section 4 rules):** L1 "fc2 better": the choice of `fc2` is supported; its maps locate the CNN's
+mistakes better and are purer. L3 "fc1 better": `fc1` separates SVHN slightly better, but the difference
+(0.005 AUROC) is small next to the gap between QE and max-softmax or energy (Phase 3), so it does not change
+the novelty conclusion. The headline layer stays `fc2`, as fixed in section 2.
+
+**Reproduction check (section 2):** the `fc2` embeddings extracted here differ from Phase 1 by at most
+3.8e-6 (train and validation), and the predictions are identical. The `fc2` maps of seeds 1 to 5 reproduce
+the headline map's values (error-cell AUROC 0.685, purity 0.982, QE AUROC 0.981).

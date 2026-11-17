@@ -12,6 +12,7 @@ Results are grouped by **project phase** and, inside each phase, by **step**, in
 | | 2 | [`p1_model_training_baseline/cnn_baseline_training/`](p1_model_training_baseline/cnn_baseline_training/README.md) | LeNet-5 checkpoint, 84-number embeddings of every split, training curves, test metrics, logs |
 | **2: SOM Training & Visualization** | 3 | [`p2_som_training_visualization/som_nnsom_training/`](p2_som_training_visualization/som_nnsom_training/README.md) | Trained SOMs, run logs, `run_manifest.csv`, QE histories and curves, SOM figures |
 | | 3 | [`p2_som_training_visualization/som_optuna_tuning/`](p2_som_training_visualization/som_optuna_tuning/README.md) | Optuna tuning of the three grid sizes and its 5-seed check |
+| | 3 | [`p2_som_training_visualization/feature_layer_ablation/`](p2_som_training_visualization/feature_layer_ablation/README.md) | SOMs on fc1 and fc2 of the Phase 1 network, 5 SOM seeds each |
 | | 4 | [`p2_som_training_visualization/cluster_analysis/`](p2_som_training_visualization/cluster_analysis/README.md) | Neuron assignments, purity and entropy tables, class maps |
 | | 5 | [`p2_som_training_visualization/error_pattern_analysis/`](p2_som_training_visualization/error_pattern_analysis/README.md) | Error geography, hotspots, robustness on three grids, comparison with simpler error detectors |
 | | 3–5 | `p2_som_training_visualization/interactive_report/` (+ `.dvc`) | `interactive_report.html` (DVC) |

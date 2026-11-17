@@ -237,6 +237,7 @@
   - Completed the final report: a figure explaining how the SOM works (with the Competitive Networks chapter cited), the contribution statement in the abstract, the Optuna and novelty-after-retraining results, all diagrams redrawn in draw.io, and clearer result tables.
   - Same-budget comparison of the error detectors: flagging the same 1.6% of validation images as the SOM's hotspot cells, the least-confident images hold 53.3% of the CNN's mistakes and kNN impurity 48.7%, against 18.1% in the hotspot cells (exploratory).
   - SOM re-analysis of the least-confident retraining arm (secondary run, protocol addendum written before the run): its new maps show no clear hotspot drop against normal training (-0.036, interval -0.093 to +0.021), and SOM guidance is not clearly better than confidence guidance (hotspot error -0.018, -0.076 to +0.039). With 5 seeds no difference can be shown. The shared cells reproduced the primary run exactly. Added to the final report's retraining table and the Phase 4 report.
+  - Feature-layer ablation (asked for in the proposal's paper outline; protocol written before the run): SOMs on the earlier layer fc1 locate the CNN's mistakes worse than SOMs on fc2 (error-cell AUROC 0.622 against 0.685, 5 SOM seeds each, interval -0.073 to -0.052) and have less pure cells, so the choice of fc2 is supported. fc1 separates SVHN slightly better (+0.005 AUROC). Added to the final report and the Phase 2 report.
   - Plan after that: run Phases 2 to 4 on Fashion-MNIST (technical freeze on November 22), merge develop into main through a reviewed pull request, and write the research paper with one results table per dataset.
 
 - Action Items:
@@ -271,4 +272,4 @@
 * [ ] Final presentation
 * [ ] Ask the instructor: ResNet comparison (11-10 note) and one Jupyter notebook per phase (proposal, Week 14) in the time left
 * [x] Feature-layer ablation: protocol, code and tests (fc1 against fc2, 5 SOM seeds)
-* [ ] Feature-layer ablation results (EC2)
+* [x] Feature-layer ablation results

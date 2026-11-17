@@ -68,6 +68,9 @@ pipeline, in its own versioned folders. SVHN is the outside (novelty) dataset fo
 - **SOM training:** the official model is a 15x15 SOM, `som_15x15_nb11_ep250_s42_v2`.
   Why 15x15, and how the grid choice was checked:
   [`src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md`](src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md).
+- **Feature-layer ablation:** SOMs on the earlier layer fc1 (120 numbers) locate the CNN's mistakes worse
+  than SOMs on fc2 (error-cell AUROC 0.622 against 0.685, 5 SOM seeds each) and have less pure cells, which
+  supports the choice of fc2. fc1 separates SVHN slightly better (+0.005 AUROC).
 - **Cluster Analysis:** every one of the 225 neurons is used, and neurons are almost pure.
   The validation purity is 0.9819, against 0.1738 when the class labels are shuffled
   (1,000 shuffles, p = 0.001).

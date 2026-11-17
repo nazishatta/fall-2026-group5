@@ -181,6 +181,25 @@ AUROC for CNN mistakes (95\% range) & 0.694 (0.582--0.799) & 0.629 (0.548--0.725
 \label{fig:planes}
 \end{figure}
 
+\subsection{Feature-layer ablation}
+
+We also checked the choice of layer, as the proposal asks. We trained SOMs with the same recipe on the earlier layer fc1 (120 numbers) and on fc2, five SOM seeds each, and compared them on rules fixed before the run (Table~\ref{tab:layer_ablation}). The fc2 maps locate the CNN's mistakes clearly better (error-cell AUROC 0.685 against 0.622) and have purer cells, so the choice of fc2 is supported by the data. The fc1 maps separate SVHN slightly better, but by only 0.005 AUROC, far less than the gap to max-softmax and energy. The SOM recipe was tuned on fc2, which may favour it. The fc2 maps of the new seeds also reproduce the main map's values (0.685, 0.982 and 0.981).
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\small
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Measure (validation images)} & \textbf{fc1} & \textbf{fc2} & \textbf{fc1 $-$ fc2 (95\% interval)} & \textbf{Verdict} \\ \hline
+Error-cell AUROC (main) & 0.622 & 0.685 & $-0.062$ ($-0.073$ to $-0.052$) & fc2 better \\ \hline
+Weighted purity & 0.961 & 0.982 & $-0.021$ ($-0.022$ to $-0.020$) & fc2 better \\ \hline
+QE novelty AUROC (SVHN) & 0.986 & 0.981 & $+0.005$ ($+0.003$ to $+0.006$) & fc1 better \\ \hline
+\end{tabular}
+\caption{Feature-layer ablation: SOMs on the 120-number layer fc1 and the 84-number layer fc2 of the same network, same recipe, mean over 5 SOM seeds each. Statements and rules fixed before the run.}
+\label{tab:layer_ablation}
+\end{table}
+
 \section{Cluster Analysis}\label{sec:cluster}
 
 \begin{itemize}[leftmargin=1.4em, itemsep=2pt]

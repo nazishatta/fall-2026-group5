@@ -143,7 +143,8 @@ the feature layer; until now only `fc2` was used. Protocol `p2_som_training_visu
 FEATURE_LAYER_ABLATION_PROTOCOL.md`, written before any `fc1` embedding was extracted. It compares SOMs on
 `fc1` and `fc2` of the frozen Phase 1 network with the same recipe and 5 new SOM seeds. Not a deviation: the
 headline layer stays `fc2` whatever the result, and no earlier result is re-run or replaced. The SOM recipe was
-tuned on `fc2`, which may favour `fc2`; this is declared in the protocol.
+tuned on `fc2`, which may favour `fc2`; this is declared in the protocol. Outcome: `fc2` is better at
+locating mistakes (L1) and purer (L2); `fc1` is slightly better on SVHN novelty (L3, +0.005 AUROC).
 
 ### Historical SOM configuration
 
