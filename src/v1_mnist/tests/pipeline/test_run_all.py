@@ -224,6 +224,7 @@ def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
 OTHER_PHASE_CONFIGS = {
     "base.yaml", "cnn_baseline.yaml", "som.yaml", "som_10x10_robustness.yaml", "som_20x20_robustness.yaml",
     "error_pattern_baselines.yaml", "som_optuna.yaml", "retraining.yaml", "som_reanalysis.yaml",
+    "novelty_after_retraining.yaml",
 }
 # Not a step: the shared input fingerprints.
 SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
