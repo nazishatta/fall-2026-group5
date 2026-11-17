@@ -69,4 +69,31 @@ embeddings; nothing is tuned; the MNIST test split is not read.
 
 ## 7. Recorded outcome
 
-[TBD: filled in after the run, from `tables/`; sections 1 to 6 stay unchanged.]
+Run `som_reanalysis_msp_arm_som_15x15_nb11_ep250_s42_v2`, finished 2026-11-17 on EC2. Source:
+`tables/paired_comparisons.csv`, `tables/statements.json` and `tables/cell_measures.csv` of that run.
+Differences are first arm minus second arm, mean over 5 seeds, with the 95% paired t-interval.
+
+| Statement | Measure | Difference | 95% interval | Seeds with first arm lower | Outcome |
+|---|---|---|---|---|---|
+| S1: `augmented_msp` − `standard` | M5 hotspot error rate | −0.036 | −0.093 to +0.021 | 3 of 5 | **not met** (interval includes 0) |
+| S2: `augmented_som` − `augmented_msp` | M5 hotspot error rate | −0.018 | −0.076 to +0.039 | 3 of 5 | **not met** |
+| S3: `augmented_som` − `augmented_msp` | M1 weighted purity | −0.0006 | −0.0029 to +0.0017 | (higher in 2 of 5) | **not met** |
+
+Mean hotspot error rate of the new maps: `standard` 0.229, `augmented_msp` 0.193, `augmented_som` 0.175.
+Mean weighted purity: 0.982, 0.983 and 0.982.
+
+**Reading (section 3 rule "neither met"):** with 5 seeds, no difference can be shown between SOM guidance
+and confidence guidance on the new map. Only SOM-guided augmentation has a clear drop against normal
+training (R2, below), but it is not clearly lower than confidence-guided augmentation, so the result does
+not show that SOM guidance shrinks the map's weak regions more than augmenting the least-confident images.
+
+**Reproduction check (section 4):** the `standard`, `augmented_som` and `baseline` cells of this run equal
+those of the primary run exactly (largest absolute difference 0 for every measure M1 to M8, the occupied
+neurons and the hotspot image counts). R1 (not met), R2 (met: −0.055, −0.101 to −0.008) and R5 (met: upper
+end +0.54 below the 1.0 tolerance) therefore repeat the primary result. As section 2 says, R3 and R4 in
+this run's `statements.json` compare with `augmented_msp`, not with random augmentation; they are S3 and S2
+above.
+
+Other measures: overall validation error is lower for `augmented_msp` than for `standard` (−0.22 points,
+−0.26 to −0.18), the only interval for this pair that excludes 0; no measure differs clearly between
+`augmented_som` and `augmented_msp`.

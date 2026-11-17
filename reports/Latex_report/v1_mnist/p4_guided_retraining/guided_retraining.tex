@@ -28,7 +28,7 @@
 \vspace{0.36in}
 {\large\bfseries Capstone - Group 5\par}
 \vspace{0.08in}
-{\large\bfseries Fyrooz Khan\par}
+{\large\bfseries Fyrooz Anika Khan\par}
 {\large\bfseries Nazish Atta\par}
 \vspace{0.30in}
 {\large The George Washington University\par}
@@ -47,7 +47,7 @@ Phase 4 asks one question: \emph{can the SOM help us train a better CNN?} The SO
 \begin{itemize}[leftmargin=1.4em, itemsep=1pt]
   \item \textbf{Targeted augmentation helped.} On the SOM's error regions (the ``hotspots''), mistakes fell from 11.4\% to 7.8\%. The rest of the images did not get worse.
   \item \textbf{Curriculum learning did not help.} It made the CNN slightly worse (98.66\% and 98.69\% correct, against 99.11\% for normal training).
-  \item \textbf{The SOM is not the only way to pick hard images.} Picking the images the CNN is least sure about worked about as well. The SOM's real value is that it shows \emph{where} the errors are.
+  \item \textbf{The SOM is not the only way to pick hard images.} Picking the images the CNN is least sure about worked about as well, and the new SOMs after that augmentation cannot be told apart from those after SOM-guided augmentation. The SOM's real value is that it shows \emph{where} the errors are.
   \item \textbf{The new SOMs have smaller weak regions, but are not cleaner.} After augmentation the hotspots of a new SOM hold fewer mistakes than after normal training (17.5\% against 22.9\% on validation images). The neurons did not become purer, and against random copies the hotspot difference is not clear (Section~\ref{sec:reanalysis}).
   \item \textbf{The SOM still detects novel images after retraining.} Every retrained network's SOM separates SVHN from MNIST (AUROC 0.965 to 0.993). Whether SOM-guided retraining changes this could not be decided with 5 seeds (Section~\ref{sec:novelty_after}).
 \end{itemize}
@@ -187,6 +187,7 @@ Table~\ref{tab:reanalysis} gives all measures and Figures~\ref{fig:reanalysis_me
   \item \textbf{R4, not met.} Against the random-image control the hotspot error rate is lower by 3.1 points, but the interval ($-0.0705$ to $+0.0075$) includes 0, so we cannot say the SOM-chosen images are better than random ones here.
   \item \textbf{R5, met.} Topographic error did not rise ($-0.29$ points, interval $-1.11$ to $+0.54$; the upper end is below the 1.0 tolerance), so the map stayed as well ordered as after plain training.
   \item \textbf{Also reported.} The low-purity share and the class scatter index show no clear change. The share of all errors that sit in hotspots is larger than for the random control by $+0.063$ (larger in 5 of 5 seeds), but not larger than for \texttt{standard}. Overall validation error is lower for \texttt{augmented\_som} than for both other arms (about 0.17 and 0.11 points). CKA between networks is 0.89 to 0.93 within an arm and 0.91 between arms, so the arms do not differ more from each other than seeds do within an arm, except that \texttt{augmented\_som} networks are somewhat less alike (0.893).
+  \item \textbf{Secondary run: the least-confident arm.} Added after these results were seen (addendum \texttt{MSP\_ARM\_ADDENDUM.md}, run \texttt{som\_reanalysis\_msp\_arm\_som\_15x15\_nb11\_ep250\_s42\_v2}). The new maps of \texttt{augmented\_msp} have a hotspot error rate of 0.193 against 0.229 for \texttt{standard} ($-0.036$, interval $-0.093$ to $+0.021$, S1 not met). \texttt{augmented\_som} is not clearly better than \texttt{augmented\_msp} on hotspot error ($-0.018$, $-0.076$ to $+0.039$, S2 not met) or purity ($-0.0006$, $-0.0029$ to $+0.0017$, S3 not met). With 5 seeds no difference between SOM and confidence guidance can be shown. The \texttt{standard} and \texttt{augmented\_som} cells reproduced the primary run exactly.
 \end{itemize}
 
 \begin{figure}[H]
@@ -241,7 +242,7 @@ As a check of the code, the Phase 1 network reproduces the Phase 3 results exact
   \item \textbf{But the SOM was not better than ``least sure''.} Using the least-sure images (msp) gave almost the same result (R1 of Table~\ref{tab:criteria}: the difference $-0.7$ points, interval includes 0, so we cannot tell them apart). So the SOM is not a better \emph{picker}; it is a useful \emph{explainer}, because it shows which regions of the data are weak. The hotspot-only pool also could not be told apart from its random control (R3 of Table~\ref{tab:criteria}).
   \item \textbf{Slow introduction of the copies made things worse (R2 of Table~\ref{tab:criteria}).} Adding the copies step by step gave a worse hotspot result than adding them all at once (+3.4 points).
   \item \textbf{Curriculum learning lost to normal training (C1, C2 not met).} The curriculum CNNs made about 47 more mistakes out of 10{,}500 (+0.45 points), and the learning curves (Figure~\ref{fig:curves}) show they were behind from the first epochs and never caught up. A possible reason, which we did not test, is that the schedule only ever shows 40\% of the hard images, so the CNN sees fewer of them. We report this result as it is; a criterion that is not met is still a result.
-  \item \textbf{The new maps: smaller weak regions, not cleaner classes.} In the new SOMs, the hotspots of the \texttt{augmented\_som} networks hold fewer mistakes than after normal training (R2, 17.5\% against 22.9\%), but the neurons are not purer (R1) and, against random copies, the hotspot drop is not clear (R4). The map stays as well ordered as before (R5).
+  \item \textbf{The new maps: smaller weak regions, not cleaner classes.} In the new SOMs, the hotspots of the \texttt{augmented\_som} networks hold fewer mistakes than after normal training (R2, 17.5\% against 22.9\%), but the neurons are not purer (R1) and, against random copies, the hotspot drop is not clear (R4). The map stays as well ordered as before (R5). A secondary run added the least-confident arm: its new maps cannot be told apart from those of \texttt{augmented\_som} on hotspot error or purity, so with 5 seeds the smaller weak regions cannot be credited to SOM guidance rather than to augmenting hard images in general.
   \item \textbf{No sign of forgetting.} In every arm, the largest one-epoch fall in validation accuracy (mean over seeds) was about 0.6 points or less (curriculum\_msp was the largest), and for augmented\_som the error outside the hotspots stayed at the standard level (A3).
 \end{itemize}
 
@@ -261,6 +262,7 @@ The first set of augmentation ranges (shift up to 2 pixels) failed the check mad
   \item Criteria, thresholds and the guard value were written down and stamped (SHA-256 of the protocol and the configuration) before the test split was opened. It was opened once and not re-run.
   \item All arms use the same data, seeds and training recipe. Finished runs are never overwritten; the changed augmentation run got a new run ID.
   \item The re-analysis uses training and validation images only; the test split was not read.
+  \item The secondary re-analysis run with the least-confident arm uses training and validation images only, and its statements were written in an addendum before its cells were computed.
   \item The novelty test after retraining fits everything on training images, uses MNIST validation and SVHN test images for scoring only, and does not read the MNIST test split. Its statements and margin were fixed before the run. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
 \end{itemize}
 
@@ -269,8 +271,8 @@ The first set of augmentation ranges (shift up to 2 pixels) failed the check mad
 All items of the Phase 4 plan are done. Two limits of the results are stated here.
 
 \begin{itemize}[leftmargin=1.4em, itemsep=2pt]
-  \item \textbf{Which arms were re-analysed.} The three arms of the SOM re-analysis (\texttt{standard}, \texttt{augmented\_som}, \texttt{augmented\_random}) were chosen after the retraining results were known. This is stated in the re-analysis protocol and in the deviations log.
-  \item \textbf{Far novelty only.} The novelty test after retraining uses SVHN, where embedding length explains most of the result. A near-novelty test, for example Fashion-MNIST images shown to the MNIST network, would test the map itself; it is future work.
+  \item \textbf{Which arms were re-analysed.} The three arms of the SOM re-analysis (\texttt{standard}, \texttt{augmented\_som}, \texttt{augmented\_random}) were chosen after the retraining results were known. This is stated in the re-analysis protocol and in the deviations log. The least-confident arm was added later as a secondary run, under its own addendum and run ID, after the primary re-analysis and the test results were seen; it is reported next to the primary statements, not in place of them.
+  \item \textbf{Far novelty only.} The novelty test after retraining uses SVHN, where embedding length explains most of the result. Phase 3 now includes a near-novelty test with held-out MNIST digits, but for the Phase 1 network only; repeating it on the retrained networks would test whether SOM-guided retraining changes how the map treats new digits, and is future work.
 \end{itemize}
 
 \printbibliography[title={References}]

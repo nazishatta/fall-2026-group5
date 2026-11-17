@@ -118,7 +118,7 @@ Phase 3 report and [`outputs/v1_mnist/p3_novelty_detection/README.md`](outputs/v
   (max-softmax) worked about as well.
 - **Curriculum:** letting the hard images in slowly made the CNN worse.
 - **SOM re-analysis:** new SOMs on the retrained CNNs have smaller weak regions, but not purer cells. The
-  re-analysis of the max-softmax arm is running as an addendum; its result will be added here when the run finishes.
+  least-confident arm, re-analysed later as a secondary run, shows no clear drop, and SOM guidance is not clearly better than it.
 - **Novelty after retraining:** the SOM still detects SVHN, but no better than before.
 
 **In short:** the SOM shows *where* the CNN fails (a few cells where two digits overlap) and is as good a guide for
@@ -135,7 +135,7 @@ the compiled PDF and a `fig/` folder with the figures it uses.
 | 2     | [`som_cluster_error.pdf`](reports/Latex_report/v1_mnist/p2_som_training_visualization/som_cluster_error.pdf)  | Done                                         |
 | 3     | [`novelty_detection.pdf`](reports/Latex_report/v1_mnist/p3_novelty_detection/novelty_detection.pdf)           | Done                                         |
 | 4     | [`guided_retraining.pdf`](reports/Latex_report/v1_mnist/p4_guided_retraining/guided_retraining.pdf)           | Done                                         |
-| Final | [`final_report.pdf`](reports/Latex_report/v1_mnist/Final_report/final_report.pdf)                             | Done, except the max-softmax-arm SOM re-analysis (running) |
+| Final | [`final_report.pdf`](reports/Latex_report/v1_mnist/Final_report/final_report.pdf)                             | Done                                         |
 
 Progress report: [`reports/Progress_Report/v1_mnist/`](reports/Progress_Report/v1_mnist/README.md).
 Technical notes: [`cnn_baseline.md`](src/v1_mnist/docs/p1_model_training_baseline/cnn_baseline_training/cnn_baseline.md)

@@ -13,6 +13,7 @@ Our main SOM is 15x15 (why: `../som_nnsom_training/README.md`). This folder answ
 | 1 | `ERROR_PATTERN_ROBUSTNESS_CRITERIA.md` | The rules for checking whether our error-pattern findings also hold on 20x20 and 10x10, written **before** looking. These rules are meant to be reused for future datasets. |
 | 2 | `ERROR_PATTERN_ROBUSTNESS_RESULTS.md` | Results of that check. |
 | 3 | `HOTSPOT_RULE.md` | The one rule for which neurons count as error hotspots, used everywhere in Week 5 since 2026-10-10 (it is the rule fixed in advance in file 1), and how to report hotspot numbers. |
+| 4 | [`baselines/PLAN.md`](baselines/README.md) | The plan for comparing the SOM's error cells with k-means cells, kNN impurity and max-softmax, and its change log (including the later same-budget comparison). Results: `outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/error_pattern_baselines/` and `error_detector_budget/`. |
 
 > Files 1 and 2 were renamed on 2026-10-09 from `RQ2_ROBUSTNESS_CRITERIA.md` and `RQ2_ROBUSTNESS_RESULTS.md`, to use the project proposal's term (Error Pattern Analysis) instead of "RQ2", and moved here from `docs/som/` on 2026-10-10. The text of file 1 is untouched (see below), so it still says "RQ2", "Claim A" (= hotspot concentration) and "Claim B" (= overlap regions).
 

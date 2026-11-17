@@ -11,7 +11,7 @@ The whole MNIST study in one report: the CNN baseline, the SOM and its error pat
 | `fig/diagrams/` | The four draw.io diagrams (project pipeline, how a SOM works, the retraining loop, the end-to-end comparison), each as `.drawio`, `.drawio.svg` and `.pdf` |
 | `tables/` | Tables kept in their own `.tex` files |
 
-In the retraining table, the new-SOM columns of the least-confident arm show n/a: that arm was not in the SOM re-analysis protocol. Its re-analysis is running on EC2 as a separate addendum (`MSP_ARM_ADDENDUM.md`), and those cells are filled in from `outputs/v1_mnist/p4_guided_retraining/som_reanalysis/` when it finishes.
+In the retraining table, the new-SOM values of the least-confident arm (marked †) come from a secondary run added after the other results were seen (`MSP_ARM_ADDENDUM.md`); the curriculum arm was not re-analysed (n/a).
 
 ## How to build
 

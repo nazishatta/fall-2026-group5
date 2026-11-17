@@ -52,6 +52,10 @@ Two of the five statements were met (R2, R5) and three were not (R1, R3, R4).
 - Hotspots are the worst neurons of each map and are chosen again for every map, so the hotspot error rate of a new map is not measured on the same images as before.
 - Five seeds with one SOM seed can only show large effects.
 
+## Secondary run: the least-confident arm
+
+Added after the results above were seen (`MSP_ARM_ADDENDUM.md`, run `som_reanalysis_msp_arm_som_15x15_nb11_ep250_s42_v2`). The new maps of `augmented_msp` (images the CNN is least sure about) have a hotspot error rate of 0.193, against 0.229 for `standard` and 0.175 for `augmented_som`. Neither difference is clear with 5 seeds: `augmented_msp` against `standard` is −0.036 (−0.093 to +0.021), and `augmented_som` against `augmented_msp` is −0.018 (−0.076 to +0.039). So the data do not show that SOM guidance shrinks the map's weak regions more than confidence guidance. The `standard` and `augmented_som` cells reproduced the primary run exactly.
+
 ## Limits
 
 Five seeds, one SOM seed; arms chosen after the retraining test results were known; maps of different networks cannot be matched neuron by neuron. See protocol section 8.
