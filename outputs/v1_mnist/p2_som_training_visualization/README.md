@@ -1,13 +1,17 @@
-# Phase 2: SOM Training & Visualization (Weeks 3–5)
+# Phase 2 results: SOM Training & Visualization (`outputs/v1_mnist/p2_som_training_visualization/`)
 
 > `p2` in the folder name means **Phase 2**.
 
-The trained SOMs and what the map shows about the CNN's classes and mistakes.
+The trained SOMs and what the map shows about the CNN's classes and mistakes. The headline map is `som_15x15_nb11_ep250_s42_v2`.
 
 ```
 p2_som_training_visualization/
-├── som_nnsom_training/            # Week 3: SOM models, logs, run_manifest.csv, QE curves, SOM figures
-├── cluster_analysis/              # Week 4: class maps, purity map, class pie/stem
-├── error_pattern_analysis/        # Week 5: error maps, error-pattern robustness results
-└── interactive_report/            # Weeks 3–5: interactive_report.html
+├── som_nnsom_training/        SOM models, logs, run_manifest.csv, QE curves, SOM figures
+├── som_optuna_tuning/         Optuna tuning of the three grid sizes and the 5-seed check
+├── feature_layer_ablation/    SOMs on fc1 and fc2, 5 SOM seeds each (DVC for the embeddings)
+├── cluster_analysis/          neuron assignments, purity tables, class maps
+├── error_pattern_analysis/    error geography, hotspots, robustness, error-detector comparisons
+└── interactive_report/        interactive_report.html (DVC), all of Phase 2
 ```
+
+Git keeps only the small files here (`.json`, `.csv`, `.dvc` pointers and READMEs). Larger files are downloaded with `dvc pull`; figures are made again by the pipeline.

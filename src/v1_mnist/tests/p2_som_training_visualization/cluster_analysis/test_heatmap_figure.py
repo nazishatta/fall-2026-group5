@@ -1,4 +1,4 @@
-"""Week 4 (Cluster Analysis): SOM heatmaps are saved as one PDF (no SVG).
+"""Cluster Analysis: SOM heatmaps are saved as one PDF (no SVG).
 
 Split from the former tests/som/test_figure_dual_format.py.
 """

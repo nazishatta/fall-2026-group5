@@ -1,4 +1,4 @@
-"""Week 5 (Error Pattern Analysis): support-aware error-rate helpers.
+"""Error Pattern Analysis: support-aware error-rate helpers.
 
 Split from the former tests/som/test_bmu_rq_analysis.py.
 """

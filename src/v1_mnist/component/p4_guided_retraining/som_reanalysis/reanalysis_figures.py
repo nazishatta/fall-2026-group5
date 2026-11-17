@@ -33,7 +33,7 @@ PANELS = (
 def plot_measures(table: dict[str, dict[str, Any]], settings: ReanalysisSettings, path: Path) -> Path:
     """One panel per measure: a dot per seed for each arm, lines join the same seed, dashed = Phase 2 map."""
     fig, axes = plt.subplots(2, 3, figsize=(11, 6))
-    for ax, (measure, title) in zip(axes.ravel(), PANELS):
+    for ax, (measure, title) in zip(axes.ravel(), PANELS, strict=True):
         values = np.array([[table[cell_name(a, s)][measure] for a in settings.arms] for s in settings.seeds])
         for row in values:
             ax.plot(range(len(settings.arms)), row, color="0.7", lw=0.8, zorder=1)
@@ -55,7 +55,7 @@ def plot_maps(settings: ReanalysisSettings, table: dict[str, dict[str, Any]], pa
     num_classes = settings.retraining.train.num_classes
     fig, axes = plt.subplots(1, len(cells), figsize=(3.6 * len(cells), 3.8))
     image = None
-    for ax, cell in zip(np.atleast_1d(axes), cells):
+    for ax, cell in zip(np.atleast_1d(axes), cells, strict=True):
         npz = np.load(settings.folder("assignments") / f"{cell}.npz")
         counts = neuron_majority(npz["val_bmu"], labels, npz["neuron_dist"].shape[0], num_classes)
         size = counts.sum(axis=1)

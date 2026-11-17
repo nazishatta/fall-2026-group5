@@ -1,4 +1,4 @@
-"""Week 3 figures for the selected SOM (SOM Setup with NNSOM).
+"""Figures for the selected SOM (SOM Setup with NNSOM).
 
 Draws the figures that describe the SOM itself: topology, neuron
 connections, U-Matrix, train/validation hit histograms, component planes,
@@ -9,8 +9,8 @@ Output (folders come from the SOM config):
         core, feature maps, component planes, extended, visualization_manifest.json
 Log: som_nnsom_training/logs/<model_name>_visualize.log
 
-Week 4 figures: cluster_analysis/cluster_figures.py.
-Week 5 figures: error_pattern_analysis/error_figures.py.
+Cluster analysis figures: cluster_analysis/cluster_figures.py.
+Error pattern analysis figures: error_pattern_analysis/error_figures.py.
 
 Usage (from the code root):
   python src/v1_mnist/component/p2_som_training_visualization/som_nnsom_training/visualize_som.py \
@@ -59,7 +59,7 @@ from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.som
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Week 3 NNSOM figures for the selected SOM."
+        description="NNSOM figures for the selected SOM."
     )
     add_common_args(parser)
     parser.add_argument(
@@ -109,7 +109,7 @@ def main() -> None:
     failed = {}
 
     logger.info("=" * 72)
-    logger.info("%s SOM Visualizations: Week 3", info.display_name)
+    logger.info("%s SOM Visualizations: SOM training", info.display_name)
     logger.info("=" * 72)
     logger.info("Model: %s", model_name)
     logger.info(

@@ -84,7 +84,7 @@ enrichment, not an OOD detector.
 
 Read-only reproduction verified on 2026-10-18.
 
-A new saved run has not yet been created.
+This read-only check was not saved as a new run. The saved random-control runs are `qe_random_control_evaluation_initial` (2026-10-12) and its reproduction `reorg_20261102_random_control_s42_v2` (2026-11-02); see `outputs/v1_mnist/p3_novelty_detection/run_manifest.csv`.
 
 ## Additional seed investigation — 2026-11-02
 

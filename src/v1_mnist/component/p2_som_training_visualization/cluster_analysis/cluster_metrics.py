@@ -1,4 +1,4 @@
-"""Week 4 SOM cluster-structure metrics (Cluster Analysis).
+"""SOM cluster-structure metrics (Cluster Analysis).
 
 Downstream analysis only: it does not train or modify the CNN, the
 embeddings, the scaler or the SOM. The functions work on sample-to-BMU

@@ -65,7 +65,7 @@ def train_cnn(
     train_y: np.ndarray,
     val_x: np.ndarray,
     val_y: np.ndarray,
-    val_in_hotspot: np.ndarray,
+    val_in_hotspot: np.ndarray | None,
     epoch_indices: EpochIndices,
     settings: TrainSettings,
     seed: int,
@@ -73,8 +73,9 @@ def train_cnn(
 ) -> TrainResult:
     """Train one LeNet-5. ``epoch_indices(e)`` lists the training rows used in epoch ``e`` (0-based).
 
-    Every epoch records the validation accuracy overall, in the hotspot images and on all other
-    images, so instability or forgetting on the easy images shows up during training."""
+    Every epoch records the validation accuracy overall and, when ``val_in_hotspot`` is given, in the
+    hotspot images and on all other images, so instability or forgetting on the easy images shows up
+    during training. Without hotspots (``None``) only the overall validation accuracy is recorded."""
     set_seed(seed)
     rng = np.random.default_rng(seed)
     model = LeNet5(num_classes=settings.num_classes).to(device)
@@ -108,15 +109,17 @@ def train_cnn(
         val_pred, _ = predict(model, val_x, device)
         val_ok = val_pred == val_y
         val_acc = float(val_ok.mean())
-        history.append({
+        record: dict[str, Any] = {
             "epoch": epoch + 1,
             "training_images": len(rows),
             "train_loss": loss_sum / len(rows),
             "train_accuracy": correct / len(rows),
             "val_accuracy": val_acc,
-            "val_hotspot_accuracy": float(val_ok[val_in_hotspot].mean()),
-            "val_non_hotspot_accuracy": float(val_ok[~val_in_hotspot].mean()),
-        })
+        }
+        if val_in_hotspot is not None:
+            record["val_hotspot_accuracy"] = float(val_ok[val_in_hotspot].mean())
+            record["val_non_hotspot_accuracy"] = float(val_ok[~val_in_hotspot].mean())
+        history.append(record)
         LOGGER.info("epoch %d/%d: %d images, train acc %.4f, val acc %.4f",
                     epoch + 1, settings.epochs, len(rows), correct / len(rows), val_acc)
         if val_acc > best_acc:  # strict: the first best epoch wins, as in Phase 1

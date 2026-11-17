@@ -1,4 +1,4 @@
-"""Week 4 (Cluster Analysis): BMU assignment and per-neuron class-mixing helpers.
+"""Cluster Analysis: BMU assignment and per-neuron class-mixing helpers.
 
 Split from the former tests/som/test_bmu_rq_analysis.py.
 """

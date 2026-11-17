@@ -1,4 +1,4 @@
-"""Week 4: Cluster Analysis.
+"""Cluster Analysis.
 
 Assigns every train and validation image to its best-matching neuron (BMU) on
 the selected SOM and measures the class structure of the map:
@@ -9,18 +9,18 @@ the selected SOM and measures the class structure of the map:
   - validation only: a label-shuffle comparison for the weighted purity (labels
     shuffled, each image keeps its BMU; number of shuffles and seed from the
     config's analysis section). Added 2026-10-10, see docs/DEVIATIONS.md.
-Each image's BMU and its distance to the BMU are saved for Week 5 (error
-patterns) and Week 6 (novelty detection).
+Each image's BMU and its distance to the BMU are saved for error pattern analysis
+and for novelty detection via quantization error.
 
 Safety checks, all before anything is written:
   - the model's SHA-256 must match run_manifest.csv (utils/run_settings.py);
   - the embeddings must match the hashes in the config (expected_inputs);
   - the model's metrics file must say the test split was never evaluated;
-  - model check: the SOM must reproduce its Week 3 number of used neurons
-    exactly, and its Week 3 quantization error to within one part in a million
+  - model check: the SOM must reproduce its SOM training number of used neurons
+    exactly, and its SOM training quantization error to within one part in a million
     (analysis.qe_relative_tolerance in the config), which allows for rounding
     differences between library versions.
-    The quantization error itself is a Week 3 result; only the check is
+    The quantization error itself is a SOM training result; only the check is
     reported here (both values and their relative difference).
 Results are built in a temporary folder and moved into place only when every
 step succeeded. The test split is never used.
@@ -47,12 +47,10 @@ if TYPE_CHECKING:
     from src.v1_mnist.component.utils.som_types import SOMModel
 
 import argparse
-import csv
 import json
 from importlib.metadata import version
 from pathlib import Path
 import shutil
-import subprocess
 import sys
 
 import numpy as np
@@ -71,11 +69,15 @@ from src.v1_mnist.component.utils.som_io import (  # noqa: E402
     write_sample_assignments,
 )
 from src.v1_mnist.component.p2_som_training_visualization.cluster_analysis.cluster_metrics import (  # noqa: E402
-    ClusterMetrics,
     compute_cluster_metrics,
     purity_label_shuffle,
     weighted_cluster_purity,
     weighted_mean_entropy,
+)
+from src.v1_mnist.component.p2_som_training_visualization.cluster_analysis.cluster_outputs import (  # noqa: E402
+    git_commit,
+    write_cluster_table,
+    write_metadata,
 )
 from src.v1_mnist.component.utils.run_settings import (  # noqa: E402
     DEFAULT_CONFIG,
@@ -101,7 +103,7 @@ logger = get_logger("v1_mnist.analysis.cluster_analysis.run_cluster_analysis")
 
 
 def check_quantization_error(split: str, recomputed: float, training_run: float, rtol: float) -> dict:
-    """Model check: the recomputed QE must match Week 3's to within rtol (relative).
+    """Model check: the recomputed QE must match SOM training's to within rtol (relative).
 
     Returns the numbers for the summary; raises RuntimeError if they differ by more.
     """
@@ -109,7 +111,7 @@ def check_quantization_error(split: str, recomputed: float, training_run: float,
     if not relative_difference <= rtol:          # also fails for NaN
         raise RuntimeError(
             f"{split}: model check failed: quantization error {recomputed} differs from the "
-            f"value recorded by the SOM training run (Week 3), {training_run}, by a relative {relative_difference:.3g} "
+            f"value recorded by the SOM training run {training_run}, by a relative {relative_difference:.3g} "
             f"(allowed: {rtol:g})."
         )
     return {
@@ -118,45 +120,6 @@ def check_quantization_error(split: str, recomputed: float, training_run: float,
         "relative_difference": relative_difference,
         "relative_tolerance": rtol,
     }
-
-
-def write_cluster_table(
-    path: Path, metrics: list[ClusterMetrics], coordinates: np.ndarray, num_classes: int,
-) -> None:
-    """One row per neuron, in neuron order, with the neuron's position on the map."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    fieldnames = [
-        "neuron_id",
-        "pos_0",
-        "pos_1",
-        "support",
-        "dominant_class",
-        "dominant_count",
-        "purity",
-        "normalized_entropy",
-    ] + [f"class_{i}_count" for i in range(num_classes)]
-
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-
-        for metric in metrics:
-            row = {
-                "neuron_id": metric.neuron_id,
-                "pos_0": float(coordinates[0, metric.neuron_id]),
-                "pos_1": float(coordinates[1, metric.neuron_id]),
-                "support": metric.support,
-                "dominant_class": metric.dominant_class,
-                "dominant_count": metric.dominant_count,
-                "purity": metric.purity,
-                "normalized_entropy": metric.normalized_entropy,
-            }
-
-            for class_id, count in enumerate(metric.class_counts):
-                row[f"class_{class_id}_count"] = count
-
-            writer.writerow(row)
 
 
 def purity_null_settings(config_path: Path) -> tuple[int, int]:
@@ -205,7 +168,7 @@ def analyze_split(
         num_samples,
     )
 
-    # Model check: the same SOM on the same embeddings must give its Week 3 numbers.
+    # Model check: the same SOM on the same embeddings must give its SOM training numbers.
     qe = float(som.quantization_error(cluster_distances))
     occupied = int(np.count_nonzero(sizes))
     expected = training_metrics["train_metrics" if split == "train" else "validation_metrics"]
@@ -213,7 +176,7 @@ def analyze_split(
     qe_check = check_quantization_error(split, qe, float(expected["quantization_error"]), rtol)
     if occupied != int(expected["occupied_neurons"]):
         raise RuntimeError(
-            f"{split}: model check failed: {occupied} neurons used, Week 3 recorded "
+            f"{split}: model check failed: {occupied} neurons used, SOM training recorded "
             f"{int(expected['occupied_neurons'])}."
         )
 
@@ -285,34 +248,8 @@ def analyze_split(
     return summary
 
 
-def git_commit(repo_root: Path) -> str:
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=repo_root, text=True, stderr=subprocess.DEVNULL,
-        ).strip()
-    except Exception:
-        return "unknown"
-
-
-def write_metadata(folder: Path, input_hashes: dict[str, str]) -> None:
-    """metadata/input_hashes.json and metadata/artifact_hashes.json (every other file in folder)."""
-    metadata_dir = folder / "metadata"
-    metadata_dir.mkdir(parents=True, exist_ok=True)
-    (metadata_dir / "input_hashes.json").write_text(
-        json.dumps(input_hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8",
-    )
-    artifact_hashes = {
-        p.relative_to(folder).as_posix(): sha256_file(p)
-        for p in sorted(folder.rglob("*"))
-        if p.is_file() and p.name != "artifact_hashes.json"
-    }
-    (metadata_dir / "artifact_hashes.json").write_text(
-        json.dumps(artifact_hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8",
-    )
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Week 4 SOM cluster analysis.")
+    parser = argparse.ArgumentParser(description="SOM cluster analysis.")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the grid and selected model.")
     args = parser.parse_args()
@@ -388,11 +325,11 @@ def main() -> None:
         temp_dir.rename(output_dir)
 
     except Exception as exc:
-        logger.error("Week 4 cluster analysis FAILED: %s", exc)
+        logger.error("Cluster analysis FAILED: %s", exc)
         logger.info("Temporary files kept for inspection: %s", temp_dir)
         raise
 
-    logger.info("Week 4 cluster analysis COMPLETE.")
+    logger.info("Cluster analysis COMPLETE.")
     logger.info("Results: %s", output_dir)
     logger.info("Held-out test split was NOT used.")
 

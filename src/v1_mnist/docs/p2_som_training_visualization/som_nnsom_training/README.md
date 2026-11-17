@@ -1,6 +1,6 @@
-# Week 3: choosing the SOM grid size (MNIST)
+# Choosing the SOM grid size (MNIST)
 
-Phase 2 (SOM Training & Visualization), Week 3 (SOM Setup with NNSOM). The proposal asks us to "configure SOM hyperparameters: grid size (e.g., 10x10 or 15x15)".
+Phase 2 (SOM Training & Visualization), step: SOM Setup with NNSOM. The proposal asks us to "configure SOM hyperparameters: grid size (e.g., 10x10 or 15x15)".
 
 ## What this folder is about
 
@@ -8,7 +8,7 @@ Our project trains a CNN to recognise handwritten digits (MNIST). We then use a 
 
 A SOM needs a grid size (10x10, 15x15, 20x20, ...). This folder answers: **which grid size should we use, and was the choice fair?** It also records honestly what went wrong earlier in the project and how we fixed it.
 
-Whether the Week 5 error-pattern findings also hold on other grid sizes is in the Week 5 folder: `../error_pattern_analysis/README.md`.
+Whether the error-pattern findings also hold on other grid sizes is in the error pattern analysis folder: `../error_pattern_analysis/README.md`.
 
 ## Read the files in this order
 
@@ -20,6 +20,8 @@ Whether the Week 5 error-pattern findings also hold on other grid sizes is in th
 | 4 | `prereg_stamp.txt` | A fingerprint (SHA-256) and timestamp of file 3. It proves the rules were written before any results existed. |
 | 5 | `GRID_COMPARISON_RESULTS.md` | Results of that fair test. |
 | 6 | `figures/grid_comparison_results.pdf` | The chart for file 5. |
+| 7 | `OPTUNA_TUNING_PROTOCOL.md` | Optuna tuning of the starting neighbourhood and the number of epochs for all three grid sizes, with the same budget, written before the runs. Its "Recorded outcome" section gives the result: 15x15 confirmed (no clear difference), so the headline map is unchanged. Results: `outputs/v1_mnist/p2_som_training_visualization/som_optuna_tuning/`. |
+| 8 | `FEATURE_LAYER_ABLATION_PROTOCOL.md` | The feature-layer ablation (fc1 against fc2, same SOM recipe, 5 SOM seeds), written before the run. The proposal's paper outline asks for it. Results: `outputs/v1_mnist/p2_som_training_visualization/feature_layer_ablation/`. |
 
 ## Why some files are never edited
 
@@ -37,4 +39,5 @@ Files 3, 4 and the rules part of file 1 were written **before** the results. The
 
 - **Grid used: 15x15** (model `som_15x15_nb11_ep250_s42_v2`), as the instructor requested.
 - **Fair test:** 15x15 and 20x20 were equally good at predicting where the CNN makes mistakes (AUROC 0.629 vs 0.630). With only 92 CNN mistakes the test cannot spot very small differences, but **nothing showed that a bigger grid is better**.
-- The Week 5 error-pattern findings also hold on 20x20 and 10x10 (see `../error_pattern_analysis/`), so **our main findings do not depend on the grid size we chose**.
+- The error-pattern findings also hold on 20x20 and 10x10 (see `../error_pattern_analysis/`), so **our main findings do not depend on the grid size we chose**.
+- **Optuna tuning (2026-11-17):** with the same budget for all three grids and a 5-seed check, the Optuna setting for 15x15 was not clearly different from ours, so the headline map stays. For 20x20 our setting was better; for 10x10 the Optuna setting was better (the 10x10 robustness map is therefore slightly below its best setting).

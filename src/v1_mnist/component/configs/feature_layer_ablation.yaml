@@ -1,0 +1,36 @@
+# ==============================================================================
+# Feature-layer ablation (Phase 2): SOMs on fc1 and fc2 of the Phase 1 LeNet-5, same recipe, 5 SOM seeds.
+# Protocol: src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/FEATURE_LAYER_ABLATION_PROTOCOL.md
+#
+# Only training and validation images and SVHN test are read; the MNIST test split is never loaded.
+# Do not change after the first run; a change needs a new run.revision.
+# ==============================================================================
+
+run:
+  name: feature_layer_ablation
+  # Run folder: <name>_som<H>x<W>_nb<N>_ep<E>_seeds<count>[_<revision>]. Empty for the first run.
+  revision: ""
+
+inputs:
+  cnn_config: src/v1_mnist/component/configs/cnn_baseline.yaml             # MNIST folder
+  som_config: src/v1_mnist/component/configs/som.yaml                       # SOM recipe, hotspot rule, frozen split
+  baselines_config: src/v1_mnist/component/configs/error_pattern_baselines.yaml   # half-split repeats (A1)
+  phase3_provenance_config: src/v1_mnist/component/configs/phase3_shared_provenance.yaml  # checkpoint, SVHN
+
+paths:
+  output_root: ./outputs/v1_mnist/p2_som_training_visualization/feature_layer_ablation
+
+protocol:
+  document: src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/FEATURE_LAYER_ABLATION_PROTOCOL.md
+
+layers: [fc1, fc2]          # compared as fc1 - fc2; fc2 is the Phase 1 layer (reproduction check)
+som_seeds: [1, 2, 3, 4, 5]  # seed s of fc1 is paired with seed s of fc2
+
+extraction:
+  batch_size: 1000
+  device: auto              # "auto", "cuda" or "cpu"
+  image_size: [28, 28]      # Phase 3's SVHN transform: grayscale, bilinear resize, [0, 1]
+  fc2_tolerance: 1.0e-4     # largest allowed |fc2 here - Phase 1 fc2|
+
+statistics:
+  confidence: 0.95          # paired t-interval over the SOM seeds

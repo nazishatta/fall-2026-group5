@@ -73,11 +73,11 @@ evaluation:
 analysis:
   hotspot_error_threshold: 0.35
   purity_metric: majority_vote
-  # Week 4 label-shuffle comparison for the validation weighted purity: labels are
+  # Cluster analysis label-shuffle comparison for the validation weighted purity: labels are
   # shuffled across images (each keeps its neuron). Added 2026-10-10 (docs/DEVIATIONS.md).
   purity_null_shuffles: 1000
   purity_null_seed: 20261010
-  # Week 4 model check: largest allowed relative difference between the recomputed
+  # Cluster analysis model check: largest allowed relative difference between the recomputed
   # quantization error and the training run's value (docs/DEVIATIONS.md, 2026-10-10).
   qe_relative_tolerance: 1.0e-6
   # The one error-hotspot rule: top k = max(min_hotspots, round(hotspot_fraction x
@@ -113,7 +113,7 @@ visualization:
   # in component-plane outputs.
   top_embedding_features: 6
 
-  # Core NNSOM plots requested for Week 3.
+  # Core NNSOM plots requested for SOM training.
   generate_topology: true
   generate_neuron_connection: true
   generate_u_matrix: true
@@ -133,6 +133,6 @@ visualization:
 
   # Extra NNSOM plots (pie, stem, histogram, box, violin, scatter, weights) saved in
   # the "extended" folder. On a 15x15 map with 84 embedding features they can look
-  # dense. Set to false to skip them; visualize_som.py --extended (Week 3) and
-  # cluster_figures.py --extended (Week 4: pie, stem) also turn them on.
+  # dense. Set to false to skip them; visualize_som.py --extended (SOM training) and
+  # cluster_figures.py --extended (cluster analysis: pie, stem) also turn them on.
   generate_extended_dense_plots: true

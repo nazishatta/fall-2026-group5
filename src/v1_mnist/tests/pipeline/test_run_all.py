@@ -220,9 +220,12 @@ def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
     assert "never overwritten" in result.stdout + result.stderr
 
 
-# Configs of other phases, and the one Phase 3 file that is read by steps but is not a step itself.
+# Configs of the other phases (1, 2 and 4); only Phase 3 configs must belong to a Phase 3 runner.
 OTHER_PHASE_CONFIGS = {
     "base.yaml", "cnn_baseline.yaml", "som.yaml", "som_10x10_robustness.yaml", "som_20x20_robustness.yaml",
+    "error_pattern_baselines.yaml", "som_optuna.yaml", "retraining.yaml", "som_reanalysis.yaml",
+    "novelty_after_retraining.yaml", "held_out_class_novelty.yaml",
+    "som_reanalysis_msp_arm.yaml", "error_detector_budget.yaml", "feature_layer_ablation.yaml",
 }
 # Not a step: the shared input fingerprints.
 SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}

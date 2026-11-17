@@ -5,6 +5,7 @@ Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage train
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage summary
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage final_test
+  python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage breakdown
 
 ``check`` looks at the altered images (contact sheet, Phase 1 CNN accuracy on altered validation
 images). Options: --arm NAME, --seed N, --smoke. Same rules as the curriculum comparison.

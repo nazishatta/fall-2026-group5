@@ -121,7 +121,7 @@ P3_OUTPUTS = REPO_ROOT / "outputs/v1_mnist/p3_novelty_detection"
 P3_MANIFEST = P3_OUTPUTS / "run_manifest.csv"
 COMPONENT = REPO_ROOT / "src/v1_mnist/component"
 CONFIGS = COMPONENT / "configs"
-STEP_FOLDERS = ("qe_novelty_detection", "u_matrix_analysis", "novelty_benchmark")
+STEP_FOLDERS = ("qe_novelty_detection", "u_matrix_analysis", "novelty_benchmark", "held_out_class_novelty")
 ROLES = {"result", "reproduction", "historical"}
 HASH_MATCH = "recorded config SHA-256 equals this file"
 

@@ -1,4 +1,4 @@
-# SOM Results (Week 3: SOM Setup with NNSOM)
+# SOM Results (SOM Setup with NNSOM)
 
 ## Official model
 
@@ -6,9 +6,9 @@
 
 | What | Where |
 |---|---|
-| Static figures (Week 3: core, component planes, feature maps, extended) | `figures/som_15x15_nb11_ep250_s42_v2/pdf/` (PDF only; SVG copies from older runs may still be on disk) |
-| Class maps, purity map, class pie/stem (Week 4) | `../cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/` |
-| Error maps (Week 5) | `../error_pattern_analysis/figures/som_15x15_nb11_ep250_s42_v2/` |
+| Static figures (SOM training: core, component planes, feature maps, extended) | `figures/som_15x15_nb11_ep250_s42_v2/pdf/` (PDF only; SVG copies from older runs may still be on disk) |
+| Class maps, purity map, class pie/stem (Cluster analysis) | `../cluster_analysis/figures/som_15x15_nb11_ep250_s42_v2/` |
+| Error maps (Error pattern analysis) | `../error_pattern_analysis/figures/som_15x15_nb11_ep250_s42_v2/` |
 | Interactive report | `../interactive_report/interactive_report.html` |
 | Metrics and logs | `logs/som_15x15_nb11_ep250_s42_v2_*` |
 | QE history | `tables/som_15x15_nb11_ep250_s42_v2_qe_history.csv` |

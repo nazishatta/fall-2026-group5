@@ -27,7 +27,7 @@
 \vspace{0.55cm}
 {\normalsize\bfseries Capstone -- Group 5\par}
 \vspace{0.17cm}
-{\normalsize Fyrooz Khan\par}
+{\normalsize Fyrooz Anika Khan\par}
 {\normalsize Nazish Atta\par}
 \vspace{0.52cm}
 {\normalsize The George Washington University\par}
@@ -37,13 +37,12 @@
 {\normalsize\itshape Dr. Amir Jafari\par}
 {\normalsize\itshape Associate Professor of Data Science\par}
 \vfill
-{\footnotesize Draft for Issue \#18; pending team and instructor review.\par}
 \end{titlepage}
 \clearpage
 \pagenumbering{arabic}
 
 \section{Overview and Scope}
-Following the project's Phase 3 objective, we examine whether a frozen self-organizing map (SOM) and comparison detectors can recognize feature representations that differ from MNIST. A trained MNIST convolutional classifier provides 84-dimensional \texttt{fc2} embeddings, and a frozen $15\times15$ SOM supplies the reference prototypes. MNIST training embeddings ($n=49{,}000$) support fitting; MNIST validation ($n=10{,}500$) forms the in-distribution (ID) evaluation set. The proposal-specified SVHN test split ($n=26{,}032$) is the current external out-of-distribution (OOD) evaluation set, following the instructor clarification on 19 October 2026. Fashion-MNIST and KMNIST are deferred to later phases and are not part of the current Phase 3 results. These are development comparisons, not a final locked MNIST test result.
+Following the project's Phase 3 objective, we examine whether a frozen self-organizing map (SOM) and comparison detectors can recognize feature representations that differ from MNIST. A trained MNIST convolutional classifier provides 84-dimensional \texttt{fc2} embeddings, and a frozen $15\times15$ SOM supplies the reference prototypes. MNIST training embeddings ($n=49{,}000$) support fitting; MNIST validation ($n=10{,}500$) forms the in-distribution (ID) evaluation set. The proposal-specified SVHN test split ($n=26{,}032$) is the current external out-of-distribution (OOD) evaluation set, as specified in the project proposal. Because SVHN is very unlike MNIST, we add a second, harder test (Section~\ref{sec:heldout}): MNIST digits of classes the network never saw, with a new network and map trained on the remaining digits. Fashion-MNIST and KMNIST are deferred to later phases and are not part of the current Phase 3 results. These are development comparisons, not a final locked MNIST test result.
 
 \section{Related Work and Project Contribution}
 Kohonen introduced self-organizing maps, a topology-preserving organization of inputs into neuron prototypes \parencite{kohonen1990som}. Unlike work developing the SOM itself, this study applies an already-trained map as a frozen novelty reference. Vesanto and Alhoniemi investigated clustering of SOM representations \parencite{vesanto2000clustering}; our use of the U-Matrix focuses instead on local prototype separation as a candidate novelty signal.
@@ -66,6 +65,8 @@ Sakurada and Yairi examined reconstruction-based anomaly detection using autoenc
 
 Nalisnick and colleagues showed that deep generative models trained on one image set can give higher likelihood to a different set; the best-known case is SVHN being rated as more typical than the CIFAR-10 images the model was trained on \parencite{nalisnick2019deep}. Our feature autoencoder and Isolation Forest show a similar inversion on SVHN, but in a different setting: they are fitted to a frozen classifier's embeddings rather than to pixels, and our diagnostics relate the inversion to the much shorter SVHN embeddings (Section~\ref{sec:diagnostics}).
 
+Neal and colleagues use an open-set protocol for MNIST in which some digit classes are hidden during training and must be recognized as unknown at test time \parencite{neal2018open}. Vaze and colleagues show that, in this open-set setting, a strong classifier's own maximum softmax probability is a hard baseline to beat \parencite{vaze2022openset}. We adopt the same 6-known/4-unknown class protocol for our held-out-digit test, but score the novel digits with the SOM's quantization error and compare it against that baseline and the other detectors on the same embeddings.
+
 \subsection{Phase 3 Framework Diagram}
 Figure~\ref{fig:framework} summarizes the frozen CNN-to-embedding and SOM scoring workflow, baseline comparisons, and evaluation boundary. The diagram is a conceptual architecture, not a quantitative outcome. The editable \texttt{.drawio} source and exported \texttt{.drawio.svg} are kept in \texttt{fig/novelty\_framework/}, alongside the PDF used for LaTeX inclusion.
 \par\medskip
@@ -81,7 +82,7 @@ The SOM has 225 units and uses an 84-dimensional representation. For scaled embe
  b(x)=\arg\min_j \lVert z(x)-w_j\rVert_2,\qquad
  s_{\mathrm{QE}}(x)=\lVert z(x)-w_{b(x)}\rVert_2.
 \end{equation}
-Higher QE means a sample's embedding lies farther from its nearest map prototype. The historical decision threshold is the 95th percentile of MNIST training QE, $\tau=1.5690279077$; a sample with QE $>\tau$ is flagged. The 19 October 2026 instructor clarification confirmed retaining this training-percentile threshold from the original Phase 3 proposal. Earlier, conflicting validation-threshold review guidance and its resolution are recorded in \texttt{src/v1\_mnist/docs/DEVIATIONS.md}; the threshold was not retroactively tuned.
+Higher QE means a sample's embedding lies farther from its nearest map prototype. The historical decision threshold is the 95th percentile of MNIST training QE, $\tau=1.5690279077$; a sample with QE $>\tau$ is flagged. This training-percentile threshold is the one given in the Phase 3 plan of the project proposal. Earlier, conflicting validation-threshold review guidance and its resolution are recorded in \texttt{src/v1\_mnist/docs/DEVIATIONS.md}; the threshold was not retroactively tuned.
 
 \par\medskip
 \begin{minipage}{0.98\linewidth}\centering
@@ -217,6 +218,43 @@ Whether part of QE's own AUROC is a length effect is tested by \run{mnist_svhn_q
 \captionof{figure}{Recorded lowest-QE SVHN examples missed at the original frozen threshold. These examples are descriptive, not a complete explanation of model behavior. Source run: \runcap{mnist_svhn_missed_qe_figure_s42_v2}.}\label{fig:missed}
 \end{minipage}\par\medskip
 
+\section{Near Novelty: Held-Out MNIST Digits}\label{sec:heldout}
+\subsection{Why and how}
+The SVHN images come from a different source, and their \texttt{fc2} embeddings are much shorter than those of MNIST, so embedding length alone separates them almost perfectly (Section~\ref{sec:diagnostics}). That test therefore cannot tell whether the SOM recognizes new \emph{kinds of digits} or only short embeddings. For a harder test, the novel images should come from the same source, scanner and writing style as the normal ones, so that only their class is new.
+
+We follow the open-set protocol for MNIST \parencite{neal2018open}: 6 known and 4 unknown digits, over 5 class splits drawn once at random (NumPy seed 2026) and fixed in the protocol before any run (Table~\ref{tab:heldout}). For each split we train a new LeNet-5 with 6 outputs (Phase 1 recipe, seed 42, best epoch by validation accuracy on the known digits) and a new $15\times15$ SOM (Phase 2 recipe: neighborhood 11, 250 epochs, seed 42) on the training images of the known digits only. The normal images are the validation images of the 6 known digits (about 6,400 per split); the novel images are the validation images of the 4 unknown digits (about 4,100 per split). Nothing is tuned.
+
+We score the images with the SOM's QE and with max-softmax, energy, Mahalanobis and 5-nearest-neighbor distance, all on the same split's embeddings and all fitted on its training embeddings only. Max-softmax is the strong baseline in this setting \parencite{vaze2022openset}. Embedding length is reported as a diagnostic, not as a detector. The protocol fixed four statements before the run, each tested with a 95\% $t$-interval over the 5 per-split differences and judged as shown, shown in the opposite direction, or inconclusive: (H1) the SOM detects the held-out digits (in every split the QE AUROC interval lies above 0.5); (H2, primary) QE is better than max-softmax; (H3) QE is not worse than max-softmax, energy or Mahalanobis by more than 0.01 AUROC; (H4) QE is better than nearest-neighbor distance. The MNIST test split is not read.
+
+\subsection{Results}
+The six-digit networks reach 99.1--99.4\% accuracy on their known digits, so the novelty test starts from good classifiers. Table~\ref{tab:heldout} gives the AUROC of every score in every split.
+
+\begin{table}[H]
+\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Held-out-digit novelty: AUROC for detecting the 4 unknown digits among the 6 known digits (MNIST validation images), with a new LeNet-5 and a new $15\times15$ SOM per split. Within a split the bootstrap intervals (2,000 resamples) are about $\pm0.005$ wide. The last two rows give QE minus each score, averaged over the 5 splits, with a 95\% $t$-interval. Source run: \runcap{held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42}.}
+\label{tab:heldout}
+\begin{tabular}{@{}cccccccc@{}}\toprule
+Split & Unknown digits & QE & MSP & Energy & Mahalanobis & $k$NN & Length\\\midrule
+1 & 0, 1, 5, 6 & 0.907 & 0.956 & 0.947 & 0.873 & 0.961 & 0.826\\
+2 & 2, 3, 5, 8 & 0.957 & 0.917 & 0.893 & 0.965 & 0.979 & 0.739\\
+3 & 1, 5, 6, 7 & 0.860 & 0.958 & 0.959 & 0.916 & 0.948 & 0.889\\
+4 & 2, 5, 6, 8 & 0.931 & 0.940 & 0.890 & 0.954 & 0.977 & 0.630\\
+5 & 0, 4, 5, 8 & 0.905 & 0.948 & 0.944 & 0.929 & 0.965 & 0.819\\\midrule
+\multicolumn{2}{c}{Mean} & 0.912 & 0.944 & 0.927 & 0.927 & 0.966 & 0.781\\
+\multicolumn{2}{c}{QE minus score} & -- & $-0.032$ & $-0.015$ & $-0.015$ & $-0.054$ & --\\
+\multicolumn{2}{c}{(95\% interval)} & & [$-0.095$, $0.032$] & [$-0.097$, $0.068$] & [$-0.056$, $0.025$] & [$-0.084$, $-0.024$] & \\\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+\item \textbf{H1 shown: the SOM detects digits it has never seen.} The QE AUROC is 0.860 to 0.957, and every split's interval lies well above 0.5. Shuffling the normal/novel labels 1,000 times gives a mean AUROC of 0.500 in every split.
+\item \textbf{Not a length effect this time.} Embedding length alone gives only 0.630 to 0.889, and QE and length are only weakly related (Spearman $-0.32$ to $+0.01$). Unlike SVHN, the separation here comes from where the embeddings lie, not from how long they are.
+\item \textbf{H2 inconclusive: the SOM is not shown to beat max-softmax.} QE is lower than max-softmax in 4 of the 5 splits, by 0.032 AUROC on average (95\% interval $-0.095$ to $+0.032$). Split 2 is the exception, where QE is higher. The splits vary too much for five values to settle the question.
+\item \textbf{H3 inconclusive for all three.} QE is not shown to be within 0.01 of max-softmax, energy or Mahalanobis; the intervals are too wide in both directions.
+\item \textbf{H4 shown in the opposite direction.} Plain nearest-neighbor distance on the same embeddings beats QE in all 5 splits ($-0.054$, interval $-0.084$ to $-0.024$). Summarizing 49,000 training embeddings with 225 prototypes loses detail that the distance to the nearest training embeddings keeps.
+\item \textbf{Where the novel digits land (descriptive).} As with SVHN, the novel images collect in a small part of the map: 90\% of them fall in 33 to 55 of the 225 cells, while 90\% of the normal images need 166 to 174 cells.
+\end{itemize}
+
 \section{Leakage Control and Reproducibility}
 The CNN and SOM were frozen for the documented Phase 3 comparisons. The additionally measured SVHN kNN baseline ($k=5$) and paired QE--MSP comparison are reproducible using the committed runner and fixed configuration; both reproduction and previous run IDs remain separate and immutable. Training embeddings supplied model fitting and the training-derived QE threshold. MNIST validation supplied ID evaluation examples; the official MNIST final-test split was not used for the reported Phase 3 results. External SVHN test samples supplied observed OOD evaluation evidence, not inputs for post-hoc fitting or threshold selection. Fashion-MNIST is outside this report's current evaluation scope. As these external sets have now been examined, further configuration changes using their outcomes would be exploratory and require a new protocol and run IDs; they must not be represented as independent validation.
 
@@ -224,11 +262,13 @@ The preregistration document's recorded writing date does not establish from Git
 
 A separate, newly identified verification run (\path{mnist_historical_baseline_verification_s42_v1}) reproduced all seven historical MNIST-validation summary measurements with zero absolute numerical difference: Isolation Forest and One-Class SVM score means and standard deviations, and the feature autoencoder initial loss, final loss and mean validation reconstruction error. Frozen training and validation embedding SHA-256 fingerprints matched the references. This verification used MNIST training/validation evidence only; its seven comparisons are summary statistics, not a rerun of the full SVHN discrimination experiment. This supports numerical agreement under the currently committed settings, not byte-identical regeneration of the original historical JSON, checkpoint, or execution environment. The original autoencoder checkpoint and historical package-version manifest remain unavailable; old metrics were not overwritten. No final MNIST test or external OOD samples were accessed during this validation-only reproduction.
 
+For the held-out-digit test, the protocol, configuration, class splits and statements were committed before any network or map was trained, and the run records their SHA-256 fingerprints. Each split's network, map and detectors use the training images of the known digits only; the known-digit validation images choose the network's epoch and serve as the normal images; the unknown-digit validation images are used only for scoring. The MNIST test split was not read.
+
 \section{Limitations and Interpretation}
-This report provides fixed-model bootstrap sampling intervals and a paired QE--MSP comparison, and a five-seed assessment of freshly fitted comparison methods, but not variability across five independent CNN/SOM retrainings. The original One-Class SVM used 10,000 MNIST training embeddings whereas some other historically fitted baselines used 49,000. In a separate post-hoc five-seed exploratory evaluation, five newly fitted methods shared 10,000 training examples per seed; four reference methods remained frozen, so not all nine underwent equivalent retraining. QE's separation of SVHN is strongly tied to embedding length (Section~\ref{sec:diagnostics}), so it is untested whether QE holds up on OOD sets whose embedding lengths resemble MNIST's, such as Fashion-MNIST. The cause of the historical autoencoder score behavior and the below-chance Isolation Forest ranking remains unresolved; orientation, consistent preprocessing, and positive-label definitions require a prospective diagnostic evaluation. The separate seven-summary reproduction does not validate the original SVHN AUROCs or establish an identical historic environment. No final locked MNIST test-set result is claimed. The comparison demonstrates useful novelty ranking on the examined distributions, not universal or clinically transferable OOD behavior.
+This report provides fixed-model bootstrap sampling intervals and a paired QE--MSP comparison, and a five-seed assessment of freshly fitted comparison methods, but not variability across five independent CNN/SOM retrainings. The original One-Class SVM used 10,000 MNIST training embeddings whereas some other historically fitted baselines used 49,000. In a separate post-hoc five-seed exploratory evaluation, five newly fitted methods shared 10,000 training examples per seed; four reference methods remained frozen, so not all nine underwent equivalent retraining. QE's separation of SVHN is strongly tied to embedding length (Section~\ref{sec:diagnostics}), so the SVHN result alone does not show whether QE holds up on novel images whose embedding lengths resemble MNIST's. The held-out-digit test addresses this for MNIST digits, but it uses one network and one map per split, five splits only, and an unbalanced draw (digit 5 is unknown in four splits and 9 in none); Fashion-MNIST remains untested. The cause of the historical autoencoder score behavior and the below-chance Isolation Forest ranking remains unresolved; orientation, consistent preprocessing, and positive-label definitions require a prospective diagnostic evaluation. The separate seven-summary reproduction does not validate the original SVHN AUROCs or establish an identical historic environment. No final locked MNIST test-set result is claimed. The comparison demonstrates useful novelty ranking on the examined distributions, not universal or clinically transferable OOD behavior.
 
 \section{Conclusion and Next Phase}
-The primary MNIST-validation versus SVHN comparison finds energy and MSP above SOM QE in AUROC, while QE remains a meaningful frozen-prototype distance signal. As a detector, the SOM therefore does not beat the classifier's own confidence. What it adds is location: the map shows SVHN collapsing onto 28 of 225 units, mostly one, and names the units that hold the images QE misses (Section~\ref{sec:overlay}), which the guided-retraining phase can target. The paired QE--MSP comparison confirms this difference for these fixed samples with a resampling interval below zero. The historical SVHN comparison shows stronger QE ranking relative to its original comparison set, but the additional SVHN baselines outperform it. A future prospectively specified study should extend the exploratory common-sample and multi-seed controls to fully matched fitting budgets and independently retrained CNN/SOM models, resolve historical reproduction gaps, and fix the final selection rules before using the untouched MNIST final-test split. These Phase 3 outputs can inform the project's subsequent guided-retraining work without prematurely claiming final benchmark success.
+The primary MNIST-validation versus SVHN comparison finds energy and MSP above SOM QE in AUROC, while QE remains a meaningful frozen-prototype distance signal. As a detector, the SOM therefore does not beat the classifier's own confidence. What it adds is location: the map shows SVHN collapsing onto 28 of 225 units, mostly one, and names the units that hold the images QE misses (Section~\ref{sec:overlay}), which the guided-retraining phase can target. The paired QE--MSP comparison confirms this difference for these fixed samples with a resampling interval below zero. The historical SVHN comparison shows stronger QE ranking relative to its original comparison set, but the additional SVHN baselines outperform it. A future prospectively specified study should extend the exploratory common-sample and multi-seed controls to fully matched fitting budgets and independently retrained CNN/SOM models, resolve historical reproduction gaps, and fix the final selection rules before using the untouched MNIST final-test split. On the harder held-out-digit test, where embedding length no longer explains the result, the SOM still detects digits it has never seen (AUROC 0.860 to 0.957 over five splits), but it is not shown to beat max-softmax, and plain nearest-neighbor distance beats it in every split. These Phase 3 outputs can inform the project's subsequent guided-retraining work without prematurely claiming final benchmark success.
 
 \printbibliography[title={References}]
 \end{document}

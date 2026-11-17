@@ -1,4 +1,4 @@
-"""Week 3 SOM training with a quantization-error history (the training used for the
+"""SOM training with a quantization-error history (the training used for the
 saved models when ``som.track_qe_history`` is true, as in som.yaml).
 
 ``train_som_with_history`` is a standard batch SOM: it recomputes winners from

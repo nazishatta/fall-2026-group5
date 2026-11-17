@@ -1,64 +1,12 @@
-# Phase 3: Novelty Detection
+# Phase 3: Novelty Detection (`src/v1_mnist/component/p3_novelty_detection/`)
 
-The newest run folder for each result is listed in the "Start here" table of `outputs/v1_mnist/p3_novelty_detection/README.md`.
+Tests whether the SOM can tell unfamiliar images from familiar ones, using the frozen Phase 1 CNN and the official SOM. MNIST validation images are the familiar set and SVHN is the outside set; the held-out test split is not used. **Order:** `qe_novelty_detection` → `u_matrix_analysis` → `novelty_benchmark`, then the extra `held_out_class_novelty` test. The newest run folder for each result is listed in the "Start here" table of `outputs/v1_mnist/p3_novelty_detection/README.md`.
 
-Evaluates unfamiliar images using frozen MNIST CNN/SOM representations,
-quantization error (QE), U-Matrix scores, and OOD baselines. MNIST
-validation and SVHN are used for evaluation; the held-out MNIST
-test split is excluded.
+## Folders
 
-```text
-p3_novelty_detection/
-├── qe_novelty_detection/
-│   ├── run_qe_novelty.py                 ▶ QE novelty detection
-│   ├── run_qe_ood.py                     ▶ external OOD evaluation
-│   ├── run_qe_random_control.py          ▶ random-selection control
-│   ├── run_qe_threshold_sweep.py         ▶ QE at several percentile cutoffs
-│   └── quantization_novelty.py, qe_threshold_sweep.py, ood_*.py, novelty_figures.py
-├── u_matrix_analysis/
-│   ├── run_qe_u_matrix.py                ▶ QE/U-Matrix analysis
-│   ├── run_qe_umatrix_validation_figure.py ▶ validation figure
-│   ├── run_u_matrix_grid_figure.py       ▶ grid visualization
-│   ├── run_proposal_gap_analysis.py      ▶ proposal-gap analysis
-│   ├── run_svhn_som_overlay.py           ▶ SVHN on the SOM grid, where QE misses
-│   └── u_matrix_novelty.py, novelty_overlay.py, svhn_som_overlay.py
-└── novelty_benchmark/
-    ├── run_svhn_benchmark.py             ▶ SVHN benchmark
-    ├── run_required_baselines.py         ▶ required baselines
-    ├── run_qe_energy_knn_paired.py       ▶ paired comparisons
-    ├── run_qe_umatrix_random_ood.py      ▶ QE/U-Matrix control
-    ├── run_standardized_autoencoder.py   ▶ autoencoder diagnostic
-    ├── run_fair_budget_baselines.py      ▶ fitting-budget comparison
-    ├── run_historical_baseline_verification.py ▶ baseline audit
-    ├── run_missed_svhn_figure.py         ▶ missed-SVHN visualization
-    ├── run_autoencoder_scaling.py        ▶ autoencoder / Isolation Forest by size and scaling
-    ├── unified_novelty_benchmark.py      ▶ all nine detectors in one run
-    ├── svhn_inverted_norm_diagnostic.py  ▶ SVHN embedding-norm diagnostic
-    ├── run_qe_norm_dependence.py         ▶ QE versus embedding norm (correlation, norm-matched AUROC)
-    ├── consolidate_phase3_evidence.py    ▶ headline numbers of three runs in one table
-    ├── inspect_svhn_scores.py            ▶ read-only SVHN score inspection
-    └── other Python modules              scoring and analysis helpers
-```
-
-**Order (set by `ORDER` in `pipeline/run_all.py`):** `qe_novelty`, then
-the whole `novelty_benchmark` runner (its `svhn_benchmark` writes the SVHN score arrays
-that later steps read), then `qe_threshold_sweep`, then the whole `u_matrix_analysis`
-runner. Select the appropriate configuration for each experiment. ▶ = runnable script.
-
-**Runners:** one step runner per folder above, in
-`pipeline/p3_novelty_detection/`: `run_qe_novelty_detection.py`,
-`run_u_matrix_analysis.py` and `run_novelty_benchmark.py`. Each supports
-`--dry-run` and `--only STEP` (with `--config` for a new run ID), and skips
-steps whose results already exist. The shared `pipeline/run_all.py` runs all
-three in dependency order as the step `novelty_detection`
-(`run_all.py --from novelty_detection`).
-
-**Results:** `outputs/v1_mnist/p3_novelty_detection/`, separated by
-step and unique run ID. Existing experiment results must not be overwritten.
-
-See the [Phase 3 documentation](../../docs/p3_novelty_detection/README.md)
-for configuration-to-run-ID traceability and scientific reports.
-
-
-See the [historical provenance audit](../../docs/p3_novelty_detection/qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md)
-for SHA-256 verification and unresolved historical provenance.
+| Folder | What is inside |
+|---|---|
+| [`qe_novelty_detection/`](qe_novelty_detection/README.md) | Proposal step Novelty Detection via Quantization Error: uses the SOM's quantization error (QE, the distance from an image's embedding to its nearest neuron) as a novelty score. |
+| [`u_matrix_analysis/`](u_matrix_analysis/README.md) | Proposal step U-Matrix & Topological Analysis: the U-Matrix shows how far each neuron is from its neighbours, so it marks borders between regions of the map. |
+| [`novelty_benchmark/`](novelty_benchmark/README.md) | Proposal step Comparative Evaluation: compares the SOM scores (QE, U-Matrix) with other novelty detectors on the same embeddings: Isolation Forest, One-Class SVM, an autoencoder, max-softmax probability, energy, Mahalanobis distance and k-nearest-neighbour distance. |
+| [`held_out_class_novelty/`](held_out_class_novelty/README.md) | A harder ("near") novelty test, asked for in Review #5. |

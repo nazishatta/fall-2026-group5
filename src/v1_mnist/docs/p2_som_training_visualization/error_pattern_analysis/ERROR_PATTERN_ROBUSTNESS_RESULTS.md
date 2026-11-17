@@ -1,6 +1,6 @@
 # Error-pattern robustness results (MNIST)
 
-> Renamed on 2026-10-09 to use the project proposal's term (Week 5: Error Pattern Analysis) instead of "RQ2". Only names changed: this file was `RQ2_ROBUSTNESS_RESULTS.md`, the rules file was `RQ2_ROBUSTNESS_CRITERIA.md`, the code was `rq2_robustness.py` / `rq2_robustness_verdict.py`, and the raw outputs were `*_rq2_robustness.json` / `rq2_robustness_verdict.json`. The rules file itself is left word for word as committed, so it still says "RQ2". The numbers are unchanged.
+> Renamed on 2026-10-09 to use the project proposal's term (Error Pattern Analysis) instead of "RQ2". Only names changed: this file was `RQ2_ROBUSTNESS_RESULTS.md`, the rules file was `RQ2_ROBUSTNESS_CRITERIA.md`, the code was `rq2_robustness.py` / `rq2_robustness_verdict.py`, and the raw outputs were `*_rq2_robustness.json` / `rq2_robustness_verdict.json`. The rules file itself is left word for word as committed, so it still says "RQ2". The numbers are unchanged.
 >
 > The two findings are named with the proposal's terms (Objective 4: "error hotspots" and "overlap regions"). The rules file calls them **Claim A** (= hotspot concentration) and **Claim B** (= overlap regions); the raw outputs used the keys `claim_a` / `claim_b` until 2026-10-09.
 
@@ -59,7 +59,7 @@ On every grid, misclassified images sit farther from their best-matching cell.
 
 - p = 0.005 is the smallest value possible with 200 shuffles: no shuffle came close to the real result.
 - With only 92 mistakes the ranges are wide. The conclusion rests on every grid being far above chance, not on the exact ratios.
-- These ratios are not meant for comparing grids with each other; that comparison is in `../som_nnsom_training/GRID_COMPARISON_RESULTS.md` (Week 3).
+- These ratios are not meant for comparing grids with each other; that comparison is in `../som_nnsom_training/GRID_COMPARISON_RESULTS.md` (SOM training).
 - Observation, not a finding: in that comparison, smaller grids tended to predict CNN errors slightly better on held-out data, likely because each cell holds more images. The differences were not statistically clear, and the error-pattern findings here were the same on all three grids.
 
 ## Sentence for the paper

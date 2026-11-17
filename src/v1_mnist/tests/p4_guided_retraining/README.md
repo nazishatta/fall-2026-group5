@@ -1,12 +1,18 @@
-# Phase 4: Guided Retraining (Weeks 9–11) — Tests
+# Phase 4 tests (`src/v1_mnist/tests/p4_guided_retraining/`)
 
-> `p4` in the folder name means **Phase 4**.
+Tests for the Phase 4 code, one folder per step, with the same names as `component/p4_guided_retraining/`. `synthetic_data.py` is a tiny made-up dataset the Phase 4 tests share. Run them with `python -m pytest src/v1_mnist/tests/p4_guided_retraining -q`.
 
-`hard_example_mining/` tests the difficulty rules, pools, run-ID preflight, fixed pool settings and the curriculum. `targeted_augmentation/` tests the altered copies and the augmented arms. `som_reanalysis/` tests the map measures, CKA, the paired comparison, a tiny stored SOM and the analysis stage with figures. `synthetic_data.py` is a tiny made-up dataset the tests share. Tests of the code shared by both steps are in `tests/utils/` (`test_retraining_support.py`; `test_cnn_retraining.py` needs PyTorch).
+## Folders
 
-```
-p4_guided_retraining/
-├── hard_example_mining/           # hard-example pool, curriculum schedule
-├── targeted_augmentation/         # augmentation only in hotspot neurons
-└── som_reanalysis/                # old vs. new SOM comparison
-```
+| Folder | What is inside |
+|---|---|
+| [`hard_example_mining/`](hard_example_mining/README.md) | Tests for the code in `component/p4_guided_retraining/hard_example_mining/`. |
+| [`targeted_augmentation/`](targeted_augmentation/README.md) | Tests for the code in `component/p4_guided_retraining/targeted_augmentation/`. |
+| [`som_reanalysis/`](som_reanalysis/README.md) | Tests for the code in `component/p4_guided_retraining/som_reanalysis/`. |
+| [`novelty_after_retraining/`](novelty_after_retraining/README.md) | Tests for the code in `component/p4_guided_retraining/novelty_after_retraining/`. |
+
+## Files
+
+| File | What it is |
+|---|---|
+| `synthetic_data.py` | A tiny made-up RetrainingData for the Phase 4 tests (no MNIST files, no PyTorch). |

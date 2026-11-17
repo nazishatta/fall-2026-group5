@@ -2,4 +2,4 @@
 
 This directory tracks chronological weekly progress and milestones for the MNIST experiments:
 
-- `som_training_progress.md`: Weekly logs covering data preparation, CNN baseline training, and NNSOM grid selection / analysis.
+- `Progress_Report_2026-11-17.md`: Weekly logs of the whole project: CNN baseline, SOM training and analysis, novelty detection, guided retraining, and paper writing.

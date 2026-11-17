@@ -2,14 +2,14 @@
 \centering
 \renewcommand{\arraystretch}{1.15}
 \small
-\begin{tabular}{|p{0.23\textwidth}|p{0.19\textwidth}|p{0.11\textwidth}|p{0.15\textwidth}|p{0.10\textwidth}|p{0.10\textwidth}|}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|>{\raggedright\arraybackslash}p{0.14\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|}
 \hline
-\textbf{Score} & \textbf{AUROC (95\% range)} & \textbf{Avg. precision} & \textbf{Hotspot ratio} & \textbf{Images in hotspots} & \textbf{Errors in hotspots} \\ \hline
+\textbf{Score} & \textbf{AUROC (95\% range)} & \textbf{Average precision} & \textbf{Hotspot ratio} & \textbf{Images in hotspots} & \textbf{Errors in hotspots} \\ \hline
 SOM 15$\times$15 cell error rate & 0.685 (0.624--0.738) & 0.053 & 11.1 (6.1--17.6) & 1.6\% & 18.1\% \\ \hline
 k-means, 225 clusters, cell error rate & 0.693 (0.651--0.729) & 0.034 & 5.6 (4.6--6.1) & 3.8\% & 20.4\% \\ \hline
-kNN impurity ($k=15$) & 0.874 (0.829--0.917) & 0.228 & -- & -- & -- \\ \hline
-CNN max-softmax probability & 0.981 (0.974--0.987) & 0.336 & -- & -- & -- \\ \hline
+kNN impurity ($k=15$) & 0.874 (0.829--0.917) & 0.228 & 30.2$^\dagger$ & 1.6\%$^\dagger$ & 48.7\% (39.6--58.3)$^\dagger$ \\ \hline
+CNN max-softmax probability & 0.981 (0.974--0.987) & 0.336 & 33.0$^\dagger$ & 1.6\%$^\dagger$ & 53.3\% (44.5--64.3)$^\dagger$ \\ \hline
 \end{tabular}
-\caption{How well each score finds the 92 validation images that the CNN gets wrong (10,500 images in total). AUROC ranges come from repeated half-splits for the cell scores, and from bootstrap resampling for kNN impurity and max-softmax. Hotspot ratio: share of mistakes divided by share of images in the 11 hotspot cells, chosen on one half and measured on the other. For k-means: median of 10 seeds, with the lowest and highest in brackets. Chance level is about 1 ($p=0.005$ for the SOM and for every k-means seed).}
+\caption{How well each score finds the 92 validation images that the CNN gets wrong (10,500 images in total). AUROC ranges come from repeated half-splits for the cell scores, and from bootstrap resampling for kNN impurity and max-softmax. Hotspot ratio: share of mistakes divided by share of images in the 11 hotspot cells, chosen on one half and measured on the other. For k-means: median of 10 seeds, with the lowest and highest in brackets. Chance level is about 1 ($p=0.005$ for the SOM and for every k-means seed). $^\dagger$kNN impurity and max-softmax score each image and form no cells, so instead they flag the same share of images as the SOM's hotspots (1.6\%, the images with the highest scores), on all validation images; the share of mistakes caught has a bootstrap interval. At k-means' share (3.8\%) they catch 75.9\% and 82.6\% of the mistakes. This same-budget comparison was added after the results were seen and is exploratory.}
 \label{tab:error-pattern-baselines}
 \end{table}

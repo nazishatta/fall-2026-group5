@@ -1,0 +1,78 @@
+{
+  "baseline_results_sha256": "1b63d21efe922dc2e32036cebe3eee074106218082ddffee4afc23cae23e7639",
+  "baseline_run_id": "error_pattern_baselines_som_15x15_nb11_ep250_s42_v2_r1",
+  "budgets": {
+    "same_share_as_kmeans_cell": {
+      "cells": {
+        "error_share": 0.20371739130434782,
+        "image_share": 0.037958000000000006,
+        "ratio": 5.366915836038458
+      },
+      "scores": {
+        "knn_impurity": {
+          "error_share": 0.7591513586956522,
+          "error_share_high": 0.8403837551139497,
+          "error_share_low": 0.6746280433174947,
+          "image_share": 0.037958000000000006,
+          "images_flagged": 398.5590000000001,
+          "ratio": 19.99977234563602
+        },
+        "max_softmax": {
+          "error_share": 0.8260869565217391,
+          "error_share_high": 0.9069827379525293,
+          "error_share_low": 0.7528089887640449,
+          "image_share": 0.037958000000000006,
+          "images_flagged": 398.5590000000001,
+          "ratio": 21.763184480787686
+        }
+      }
+    },
+    "same_share_as_som_cell": {
+      "cells": {
+        "error_share": 0.1807608695652174,
+        "image_share": 0.01612,
+        "ratio": 11.213453446973784
+      },
+      "scores": {
+        "knn_impurity": {
+          "error_share": 0.48725897920604916,
+          "error_share_high": 0.5834981585491826,
+          "error_share_low": 0.39621957120377654,
+          "image_share": 0.01612,
+          "images_flagged": 169.26,
+          "ratio": 30.226983821715212
+        },
+        "max_softmax": {
+          "error_share": 0.532608695652174,
+          "error_share_high": 0.6428914835164834,
+          "error_share_low": 0.4448412449392712,
+          "image_share": 0.01612,
+          "images_flagged": 169.26,
+          "ratio": 33.04024166576762
+        }
+      }
+    }
+  },
+  "config_sha256": "7492e2053c6e841d879f913cae48f4ee1461d60341ae0d8411cbe5e04989390e",
+  "environment": {
+    "numpy": "2.4.4",
+    "python": "3.13.14"
+  },
+  "exploratory": true,
+  "inputs_sha256": {
+    "som_model": "e02d4849353348b7b7a0d7dca61a17d34a80b20d9d476d69542f1456555c1831",
+    "train_features": "26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65",
+    "val_cells_som": "bcfdb20a244d96d5c3e6b6eb797b98cf3c2ee83ef99bc6f1fae234564b454369",
+    "val_features": "e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d"
+  },
+  "run_id": "error_detector_budget_som_15x15",
+  "settings": {
+    "bootstrap_resamples": 2000,
+    "bootstrap_seed": 2026,
+    "knn_neighbors": 15
+  },
+  "split": "val",
+  "test_used": false,
+  "validation_errors": 92,
+  "validation_samples": 10500
+}

@@ -1,4 +1,4 @@
-"""Week 4 (Cluster Analysis): the quantization-error model check."""
+"""Cluster Analysis: the quantization-error model check."""
 
 import math
 from pathlib import Path
@@ -15,7 +15,7 @@ QE_RTOL = float(analysis_config(None, REPO_ROOT).qe_relative_tolerance)   # 1e-6
 
 
 def test_rounding_difference_between_library_versions_passes() -> None:
-    # Real values: Week 3 on EC2 vs recomputed on the laptop (15x15 training split).
+    # Real values: SOM training on EC2 vs recomputed on the laptop (15x15 training split).
     result = check_quantization_error("train", 1.038720629452448, 1.0387206275713383, QE_RTOL)
     assert result["relative_difference"] < 1e-8
     assert result["relative_tolerance"] == QE_RTOL == 1e-6

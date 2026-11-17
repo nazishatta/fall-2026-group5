@@ -1,125 +1,29 @@
 # Tests (`src/v1_mnist/tests/`)
 
-The tests are grouped by **project phase**, and inside each phase by **project week**, in the same order as the capstone proposal.
-Each folder holds the tests for the code written in that week.
-Weeks 12–14 (results, paper, code release) have no folder because they produce no new code to test.
+Unit and regression tests. The folders have the same names as `component/`, so the tests for `component/<phase>/<step>/` are in `tests/<phase>/<step>/`. Tests that need PyTorch or NNSOM are skipped when those are not installed.
 
-> **Naming:** the `p` in `p1_…`, `p2_…`, `p3_…`, `p4_…` means **phase** (e.g. `p2_som_training_visualization` = Phase 2: SOM Training & Visualization).
-
-## Folders in proposal order
-
-| Order | Folder | Proposal week | What the tests check |
-|---|---|---|---|
-| **Phase 1: Model Training Baseline** | `p1_model_training_baseline/` | | |
-| 1 | `data_pipeline/` | Week 1: Environment Setup & Data Pipeline | 70/15/15 split sizes, image shape and range, all classes present, class-distribution figure saved as one PDF with embedded fonts |
-| 2 | `cnn_baseline_training/` | Week 2: Train Baseline CNN | LeNet-5 output shape, `fc2` feature layer, 84-D embeddings are finite, extractor metadata, run IDs (no overwriting a CNN run) |
-| **Phase 2: SOM Training & Visualization** | `p2_som_training_visualization/` | | |
-| 3 | `som_nnsom_training/` | Week 3: SOM Setup with NNSOM | Memory-safe SVD init, our trainer matches NNSOM, model save path, run-ID preflight (no overwriting a run), SOM and QE-curve figures saved as one PDF each (embedded TrueType fonts, no SVG); optional dense-layer rasterizing |
-| 4 | `cluster_analysis/` | Week 4: Cluster Analysis | BMU reconstruction, neuron entropy, staggered-grid coordinates, cluster purity, class–neuron intersection, heatmap saved as one PDF (no SVG) |
-| 5 | `error_pattern_analysis/` | Week 5: Error Pattern Analysis | Wilson lower bound for neuron error rates |
-| **Phase 3: Novelty Detection** | `p3_novelty_detection/` | | |
-| 6 | `qe_novelty_detection/` | Week 6: Novelty Detection via Quantization Error | Measures, CKA, paired comparison, a tiny stored SOM, analysis and figures |
-| 7 | `u_matrix_analysis/` | Week 7: U-Matrix & Topological Analysis | *(empty, to be added)* |
-| 8 | `novelty_benchmark/` | Week 8: Comparative Evaluation | *(empty, to be added)* |
-| **Phase 4: Guided Retraining** | `p4_guided_retraining/` | | |
-| 9 | `hard_example_mining/` | Week 9: Hard Example Mining | The three difficulty rules, the msp and random pools (equal size, same digit mix), the run-ID preflight, and the pool rules staying as fixed in `retraining.yaml` |
-| 10 | `targeted_augmentation/` | Week 10: Targeted Data Augmentation | Altered copies keep shape, range and labels and are seeded; every augmented arm adds the same number of images with the SOM pool's digit mix |
-| 11 | `som_reanalysis/` | Week 11: Iterative SOM Re-analysis | *(empty, to be added)* |
-
-## Files in each folder
-
-```
-tests/
-├── README.md
-├── conftest.py                                      # adds the code root to the import path
-├── test_repository_rules.py                         # whole-repo rules: no figures or large files in git, PDF only,
-│                                                    #   no overwrite options, no seeds in code, no digit-first names,
-│                                                    #   every Phase 3 result traces to its run and code
-├── pipeline/                                        # the runners in component/pipeline
-│   └── test_run_all.py                              # run_all.py order (Phases 1-3) and the Phase 3 runners (--dry-run)
-├── utils/                                           # shared code in component/utils
-│   ├── test_config_run_names.py                     # old week-numbered run names are refused
-│   ├── test_file_hash.py                            # SHA-256 fingerprints of files
-│   ├── test_repo_paths.py                           # config paths cannot point outside the repository
-│   ├── test_run_ids.py                              # unsafe run IDs are refused
-│   ├── test_seed_from_config.py                     # training.seed comes only from the config
-│   └── test_shared_provenance.py                    # Phase 3 frozen inputs match the shared SHA-256 manifest
-├── p1_model_training_baseline/
-│   ├── data_pipeline/                               # Week 1
-│   │   ├── test_data_loader.py
-│   │   └── test_class_distribution_figure.py
-│   └── cnn_baseline_training/                       # Week 2
-│       ├── test_lenet5.py
-│       ├── test_feature_extractor.py
-│       ├── test_cnn_run_id.py
-│       └── test_accuracy_interval.py
-├── p2_som_training_visualization/
-│   ├── som_nnsom_training/                          # Week 3
-│   │   ├── test_memory_safe_init.py
-│   │   ├── test_trainer_vs_nnsom.py
-│   │   ├── test_model_save_path.py
-│   │   ├── test_run_id_preflight.py
-│   │   ├── test_som_figure_formats.py
-│   │   ├── test_dataset_info.py
-│   │   └── test_embeddings_folder.py
-│   ├── cluster_analysis/                            # Week 4
-│   │   ├── test_bmu_assignment_and_entropy.py
-│   │   ├── test_cluster_metrics.py
-│   │   ├── test_confusion_overlay.py
-│   │   ├── test_heatmap_figure.py
-│   │   ├── test_purity_label_shuffle.py
-│   │   └── test_qe_model_check.py
-│   ├── error_pattern_analysis/                      # Week 5
-│   │   ├── test_error_metrics.py
-│   │   ├── test_hotspot_rule.py
-│   │   └── test_frozen_settings.py
-│   └── interactive_report/
-│       └── test_js_order.py
-├── p3_novelty_detection/
-│   ├── qe_novelty_detection/                        # Week 6   (empty)
-│   ├── u_matrix_analysis/                           # Week 7   (empty)
-│   └── novelty_benchmark/                           # Week 8   (empty)
-└── p4_guided_retraining/
-    ├── hard_example_mining/                         # Week 9
-    │   ├── test_difficulty_and_pools.py
-    │   ├── test_build_pools.py
-    │   └── test_curriculum.py
-    ├── targeted_augmentation/                       # Week 10
-    │   └── test_augmentation_arms.py
-    └── som_reanalysis/                              # Week 11
-```
-
-Each phase folder has its own short `README.md`. Tests for shared code in `component/utils` go in `utils/`; checks that cover the whole repository stay in `test_repository_rules.py` at the top of `tests/`.
-
-## Ideas for the empty folders
-
-- **Week 6:** the 95th-percentile threshold is computed correctly; samples above it are flagged as novel.
-- **Week 7:** the U-Matrix has one value per neuron; novelty scores rise for samples far from all prototypes.
-- **Week 8:** AUROC, AUPR and FPR@95%TPR give known answers on a tiny hand-made example.
-- **Week 9:** the hard-example pool contains only hotspot or boundary samples; the curriculum's hard share grows on schedule.
-- **Week 10:** augmentation is applied only to samples in hotspot neurons.
-- **Week 11:** the old-vs-new SOM comparison works on two tiny hand-made maps.
-
-## How to run
-
-Run from the code root (`Code_local/`) so imports resolve.
+Run every test from the code root:
 
 ```bash
-# all tests
-python -m pytest src/v1_mnist/tests -v
-
-# one phase
-python -m pytest src/v1_mnist/tests/p2_som_training_visualization -v
-
-# one week
-python -m pytest src/v1_mnist/tests/p2_som_training_visualization/cluster_analysis -v
-
-# one file
-python -m pytest src/v1_mnist/tests/p1_model_training_baseline/cnn_baseline_training/test_lenet5.py -v
+python -m pytest src/v1_mnist/tests -q
 ```
 
-## Adding a test
+`test_repository_rules.py` checks rules for the whole repository: no figures or large files in git, PDF-only figures, no overwrite options, no seeds hard-coded in the code, no module names starting with a digit, and that every Phase 3 result traces to its run and code.
 
-1. Put it in the week folder (inside its phase folder) whose code it tests.
-2. Name the file `test_<what_it_checks>.py`. Use a name not already used in another folder.
-3. If a test checks code from two weeks, split it so each part sits in its own week's folder.
+## Folders
+
+| Folder | What is inside |
+|---|---|
+| [`p1_model_training_baseline/`](p1_model_training_baseline/README.md) | Tests for the Phase 1 code, one folder per step, with the same names as `component/p1_model_training_baseline/`. |
+| [`p2_som_training_visualization/`](p2_som_training_visualization/README.md) | Tests for the Phase 2 code, one folder per step, with the same names as `component/p2_som_training_visualization/`. |
+| [`p3_novelty_detection/`](p3_novelty_detection/README.md) | Tests for the Phase 3 code, one folder per step, with the same names as `component/p3_novelty_detection/`. |
+| [`p4_guided_retraining/`](p4_guided_retraining/README.md) | Tests for the Phase 4 code, one folder per step, with the same names as `component/p4_guided_retraining/`. |
+| [`pipeline/`](pipeline/README.md) | Tests for the code in `component/pipeline/`. |
+| [`utils/`](utils/README.md) | Tests for the code in `component/utils/`. |
+
+## Files
+
+| File | What it is |
+|---|---|
+| `conftest.py` | Adds the code root to the import path so the tests can import the project code. |
+| `test_repository_rules.py` | Repository rules that .gitignore alone cannot enforce (project rules, Large files / Figures). |
