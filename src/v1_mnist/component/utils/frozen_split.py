@@ -1,8 +1,11 @@
 """Rebuild the project's frozen data split from the saved sample IDs.
 
 The split is not re-drawn with a random seed. Phase 1 saved the sample IDs of every split next to
-the embeddings (an ID is a position in the 70,000 images: MNIST train 0..59999, then MNIST test
-60000..69999), so the images are looked up by those IDs. That keeps the split identical whatever
+the embeddings (an ID is a position in all the dataset's images: the original training images
+first, then the original test images; for MNIST and Fashion-MNIST 0..59999 and 60000..69999), so
+the images are looked up by those IDs. Which dataset, and the input size the network expects, come
+from a ``DatasetSpec`` (default MNIST, 1 x 28 x 28) built from the Phase 1 config.
+That keeps the split identical whatever
 training seed a Phase 4 run uses, and every look-up is checked against the saved labels.
 
 The test split has its own function (``load_test_images``). Training code never calls it.
@@ -16,9 +19,17 @@ from pathlib import Path
 
 import numpy as np
 
+from src.v1_mnist.component.utils.image_datasets import (
+    DatasetSpec,
+    dataset_source,
+    load_raw_images,
+    to_model_input,
+)
+
 IMAGE_MAGIC = 2051
 LABEL_MAGIC = 2049
-MNIST_FILES = {
+MNIST_SPEC = DatasetSpec()   # the default dataset: MNIST, 1 x 28 x 28
+IDX_FILES = {   # the MNIST file layout, also used by Fashion-MNIST and KMNIST
     "train_images": "train-images-idx3-ubyte",
     "train_labels": "train-labels-idx1-ubyte",
     "test_images": "t10k-images-idx3-ubyte",
@@ -28,7 +39,7 @@ MNIST_FILES = {
 
 @dataclass(frozen=True)
 class SplitImages:
-    """Images (scaled to 0..1, shape N x 28 x 28), labels and sample IDs of one split."""
+    """Images (scaled to 0..1, N x H x W, or N x C x H x W for colour), labels and sample IDs of one split."""
 
     images: np.ndarray
     labels: np.ndarray
@@ -41,11 +52,11 @@ def _read_bytes(folder: Path, name: str) -> bytes:
         return plain.read_bytes()
     if packed.is_file():
         return gzip.decompress(packed.read_bytes())
-    raise FileNotFoundError(f"MNIST file not found: {plain} (or .gz). Check paths.data_root.")
+    raise FileNotFoundError(f"Dataset file not found: {plain} (or .gz). Check paths.data_root.")
 
 
 def read_idx(folder: Path, name: str, magic: int) -> np.ndarray:
-    """Read one MNIST idx file (images or labels)."""
+    """Read one idx file (images or labels) in the MNIST file format."""
     raw = _read_bytes(folder, name)
     if int.from_bytes(raw[:4], "big") != magic:
         raise ValueError(f"{name}: unexpected file header.")
@@ -56,18 +67,24 @@ def read_idx(folder: Path, name: str, magic: int) -> np.ndarray:
     return np.frombuffer(raw, dtype=np.uint8, offset=8).reshape(count)
 
 
-def load_combined_mnist(data_root: Path) -> tuple[np.ndarray, np.ndarray]:
-    """All 70,000 MNIST images (float32, 0..1) and labels, in sample-ID order."""
-    folder = Path(data_root) / "MNIST" / "raw"
-    images = np.concatenate([
-        read_idx(folder, MNIST_FILES["train_images"], IMAGE_MAGIC),
-        read_idx(folder, MNIST_FILES["test_images"], IMAGE_MAGIC),
-    ]).astype(np.float32) / 255.0
-    labels = np.concatenate([
-        read_idx(folder, MNIST_FILES["train_labels"], LABEL_MAGIC),
-        read_idx(folder, MNIST_FILES["test_labels"], LABEL_MAGIC),
-    ]).astype(np.int64)
-    return images, labels
+def load_combined_images(
+    data_root: Path, dataset: DatasetSpec = MNIST_SPEC
+) -> tuple[np.ndarray, np.ndarray]:
+    """All images of the dataset (float32, 0..1, in the network's input size) and labels, in sample-ID order."""
+    source = dataset_source(dataset.name)
+    if source.idx_files:
+        folder = Path(data_root) / source.folder / "raw"
+        raw = np.concatenate([
+            read_idx(folder, IDX_FILES["train_images"], IMAGE_MAGIC),
+            read_idx(folder, IDX_FILES["test_images"], IMAGE_MAGIC),
+        ])
+        labels = np.concatenate([
+            read_idx(folder, IDX_FILES["train_labels"], LABEL_MAGIC),
+            read_idx(folder, IDX_FILES["test_labels"], LABEL_MAGIC),
+        ]).astype(np.int64)
+    else:
+        raw, labels = load_raw_images(data_root, dataset.name, download=False)
+    return to_model_input(raw, dataset.channels, dataset.image_size), labels
 
 
 def _split_from_ids(
@@ -79,17 +96,17 @@ def _split_from_ids(
         raise ValueError(f"{split}: sample IDs must be unique and inside 0..{len(labels) - 1}.")
     if not np.array_equal(labels[ids], saved_labels):
         raise ValueError(
-            f"{split}: MNIST labels at the saved sample IDs differ from the saved labels. "
+            f"{split}: the labels at the saved sample IDs differ from the saved labels. "
             "paths.data_root points at different data than Phase 1 used."
         )
     return SplitImages(images=images[ids], labels=saved_labels, sample_ids=ids)
 
 
 def load_train_val_images(
-    data_root: Path, embeddings_dir: Path
+    data_root: Path, embeddings_dir: Path, dataset: DatasetSpec = MNIST_SPEC
 ) -> tuple[SplitImages, SplitImages]:
     """Training and validation images in the saved order. The test split is not touched."""
-    images, labels = load_combined_mnist(data_root)
+    images, labels = load_combined_images(data_root, dataset)
     train = _split_from_ids("train", embeddings_dir, images, labels)
     val = _split_from_ids("val", embeddings_dir, images, labels)
     if set(train.sample_ids.tolist()) & set(val.sample_ids.tolist()):
@@ -97,7 +114,9 @@ def load_train_val_images(
     return train, val
 
 
-def load_test_images(data_root: Path, embeddings_dir: Path) -> SplitImages:
+def load_test_images(
+    data_root: Path, embeddings_dir: Path, dataset: DatasetSpec = MNIST_SPEC
+) -> SplitImages:
     """Test images. Only the final test stage may call this (protocol must be frozen)."""
-    images, labels = load_combined_mnist(data_root)
+    images, labels = load_combined_images(data_root, dataset)
     return _split_from_ids("test", embeddings_dir, images, labels)

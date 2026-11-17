@@ -247,3 +247,20 @@ def test_a_step_never_comes_before_the_step_whose_results_it_reads() -> None:
     assert names.index("unified_novelty_benchmark") < names.index("autoencoder_scaling_diagnostic")
     for source in ("svhn_benchmark", "required_baselines_knn", "qe_msp_paired_comparison"):
         assert names.index(source) < names.index("consolidate_evidence")
+
+
+def test_phase3_steps_pass_the_config_folder_on() -> None:
+    plan = phase3_steps(dry_run=True, config_dir="src/other/configs")
+    for step in plan:
+        position = step.args.index("--config-dir")
+        assert step.args[position + 1] == "src/other/configs"
+
+
+def test_config_dir_chooses_the_configs_of_every_step() -> None:
+    """With --config-dir, the Phase 1 and 2 runners get that folder's cnn_baseline.yaml and som.yaml."""
+    folder = "src/v1_fashion_mnist/component/configs"
+    result = run_all("--config-dir", folder, "--from", "data_pipeline")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert f"{folder}/cnn_baseline.yaml" in result.stdout
+    assert f"{folder}/som.yaml" in result.stdout
+    assert "src/v1_mnist/component/configs/" not in result.stdout

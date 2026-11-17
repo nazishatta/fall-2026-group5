@@ -15,7 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[5]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.image_dataset import get_dataloaders
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.evaluation import (
     evaluate_model,
     print_evaluation_summary,
@@ -64,7 +64,7 @@ def _relative(path: Path) -> str:
 def train_baseline(
     config_path: Optional[str | Path] = None,
 ) -> dict[str, Any]:
-    """Train the LeNet-5 CNN baseline model on MNIST.
+    """Train the LeNet-5 CNN baseline model on the dataset named in the config.
 
     Args:
         config_path: Path to configuration file.
@@ -100,7 +100,11 @@ def train_baseline(
     logger.info("Using device: %s", device)
     train_loader, val_loader, test_loader, _, _, _ = get_dataloaders(config)
 
-    model = LeNet5(num_classes=config.dataset.num_classes).to(device)
+    model = LeNet5(
+        num_classes=config.dataset.num_classes,
+        in_channels=int(config.dataset.channels),
+        image_size=int(config.dataset.image_size),
+    ).to(device)
     logger.info(
         "Initialized LeNet-5 CNN (penultimate layer: %s, dim: %d)",
         model.feature_layer_name,
@@ -262,7 +266,7 @@ def train_baseline(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train LeNet-5 Baseline on MNIST")
+    parser = argparse.ArgumentParser(description="Train the LeNet-5 baseline on the dataset named in the config")
     parser.add_argument(
         "--config",
         type=str,

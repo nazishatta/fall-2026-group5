@@ -1,0 +1,59 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/som_optuna.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# ==============================================================================
+# Optuna tuning of the SOM settings for the 10x10, 15x15 and 20x20 grids.
+# Protocol: docs/p2_som_training_visualization/som_nnsom_training/OPTUNA_TUNING_PROTOCOL.md
+# Validation FEATURES only: no labels, no CNN correctness, no test split.
+# Do not change after the first real (non-smoke) run; a change needs a new run.revision.
+# ==============================================================================
+
+run:
+  revision: v1
+
+inputs:
+  # Embeddings folder, their expected SHA-256 and the scaler come from the headline SOM config.
+  som_config: src/v1_fashion_mnist/component/configs/som.yaml
+
+paths:
+  output_dir: "./outputs/v1_fashion_mnist/p2_som_training_visualization/som_optuna_tuning"
+  summary_table: "./outputs/v1_fashion_mnist/p2_som_training_visualization/som_optuna_tuning/optuna_grid_summary.csv"
+
+# Stage 1: the search (optuna_grid_tuning.py)
+optuna:
+  grids: ["10x10", "15x15", "20x20"]
+  n_trials: 20             # the same trial budget for every grid
+  n_startup_trials: 8      # random trials before TPE starts modelling
+  sampler_seed: 42         # TPE sampler seed
+  search_seed: 42          # SOM seed for every search trial (the v2 runs' seed)
+  search_space:
+    # Starting neighbourhood = fraction x side length (rounded half up, at least 1),
+    # so every grid has the same search space. The 3-point search used 0.20, 0.47, 0.73.
+    nb_fraction_min: 0.10
+    nb_fraction_max: 1.00
+    epochs_min: 100
+    epochs_max: 400
+    epochs_step: 50
+  # NNSOM's `steps` (length of the neighbourhood decay) is always equal to epochs.
+
+# The 3-point search choices (PREREGISTRATION_grid_comparison.md, GRID_COMPARISON_RESULTS.md)
+reference_settings:
+  "10x10": {init_neighborhood: 7, epochs: 250}
+  "15x15": {init_neighborhood: 11, epochs: 250}
+  "20x20": {init_neighborhood: 15, epochs: 250}
+
+# Stage 2: the seed check (optuna_confirmation.py)
+confirmation:
+  seeds: [1, 2, 3, 4, 5]   # new SOM seeds, never the search seed
+  ci_level: 0.95
+
+smoke_test:
+  grid: "5x5"
+  n_trials: 3
+  train_samples: 2000
+  val_samples: 500
+  epochs_min: 2
+  epochs_max: 4
+  epochs_step: 1
+  reference: {init_neighborhood: 2, epochs: 3}
+  confirmation_seeds: [1, 2]

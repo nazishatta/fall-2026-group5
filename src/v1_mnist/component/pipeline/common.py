@@ -5,6 +5,9 @@ builds a list of steps and hands it to ``run_steps``. A step is either one of th
 scripts in the component folders, run as its own process from the code root
 (the folder that holds src/ and outputs/), or a small Python function.
 
+<output_root> in the runners' notes is project.output_root in the base.yaml next to the
+config (outputs/v1_mnist for MNIST, outputs/v1_fashion_mnist for Fashion-MNIST).
+
 Common options for every Phase 1 and 2 runner:
   --config    config file (relative to the code root or absolute)
   --dry-run   print the steps and exit without running anything
@@ -17,6 +20,7 @@ its own config (its own run ID), so each step names its config. Their options:
   --config CONFIG    config for the --only step (a new run needs a new run ID)
   --steps STEP ...   run these steps in the runner's order, skipping any whose results
                      exist (used by run_all.py)
+  --config-dir DIR   folder of the steps' configs (default: the MNIST configs folder)
 """
 
 from __future__ import annotations
@@ -181,6 +185,8 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
                         help="Run these steps in order, skipping those whose results already exist.")
     parser.add_argument("--config", default=None,
                         help="Config for the --only step (default: the step's own config in configs/).")
+    parser.add_argument("--config-dir", default=CONFIG_DIR,
+                        help=f"Folder holding the steps' configs, one folder per dataset (default: {CONFIG_DIR}).")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print the steps without running them.")
     args = parser.parse_args()
@@ -195,7 +201,7 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
             continue
         if args.steps is not None and step.name not in args.steps:
             continue
-        config = args.config or f"{CONFIG_DIR}/{step.config}"
+        config = args.config or f"{args.config_dir}/{step.config}"
         folder = results_folder(config)
         label = step.label
         if folder is not None and folder.exists():

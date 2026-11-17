@@ -179,9 +179,13 @@ src/v1_mnist/
       novelty_after_retraining/      SVHN novelty on the retrained networks
     utils/                           config, logging, run IDs and SHA-256 checks, stats, figures, retraining
   docs/                              protocols, results, DEVIATIONS.md
-  shellscripts/                      kept for shell scripts (empty; the Python runners are used)
+  shellscripts/                      run_pipeline.sh: runs the whole pipeline (run_all.py) from any folder
   tests/                             pytest tests, same phase/step folders as component/
+src/v1_fashion_mnist/                Fashion-MNIST: settings (component/configs/), runner (component/pipeline/),
+                                     protocol (docs/) and tests, in the same phase folders; the step code is
+                                     shared from src/v1_mnist/component/
 outputs/v1_mnist/    results, in the same phase/step folders (see "Data and results" below)
+outputs/v1_fashion_mnist/  Fashion-MNIST results, same phase/step folders
 proposals/           the project proposal and our group proposal
 reports/             LaTeX reports (one per phase + final report), progress report, Word report
 research_paper/      the journal paper (draft on branch feature/integrated-research-paper)
@@ -257,8 +261,8 @@ If a figure is used in a report, also copy it into that report's `fig/` folder a
 Run from the project root, after `dvc pull`.
 
 ```bash
-# Run the test suite
-python -m pytest src/v1_mnist/tests -q
+# Run the test suite (both datasets)
+python -m pytest src -q
 
 # See every step without running anything
 python src/v1_mnist/component/pipeline/run_all.py --from data_pipeline --dry-run
@@ -267,6 +271,11 @@ python src/v1_mnist/component/pipeline/run_all.py --from data_pipeline --dry-run
 # error-pattern analyses and the report (a step whose results already exist stops
 # the run; results are never overwritten, so move or delete them to redo a step)
 python src/v1_mnist/component/pipeline/run_all.py --skip-training
+
+# The same pipeline on Fashion-MNIST (settings in src/v1_fashion_mnist/component/configs/,
+# results in outputs/v1_fashion_mnist/); the shell script does the same
+python src/v1_fashion_mnist/component/pipeline/run_all.py --from data_pipeline --dry-run
+bash src/v1_fashion_mnist/shellscripts/run_pipeline.sh
 ```
 
 There is one runner per proposal step in `src/v1_mnist/component/pipeline/`. The `data_pipeline` and

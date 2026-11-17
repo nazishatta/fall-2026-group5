@@ -97,7 +97,8 @@ One line per file, taken from the file's own description. The trees above show w
 | `dataset_info.py` | What the SOM code needs to know about the dataset and the CNN, read from the config. |
 | `figures.py` | Save every results figure the same way: one PDF, fonts embedded as TrueType. |
 | `file_hash.py` | SHA-256 fingerprints of files, used for provenance checks. |
-| `frozen_split.py` | Rebuild the project's frozen data split from the saved sample IDs. |
+| `frozen_split.py` | Rebuild the project's frozen data split from the saved sample IDs, for the dataset named in the config (MNIST by default). |
+| `image_datasets.py` | The datasets the pipeline can load (MNIST, Fashion-MNIST, KMNIST, CIFAR-10), and the conversion of stored images to the channels and size the network expects (`dataset.channels`, `dataset.image_size`). To add a dataset, add one entry to `SOURCES`. |
 | `heatmaps.py` | Draws neuron-by-neuron heatmaps on the SOM grid. |
 | `hotspots.py` | The project's error-hotspot rule (Error Pattern Analysis). |
 | `image_transforms.py` | Label-preserving image changes for targeted augmentation (small affine moves only). |

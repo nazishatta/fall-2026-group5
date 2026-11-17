@@ -1,0 +1,53 @@
+# Fashion-MNIST: the shared settings every config in this folder merges.
+# Same as src/v1_mnist/component/configs/base.yaml except the dataset section and the output folder.
+project:
+  output_root: "./outputs/v1_fashion_mnist"
+
+paths:
+  data_root: "../../All_Data"
+
+dataset:
+  name: fashion_mnist
+  display_name: Fashion-MNIST   # used in figure titles
+  class_label: class     # word for one class in figure titles and file names (class_0_...)
+  class_names:           # torchvision order 0-9, used in figure titles
+    - T-shirt/top
+    - Trouser
+    - Pullover
+    - Dress
+    - Coat
+    - Sandal
+    - Shirt
+    - Sneaker
+    - Bag
+    - Ankle boot
+  total_samples: 70000
+  num_classes: 10
+  channels: 1
+  image_size: 28         # images are resized to this on load if stored at another size
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+dataloader:
+  batch_size: 64
+  num_workers: 2
+  pin_memory: true
+
+model:
+  architecture: LeNet5
+  display_name: LeNet    # used in figure titles
+  feature_layer: fc2
+  feature_dim: 84
+
+training:
+  epochs: 20
+  lr: 0.001
+  optimizer: Adam
+  weight_decay: 0.0001
+  scheduler: StepLR
+  step_size: 10
+  gamma: 0.1
+  seed: 42
+
+device: auto # "auto", "cuda", or "cpu"

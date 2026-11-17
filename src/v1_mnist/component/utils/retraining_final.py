@@ -111,7 +111,7 @@ def run_final_test(settings: ExperimentSettings, repo_root: Path) -> dict[str, A
         for seed in settings.seeds:
             load_run_record(settings, arm.name, seed)  # stops if any run is unfinished
 
-    test = load_test_images(settings.data_root, settings.embeddings_dir)
+    test = load_test_images(settings.data_root, settings.embeddings_dir, settings.dataset)
     features = np.load(settings.embeddings_dir / "test_features.npy")
     if not np.array_equal(np.load(settings.embeddings_dir / "test_sample_ids.npy"), test.sample_ids):
         raise ValueError("Test sample IDs differ between the images and the embeddings.")

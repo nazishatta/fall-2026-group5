@@ -78,7 +78,7 @@ def run_extraction(settings: AblationSettings) -> None:
     device = resolve_device(settings.device)
     state = torch.load(settings.checkpoint, map_location="cpu", weights_only=True)
     model = load_model(state, settings.num_classes, device)
-    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir)
+    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir, settings.dataset)
 
     record: dict[str, Any] = {"layers": list(settings.layers), "fc2_max_abs_difference": {}}
     sources = {

@@ -4,17 +4,17 @@ Steps:
   1. error_patterns: per-neuron error geography, hotspots (the project's one
      hotspot rule, utils/hotspots.py), confusion pairs and the list of
      misclassified validation samples.
-  2. hotspot_samples: images of the actual MNIST digits in the hotspots.
+  2. hotspot_samples: the actual images in the hotspots.
   3. error_figures: error-rate and complex error maps.
   4. error_heatmaps: error heatmaps (error count, rate, Wilson bound, confidence, hotspots).
   5. error_pattern_robustness: error-pattern statistics for the headline SOM and each robustness SOM.
   6. error_pattern_robustness_verdict: apply the pre-specified rules to those results.
 
-Results go to outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/.
+Results go to <output_root>/p2_som_training_visualization/error_pattern_analysis/.
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_error_pattern_analysis.py \
-      [--config CONFIG] [--robustness-configs CFG ...] [--mnist-root PATH] [--dry-run]
+      [--config CONFIG] [--robustness-configs CFG ...] [--data-root PATH] [--dry-run]
 
 Needs the cluster analysis results for the same SOM (run run_cluster_analysis.py
 first). Stops if this SOM's error-pattern results already exist (results are never overwritten).
@@ -37,8 +37,8 @@ def main() -> None:
     parser = base_parser("Error pattern analysis and robustness check.", SOM_CONFIG)
     parser.add_argument("--robustness-configs", nargs="*", default=None,
                         help="Configs of the robustness SOMs (default: robustness_check.configs in --config).")
-    parser.add_argument("--mnist-root", default=None,
-                        help="Folder holding the torchvision MNIST download (passed to hotspot_samples.py).")
+    parser.add_argument("--data-root", default=None,
+                        help="Folder holding the torchvision download of the dataset (passed to hotspot_samples.py).")
     args = parser.parse_args()
 
     config = load(args.config)
@@ -57,7 +57,7 @@ def main() -> None:
                    hint=f"Folder: {error_dir / model}")
 
     folder = P2 / "error_pattern_analysis"
-    hotspot_args = ["--config", args.config] + (["--mnist-root", args.mnist_root] if args.mnist_root else [])
+    hotspot_args = ["--config", args.config] + (["--data-root", args.data_root] if args.data_root else [])
     steps = [
         Step("Error geography, hotspots, confusion pairs", folder / "error_patterns.py", ["--config", args.config]),
         Step("Images of the digits in the hotspots", folder / "hotspot_samples.py", hotspot_args),

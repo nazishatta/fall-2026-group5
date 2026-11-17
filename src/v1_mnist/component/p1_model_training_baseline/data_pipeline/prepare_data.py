@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[5]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.mnist_dataset import (
+from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.image_dataset import (
     compute_class_distribution,
     get_dataloaders,
 )
@@ -25,7 +25,7 @@ from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.data_plots 
 def prepare_data(
     config_path: Optional[str | Path] = None,
 ) -> dict[str, Any]:
-    """Prepare MNIST dataset splits, verify distributions, and emit vector figures.
+    """Prepare the configured dataset's splits, verify distributions, and emit vector figures.
 
     Args:
         config_path: Path to YAML configuration file.
@@ -53,9 +53,9 @@ def prepare_data(
     log_file = logs_dir / "prepare_data.log"
 
     logger = setup_logger("prepare_data", log_file=log_file)
-    logger.info("Initializing MNIST data preparation using config: %s", config_path)
+    logger.info("Initializing %s data preparation using config: %s", config.dataset.name, config_path)
 
-    logger.info("Loading MNIST raw data and creating deterministic train/val/test splits...")
+    logger.info("Loading %s and creating deterministic train/val/test splits...", config.dataset.name)
     (
         train_loader,
         val_loader,
@@ -66,9 +66,9 @@ def prepare_data(
     ) = get_dataloaders(config)
 
     logger.info("Computing class distributions across splits...")
-    train_dist = compute_class_distribution(train_labels, "train")
-    val_dist = compute_class_distribution(val_labels, "val")
-    test_dist = compute_class_distribution(test_labels, "test")
+    train_dist = compute_class_distribution(train_labels, "train", config.dataset.num_classes)
+    val_dist = compute_class_distribution(val_labels, "val", config.dataset.num_classes)
+    test_dist = compute_class_distribution(test_labels, "test", config.dataset.num_classes)
 
     # Data pipeline outputs go to the data_pipeline/ step folder (p1_model_training_baseline/data_pipeline);
     # the log above stays with the other Phase 1 logs in cnn_baseline_training/logs.
@@ -131,7 +131,7 @@ def prepare_data(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Prepare MNIST Dataset")
+    parser = argparse.ArgumentParser(description="Prepare the dataset named in the config")
     parser.add_argument(
         "--config",
         type=str,

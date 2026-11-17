@@ -8,7 +8,7 @@ Steps:
   3. The three convergence charts (QE, train/validation quality, neighbourhood radius).
   4. grid_ablation: the 10x10 / 15x15 / 20x20 comparison table.
 
-Results go to outputs/v1_mnist/p2_som_training_visualization/som_nnsom_training/
+Results go to <output_root>/p2_som_training_visualization/som_nnsom_training/
 (the convergence charts to its convergence_plots/ folder). demo/ is a hand-picked
 showcase: copy the charts you want to show there yourself.
 

@@ -1,22 +1,19 @@
-"""Generate representative MNIST images for the SOM error hotspots (error pattern analysis).
+"""Representative images for the SOM error hotspots (error pattern analysis).
 
-This step is MNIST-specific on purpose: it fetches the original MNIST images
-(torchvision) by their global sample IDs. Another dataset needs its own image
-loader here; every other Phase 2 step reads the dataset facts from the config.
-
-Uses stable global MNIST sample IDs:
-    0..59999     -> original MNIST training set
-    60000..69999 -> original MNIST test set
+The images are found by their stable sample IDs (the original training images first, then the
+original test images) in the dataset named in the config, through the same loader as Phases 2 to 4
+(``utils/frozen_split.py``). Titles use the class names in the config (dataset.class_names), or
+the class numbers if it names none.
 
 Development validation samples only.
 
 Reads the error pattern analysis table for the SOM named in a config (default som.yaml) and
-writes images to outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/<selected_model>/
+writes images to <output_root>/p2_som_training_visualization/error_pattern_analysis/<selected_model>/
 representative_samples/.
 
 Usage (from the code root):
   python src/v1_mnist/component/p2_som_training_visualization/error_pattern_analysis/hotspot_samples.py \
-      [--config CONFIG] [--mnist-root PATH_TO_MNIST_DOWNLOAD]
+      [--config CONFIG] [--data-root PATH]
 """
 
 from __future__ import annotations
@@ -28,13 +25,15 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from torchvision import datasets
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.dataset_info import DatasetInfo, dataset_info
+from src.v1_mnist.component.utils.frozen_split import load_combined_images
+from src.v1_mnist.component.utils.image_datasets import dataset_spec
 from src.v1_mnist.component.utils.run_settings import (
     DEFAULT_CONFIG,
     error_output_dir,
@@ -47,6 +46,7 @@ from src.v1_mnist.component.utils.logging import get_logger
 TABLE_PATH: Path = Path()
 OUTPUT_DIR: Path = Path()
 DATA_ROOT: Path = Path()
+INFO: DatasetInfo | None = None
 
 MAX_PER_HOTSPOT = 6
 
@@ -69,40 +69,17 @@ def load_rows() -> list[dict]:
     return rows
 
 
-def load_original_mnist() -> tuple[datasets.MNIST, datasets.MNIST]:
-    train = datasets.MNIST(
-        root=str(DATA_ROOT),
-        train=True,
-        download=False,
-    )
-
-    test = datasets.MNIST(
-        root=str(DATA_ROOT),
-        train=False,
-        download=False,
-    )
-
-    return train, test
+def get_image(sample_id: int, images: np.ndarray) -> np.ndarray:
+    """The image with this sample ID, as height x width (x 3 for colour)."""
+    if not 0 <= sample_id < len(images):
+        raise ValueError(f"Invalid sample ID: {sample_id} (the dataset has {len(images)} images).")
+    image = images[sample_id]
+    return image if image.ndim == 2 else np.transpose(image, (1, 2, 0))
 
 
-def get_image(sample_id: int, train: datasets.MNIST, test: datasets.MNIST) -> np.ndarray:
-    if 0 <= sample_id < 60000:
-        return train.data[sample_id].numpy()
-
-    if 60000 <= sample_id < 70000:
-        return test.data[sample_id - 60000].numpy()
-
-    raise ValueError(f"Invalid global MNIST sample ID: {sample_id}")
-
-
-def verify_label(row: dict, train: datasets.MNIST, test: datasets.MNIST) -> None:
+def verify_label(row: dict, labels: np.ndarray) -> None:
     sid = row["sample_id"]
-
-    if sid < 60000:
-        source_label = int(train.targets[sid])
-    else:
-        source_label = int(test.targets[sid - 60000])
-
+    source_label = int(labels[sid])
     if source_label != row["true_class"]:
         raise RuntimeError(
             f"Sample-ID reconstruction mismatch for {sid}: "
@@ -111,7 +88,11 @@ def verify_label(row: dict, train: datasets.MNIST, test: datasets.MNIST) -> None
         )
 
 
-def plot_hotspot(neuron: int, rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) -> None:
+def name(class_id: int) -> str:
+    return INFO.class_name(class_id) if INFO is not None else str(class_id)
+
+
+def plot_hotspot(neuron: int, rows: list[dict], images: np.ndarray, labels: np.ndarray) -> None:
     rows = sorted(
         rows,
         key=lambda r: r["bmu_distance"],
@@ -137,15 +118,15 @@ def plot_hotspot(neuron: int, rows: list[dict], train: datasets.MNIST, test: dat
 
     # The grid pads its last row with empty panels, so there can be more axes than samples.
     for ax, row in zip(axes, selected, strict=False):
-        verify_label(row, train, test)
+        verify_label(row, labels)
 
-        image = get_image(row["sample_id"], train, test)
+        image = get_image(row["sample_id"], images)
 
         ax.imshow(image, cmap="gray")
         ax.axis("off")
         ax.set_title(
             f"ID {row['sample_id']}\n"
-            f"True {row['true_class']} → Pred {row['predicted_class']}\n"
+            f"True {name(row['true_class'])} → Pred {name(row['predicted_class'])}\n"
             f"Conf {row['confidence']:.3f} | "
             f"BMU dist {row['bmu_distance']:.3f}",
             fontsize=9,
@@ -163,7 +144,7 @@ def plot_hotspot(neuron: int, rows: list[dict], train: datasets.MNIST, test: dat
     save_pdf(fig, stem.with_suffix(".pdf"))
 
 
-def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) -> None:
+def plot_overall(rows: list[dict], images: np.ndarray, labels: np.ndarray) -> None:
     """Plot one representative error from each detected hotspot."""
 
     by_neuron: dict[int, list[dict]] = {}
@@ -203,16 +184,16 @@ def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) 
 
     # The grid pads its last row with empty panels, so there can be more axes than samples.
     for ax, row in zip(axes, representatives, strict=False):
-        verify_label(row, train, test)
+        verify_label(row, labels)
 
-        image = get_image(row["sample_id"], train, test)
+        image = get_image(row["sample_id"], images)
 
         ax.imshow(image, cmap="gray")
         ax.axis("off")
 
         ax.set_title(
             f"Neuron {row['bmu']}\n"
-            f"True {row['true_class']} → Pred {row['predicted_class']}\n"
+            f"True {name(row['true_class'])} → Pred {name(row['predicted_class'])}\n"
             f"Conf {row['confidence']:.3f}",
             fontsize=10,
         )
@@ -230,29 +211,28 @@ def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) 
 
 
 def main() -> None:
-    global TABLE_PATH, OUTPUT_DIR, DATA_ROOT
+    global TABLE_PATH, OUTPUT_DIR, DATA_ROOT, INFO
 
     parser = argparse.ArgumentParser(description="Representative images for the error hotspots.")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the selected model.")
-    parser.add_argument("--mnist-root", default=None,
-                        help="Folder holding the torchvision MNIST download "
+    parser.add_argument("--data-root", default=None,
+                        help="Folder holding the torchvision download of the dataset "
                              "(default: paths.data_root from the config).")
     args = parser.parse_args()
 
     run_dir = error_output_dir(args.config, REPO_ROOT)
     TABLE_PATH = run_dir / "tables" / "val_misclassified_samples.csv"
     OUTPUT_DIR = run_dir / "representative_samples"
-    if args.mnist_root is not None:
-        DATA_ROOT = Path(args.mnist_root)
-    else:
-        # Same folder baseline training downloaded MNIST into (base.yaml paths.data_root).
-        config_path = Path(args.config)
-        if not config_path.is_absolute():
-            config_path = REPO_ROOT / config_path
-        DATA_ROOT = Path(load_config(str(config_path)).paths.data_root)
-        if not DATA_ROOT.is_absolute():
-            DATA_ROOT = (REPO_ROOT / DATA_ROOT).resolve()
+    config_path = Path(args.config)
+    if not config_path.is_absolute():
+        config_path = REPO_ROOT / config_path
+    config = load_config(str(config_path))
+    INFO = dataset_info(config)
+    # Same folder baseline training downloaded the dataset into (base.yaml paths.data_root).
+    DATA_ROOT = Path(args.data_root) if args.data_root is not None else Path(config.paths.data_root)
+    if not DATA_ROOT.is_absolute():
+        DATA_ROOT = (REPO_ROOT / DATA_ROOT).resolve()
     if not TABLE_PATH.is_file():
         raise FileNotFoundError(f"{TABLE_PATH} not found: run error_patterns.py with the same config first.")
 
@@ -264,12 +244,12 @@ def main() -> None:
     if not hotspot_rows:
         raise RuntimeError("No hotspot validation errors were found.")
 
-    logger.info("Loading original MNIST for sample-ID reconstruction from %s", DATA_ROOT)
-    train, test = load_original_mnist()
+    logger.info("Loading %s for sample-ID reconstruction from %s", INFO.display_name, DATA_ROOT)
+    images, labels = load_combined_images(DATA_ROOT, dataset_spec(config))
 
     # Verify every hotspot error before producing any figure.
     for row in hotspot_rows:
-        verify_label(row, train, test)
+        verify_label(row, labels)
 
     neurons = sorted({row["bmu"] for row in hotspot_rows})
 
@@ -286,11 +266,11 @@ def main() -> None:
         plot_hotspot(
             neuron,
             neuron_rows,
-            train,
-            test,
+            images,
+            labels,
         )
 
-    plot_overall(hotspot_rows, train, test)
+    plot_overall(hotspot_rows, images, labels)
 
     logger.info("Representative-image generation COMPLETE.")
     logger.info("Hotspot neurons represented: %d", len(neurons))

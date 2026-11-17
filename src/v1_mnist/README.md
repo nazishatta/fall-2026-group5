@@ -7,7 +7,7 @@ Everything needed to run the MNIST study: the code, its tests and the written pr
 | [`component/`](component/README.md) | The code, one folder per project phase and step, plus `pipeline/` (one runner per step and `run_all.py`), `configs/` (every setting) and `utils/` (shared helpers) |
 | [`tests/`](tests/README.md) | pytest tests, in the same phase and step folders as `component/` |
 | [`docs/`](docs/README.md) | Protocols written before the runs, results, explanations, and `DEVIATIONS.md` (every change to a written rule) |
-| [`shellscripts/`](shellscripts/README.md) | Kept for shell scripts; empty for now (the Python runners in `component/pipeline/` are used instead) |
+| [`shellscripts/`](shellscripts/README.md) | `run_pipeline.sh`: runs the whole MNIST pipeline (`component/pipeline/run_all.py`) from any folder |
 
 The results of the code are written to `outputs/v1_mnist/`, in the same phase and step folders.
 

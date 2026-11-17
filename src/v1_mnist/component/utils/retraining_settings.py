@@ -18,6 +18,7 @@ from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings im
     resolve_path,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.image_datasets import DatasetSpec, dataset_spec
 from src.v1_mnist.component.utils.run_settings import AnalysisSettings
 
 ARM_KINDS = ("standard", "curriculum", "augmentation")
@@ -72,6 +73,7 @@ class ExperimentSettings:
     stamp_path: Path
     som_config: str
     analysis: AnalysisSettings
+    dataset: DatasetSpec = DatasetSpec()   # dataset and network input size (Phase 1 config)
 
     @property
     def metrics_dir(self) -> Path:
@@ -146,6 +148,7 @@ def load_experiment_settings(
         arms=tuple(_arm(e) for e in block["arms"]),
         options=options,
         data_root=resolve_path(repo_root, cnn.paths.data_root),
+        dataset=dataset_spec(cnn),
         cnn_checkpoint=resolve_path(repo_root, cnn.paths.checkpoints_dir) / f"{cnn.run.id}.pth",
         embeddings_dir=analysis.embeddings_dir,
         pool_dir=pool_settings.output_dir,
