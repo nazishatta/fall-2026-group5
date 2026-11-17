@@ -6,7 +6,7 @@ Tests whether the SOM can tell unfamiliar images from familiar ones, using the f
 
 | Folder | What is inside |
 |---|---|
-| [`qe_novelty_detection/`](qe_novelty_detection/README.md) | Proposal Week 6: uses the SOM's quantization error (QE, the distance from an image's embedding to its nearest neuron) as a novelty score. |
-| [`u_matrix_analysis/`](u_matrix_analysis/README.md) | Proposal Week 7: the U-Matrix shows how far each neuron is from its neighbours, so it marks borders between regions of the map. |
-| [`novelty_benchmark/`](novelty_benchmark/README.md) | Proposal Week 8: compares the SOM scores (QE, U-Matrix) with other novelty detectors on the same embeddings: Isolation Forest, One-Class SVM, an autoencoder, max-softmax probability, energy, Mahalanobis distance and k-nearest-neighbour distance. |
+| [`qe_novelty_detection/`](qe_novelty_detection/README.md) | Proposal step Novelty Detection via Quantization Error: uses the SOM's quantization error (QE, the distance from an image's embedding to its nearest neuron) as a novelty score. |
+| [`u_matrix_analysis/`](u_matrix_analysis/README.md) | Proposal step U-Matrix & Topological Analysis: the U-Matrix shows how far each neuron is from its neighbours, so it marks borders between regions of the map. |
+| [`novelty_benchmark/`](novelty_benchmark/README.md) | Proposal step Comparative Evaluation: compares the SOM scores (QE, U-Matrix) with other novelty detectors on the same embeddings: Isolation Forest, One-Class SVM, an autoencoder, max-softmax probability, energy, Mahalanobis distance and k-nearest-neighbour distance. |
 | [`held_out_class_novelty/`](held_out_class_novelty/README.md) | A harder ("near") novelty test, asked for in Review #5. |

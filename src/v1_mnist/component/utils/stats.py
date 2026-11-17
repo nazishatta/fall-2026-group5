@@ -10,7 +10,7 @@ def normalized_entropy(counts: np.ndarray | Sequence[int | float]) -> float:
     """Normalized Shannon entropy of one neuron's class counts, in [0, 1].
 
     Divided by log(number of classes), e.g. log(10) for ten classes.
-    This is the project's only entropy function (Weeks 4 and 5 and the
+    This is the project's only entropy function (cluster and error pattern analysis and the
     robustness check all use it).
 
     Returns:

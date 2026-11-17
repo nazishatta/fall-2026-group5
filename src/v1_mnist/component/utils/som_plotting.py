@@ -1,7 +1,7 @@
 """Shared SOM plotting helpers for every week.
 
-Used by the Week 3 (som_nnsom_training/visualize_som.py), Week 4
-(cluster_analysis/cluster_figures.py) and Week 5
+Used by the SOM training (som_nnsom_training/visualize_som.py), cluster analysis
+(cluster_analysis/cluster_figures.py) and error pattern analysis
 (error_pattern_analysis/error_figures.py) figure scripts, and by the
 interactive report. Week-specific drawing functions live in each week's folder.
 Label styling: som_text_style.py. Per-neuron class/error statistics and the simple

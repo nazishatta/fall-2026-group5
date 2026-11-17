@@ -1,6 +1,6 @@
 # Error pattern analysis results (`outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/`)
 
-Results of Phase 2, Week 5 (code: `src/v1_mnist/component/p2_som_training_visualization/error_pattern_analysis/`).
+Results of Phase 2, Error Pattern Analysis (code: `src/v1_mnist/component/p2_som_training_visualization/error_pattern_analysis/`).
 
 | Path | What is inside |
 |---|---|

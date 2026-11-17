@@ -1,6 +1,6 @@
 # Hard example mining results (`outputs/v1_mnist/p4_guided_retraining/hard_example_mining/`)
 
-Results of Phase 4, Week 9 (code: `src/v1_mnist/component/p4_guided_retraining/hard_example_mining/`).
+Results of Phase 4, Hard Example Mining (code: `src/v1_mnist/component/p4_guided_retraining/hard_example_mining/`).
 
 | Run folder | What is inside |
 |---|---|

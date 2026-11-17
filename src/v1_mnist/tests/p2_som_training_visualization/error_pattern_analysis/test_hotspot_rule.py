@@ -1,4 +1,4 @@
-"""Week 5 (Error Pattern Analysis): the project's one hotspot rule (utils/hotspots.py)."""
+"""Error Pattern Analysis: the project's one hotspot rule (utils/hotspots.py)."""
 
 import numpy as np
 
@@ -40,7 +40,7 @@ def test_top_hotspots_ranking_and_ties() -> None:
 
 
 def test_error_rate_matches_nnsom_get_perc_misclassified() -> None:
-    """Week 5 error rates equal NNSOM's own per-neuron misclassification percentage."""
+    """Error pattern analysis error rates equal NNSOM's own per-neuron misclassification percentage."""
     rng = np.random.default_rng(1)
     num_neurons = 9
     labels = rng.integers(0, 10, size=600)

@@ -70,7 +70,7 @@ def prepare_data(
     val_dist = compute_class_distribution(val_labels, "val")
     test_dist = compute_class_distribution(test_labels, "test")
 
-    # Week 1 outputs go to the data_pipeline/ week folder (p1_model_training_baseline/data_pipeline);
+    # Data pipeline outputs go to the data_pipeline/ step folder (p1_model_training_baseline/data_pipeline);
     # the log above stays with the other Phase 1 logs in cnn_baseline_training/logs.
     data_pipeline_dir = Path(
         getattr(

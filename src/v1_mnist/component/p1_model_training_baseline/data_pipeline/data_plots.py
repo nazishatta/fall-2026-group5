@@ -1,6 +1,6 @@
-"""Week 1 (Environment Setup & Data Pipeline) figures: class distributions and sample images.
+"""Environment Setup & Data Pipeline figures: class distributions and sample images.
 
-Split from visualization/plots.py; the Week 2 CNN figures are in
+Split from visualization/plots.py; the baseline CNN figures are in
 p1_model_training_baseline/cnn_baseline_training/cnn_plots.py.
 """
 from __future__ import annotations

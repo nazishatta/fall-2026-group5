@@ -1,6 +1,6 @@
 # Cluster analysis results (`outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/`)
 
-Results of Phase 2, Week 4 (code: `src/v1_mnist/component/p2_som_training_visualization/cluster_analysis/`), one folder per SOM.
+Results of Phase 2, Cluster Analysis (code: `src/v1_mnist/component/p2_som_training_visualization/cluster_analysis/`), one folder per SOM.
 
 | Path | What is inside |
 |---|---|

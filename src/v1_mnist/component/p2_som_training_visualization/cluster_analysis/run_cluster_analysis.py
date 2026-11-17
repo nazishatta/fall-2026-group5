@@ -1,4 +1,4 @@
-"""Week 4: Cluster Analysis.
+"""Cluster Analysis.
 
 Assigns every train and validation image to its best-matching neuron (BMU) on
 the selected SOM and measures the class structure of the map:
@@ -9,18 +9,18 @@ the selected SOM and measures the class structure of the map:
   - validation only: a label-shuffle comparison for the weighted purity (labels
     shuffled, each image keeps its BMU; number of shuffles and seed from the
     config's analysis section). Added 2026-10-10, see docs/DEVIATIONS.md.
-Each image's BMU and its distance to the BMU are saved for Week 5 (error
-patterns) and Week 6 (novelty detection).
+Each image's BMU and its distance to the BMU are saved for error pattern analysis
+and for novelty detection via quantization error.
 
 Safety checks, all before anything is written:
   - the model's SHA-256 must match run_manifest.csv (utils/run_settings.py);
   - the embeddings must match the hashes in the config (expected_inputs);
   - the model's metrics file must say the test split was never evaluated;
-  - model check: the SOM must reproduce its Week 3 number of used neurons
-    exactly, and its Week 3 quantization error to within one part in a million
+  - model check: the SOM must reproduce its SOM training number of used neurons
+    exactly, and its SOM training quantization error to within one part in a million
     (analysis.qe_relative_tolerance in the config), which allows for rounding
     differences between library versions.
-    The quantization error itself is a Week 3 result; only the check is
+    The quantization error itself is a SOM training result; only the check is
     reported here (both values and their relative difference).
 Results are built in a temporary folder and moved into place only when every
 step succeeded. The test split is never used.
@@ -103,7 +103,7 @@ logger = get_logger("v1_mnist.analysis.cluster_analysis.run_cluster_analysis")
 
 
 def check_quantization_error(split: str, recomputed: float, training_run: float, rtol: float) -> dict:
-    """Model check: the recomputed QE must match Week 3's to within rtol (relative).
+    """Model check: the recomputed QE must match SOM training's to within rtol (relative).
 
     Returns the numbers for the summary; raises RuntimeError if they differ by more.
     """
@@ -111,7 +111,7 @@ def check_quantization_error(split: str, recomputed: float, training_run: float,
     if not relative_difference <= rtol:          # also fails for NaN
         raise RuntimeError(
             f"{split}: model check failed: quantization error {recomputed} differs from the "
-            f"value recorded by the SOM training run (Week 3), {training_run}, by a relative {relative_difference:.3g} "
+            f"value recorded by the SOM training run {training_run}, by a relative {relative_difference:.3g} "
             f"(allowed: {rtol:g})."
         )
     return {
@@ -168,7 +168,7 @@ def analyze_split(
         num_samples,
     )
 
-    # Model check: the same SOM on the same embeddings must give its Week 3 numbers.
+    # Model check: the same SOM on the same embeddings must give its SOM training numbers.
     qe = float(som.quantization_error(cluster_distances))
     occupied = int(np.count_nonzero(sizes))
     expected = training_metrics["train_metrics" if split == "train" else "validation_metrics"]
@@ -176,7 +176,7 @@ def analyze_split(
     qe_check = check_quantization_error(split, qe, float(expected["quantization_error"]), rtol)
     if occupied != int(expected["occupied_neurons"]):
         raise RuntimeError(
-            f"{split}: model check failed: {occupied} neurons used, Week 3 recorded "
+            f"{split}: model check failed: {occupied} neurons used, SOM training recorded "
             f"{int(expected['occupied_neurons'])}."
         )
 
@@ -249,7 +249,7 @@ def analyze_split(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Week 4 SOM cluster analysis.")
+    parser = argparse.ArgumentParser(description="SOM cluster analysis.")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the grid and selected model.")
     args = parser.parse_args()
@@ -325,11 +325,11 @@ def main() -> None:
         temp_dir.rename(output_dir)
 
     except Exception as exc:
-        logger.error("Week 4 cluster analysis FAILED: %s", exc)
+        logger.error("Cluster analysis FAILED: %s", exc)
         logger.info("Temporary files kept for inspection: %s", temp_dir)
         raise
 
-    logger.info("Week 4 cluster analysis COMPLETE.")
+    logger.info("Cluster analysis COMPLETE.")
     logger.info("Results: %s", output_dir)
     logger.info("Held-out test split was NOT used.")
 

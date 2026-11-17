@@ -1,6 +1,6 @@
 # Novelty benchmark (`src/v1_mnist/component/p3_novelty_detection/novelty_benchmark/`)
 
-Proposal Week 8. Compares the SOM scores (QE, U-Matrix) with other novelty detectors on the same embeddings: Isolation Forest, One-Class SVM, an autoencoder, max-softmax probability, energy, Mahalanobis distance and k-nearest-neighbour distance. Reports AUROC, AUPR and FPR at 95% TPR, with paired bootstrap intervals. Also holds the diagnostic checks (for example whether QE just follows the length of the embedding) and the script that joins all Phase 3 evidence.
+Proposal step: Comparative Evaluation. Compares the SOM scores (QE, U-Matrix) with other novelty detectors on the same embeddings: Isolation Forest, One-Class SVM, an autoencoder, max-softmax probability, energy, Mahalanobis distance and k-nearest-neighbour distance. Reports AUROC, AUPR and FPR at 95% TPR, with paired bootstrap intervals. Also holds the diagnostic checks (for example whether QE just follows the length of the embedding) and the script that joins all Phase 3 evidence.
 
 Runner: `pipeline/p3_novelty_detection/run_novelty_benchmark.py`. Results: `outputs/v1_mnist/p3_novelty_detection/novelty_benchmark/`. Notes: `docs/p3_novelty_detection/novelty_benchmark/`.
 

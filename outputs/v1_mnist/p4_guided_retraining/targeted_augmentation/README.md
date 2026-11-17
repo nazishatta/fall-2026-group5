@@ -1,6 +1,6 @@
 # Targeted augmentation results (`outputs/v1_mnist/p4_guided_retraining/targeted_augmentation/`)
 
-Results of Phase 4, Week 10 (code: `src/v1_mnist/component/p4_guided_retraining/targeted_augmentation/`).
+Results of Phase 4, Targeted Data Augmentation (code: `src/v1_mnist/component/p4_guided_retraining/targeted_augmentation/`).
 
 | Run folder | What is inside |
 |---|---|

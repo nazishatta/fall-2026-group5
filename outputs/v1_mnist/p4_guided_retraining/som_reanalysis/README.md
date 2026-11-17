@@ -1,6 +1,6 @@
 # SOM re-analysis results (`outputs/v1_mnist/p4_guided_retraining/som_reanalysis/`)
 
-Results of Phase 4, Week 11 (code: `src/v1_mnist/component/p4_guided_retraining/som_reanalysis/`). A new SOM is trained on the embeddings of every retrained CNN and compared with the original map. Protocol: `src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/SOM_REANALYSIS_PROTOCOL.md`.
+Results of Phase 4, Iterative SOM Re-analysis (code: `src/v1_mnist/component/p4_guided_retraining/som_reanalysis/`). A new SOM is trained on the embeddings of every retrained CNN and compared with the original map. Protocol: `src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/SOM_REANALYSIS_PROTOCOL.md`.
 
 | Run folder | What is inside |
 |---|---|

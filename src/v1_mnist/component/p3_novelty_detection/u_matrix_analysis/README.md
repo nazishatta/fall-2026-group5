@@ -1,6 +1,6 @@
 # U-Matrix analysis (`src/v1_mnist/component/p3_novelty_detection/u_matrix_analysis/`)
 
-Proposal Week 7. The U-Matrix shows how far each neuron is from its neighbours, so it marks borders between regions of the map. This step scores novelty with the U-Matrix, compares it with QE, draws where the SVHN images land on the map (and where QE misses them), and checks the work against the proposal.
+Proposal step: U-Matrix & Topological Analysis. The U-Matrix shows how far each neuron is from its neighbours, so it marks borders between regions of the map. This step scores novelty with the U-Matrix, compares it with QE, draws where the SVHN images land on the map (and where QE misses them), and checks the work against the proposal.
 
 Runner: `pipeline/p3_novelty_detection/run_u_matrix_analysis.py`. Results: `outputs/v1_mnist/p3_novelty_detection/u_matrix_analysis/`.
 

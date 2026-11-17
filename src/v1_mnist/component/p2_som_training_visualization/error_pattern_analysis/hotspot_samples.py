@@ -1,8 +1,8 @@
-"""Generate representative MNIST images for Week 5 SOM error hotspots.
+"""Generate representative MNIST images for the SOM error hotspots (error pattern analysis).
 
 This step is MNIST-specific on purpose: it fetches the original MNIST images
 (torchvision) by their global sample IDs. Another dataset needs its own image
-loader here; every other Week 3-5 step reads the dataset facts from the config.
+loader here; every other Phase 2 step reads the dataset facts from the config.
 
 Uses stable global MNIST sample IDs:
     0..59999     -> original MNIST training set
@@ -10,7 +10,7 @@ Uses stable global MNIST sample IDs:
 
 Development validation samples only.
 
-Reads the Week 5 table for the SOM named in a config (default som.yaml) and
+Reads the error pattern analysis table for the SOM named in a config (default som.yaml) and
 writes images to outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/<selected_model>/
 representative_samples/.
 
@@ -232,7 +232,7 @@ def plot_overall(rows: list[dict], train: datasets.MNIST, test: datasets.MNIST) 
 def main() -> None:
     global TABLE_PATH, OUTPUT_DIR, DATA_ROOT
 
-    parser = argparse.ArgumentParser(description="Representative images for Week 5 hotspots.")
+    parser = argparse.ArgumentParser(description="Representative images for the error hotspots.")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the selected model.")
     parser.add_argument("--mnist-root", default=None,

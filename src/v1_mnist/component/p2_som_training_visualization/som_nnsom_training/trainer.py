@@ -1,4 +1,4 @@
-"""Training helpers for Week 3 NNSOM experiments.
+"""Training helpers for the NNSOM training experiments.
 
 ``train_som`` delegates training to NNSOM's native ``som.train``.
 NOTE: NNSOM 1.8.x picks winners from the *initial* weights in every epoch,

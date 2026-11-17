@@ -99,7 +99,7 @@ One line per file, taken from the file's own description. The trees above show w
 | `file_hash.py` | SHA-256 fingerprints of files, used for provenance checks. |
 | `frozen_split.py` | Rebuild the project's frozen data split from the saved sample IDs. |
 | `heatmaps.py` | Draws neuron-by-neuron heatmaps on the SOM grid. |
-| `hotspots.py` | The project's error-hotspot rule (Week 5, Error Pattern Analysis). |
+| `hotspots.py` | The project's error-hotspot rule (Error Pattern Analysis). |
 | `image_transforms.py` | Label-preserving image changes for targeted augmentation (small affine moves only). |
 | `logging.py` | Sets up logging to the console and to a log file. |
 | `paired_stats.py` | Uncertainty for the arm-against-arm comparison. |
@@ -118,14 +118,14 @@ One line per file, taken from the file's own description. The trees above show w
 | `retraining_summary.py` | Validation-only summary of an experiment: mean and spread over seeds, and arm-against-arm differences. |
 | `run_ids.py` | Check run IDs before a step creates its output folder. |
 | `run_provenance.py` | Run-ID preflight and SHA-256 provenance helpers shared by the Phase 4 steps. |
-| `run_settings.py` | Which SOM the Week 4-5 analysis uses, and checks that it is the right one. |
+| `run_settings.py` | Which SOM the cluster and error pattern analysis uses, and checks that it is the right one. |
 | `scores.py` | Per-sample scores computed from the CNN's output that several analyses share. |
 | `shared_provenance.py` | Validate Phase 3 frozen input provenance against the shared manifest. |
 | `som_cells.py` | Assign embeddings to the neurons (cells) of the selected SOM. |
 | `som_data.py` | Data loading and validation utilities for the SOM experiments. |
-| `som_figure_setup.py` | Shared setup for the SOM figure scripts of Weeks 3, 4 and 5. |
+| `som_figure_setup.py` | Shared setup for the SOM figure scripts of SOM training, cluster analysis and error pattern analysis. |
 | `som_io.py` | Loads the embedding splits and the chosen SOM, rebuilds the neuron of every image and writes the assignment tables. |
-| `som_neuron_maps.py` | Per-neuron class and error statistics, and the simple grid map used by the Week 4 and Week 5 figure scripts (cluster_figures.py, error_figures.py). |
+| `som_neuron_maps.py` | Per-neuron class and error statistics, and the simple grid map used by the cluster analysis and error pattern analysis figure scripts (cluster_figures.py, error_figures.py). |
 | `som_plotting.py` | Shared SOM plotting helpers for every week. |
 | `som_text_style.py` | Text styling for NNSOM's dense SOM plots (neuron labels on hexagons). |
 | `som_types.py` | Type names for annotations of NNSOM objects. |

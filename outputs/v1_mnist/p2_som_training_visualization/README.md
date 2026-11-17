@@ -6,11 +6,11 @@ The trained SOMs and what the map shows about the CNN's classes and mistakes. Th
 
 ```
 p2_som_training_visualization/
-├── som_nnsom_training/        Week 3: SOM models, logs, run_manifest.csv, QE curves, SOM figures
-├── som_optuna_tuning/         Week 3: Optuna tuning of the three grid sizes and the 5-seed check
-├── cluster_analysis/          Week 4: neuron assignments, purity tables, class maps
-├── error_pattern_analysis/    Week 5: error geography, hotspots, robustness, error-detector comparisons
-└── interactive_report/        Weeks 3–5: interactive_report.html (DVC)
+├── som_nnsom_training/        SOM models, logs, run_manifest.csv, QE curves, SOM figures
+├── som_optuna_tuning/         Optuna tuning of the three grid sizes and the 5-seed check
+├── cluster_analysis/          neuron assignments, purity tables, class maps
+├── error_pattern_analysis/    error geography, hotspots, robustness, error-detector comparisons
+└── interactive_report/        interactive_report.html (DVC), all of Phase 2
 ```
 
 Git keeps only the small files here (`.json`, `.csv`, `.dvc` pointers and READMEs). Larger files are downloaded with `dvc pull`; figures are made again by the pipeline.

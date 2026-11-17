@@ -1,6 +1,6 @@
-"""Week 2 (Train Baseline CNN) figures: training curves and the test confusion matrix.
+"""Train Baseline CNN figures: training curves and the test confusion matrix.
 
-Split from visualization/plots.py; the Week 1 data figures are in
+Split from visualization/plots.py; the data pipeline figures are in
 p1_model_training_baseline/data_pipeline/data_plots.py.
 """
 from __future__ import annotations

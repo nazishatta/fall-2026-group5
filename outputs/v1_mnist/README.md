@@ -35,5 +35,5 @@ Every Phase 3 run folder, the script and config that wrote it, and how that was 
 
 - **Official SOM:** `som_15x15_nb11_ep250_s42_v2`. The 10x10 and 20x20 maps are only for the robustness check. `som_15x15_seed42_v1` is an old run; do not use it (see `p2_som_training_visualization/som_nnsom_training/README.md`).
 - **The test split** (10,500 images) was used once for the CNN baseline and once in the final test stages of Phase 4 (after the retraining protocol was frozen). Phases 2 and 3 use training and validation images only.
-- **The Week 1 log (`prepare_data.log`) is in `cnn_baseline_training/logs/`**, because DVC tracks that folder as one unit with the other two Phase 1 logs.
-- **The U-Matrix figure in `som_nnsom_training/`** is the Week 3 picture of the map; the Week 7 U-Matrix novelty scores are in `p3_novelty_detection/u_matrix_analysis/`.
+- **The data pipeline log (`prepare_data.log`) is in `cnn_baseline_training/logs/`**, because DVC tracks that folder as one unit with the other two Phase 1 logs.
+- **The U-Matrix figure in `som_nnsom_training/`** is the SOM training picture of the map; the U-Matrix novelty scores are in `p3_novelty_detection/u_matrix_analysis/`.

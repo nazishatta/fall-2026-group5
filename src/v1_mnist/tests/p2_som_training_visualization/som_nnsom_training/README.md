@@ -18,5 +18,5 @@ Tests for the code in `component/p2_som_training_visualization/som_nnsom_trainin
 | `test_model_save_path.py` | Regression test for NNSOM model save-path handling. |
 | `test_optuna_selection.py` | Tests for the Optuna tuning rules and config (no SOM training). |
 | `test_run_id_preflight.py` | Regression tests for v1_mnist scientific run output isolation. |
-| `test_som_figure_formats.py` | Week 3 (SOM Setup with NNSOM): figures are saved as one PDF each, with embedded TrueType fonts (pdf.fonttype 42), and dense plots rasterize their data layer only. |
+| `test_som_figure_formats.py` | SOM Setup with NNSOM: figures are saved as one PDF each, with embedded TrueType fonts (pdf.fonttype 42), and dense plots rasterize their data layer only. |
 | `test_trainer_vs_nnsom.py` | Check the history trainer against NNSOM's native train(). |

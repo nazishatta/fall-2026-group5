@@ -1,4 +1,4 @@
-"""Week 3 SOM drawing helpers: component planes and feature maps.
+"""SOM drawing helpers: component planes and feature maps.
 
 Paginated component-plane views keep every embedding dimension readable on
 the selected SOM. The layer and model names come from the config. Shared helpers (saving figures, NNSOM plots)

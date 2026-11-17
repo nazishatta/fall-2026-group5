@@ -1,4 +1,4 @@
-"""Week 5 heatmaps of the SOM (Error Pattern Analysis).
+"""Heatmaps of the SOM (Error Pattern Analysis).
 
 Reads the per-neuron error table written by error_patterns.py and draws one
 value per neuron at the neuron's position on the map (NNSOM topology):
@@ -7,7 +7,7 @@ mean CNN confidence, and the hotspot map (1 = hotspot, by the project's one
 hotspot rule).
 
 Output: outputs/v1_mnist/p2_som_training_visualization/error_pattern_analysis/<selected_model>/figures/pdf/
-Week 4 heatmaps: cluster_analysis/cluster_heatmaps.py.
+Cluster analysis heatmaps: cluster_analysis/cluster_heatmaps.py.
 
 Usage (from the code root):
   python src/v1_mnist/component/p2_som_training_visualization/error_pattern_analysis/error_heatmaps.py [--config CONFIG]
@@ -41,7 +41,7 @@ logger = get_logger("v1_mnist.analysis.error_patterns.error_heatmaps")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Week 5 SOM heatmaps (error pattern analysis).")
+    parser = argparse.ArgumentParser(description="SOM heatmaps (error pattern analysis).")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the selected model.")
     args = parser.parse_args()
@@ -75,7 +75,7 @@ def main() -> None:
     for values, name, title, label in figures:
         save_heatmap(figdir / name, matrix_from_neuron_values(coordinates, values), title, label)
 
-    logger.info("Week 5 heatmaps (%d) written to %s", len(figures), figdir)
+    logger.info("Error pattern analysis heatmaps (%d) written to %s", len(figures), figdir)
 
 
 if __name__ == "__main__":

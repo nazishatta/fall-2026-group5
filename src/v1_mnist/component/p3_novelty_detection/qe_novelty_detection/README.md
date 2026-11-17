@@ -1,6 +1,6 @@
 # Novelty detection with quantization error (`src/v1_mnist/component/p3_novelty_detection/qe_novelty_detection/`)
 
-Proposal Week 6. Uses the SOM's quantization error (QE, the distance from an image's embedding to its nearest neuron) as a novelty score. The cut-off is set from the training images only and then frozen. The score is tested on MNIST validation images against SVHN images (house numbers, the outside dataset), with a cut-off sweep and a random-selection control.
+Proposal step: Novelty Detection via Quantization Error. Uses the SOM's quantization error (QE, the distance from an image's embedding to its nearest neuron) as a novelty score. The cut-off is set from the training images only and then frozen. The score is tested on MNIST validation images against SVHN images (house numbers, the outside dataset), with a cut-off sweep and a random-selection control.
 
 Runner: `pipeline/p3_novelty_detection/run_qe_novelty_detection.py`. Results: `outputs/v1_mnist/p3_novelty_detection/qe_novelty_detection/` (one folder per run ID). Notes: `docs/p3_novelty_detection/qe_novelty_detection/`.
 

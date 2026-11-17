@@ -1,4 +1,4 @@
-"""Week 4 heatmaps of the SOM (Cluster Analysis).
+"""Heatmaps of the SOM (Cluster Analysis).
 
 Reads the per-neuron tables written by run_cluster_analysis.py and draws one
 value per neuron at the neuron's position on the map (NNSOM topology):
@@ -7,7 +7,7 @@ count, validation purity, validation class entropy and validation dominant
 class. Class count and names come from the config.
 
 Output: outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/<selected_model>/figures/pdf/
-Week 5 heatmaps: error_pattern_analysis/error_heatmaps.py.
+Error pattern analysis heatmaps: error_pattern_analysis/error_heatmaps.py.
 
 Usage (from the code root):
   python src/v1_mnist/component/p2_som_training_visualization/cluster_analysis/cluster_heatmaps.py [--config CONFIG]
@@ -42,7 +42,7 @@ logger = get_logger("v1_mnist.analysis.cluster_analysis.cluster_heatmaps")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Week 4 SOM heatmaps (cluster analysis).")
+    parser = argparse.ArgumentParser(description="SOM heatmaps (cluster analysis).")
     parser.add_argument("--config", default=DEFAULT_CONFIG,
                         help="SOM config naming the selected model.")
     args = parser.parse_args()
@@ -52,14 +52,14 @@ def main() -> None:
     base = cluster_output_dir(args.config, REPO_ROOT)
     tables = base / "tables"
     if not (tables / "val_cluster_metrics.csv").is_file():
-        raise FileNotFoundError(f"{tables} has no Week 4 tables: run run_cluster_analysis.py first.")
+        raise FileNotFoundError(f"{tables} has no cluster analysis tables: run run_cluster_analysis.py first.")
     figdir = base / "figures"
 
     train_xy, train_rows = read_neuron_table(tables / "train_cluster_metrics.csv")
     val_xy, val_rows = read_neuron_table(tables / "val_cluster_metrics.csv")
     table_classes = sum(1 for name in val_rows[0] if name.startswith("class_") and name.endswith("_count"))
     if table_classes != info.num_classes:
-        raise RuntimeError(f"Week 4 tables have {table_classes} classes; the config says {info.num_classes}.")
+        raise RuntimeError(f"Cluster analysis tables have {table_classes} classes; the config says {info.num_classes}.")
 
     figures = [
         (train_xy, np.log1p(column(train_rows, "support")), "train_hit_count",
@@ -85,7 +85,7 @@ def main() -> None:
             num_classes=info.num_classes if categorical else None,
         )
 
-    logger.info("Week 4 heatmaps (%d) written to %s", len(figures), figdir)
+    logger.info("Cluster analysis heatmaps (%d) written to %s", len(figures), figdir)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Interactive SOM report (`src/v1_mnist/component/p2_som_training_visualization/interactive_report/`)
 
-Builds one self-contained HTML page that shows the official SOM: the map, which digits each neuron holds, where the mistakes are, and sample images. It covers Weeks 3 to 5 in one place.
+Builds one self-contained HTML page that shows the official SOM: the map, which digits each neuron holds, where the mistakes are, and sample images. It covers Phase 2 (SOM training, cluster analysis and error pattern analysis) in one place.
 
 Runner: `pipeline/p2_som_training_visualization/run_interactive_report.py`. Result: `outputs/v1_mnist/p2_som_training_visualization/interactive_report/interactive_report.html` (a copy is in `demo/interactive_plots/`).
 

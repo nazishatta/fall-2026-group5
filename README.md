@@ -33,15 +33,15 @@ unsupported by evidence will be reported as unsupported.
 
 ## Project phases
 
-The phases and weeks follow the project proposal ([`proposals/Project_proposal.md`](proposals/Project_proposal.md)).
+The phases follow the project proposal ([`proposals/Project_proposal.md`](proposals/Project_proposal.md)).
 
-| Phase                               | Weeks | What is done                                                                                                | Main outputs                                                                           |
-| ----------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| **1: Model Training Baseline**      | 1–2   | Data pipeline; train a baseline CNN; extract feature embeddings for every split                             | Accuracy, precision, recall, F1; 84-D fc2 embeddings                                   |
-| **2: SOM Training & Visualization** | 3–5   | Week 3: train the SOM with NNSOM. Week 4: Cluster Analysis. Week 5: Error Pattern Analysis                  | SOM maps, cluster purity, class–cluster intersection, error hotspots and their images  |
-| **3: Novelty Detection**            | 6–8   | Week 6: novelty detection via quantization error. Week 7: U-Matrix analysis. Week 8: Comparative Evaluation | AUROC, AUPR, FPR at 95% TPR against Isolation Forest, One-Class SVM and an autoencoder |
-| **4: Guided Retraining**            | 9–11  | Week 9: hard example mining. Week 10: targeted data augmentation. Week 11: iterative SOM re-analysis        | Retrained model vs. baseline; old vs. new SOM maps                                     |
-| **5: Paper Writing & Code Release** | 12–14 | Final results and figures, paper draft, code release                                                        | Paper, documented code                                                                 |
+| Phase                               | What is done                                                                                                | Main outputs                                                                           |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **1: Model Training Baseline**      | Data pipeline; train a baseline CNN; extract feature embeddings for every split                             | Accuracy, precision, recall, F1; 84-D fc2 embeddings                                   |
+| **2: SOM Training & Visualization** | Train the SOM with NNSOM; Cluster Analysis; Error Pattern Analysis                                          | SOM maps, cluster purity, class–cluster intersection, error hotspots and their images  |
+| **3: Novelty Detection**            | Novelty detection via quantization error; U-Matrix analysis; Comparative Evaluation                         | AUROC, AUPR, FPR at 95% TPR against Isolation Forest, One-Class SVM and an autoencoder |
+| **4: Guided Retraining**            | Hard example mining; targeted data augmentation; iterative SOM re-analysis                                  | Retrained model vs. baseline; old vs. new SOM maps                                     |
+| **5: Paper Writing & Code Release** | Final results and figures, paper draft, code release                                                        | Paper, documented code                                                                 |
 
 Success criteria and thresholds are fixed **before** the test set is used, in the protocol of each step
 (`src/v1_mnist/docs/`). Every change to a written rule is logged in
@@ -65,13 +65,13 @@ pipeline, in its own versioned folders. SVHN is the outside (novelty) dataset fo
 
 **Phase 2: SOM on the fc2 embeddings (training and validation data only; the test split is not used):**
 
-- **Week 3, SOM training:** the official model is a 15x15 SOM, `som_15x15_nb11_ep250_s42_v2`.
+- **SOM training:** the official model is a 15x15 SOM, `som_15x15_nb11_ep250_s42_v2`.
   Why 15x15, and how the grid choice was checked:
   [`src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md`](src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/README.md).
-- **Week 4, Cluster Analysis:** every one of the 225 neurons is used, and neurons are almost pure.
+- **Cluster Analysis:** every one of the 225 neurons is used, and neurons are almost pure.
   The validation purity is 0.9819, against 0.1738 when the class labels are shuffled
   (1,000 shuffles, p = 0.001).
-- **Week 5, Error Pattern Analysis (error geography):** CNN errors concentrate in a few hotspot
+- **Error Pattern Analysis (error geography):** CNN errors concentrate in a few hotspot
   neurons (about 5% of the map holds 10–13 times its fair share of mistakes) and in neurons
   where digit classes mix. Both findings also hold on 10x10 and 20x20 SOMs
   ([`ERROR_PATTERN_ROBUSTNESS_RESULTS.md`](src/v1_mnist/docs/p2_som_training_visualization/error_pattern_analysis/ERROR_PATTERN_ROBUSTNESS_RESULTS.md)).
@@ -151,22 +151,22 @@ src/v1_mnist/
     configs/                         every setting, as YAML
     pipeline/                        one runner per step, grouped by phase, + run_all.py
     p1_model_training_baseline/
-      data_pipeline/                 Week 1: MNIST split, class distributions
-      cnn_baseline_training/         Week 2: LeNet-5, evaluation, fc2 embeddings
+      data_pipeline/                 MNIST split, class distributions
+      cnn_baseline_training/         LeNet-5, evaluation, fc2 embeddings
     p2_som_training_visualization/
-      som_nnsom_training/            Week 3: NNSOM training, map quality, SOM figures, Optuna tuning
-      cluster_analysis/              Week 4: best-matching neurons, purity, cluster maps
-      error_pattern_analysis/        Week 5: error hotspots, robustness, comparison with simpler detectors
-      interactive_report/            Weeks 3-5: interactive SOM HTML report
+      som_nnsom_training/            NNSOM training, map quality, SOM figures, Optuna tuning
+      cluster_analysis/              best-matching neurons, purity, cluster maps
+      error_pattern_analysis/        error hotspots, robustness, comparison with simpler detectors
+      interactive_report/            interactive SOM HTML report (all of Phase 2)
     p3_novelty_detection/
-      qe_novelty_detection/          Week 6: quantization error as a novelty score
-      u_matrix_analysis/             Week 7: U-Matrix novelty score, SVHN on the map
-      novelty_benchmark/             Week 8: comparison with seven other detectors
+      qe_novelty_detection/          quantization error as a novelty score
+      u_matrix_analysis/             U-Matrix novelty score, SVHN on the map
+      novelty_benchmark/             comparison with seven other detectors
       held_out_class_novelty/        harder test: 6 known digits, 4 new
     p4_guided_retraining/
-      hard_example_mining/           Week 9: hard-image pools, curriculum comparison
-      targeted_augmentation/         Week 10: retraining with altered copies of the hard images
-      som_reanalysis/                Week 11: new SOMs on the retrained CNNs
+      hard_example_mining/           hard-image pools, curriculum comparison
+      targeted_augmentation/         retraining with altered copies of the hard images
+      som_reanalysis/                new SOMs on the retrained CNNs
       novelty_after_retraining/      SVHN novelty on the retrained networks
     utils/                           config, logging, run IDs and SHA-256 checks, stats, figures, retraining
   docs/                              protocols, results, DEVIATIONS.md

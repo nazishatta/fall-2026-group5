@@ -6,5 +6,5 @@ Tests for the code in `component/p1_model_training_baseline/data_pipeline/`. Run
 
 | File | What it is |
 |---|---|
-| `test_class_distribution_figure.py` | Week 1 (Data Pipeline): class-distribution figure is saved as one PDF (no SVG). |
+| `test_class_distribution_figure.py` | Environment Setup & Data Pipeline: class-distribution figure is saved as one PDF (no SVG). |
 | `test_data_loader.py` | Split sizes, image shape and range, and that every digit is present in every split. |

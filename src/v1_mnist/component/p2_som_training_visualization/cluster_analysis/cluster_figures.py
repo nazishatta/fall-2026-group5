@@ -1,4 +1,4 @@
-"""Week 4 figures for the selected SOM (Cluster Analysis).
+"""Figures for the selected SOM (Cluster Analysis).
 
 Draws the class figures: one class-distribution map per class (colour and
 grey; for MNIST, per digit), the class-purity map (colour: purity, size: support) and, with the
@@ -168,7 +168,7 @@ def attempt_class_composition_plots(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Week 4 cluster-analysis figures for the selected SOM."
+        description="Cluster-analysis figures for the selected SOM."
     )
     add_common_args(parser)
     parser.add_argument(
@@ -212,7 +212,7 @@ def main() -> None:
     failed = {}
 
     logger.info("=" * 72)
-    logger.info("%s SOM Visualizations: Week 4 (cluster analysis)", info.display_name)
+    logger.info("%s SOM Visualizations: Cluster Analysis", info.display_name)
     logger.info("=" * 72)
     logger.info("Model: %s", model_name)
     logger.info(
