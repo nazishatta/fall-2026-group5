@@ -46,6 +46,14 @@ def test_trainer_uses_the_rows_of_each_epoch_and_learns() -> None:
     assert result.best_val_accuracy > 0.5
 
 
+def test_trainer_without_hotspots_records_the_overall_accuracy_only() -> None:
+    x, y = _digits()
+    every = np.arange(len(y))
+    result = train_cnn(x, y, x, y, None, lambda _e: every, SETTINGS, seed=1, device=CPU)
+    assert "val_accuracy" in result.history[0]
+    assert not {"val_hotspot_accuracy", "val_non_hotspot_accuracy"} & set(result.history[0])
+
+
 def test_same_seed_gives_the_same_training() -> None:
     x, y = _digits()
     every = np.arange(len(y))

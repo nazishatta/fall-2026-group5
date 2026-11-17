@@ -15,6 +15,7 @@ The held-out MNIST test split (the project's own 10,500-image split, not the off
 | QE novelty detection | [Preregistration](qe_novelty_detection/PREREGISTRATION_qe_novelty.md), [random-control reproduction](qe_novelty_detection/RANDOM_CONTROL_REPRODUCTION.md), [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md) |
 | U-Matrix analysis | [U-Matrix reproduction](u_matrix_analysis/U_MATRIX_REPRODUCTION.md) |
 | Novelty benchmark | [Consolidated evidence](novelty_benchmark/CONSOLIDATED_EVIDENCE.md), [why Isolation Forest and the autoencoder look odd on SVHN](novelty_benchmark/BASELINE_SCORE_ANALYSIS.md), [SVHN baseline diagnostic](novelty_benchmark/SVHN_BASELINE_DIAGNOSTIC.md) |
+| Held-out-class novelty (near novelty: train on 6 digits, the other 4 are novel; Review #5) | [Protocol](held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md) |
 | Report | `reports/Latex_report/v1_mnist/p3_novelty_detection/novelty_detection.tex` |
 
 ## Implementation and configuration
@@ -25,6 +26,9 @@ the proposal's Phase 3:
 - `qe_novelty_detection/`: BMU and quantization-error (QE) novelty scoring.
 - `u_matrix_analysis/`: SOM neighborhood distances and the SOM-grid figures.
 - `novelty_benchmark/`: comparison with the other novelty methods, and diagnostics.
+- `held_out_class_novelty/`: near novelty. A LeNet-5 and a SOM are trained on 6 digits and the other 4
+  digits are the novel images (5 class splits); runner
+  `component/pipeline/p3_novelty_detection/run_held_out_class_novelty.py`.
 
 Every step has one config in `src/v1_mnist/component/configs/`. A config's `run_id`
 names its results folder; a new or re-tuned run always gets a new `run_id`. The

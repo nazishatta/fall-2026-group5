@@ -1,0 +1,59 @@
+# ==============================================================================
+# Novelty detection on held-out classes (Phase 3, near novelty): train on 6 digits, treat the other 4 as novel.
+# Protocol: src/v1_mnist/docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md
+#
+# Training and validation images of the frozen split only; the MNIST test split is never read.
+# The network recipe comes from cnn_baseline.yaml and the map recipe from som.yaml, so nothing is tuned here.
+# Do not change after the first run; a change needs a new run.revision.
+# ==============================================================================
+
+run:
+  name: held_out_class_novelty
+  # Run folder: <name>_lenet5_som<H>x<W>_nb<N>_ep<E>_s<seed>[_<revision>]. Empty for the first run.
+  revision: ""
+
+inputs:
+  cnn_config: src/v1_mnist/component/configs/cnn_baseline.yaml   # training recipe and MNIST folder
+  som_config: src/v1_mnist/component/configs/som.yaml             # SOM recipe and the frozen split's sample IDs
+
+paths:
+  output_root: ./outputs/v1_mnist/p3_novelty_detection/held_out_class_novelty
+
+protocol:
+  document: src/v1_mnist/docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md
+
+splits:
+  # Drawn once with numpy default_rng(generation_seed); the code re-draws them and stops if they differ.
+  generation_seed: 2026
+  unknown_per_split: 4
+  count: 5
+  unknown_digits:
+    - [0, 1, 5, 6]
+    - [2, 3, 5, 8]
+    - [1, 5, 6, 7]
+    - [2, 5, 6, 8]
+    - [0, 4, 5, 8]
+
+training:
+  seed: 42           # the Phase 1 training seed, for every split
+  device: auto       # "auto", "cuda" or "cpu"
+
+extraction:
+  layer: fc2         # the layer Phase 1 used for the embeddings
+  batch_size: 1000
+
+scores:
+  energy_temperature: 1.0
+  threshold_percentile: 95    # training-score percentile; detection and false-alarm rates are reported only
+  knn_neighbors: 5            # Phase 3's nearest-neighbour baseline
+
+statistics:
+  bootstrap_resamples: 2000   # stratified paired bootstrap within a split (Phase 3)
+  bootstrap_seed: 42
+  confidence: 0.95            # t-interval over the 5 splits (4 degrees of freedom)
+  auroc_margin: 0.01          # the project's "competitive" margin (Proposal RQ4)
+  null_iterations: 1000       # label-shuffle control for the QE AUROC
+  null_seed: 42
+
+map:
+  coverage_share: 0.9         # cells that together hold this share of the novel (and normal) images

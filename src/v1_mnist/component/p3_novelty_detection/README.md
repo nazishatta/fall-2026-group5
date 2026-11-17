@@ -22,23 +22,33 @@ p3_novelty_detection/
 │   ├── run_proposal_gap_analysis.py      ▶ proposal-gap analysis
 │   ├── run_svhn_som_overlay.py           ▶ SVHN on the SOM grid, where QE misses
 │   └── u_matrix_novelty.py, novelty_overlay.py, svhn_som_overlay.py
-└── novelty_benchmark/
-    ├── run_svhn_benchmark.py             ▶ SVHN benchmark
-    ├── run_required_baselines.py         ▶ required baselines
-    ├── run_qe_energy_knn_paired.py       ▶ paired comparisons
-    ├── run_qe_umatrix_random_ood.py      ▶ QE/U-Matrix control
-    ├── run_standardized_autoencoder.py   ▶ autoencoder diagnostic
-    ├── run_fair_budget_baselines.py      ▶ fitting-budget comparison
-    ├── run_historical_baseline_verification.py ▶ baseline audit
-    ├── run_missed_svhn_figure.py         ▶ missed-SVHN visualization
-    ├── run_autoencoder_scaling.py        ▶ autoencoder / Isolation Forest by size and scaling
-    ├── unified_novelty_benchmark.py      ▶ all nine detectors in one run
-    ├── svhn_inverted_norm_diagnostic.py  ▶ SVHN embedding-norm diagnostic
-    ├── run_qe_norm_dependence.py         ▶ QE versus embedding norm (correlation, norm-matched AUROC)
-    ├── consolidate_phase3_evidence.py    ▶ headline numbers of three runs in one table
-    ├── inspect_svhn_scores.py            ▶ read-only SVHN score inspection
-    └── other Python modules              scoring and analysis helpers
+├── novelty_benchmark/
+│   ├── run_svhn_benchmark.py             ▶ SVHN benchmark
+│   ├── run_required_baselines.py         ▶ required baselines
+│   ├── run_qe_energy_knn_paired.py       ▶ paired comparisons
+│   ├── run_qe_umatrix_random_ood.py      ▶ QE/U-Matrix control
+│   ├── run_standardized_autoencoder.py   ▶ autoencoder diagnostic
+│   ├── run_fair_budget_baselines.py      ▶ fitting-budget comparison
+│   ├── run_historical_baseline_verification.py ▶ baseline audit
+│   ├── run_missed_svhn_figure.py         ▶ missed-SVHN visualization
+│   ├── run_autoencoder_scaling.py        ▶ autoencoder / Isolation Forest by size and scaling
+│   ├── unified_novelty_benchmark.py      ▶ all nine detectors in one run
+│   ├── svhn_inverted_norm_diagnostic.py  ▶ SVHN embedding-norm diagnostic
+│   ├── run_qe_norm_dependence.py         ▶ QE versus embedding norm (correlation, norm-matched AUROC)
+│   ├── consolidate_phase3_evidence.py    ▶ headline numbers of three runs in one table
+│   ├── inspect_svhn_scores.py            ▶ read-only SVHN score inspection
+│   └── other Python modules              scoring and analysis helpers
+└── held_out_class_novelty/               near novelty: train on 6 digits, the other 4 are novel (5 splits)
+    ├── settings.py, provenance.py        config, class splits, SHA-256 run record
+    ├── class_split.py, split_metrics.py  image selection per split; scores and metrics (NumPy)
+    ├── split_run.py                      one split: LeNet-5, fc2 embeddings, SOM, scores (PyTorch)
+    └── comparison.py                     statements H1 to H4 over the splits, results.json, tables
 ```
+
+**Held-out-class novelty** has its own runner,
+`pipeline/p3_novelty_detection/run_held_out_class_novelty.py` (`--stage run`, then
+`--stage compare`), with config `held_out_class_novelty.yaml`. It is not part of
+`run_all.py`, because it trains new networks instead of reusing the Phase 1 network.
 
 **Order (set by `ORDER` in `pipeline/run_all.py`):** `qe_novelty`, then
 the whole `novelty_benchmark` runner (its `svhn_benchmark` writes the SVHN score arrays

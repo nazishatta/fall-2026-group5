@@ -119,6 +119,14 @@ Preserve the exploratory Fashion-MNIST work privately for possible
 later reuse; do not create or push a separate GitHub branch now.
 No official MNIST final-test data is used for this Phase 3 tuning.
 
+**2026-11-17: near novelty within MNIST.** Instructor Review #5 (2026-10-19) also asked for "one
+near-OOD pair (e.g. MNIST vs held-out MNIST classes)"; later reviews did not repeat or cancel it. The
+held-out-class step (`docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md`)
+answers it without a new dataset: a LeNet-5 and a SOM are trained on 6 MNIST digits and the other 4 are
+the novel images, over 5 class splits. This stays inside the 2026-10-19 scope (MNIST plus SVHN). Its
+protocol, splits and statements were committed before any network or map of the step was trained. It
+trains new networks, so its results do not change any earlier Phase 3 result.
+
 ### Historical SOM configuration
 
 Phase 3 uses the frozen 15x15 SOM employed by the previous analysis.
