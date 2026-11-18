@@ -64,8 +64,8 @@ robustness_check:
     - src/v1_fashion_mnist/component/configs/som_10x10_robustness.yaml
 
 expected_inputs:
-  train_features_sha256: ""   # filled in from the Phase 1 run record before any SOM run
-  val_features_sha256: ""   # filled in from the Phase 1 run record before any SOM run
+  train_features_sha256: "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527"   # run lenet5_fashion_mnist_s42, 2026-11-17
+  val_features_sha256: "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d"   # run lenet5_fashion_mnist_s42, 2026-11-17
 
 som:
   grid_height: 15

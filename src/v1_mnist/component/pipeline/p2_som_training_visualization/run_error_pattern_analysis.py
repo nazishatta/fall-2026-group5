@@ -60,7 +60,7 @@ def main() -> None:
     hotspot_args = ["--config", args.config] + (["--data-root", args.data_root] if args.data_root else [])
     steps = [
         Step("Error geography, hotspots, confusion pairs", folder / "error_patterns.py", ["--config", args.config]),
-        Step("Images of the digits in the hotspots", folder / "hotspot_samples.py", hotspot_args),
+        Step("Images in the hotspots", folder / "hotspot_samples.py", hotspot_args),
         Step("Error-rate and complex error maps",
              folder / "error_figures.py", ["--config", args.config, "--model-name", model]),
         Step("Error heatmaps", folder / "error_heatmaps.py", ["--config", args.config]),
