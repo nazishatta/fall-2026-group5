@@ -6,7 +6,8 @@ Steps:
   2. visualize_som: topology, hit histograms, U-Matrix,
      component planes, feature maps and the other SOM figures.
   3. The three convergence charts (QE, train/validation quality, neighbourhood radius).
-  4. grid_ablation: the 10x10 / 15x15 / 20x20 comparison table.
+  4. grid_ablation: the 10x10 / 15x15 / 20x20 comparison table (only for a config with
+     grid_comparison.run_ids, once all those SOMs are trained; otherwise skipped with a note).
 
 Results go to <output_root>/p2_som_training_visualization/som_nnsom_training/
 (the convergence charts to its convergence_plots/ folder). demo/ is a hand-picked
@@ -27,12 +28,28 @@ from __future__ import annotations
 
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 
 from src.v1_mnist.component.pipeline.common import (  # noqa: E402
-    P2, SOM_CONFIG, Step, base_parser, check_not_done, load, resolve, run_steps,
+    P2, SOM_CONFIG, Step, base_parser, check_not_done, load, log, resolve, run_steps,
 )
+
+
+def grid_table_ready(config: SimpleNamespace, run_id: str, will_train: bool) -> tuple[bool, list[str]]:
+    """Whether the grid-size table can be made now, and the SOMs it still waits for.
+
+    Only a config with grid_comparison.run_ids asks for the table (the headline som.yaml). It
+    needs the metrics file of every SOM it lists; the SOM this run trains counts as present.
+    """
+    run_ids = [str(r) for r in (getattr(getattr(config, "grid_comparison", None), "run_ids", None) or [])]
+    if not run_ids:
+        return False, []
+    logs_dir = resolve(config.paths.logs_dir)
+    missing = [r for r in run_ids
+               if not (will_train and r == run_id) and not (logs_dir / f"{r}_metrics.json").exists()]
+    return not missing, missing
 
 
 def main() -> None:
@@ -68,8 +85,14 @@ def main() -> None:
              charts / "generate_som_quality_interactive.py", chart_args),
         Step("Convergence chart: neighbourhood radius per epoch",
              charts / "generate_som_radius_interactive.py", chart_args),
-        Step("Grid-size comparison table (10x10 / 15x15 / 20x20)", folder / "grid_ablation.py", ["--config", args.config]),
     ]
+    ready, missing = grid_table_ready(config, run_id, will_train=not args.skip_training)
+    if ready:
+        steps.append(Step("Grid-size comparison table (10x10 / 15x15 / 20x20)",
+                          folder / "grid_ablation.py", ["--config", args.config]))
+    elif missing:
+        log.info("Grid-size comparison table skipped: these SOMs are not trained yet: "
+                 + ", ".join(missing) + ". Train them, then run this runner again with --skip-training.")
     run_steps(f"SOM training and visualization ({run_id})", steps, args.dry_run)
 
 
