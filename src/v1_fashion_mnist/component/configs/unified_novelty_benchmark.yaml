@@ -40,4 +40,4 @@ expected:
   svhn_samples: 26032
   embedding_dimensions: 84
   som_units: 225
-  frozen_training_qe_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
+  frozen_training_qe_threshold: 1.4214525859373504

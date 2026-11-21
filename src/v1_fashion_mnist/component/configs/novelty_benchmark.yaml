@@ -40,7 +40,7 @@ expected:
   fashion_mnist_validation_count: 10500
   som_neurons: 225
   feature_dim: 84
-  qe_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
+  qe_threshold: 1.4214525859373504
 tolerances:
   qe_reconstruction: 0.0001
   metric_agreement: 0.0000000001

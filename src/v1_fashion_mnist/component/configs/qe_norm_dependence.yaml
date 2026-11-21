@@ -19,6 +19,6 @@ expected:
   validation_samples: 10500
   svhn_samples: 26032
   feature_dim: 84
-  frozen_training_qe_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
-  qe_reference_auroc: "[TBD: QE AUROC of fashion_mnist_svhn_qe_s42_v1, filled in after stage 1]"
+  frozen_training_qe_threshold: 1.4214525859373504
+  qe_reference_auroc: 0.7893755670676385
   qe_auroc_tolerance: 1.0e-6

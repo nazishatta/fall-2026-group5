@@ -41,5 +41,5 @@ paired_qe:
   id_sha256: "[TBD: SHA-256 of qe_fashion_mnist_val_scores.npy, filled in after stage 2]"
   ood_sha256: "[TBD: SHA-256 of qe_svhn_test_scores.npy, filled in after stage 2]"
   expected_qe_auroc: "[TBD: QE AUROC of the five-method run, filled in after stage 2]"
-  expected_msp_auroc: "[TBD: max-softmax AUROC of fashion_mnist_svhn_required_baselines_s42_v1, filled in after stage 1]"
+  expected_msp_auroc: 0.8837241526911932
   auroc_tolerance: 1.0e-10

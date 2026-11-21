@@ -19,7 +19,7 @@ expected:
   training_samples: 49000
   validation_samples: 10500
   svhn_samples: 26032
-  frozen_percentile_95_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
+  frozen_percentile_95_threshold: 1.4214525859373504
 inputs:
   train_qe: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/train_bmu_distance.npy
   validation_qe: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu_distance.npy

@@ -30,7 +30,7 @@ expected:
   fashion_mnist_validation_count: 10500
   som_neurons: 225
   feature_dim: 84
-  qe_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
+  qe_threshold: 1.4214525859373504
 svhn_file: data/ood_svhn/test_32x32.mat
 qe_evaluation_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
 output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
