@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 import csv
+from dataclasses import dataclass
 import hashlib
 import json
 from typing import Any
@@ -117,27 +118,46 @@ def test_no_order_numbers_in_file_names() -> None:
 
 # ---- Phase 3: every output traces to its code -------------------------------
 
-P3_OUTPUTS = REPO_ROOT / "outputs/v1_mnist/p3_novelty_detection"
-P3_MANIFEST = P3_OUTPUTS / "run_manifest.csv"
 COMPONENT = REPO_ROOT / "src/v1_mnist/component"
-CONFIGS = COMPONENT / "configs"
 STEP_FOLDERS = ("qe_novelty_detection", "u_matrix_analysis", "novelty_benchmark", "held_out_class_novelty")
 ROLES = {"result", "reproduction", "historical"}
 HASH_MATCH = "recorded config SHA-256 equals this file"
 
 
-def manifest_rows() -> list[dict[str, str]]:
+@dataclass(frozen=True)
+class Phase3Outputs:
+    """One dataset's Phase 3 output folder and the config folder its manifest names configs in."""
+
+    name: str
+    outputs: Path
+    configs: Path
+
+    @property
+    def manifest(self) -> Path:
+        return self.outputs / "run_manifest.csv"
+
+
+MNIST_P3 = Phase3Outputs("mnist", REPO_ROOT / "outputs/v1_mnist/p3_novelty_detection", COMPONENT / "configs")
+FASHION_P3 = Phase3Outputs("fashion_mnist", REPO_ROOT / "outputs/v1_fashion_mnist/p3_novelty_detection",
+                           REPO_ROOT / "src/v1_fashion_mnist/component/configs")
+DATASETS = pytest.mark.parametrize("dataset", [MNIST_P3, FASHION_P3], ids=lambda d: d.name)
+# Kept for the MNIST-only test below.
+P3_OUTPUTS, CONFIGS = MNIST_P3.outputs, MNIST_P3.configs
+
+
+def manifest_rows(dataset: Phase3Outputs = MNIST_P3) -> list[dict[str, str]]:
     """Read the manifest rows."""
-    with P3_MANIFEST.open(encoding="utf-8", newline="") as handle:
+    with dataset.manifest.open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
 
 
-def run_folders_on_disk() -> set[tuple[str, str]]:
+def run_folders_on_disk(dataset: Phase3Outputs = MNIST_P3) -> set[tuple[str, str]]:
     """Return (step folder, run folder) for every Phase 3 run folder."""
     return {
         (step, path.name)
         for step in STEP_FOLDERS
-        for path in (P3_OUTPUTS / step).iterdir()
+        if (dataset.outputs / step).is_dir()
+        for path in (dataset.outputs / step).iterdir()
         if path.is_dir() and not path.name.startswith((".", "__"))
     }
 
@@ -155,41 +175,46 @@ def recorded_config_hashes(value: Any) -> Iterator[str]:
             yield from recorded_config_hashes(item)
 
 
-def test_every_run_folder_has_exactly_one_row() -> None:
+@DATASETS
+def test_every_run_folder_has_exactly_one_row(dataset: Phase3Outputs) -> None:
     """No folder is missing from the manifest and no row points to a missing folder."""
-    keys = [(row["step_folder"], row["run_folder"]) for row in manifest_rows()]
+    keys = [(row["step_folder"], row["run_folder"]) for row in manifest_rows(dataset)]
     assert len(keys) == len(set(keys)), "a run folder is listed twice"
-    assert set(keys) == run_folders_on_disk()
+    assert set(keys) == run_folders_on_disk(dataset)
 
 
-def test_roles_are_known_and_reproductions_are_marked() -> None:
+@DATASETS
+def test_roles_are_known_and_reproductions_are_marked(dataset: Phase3Outputs) -> None:
     """Repeat runs made during the code reorganisation are never cited as results."""
-    for row in manifest_rows():
+    for row in manifest_rows(dataset):
         assert row["role"] in ROLES, row["run_folder"]
         if row["run_folder"].startswith("reorg_"):
             assert row["role"] == "reproduction", row["run_folder"]
             assert row["used_in"].startswith("reproduces "), row["run_folder"]
 
 
-@pytest.mark.parametrize("column, base", [("script", COMPONENT), ("config", CONFIGS)])
-def test_named_scripts_and_configs_exist(column: str, base: Path) -> None:
+@DATASETS
+@pytest.mark.parametrize("column", ["script", "config"])
+def test_named_scripts_and_configs_exist(dataset: Phase3Outputs, column: str) -> None:
     """Every script and config the manifest names is in the repository."""
+    base = COMPONENT if column == "script" else dataset.configs
     missing = [
         row[column]
-        for row in manifest_rows()
+        for row in manifest_rows(dataset)
         if row[column] != "-" and not (base / row[column]).is_file()
     ]
     assert not missing
 
 
-def test_recorded_config_hashes_still_match() -> None:
+@DATASETS
+def test_recorded_config_hashes_still_match(dataset: Phase3Outputs) -> None:
     """Where a result stores its config fingerprint, today's config file still has it."""
     checked = 0
-    for row in manifest_rows():
+    for row in manifest_rows(dataset):
         if row["config_check"] != HASH_MATCH:
             continue
-        expected = hashlib.sha256((CONFIGS / row["config"]).read_bytes()).hexdigest()
-        folder = P3_OUTPUTS / row["step_folder"] / row["run_folder"]
+        expected = hashlib.sha256((dataset.configs / row["config"]).read_bytes()).hexdigest()
+        folder = dataset.outputs / row["step_folder"] / row["run_folder"]
         recorded: set[str] = set()
         for result_file in folder.glob("*.json"):
             recorded.update(
