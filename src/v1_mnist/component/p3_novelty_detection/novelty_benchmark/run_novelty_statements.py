@@ -20,36 +20,42 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-import yaml
+# run_all.py starts this file directly, so put the code root on the import path first.
+REPO_ROOT = Path(__file__).resolve().parents[5]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.cnn_score_inference import (
+import numpy as np  # noqa: E402
+import yaml  # noqa: E402
+
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.cnn_score_inference import (  # noqa: E402
     reconstruct_logits,
     verify_predictions,
 )
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.knn_baseline import (
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.knn_baseline import (  # noqa: E402
     knn_novelty,
 )
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.novelty_statements import (
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.novelty_statements import (  # noqa: E402
     SCORE_IDS,
     SCORES,
     StatementSettings,
     judge,
 )
-from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_baselines import (
+from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_baselines import (  # noqa: E402
     energy_novelty,
     mahalanobis_novelty,
     max_softmax_novelty,
 )
-from src.v1_mnist.component.utils.in_distribution import in_distribution
-from src.v1_mnist.component.utils.logging import get_logger
-from src.v1_mnist.component.utils.repo_paths import resolve_inside
-from src.v1_mnist.component.utils.run_ids import check_run_id
-from src.v1_mnist.component.utils.shared_provenance import verify_shared_inputs
-from src.v1_mnist.component.utils.som_io import sha256_file
+from src.v1_mnist.component.utils.in_distribution import in_distribution  # noqa: E402
+from src.v1_mnist.component.utils.logging import get_logger  # noqa: E402
+from src.v1_mnist.component.utils.repo_paths import resolve_inside  # noqa: E402
+from src.v1_mnist.component.utils.run_ids import check_run_id  # noqa: E402
+from src.v1_mnist.component.utils.shared_provenance import verify_shared_inputs  # noqa: E402
+from src.v1_mnist.component.utils.som_io import sha256_file  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[5]
 LOGGER = get_logger("v1_mnist.p3.novelty_statements")

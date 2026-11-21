@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -348,6 +349,17 @@ def test_every_study_step_passes_its_own_config() -> None:
             assert config.startswith("src/v1_mnist/component/configs/"), (name, command.label)
             assert (REPO_ROOT / config).is_file(), (name, config)
 
+
+
+def test_every_study_step_script_starts_without_pythonpath(tmp_path: Path) -> None:
+    """run_all.py starts these scripts directly, so each must put the code root on its own import path."""
+    mnist = "src/v1_mnist/component/configs"
+    scripts = sorted({command.script for step in STUDY_STEPS.values() for command in step.commands(mnist)})
+    env = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
+    for script in scripts:
+        result = subprocess.run([sys.executable, str(script), "--help"], cwd=tmp_path, env=env,
+                                capture_output=True, text=True, check=False)
+        assert result.returncode == 0, (script.name, result.stderr[-500:])
 
 def test_reproductions_are_optional_only_for_mnist() -> None:
     assert optional_steps() == REPRODUCTION_STEPS
