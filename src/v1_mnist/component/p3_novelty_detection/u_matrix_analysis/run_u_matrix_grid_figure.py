@@ -16,6 +16,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
     neuron_u_matrix,
 )
 from src.v1_mnist.component.utils.figures import save_pdf
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -132,7 +133,7 @@ def run(config_path: Path) -> Path:
         "u_matrix_min": float(scores.min()),
         "u_matrix_max": float(scores.max()),
         "u_matrix_mean": float(scores.mean()),
-        "leakage_control": (
+        "leakage_control": in_distribution(config_path).wording(
             "Frozen trained SOM only; no fitting, threshold tuning, "
             "or access to the MNIST final test set."
         ),

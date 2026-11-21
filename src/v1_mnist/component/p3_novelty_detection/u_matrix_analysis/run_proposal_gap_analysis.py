@@ -15,6 +15,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.novelty_overl
     summarize_qe_misses,
 )
 from src.v1_mnist.component.utils.file_hash import sha256_file
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 
 ROOT = Path(__file__).resolve().parents[5]
@@ -28,6 +29,7 @@ def resolve_repo_path(value: str) -> Path:
 def run(config_path: Path) -> dict[str, Any]:
     """Create fresh output with no test-set access, refits, or overwrites."""
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    dataset = in_distribution(config_path)
     run_id = str(config["run_id"])
     if not run_id or run_id in {".", ".."} or any(c in run_id for c in "/\\"):
         raise ValueError("Invalid run ID")
@@ -54,7 +56,7 @@ def run(config_path: Path) -> dict[str, Any]:
     if root.exists():
         raise FileExistsError(root)
     destination.mkdir(parents=True, exist_ok=False)
-    overlay = save_novelty_overlay(bmu, val_qe, int(grid["height"]), int(grid["width"]), destination / "pdf" / "mnist_validation_qe_som_overlay.pdf")
+    overlay = save_novelty_overlay(bmu, val_qe, int(grid["height"]), int(grid["width"]), destination / "pdf" / f"{dataset.validation_key}_qe_som_overlay.pdf", dataset)
     failures = summarize_qe_misses(svhn_qe, threshold)
     result = {
         "run_id": run_id,
@@ -63,7 +65,7 @@ def run(config_path: Path) -> dict[str, Any]:
         "svhn_qe_failures": failures,
         "qe_threshold": threshold,
         "provenance": {"config_sha256": sha256_file(config_path), "input_sha256": {key: sha256_file(value) for key, value in inputs.items()}},
-        "leakage_control": "MNIST validation used only for visualization; SVHN scores used for descriptive failure analysis only. No hyperparameter tuning, threshold changes, or final MNIST test use.",
+        "leakage_control": dataset.wording("MNIST validation used only for visualization; SVHN scores used for descriptive failure analysis only. No hyperparameter tuning, threshold changes, or final MNIST test use."),
         "limitation": "The saved SVHN sample-to-BMU assignments were not provided. This analysis cannot establish why individual images were missed or produce an SVHN miss-rate SOM overlay.",
     }
     with (destination / "analysis.json").open("x", encoding="utf-8") as stream:

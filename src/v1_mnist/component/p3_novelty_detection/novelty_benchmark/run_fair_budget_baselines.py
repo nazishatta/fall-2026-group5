@@ -30,6 +30,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood
     prepare,
     read_settings,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -48,6 +49,9 @@ def repository_path(value: str) -> Path:
     return resolve_inside(ROOT, value)
 
 
+ANALYSIS_STATUSES = frozenset({"post_hoc_exploratory", "preregistered_exploratory"})
+
+
 def validate_protocol(config: dict[str, Any]) -> None:
     """Reject inconsistent training budgets and seed protocols."""
     seeds = config["seed_list"]
@@ -58,8 +62,10 @@ def validate_protocol(config: dict[str, Any]) -> None:
         raise ValueError("Training sample budget must be positive")
     if int(config["one_class_svm"]["max_training_samples"]) != budget:
         raise ValueError("SVM training budget differs from common budget")
-    if config["analysis_status"] != "post_hoc_exploratory":
-        raise ValueError("This experiment must be labeled post-hoc")
+    # MNIST ran this after seeing SVHN results (post hoc); a later dataset fixes it in its
+    # protocol before any run (pre-registered, still exploratory).
+    if config["analysis_status"] not in ANALYSIS_STATUSES:
+        raise ValueError(f"analysis_status must be one of {sorted(ANALYSIS_STATUSES)}")
 
 
 def evaluate_seed(
@@ -121,6 +127,7 @@ def run(config_path: Path) -> Path:
     with config_path.open(encoding="utf-8") as stream:
         config = yaml.safe_load(stream)
     validate_protocol(config)
+    dataset = in_distribution(config_path)
 
     run_id = str(config["run_id"])
     check_run_id(run_id)
@@ -136,6 +143,7 @@ def run(config_path: Path) -> Path:
             "svhn_file": str(config["svhn_file"]),
         },
         required_keys=("train_features", "validation_features", "svhn_file"),
+        config_path=config_path,
     )
 
     train_path = repository_path(config["embeddings"]["train"])
@@ -145,19 +153,19 @@ def run(config_path: Path) -> Path:
         "validation": sha256_file(val_path),
     }
     if hashes != config["expected_sha256"]:
-        raise RuntimeError("Frozen MNIST embedding fingerprints mismatch")
+        raise RuntimeError(dataset.wording("Frozen MNIST embedding fingerprints mismatch"))
 
     train = np.load(train_path, allow_pickle=False)
     validation = np.load(val_path, allow_pickle=False)
     expected = config["expected"]
     width = int(expected["feature_dim"])
 
-    if train.shape != (int(expected["mnist_train_count"]), width):
-        raise RuntimeError("Unexpected MNIST training embeddings")
+    if train.shape != (dataset.expected_count(expected, "train"), width):
+        raise RuntimeError(dataset.wording("Unexpected MNIST training embeddings"))
     if validation.shape != (
-        int(expected["mnist_validation_count"]), width
+        dataset.expected_count(expected, "validation"), width
     ):
-        raise RuntimeError("Unexpected MNIST validation embeddings")
+        raise RuntimeError(dataset.wording("Unexpected MNIST validation embeddings"))
     if int(config["training_sample_count"]) > len(train):
         raise ValueError("Training sample budget exceeds available data")
     if not np.isfinite(train).all() or not np.isfinite(validation).all():
@@ -176,17 +184,15 @@ def run(config_path: Path) -> Path:
     ood_settings = read_settings(
         repository_path(config["qe_evaluation_config"])
     )
-    if (
-        tuple(ood_settings["image_size"]) != (28, 28)
-        or ood_settings["feature_layer"] != "fc2"
-    ):
+    if ood_settings["feature_layer"] != "fc2":
         raise RuntimeError("Frozen CNN feature protocol mismatch")
 
     model, _, _, provenance = prepare(ood_settings)
     if float(provenance["qe_threshold"]) != float(expected["qe_threshold"]):
         raise RuntimeError("Frozen QE protocol mismatch")
 
-    loader = svhn_test_loader(svhn_file, tuple(ood_settings['image_size']), int(ood_settings['batch_size']))
+    loader = svhn_test_loader(svhn_file, tuple(ood_settings['image_size']), int(ood_settings['batch_size']),
+                              channels=int(ood_settings["channels"]))
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(
         loader, torch.device("cpu")
@@ -226,7 +232,7 @@ def run(config_path: Path) -> Path:
 
     output = {
         "run_id": run_id,
-        "analysis_status": "post_hoc_exploratory",
+        "analysis_status": str(config["analysis_status"]),
         "training_sample_count": int(config["training_sample_count"]),
         "seeds": config["seed_list"],
         "per_seed_results": results,
@@ -235,14 +241,16 @@ def run(config_path: Path) -> Path:
             **hashes, "svhn_mat": svhn_hash
         },
         "config_sha256": sha256_file(config_path),
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "All three baselines trained only on the same 10,000 MNIST "
             "training examples per seed. MNIST validation and SVHN test "
             "used for evaluation, not fitting; final MNIST test untouched."
         ),
         "limitation": (
-            "Post-hoc analysis after prior SVHN result inspection. "
-            "Training-pool sizes are equal, but computational budgets, "
+            ("Post-hoc analysis after prior SVHN result inspection. "
+             if config["analysis_status"] == "post_hoc_exploratory"
+             else "Exploratory analysis fixed in the protocol before any run. ")
+            + "Training-pool sizes are equal, but computational budgets, "
             "model preprocessing, and optimization costs are not equal. "
             "Seed spread is not an independent-data confidence interval."
         ),

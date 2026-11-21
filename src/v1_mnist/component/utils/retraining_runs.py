@@ -56,7 +56,8 @@ def run_arm_seed(
     checkpoint = settings.checkpoint_path(arm.name, seed)
     torch.save(result.best_state, checkpoint)
 
-    model = load_model(result.best_state, settings.train.num_classes, device)
+    model = load_model(result.best_state, settings.train.num_classes, device,
+                       settings.train.in_channels, settings.train.image_size)
     val_pred, val_conf = predict(model, data.val.images, device)
     np.savez_compressed(settings.prediction_path(arm.name, seed, "val"), pred=val_pred, confidence=val_conf)
 

@@ -7,6 +7,7 @@ import numpy as np
 from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_arms import (
     make_augmentation_builder,
 )
+from src.v1_mnist.component.utils.image_datasets import DatasetSpec
 from src.v1_mnist.component.utils.image_transforms import TransformRanges, make_copies
 from src.v1_mnist.component.utils.retraining_settings import ArmSpec
 from src.v1_mnist.tests.p4_guided_retraining.synthetic_data import make_data
@@ -43,6 +44,8 @@ class _Settings:
         "max_rotation_degrees": 10.0, "max_shift_pixels": 2.0, "min_zoom": 0.9,
         "max_zoom": 1.1, "max_shear_degrees": 8.0},
         "schedules": {"proposal": {"initial_fraction": 0.10, "step_fraction": 0.10, "step_epochs": 5}}}
+
+    dataset = DatasetSpec()   # as in ExperimentSettings: MNIST unless the config says otherwise
 
     class train:
         num_classes = 3
@@ -105,3 +108,16 @@ def test_a_paced_epoch_only_uses_rows_that_exist_and_always_keeps_the_originals(
         rows = plan.epoch_indices(epoch)
         assert rows.max() < len(plan.train_y) and len(set(rows.tolist())) == len(rows)
         assert set(range(len(data.train.labels))) <= set(rows.tolist())
+
+
+def test_added_per_class_key_uses_the_dataset_word() -> None:
+    """MNIST keeps its historical key; another dataset uses its own word for one class."""
+    data = make_data()
+    arm = ArmSpec("s", "augmentation", "som")
+    assert "added_per_digit" in make_augmentation_builder(_Settings())(arm, data, seed=4).info  # type: ignore[arg-type]
+
+    class _Fashion(_Settings):
+        dataset = DatasetSpec("fashion_mnist", 1, 28, class_label="class")
+
+    info = make_augmentation_builder(_Fashion())(arm, data, seed=4).info  # type: ignore[arg-type]
+    assert "added_per_class" in info and "added_per_digit" not in info

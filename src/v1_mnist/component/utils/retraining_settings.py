@@ -36,6 +36,8 @@ class TrainSettings:
     gamma: float
     batch_size: int
     num_classes: int
+    in_channels: int = 1     # network input; MNIST and Fashion-MNIST are grey
+    image_size: int = 28
 
 
 @dataclass(frozen=True)
@@ -144,6 +146,8 @@ def load_experiment_settings(
             gamma=float(cnn.training.gamma),
             batch_size=int(cnn.dataloader.batch_size),
             num_classes=int(cnn.dataset.num_classes),
+            in_channels=int(getattr(cnn.dataset, "channels", 1)),
+            image_size=int(getattr(cnn.dataset, "image_size", 28)),
         ),
         arms=tuple(_arm(e) for e in block["arms"]),
         options=options,

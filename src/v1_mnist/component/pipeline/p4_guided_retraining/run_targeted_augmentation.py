@@ -8,11 +8,13 @@ Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage breakdown
 
 ``check`` looks at the altered images (contact sheet, Phase 1 CNN accuracy on altered validation
-images). Options: --arm NAME, --seed N, --smoke. Same rules as the curriculum comparison.
+images). Options: --config CONFIG (every stage; default: the MNIST retraining.yaml), --arm NAME,
+--seed N, --smoke. Same rules as the curriculum comparison.
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -23,18 +25,30 @@ if str(REPO_ROOT) not in sys.path:
 from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_arms import (  # noqa: E402
     make_augmentation_builder,
 )
-from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_check import (
-    run_check,  # noqa: E402
+from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_check import (  # noqa: E402
+    run_check,
 )
 from src.v1_mnist.component.utils.logging import setup_logger  # noqa: E402
 from src.v1_mnist.component.utils.retraining_cli import run_experiment_cli  # noqa: E402
-from src.v1_mnist.component.utils.retraining_data import load_retraining_data  # noqa: E402
-from src.v1_mnist.component.utils.retraining_settings import load_experiment_settings  # noqa: E402
+from src.v1_mnist.component.utils.retraining_data import (  # noqa: E402
+    load_retraining_data,
+)
+from src.v1_mnist.component.utils.retraining_settings import (  # noqa: E402
+    load_experiment_settings,
+)
+
+
+def check_config(argv: list[str]) -> str | None:
+    """The --config of a ``--stage check`` call (None means the MNIST retraining.yaml)."""
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--config", default=None)
+    known, _ = parser.parse_known_args(argv)
+    return known.config
 
 
 def main() -> None:
     if "--stage" in sys.argv and sys.argv[sys.argv.index("--stage") + 1] == "check":
-        settings = load_experiment_settings("augmentation", None, REPO_ROOT)
+        settings = load_experiment_settings("augmentation", check_config(sys.argv[1:]), REPO_ROOT)
         setup_logger("v1_mnist", settings.output_dir / "logs" / "check.log")
         run_check(settings, load_retraining_data(settings, REPO_ROOT))
         return

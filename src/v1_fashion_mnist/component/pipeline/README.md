@@ -14,4 +14,4 @@ python src/v1_fashion_mnist/component/pipeline/run_all.py --from data_pipeline
 
 Or use the shell script [`../../shellscripts/run_pipeline.sh`](../../shellscripts/run_pipeline.sh), which does the same.
 
-Phase 3 (novelty detection) and the feature-layer ablation wait for the outside sets to be chosen (protocol section 5). The phase subfolders hold the Fashion-MNIST runners added for later steps.
+The same runner covers every later step too (`--to STEP`; the list and the stop points before the test split are in [`src/v1_mnist/component/pipeline/README.md`](../../../v1_mnist/component/pipeline/README.md)). A step runs only once its config is in `../configs/`: a step without one is skipped with the message "not part of this dataset's study". The Phase 3 and 4 configs are added after the outside set was fixed (SVHN, `docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md`). The phase subfolders hold the Fashion-MNIST runners added for later steps.

@@ -12,6 +12,7 @@ import numpy as np
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.paired_bootstrap import (
     compare_auroc_paired,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 
 
 def evaluate_paired_qe(
@@ -28,11 +29,12 @@ def evaluate_paired_qe(
     paired_result: dict[str, Any] | None = None
     if hasattr(config, "paired_qe"):
         qe_settings = config.paired_qe
+        dataset = in_distribution(config_path)
         qe_id_path = input_path(str(qe_settings.id_scores))
         qe_ood_path = input_path(str(qe_settings.ood_scores))
 
         for label, path, expected_hash in (
-            ("MNIST QE", qe_id_path, str(qe_settings.id_sha256)),
+            (dataset.wording("MNIST QE"), qe_id_path, str(qe_settings.id_sha256)),
             ("SVHN QE", qe_ood_path, str(qe_settings.ood_sha256)),
         ):
             if fingerprint(path) != expected_hash:
@@ -65,14 +67,14 @@ def evaluate_paired_qe(
 
         paired_result.update({
             "run_id": run_id,
-            "id_dataset": "mnist_validation",
+            "id_dataset": dataset.validation_key,
             "ood_dataset": "svhn_test",
             "qe_id_sha256": fingerprint(qe_id_path),
             "qe_ood_sha256": fingerprint(qe_ood_path),
             "checkpoint_sha256": hashes["checkpoint"],
             "svhn_sha256": hashes["svhn_file"],
             "source_config_sha256": fingerprint(config_path),
-            "leakage_control": (
+            "leakage_control": dataset.wording(
                 "Frozen CNN and historical QE; no OOD fitting, tuning "
                 "or final MNIST test-set use."
             ),

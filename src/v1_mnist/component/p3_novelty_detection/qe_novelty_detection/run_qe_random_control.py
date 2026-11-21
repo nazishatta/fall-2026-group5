@@ -11,6 +11,7 @@ import numpy as np
 from scipy.stats import hypergeom
 
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.som_io import sha256_file
 from src.v1_mnist.component.utils.stats import wilson_interval
@@ -155,6 +156,8 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         "source_summary_sha256": sha256_file(summary_path),
         "config_sha256": sha256_file(config_path),
     })
+    dataset = in_distribution(config_path)
+    result["limitations"] = [dataset.wording(line) for line in result["limitations"]]
 
     if save:
         destination.mkdir(parents=True, exist_ok=False)

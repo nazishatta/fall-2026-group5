@@ -13,6 +13,7 @@ import yaml
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.paired_bootstrap import (
     compare_auroc_paired,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.som_io import sha256_file
@@ -39,9 +40,10 @@ def run(config_path: Path) -> Path:
     if destination.exists():
         raise FileExistsError(f"STOP: Existing run: {destination}")
 
+    dataset = in_distribution(config_path)
     counts = config["expected_counts"]
     expected = {
-        "mnist_val": int(counts["mnist_validation"]),
+        dataset.val_tag: int(counts[dataset.validation_key]),
         "svhn_test": int(counts["svhn_test"]),
     }
     arrays = {}
@@ -66,9 +68,9 @@ def run(config_path: Path) -> Path:
     results = {}
     for method in ("energy", "knn"):
         comparison = compare_auroc_paired(
-            arrays["qe"]["mnist_val"],
+            arrays["qe"][dataset.val_tag],
             arrays["qe"]["svhn_test"],
-            arrays[method]["mnist_val"],
+            arrays[method][dataset.val_tag],
             arrays[method]["svhn_test"],
             iterations=int(config["bootstrap_iterations"]),
             seed=int(config["seed"]),
@@ -88,7 +90,7 @@ def run(config_path: Path) -> Path:
         "sample_counts": expected,
         "input_sha256": hashes,
         "config_sha256": sha256_file(config_path),
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Frozen historical novelty scores; no fitting, tuning, "
             "or official MNIST final-test access."
         ),

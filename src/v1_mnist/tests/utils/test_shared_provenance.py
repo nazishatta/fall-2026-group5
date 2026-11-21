@@ -29,3 +29,40 @@ def test_phase3_configs_match_shared_provenance() -> None:
                 == shared["expected_sha256"][key]
             ), name
         assert config["inputs"]["svhn_file"] == shared["svhn_file"], name
+
+
+# ---- one manifest per dataset folder --------------------------------------------------
+
+
+def test_manifest_for_mnist_configs_is_the_mnist_manifest() -> None:
+    from src.v1_mnist.component.utils.shared_provenance import MANIFEST, manifest_path
+
+    assert manifest_path() == MANIFEST
+    assert manifest_path("src/v1_mnist/component/configs/qe_ood_evaluation.yaml") == MANIFEST
+
+
+def test_manifest_for_a_folder_without_base_yaml_is_the_mnist_manifest(tmp_path) -> None:
+    from src.v1_mnist.component.utils.shared_provenance import MANIFEST, manifest_path
+
+    assert manifest_path(tmp_path / "step.yaml") == MANIFEST
+
+
+def test_manifest_is_read_from_the_dataset_folder(tmp_path) -> None:
+    from src.v1_mnist.component.utils.shared_provenance import (
+        MANIFEST_NAME,
+        load_manifest,
+    )
+
+    (tmp_path / "base.yaml").write_text("dataset:\n  name: fashion_mnist\n", encoding="utf-8")
+    (tmp_path / MANIFEST_NAME).write_text("svhn_file: data/x.mat\n", encoding="utf-8")
+    assert load_manifest(tmp_path / "step.yaml") == {"svhn_file": "data/x.mat"}
+
+
+def test_dataset_folder_without_its_own_manifest_stops(tmp_path) -> None:
+    import pytest
+
+    from src.v1_mnist.component.utils.shared_provenance import manifest_path
+
+    (tmp_path / "base.yaml").write_text("dataset:\n  name: fashion_mnist\n", encoding="utf-8")
+    with pytest.raises(FileNotFoundError, match="needs its own Phase 3 manifest"):
+        manifest_path(tmp_path / "step.yaml")

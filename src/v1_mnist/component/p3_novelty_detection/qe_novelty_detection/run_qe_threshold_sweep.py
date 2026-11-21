@@ -24,6 +24,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.qe_thresho
     permutation_auroc_null,
     threshold_sweep,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -78,6 +79,7 @@ def write_table(path: Path, rows: list[dict[str, Any]]) -> None:
 def run(config_path: Path) -> dict[str, Any]:
     """Compute the sweep under a new run ID; refuse to reuse an existing one."""
     config = read_config(config_path)
+    dataset = in_distribution(config_path)
     destination = repo_path(config["output_root"]) / config["run_id"]
     if destination.exists():
         raise FileExistsError(f"STOP: Existing run: {destination}")
@@ -125,11 +127,12 @@ def run(config_path: Path) -> dict[str, Any]:
             "config_sha256": sha256_file(config_path),
             "input_sha256": {key: sha256_file(repo_path(path)) for key, path in config["inputs"].items()},
         },
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Cutoffs come from MNIST training QE only. MNIST validation is the in-distribution "
-            "set and SVHN test is the novel set, both used for evaluation only. SVHN was "
-            "examined in earlier runs, so this is a post-hoc sensitivity analysis. "
-            "The final MNIST test split is never opened."
+            "set and SVHN test is the novel set, both used for evaluation only. "
+            + ("SVHN was examined in earlier runs, so this is a post-hoc sensitivity analysis. "
+               if dataset.is_mnist else "The sweep was fixed in the protocol before any run. ")
+            + "The final MNIST test split is never opened."
         ),
     }
     with (destination / "qe_threshold_sweep.json").open("x", encoding="utf-8") as stream:

@@ -13,6 +13,7 @@ import yaml
 from scipy.io import loadmat
 
 from src.v1_mnist.component.utils.figures import save_pdf
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -169,7 +170,7 @@ def run(config_path: Path) -> Path:
         "sample_indices": recorded_indices.tolist(),
         "sample_qe_scores": scores[recorded_indices].tolist(),
         "sample_labels": labels[recorded_indices].tolist(),
-        "leakage_control": (
+        "leakage_control": in_distribution(config_path).wording(
             "Frozen historical SVHN evaluation only; no refitting, "
             "threshold selection, or final MNIST test access."
         ),

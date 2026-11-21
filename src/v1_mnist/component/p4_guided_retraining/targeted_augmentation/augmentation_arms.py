@@ -94,7 +94,7 @@ def make_augmentation_builder(settings: ExperimentSettings) -> BuildArm:
                 "schedule": arm.schedule or "none (all copies from epoch 1)",
                 "added_images": len(extra_y),
                 "training_images_by_epoch": [len(epoch_indices(e)) for e in range(epochs)],
-                "added_per_digit": np.bincount(extra_y, minlength=settings.train.num_classes).tolist(),
+                f"added_per_{settings.dataset.class_label}": np.bincount(extra_y, minlength=settings.train.num_classes).tolist(),
                 "added_images_sha256": hashlib.sha256(extra_x.tobytes()).hexdigest(),
             },
         )

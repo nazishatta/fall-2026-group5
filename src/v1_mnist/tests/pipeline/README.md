@@ -6,4 +6,4 @@ Tests for the code in `component/pipeline/`. Run them with `python -m pytest src
 
 | File | What it is |
 |---|---|
-| `test_run_all.py` | The step runners in pipeline/ list their steps in order and never overwrite results. |
+| `test_run_all.py` | The step runners in pipeline/ list their steps in proposal order and never overwrite results; steps a dataset's config folder lacks are skipped; the test step runs only when asked for. |

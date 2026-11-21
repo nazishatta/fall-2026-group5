@@ -14,6 +14,7 @@ from sklearn.metrics import roc_auc_score
 from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.paired_bootstrap import (
     compare_auroc_paired,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.som_io import sha256_file
 
@@ -70,9 +71,10 @@ def run(config_path: Path) -> Path:
     def get(method: str, split: str) -> np.ndarray:
         return scores[f"{method}_{split}_scores.npy"]
 
-    qe_id = get("qe", "mnist_val")
+    dataset = in_distribution(config_path)
+    qe_id = get("qe", dataset.val_tag)
     qe_ood = get("qe", "svhn_test")
-    um_id = get("u_matrix", "mnist_val")
+    um_id = get("u_matrix", dataset.val_tag)
     um_ood = get("u_matrix", "svhn_test")
 
     n_id = int(config["expected_id_count"])
@@ -108,7 +110,7 @@ def run(config_path: Path) -> Path:
 
     result = {
         "run_id": run_id,
-        "dataset": "MNIST validation vs SVHN test",
+        "dataset": dataset.wording("MNIST validation vs SVHN test"),
         "paired_qe_vs_u_matrix": {
             "qe_auroc": paired["qe_auroc"],
             "u_matrix_auroc": paired["msp_auroc"],
@@ -130,7 +132,7 @@ def run(config_path: Path) -> Path:
         "n_ood": n_ood,
         "input_sha256": hashes,
         "config_sha256": sha256_file(config_path),
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Historical frozen scores only; no model fitting, "
             "no threshold tuning, no official MNIST final test."
         ),

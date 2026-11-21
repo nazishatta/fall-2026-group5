@@ -30,6 +30,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.unified_novel
     evaluate,
     stratified_bootstrap,
 )
+from src.v1_mnist.component.utils.in_distribution import InDistribution, in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -57,7 +58,7 @@ def read_config(config_path: Path) -> dict[str, Any]:
     return config
 
 
-def load_embeddings(config: dict[str, Any]) -> dict[str, Any]:
+def load_embeddings(config: dict[str, Any], config_path: Path | None = None) -> dict[str, Any]:
     """Frozen MNIST embeddings plus SVHN embeddings (needs torch, nnsom and the SVHN files)."""
     import torch
 
@@ -75,10 +76,11 @@ def load_embeddings(config: dict[str, Any]) -> dict[str, Any]:
     )
     from src.v1_mnist.component.utils.shared_provenance import load_manifest
 
-    train, validation, _labels, model, _som, _qe, provenance, hashes = load_inputs(config)
-    svhn_path = repo_path(load_manifest()["svhn_file"])
+    train, validation, _labels, model, _som, _qe, provenance, hashes = load_inputs(config, config_path)
+    svhn_path = repo_path(load_manifest(config_path)["svhn_file"])
     settings = read_settings(repo_path(config["qe_config"]))
-    loader = svhn_test_loader(svhn_path, tuple(settings['image_size']), int(config['scoring']['batch_size']))
+    loader = svhn_test_loader(svhn_path, tuple(settings['image_size']), int(config['scoring']['batch_size']),
+                              channels=int(settings["channels"]))
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     return {"train": train, "validation": validation, "svhn": svhn, "hashes": hashes, "provenance": provenance}
@@ -93,8 +95,11 @@ def get_autoencoder_fitter() -> AutoencoderFitter:
     return fit_autoencoder
 
 
-def length_control(validation: np.ndarray, svhn: np.ndarray, config: dict[str, Any]) -> dict[str, Any]:
+def length_control(
+    validation: np.ndarray, svhn: np.ndarray, config: dict[str, Any], dataset: InDistribution | None = None
+) -> dict[str, Any]:
     """AUROC of embedding length alone (higher length = more novel, like every other score)."""
+    dataset = dataset or InDistribution()
     ids, oods = length_scores(validation), length_scores(svhn)
     target = float(config["target_tpr"])
     point = evaluate(ids, oods, target)
@@ -104,9 +109,9 @@ def length_control(validation: np.ndarray, svhn: np.ndarray, config: dict[str, A
     return {
         **point,
         "auroc_interval_95": interval["auroc"],
-        "mean_length_mnist_validation": float(ids.mean()),
+        f"mean_length_{dataset.validation_key}": float(ids.mean()),
         "mean_length_svhn": float(oods.mean()),
-        "interpretation": (
+        "interpretation": dataset.wording(
             "Score = embedding length, higher = more novel. An AUROC far below 0.5 means SVHN "
             "embeddings are shorter than MNIST ones; 1 minus the AUROC then says how well "
             "'shorter = more novel' would separate them. This is a control for comparison, "
@@ -179,14 +184,14 @@ def run(config_path: Path) -> dict[str, Any]:
     output = repo_path(config["output_root"]) / config["run_id"]
     if output.exists():
         raise FileExistsError(f"STOP: Existing run: {output}")
-    data = load_embeddings(config)
+    data = load_embeddings(config, config_path)
     expected = config["expected"]
     width = int(expected["embedding_dimensions"])
     if data["svhn"].shape != (int(expected["svhn_samples"]), width):
         raise RuntimeError("SVHN embedding shape mismatch")
     joined = np.concatenate((data["validation"], data["svhn"]), axis=0)
     rows = evaluate_conditions(data["train"], joined, len(data["validation"]), config, get_autoencoder_fitter())
-    control = length_control(data["validation"], data["svhn"], config)
+    control = length_control(data["validation"], data["svhn"], config, in_distribution(config_path))
     result = write_run(
         output, config, sha256_file(config_path), data, rows, control, compare_to_reference(rows, config)
     )

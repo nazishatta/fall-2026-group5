@@ -18,6 +18,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_scorin
     score_embeddings,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.shared_provenance import (
     ROOT as PROVENANCE_ROOT,
@@ -47,10 +48,16 @@ def read_settings(config_path: Path) -> dict[str, Any]:
     config["bootstrap"] = vars(shared.bootstrap).copy()
     config["image_size"] = [int(shared.dataset.image_size)] * 2
     config["feature_layer"] = str(shared.model.feature_layer)
-    if not isinstance(config, dict) or config.get("id_dataset") != "mnist":
-        raise ValueError("This runner currently supports the MNIST ID model only")
+    config["channels"] = int(getattr(shared.dataset, "channels", 1))
+    # Derived, like image_size: which dataset folder this config belongs to.
+    config["config_path"] = str(config_path)
+    dataset = in_distribution(config_path)
+    if config.get("id_dataset") != dataset.name:
+        raise ValueError(
+            f"id_dataset is {config.get('id_dataset')!r}, but this config folder is for {dataset.name!r}"
+        )
     if config.get("id_split") != "val":
-        raise ValueError("Development runner must use MNIST validation, never test")
+        raise ValueError("Development runner must use the validation split, never test")
     entries = config.get("ood_datasets")
     if not isinstance(entries, list) or len(entries) != 1 or entries[0].get("name") != "svhn":
         raise ValueError("Expected one SVHN evaluation")
@@ -61,8 +68,8 @@ def read_settings(config_path: Path) -> dict[str, Any]:
         raise ValueError("Invalid output run ID")
     if len(set(run_ids)) != len(run_ids):
         raise ValueError("Duplicate run IDs")
-    if tuple(config["image_size"]) != (28, 28) or config["feature_layer"] != "fc2":
-        raise ValueError("This frozen CNN requires fc2 and grayscale 28x28")
+    if config["feature_layer"] != "fc2" or min(config["image_size"]) <= 0:
+        raise ValueError("This frozen CNN requires the fc2 layer and a positive image size")
     for key in (
         "som_config",
         "qe_config",
@@ -146,7 +153,8 @@ def prepare(config: dict[str, Any]) -> tuple[Any, Any, np.ndarray, dict[str, Any
     checkpoint_sha = sha256_file(ckpt)
     if checkpoint_sha != str(config["cnn_sha256"]):
         raise RuntimeError("CNN checkpoint SHA-256 mismatch")
-    model = LeNet5(num_classes=settings.num_classes)
+    model = LeNet5(num_classes=settings.num_classes, in_channels=int(config["channels"]),
+                   image_size=int(config["image_size"][0]))
     model.load_state_dict(torch.load(ckpt, map_location="cpu", weights_only=True))
     model.eval()
     return (
@@ -194,14 +202,16 @@ def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]
         if (output_root / entry["run_id"]).exists():
             raise FileExistsError(f"Existing run: {entry['run_id']}")
     model, som, validation, provenance = prepare(config)
+    dataset = in_distribution(config["config_path"])
     results: list[dict[str, Any]] = []
     for entry in config["ood_datasets"]:
         name = entry["name"]
-        transform = image_transform(name, tuple(config["image_size"]))
-        svhn_relative = str(load_manifest()["svhn_file"])
+        transform = image_transform(name, tuple(config["image_size"]), int(config["channels"]))
+        svhn_relative = str(load_manifest(config["config_path"])["svhn_file"])
         verify_shared_inputs(
             {"svhn_file": svhn_relative},
             required_keys=("svhn_file",),
+            config_path=config["config_path"],
         )
         canonical_svhn = PROVENANCE_ROOT / svhn_relative
         loader = svhn_test_loader(canonical_svhn, tuple(config['image_size']), int(config['batch_size']), transform=transform)
@@ -224,12 +234,12 @@ def evaluate(config: dict[str, Any], save: bool = False) -> list[dict[str, Any]]
         results.append(
             {
                 "run_id": entry["run_id"],
-                "id_dataset": "mnist",
+                "id_dataset": dataset.name,
                 "id_split": "val",
                 "ood_dataset": name,
                 "ood_split": "test",
                 "development_only": True,
-                "final_mnist_test_used": False,
+                f"final_{dataset.name}_test_used": False,
                 "metrics": report,
                 "auroc_bootstrap_interval": [low, high],
                 "provenance": provenance,

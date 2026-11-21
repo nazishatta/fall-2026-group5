@@ -8,21 +8,30 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 import yaml
 
 from src.v1_mnist.component.pipeline.common import (
-    CONFIG_DIR, P3, STEP_RUNNERS, P3Step, results_folder,
+    CONFIG_DIR,
+    P3,
+    STEP_RUNNERS,
+    P3Step,
+    results_folder,
 )
 from src.v1_mnist.component.pipeline.p3_novelty_detection import (
-    run_novelty_benchmark, run_qe_novelty_detection, run_u_matrix_analysis,
+    run_novelty_benchmark,
+    run_qe_novelty_detection,
+    run_u_matrix_analysis,
 )
 from src.v1_mnist.component.pipeline.run_all import (
-    REPRODUCTION_STEPS, RUNNER_STEPS, groups, phase3_steps,
+    REPRODUCTION_STEPS,
+    RUNNER_STEPS,
+    groups,
+    phase3_steps,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -264,3 +273,76 @@ def test_config_dir_chooses_the_configs_of_every_step() -> None:
     assert f"{folder}/cnn_baseline.yaml" in result.stdout
     assert f"{folder}/som.yaml" in result.stdout
     assert "src/v1_mnist/component/configs/" not in result.stdout
+
+
+# ---- the study steps after the core Phase 2 chain -----------------------------------------------
+
+from src.v1_mnist.component.pipeline.run_all import (  # noqa: E402
+    STEP_NAMES,
+    optional_steps,
+    study_plan,
+)
+from src.v1_mnist.component.pipeline.study_steps import (  # noqa: E402
+    STUDY_STEPS,
+    optuna_grids,
+)
+
+FASHION_DIR = "src/v1_fashion_mnist/component/configs"
+
+
+def test_steps_follow_the_proposal_order() -> None:
+    assert STEP_NAMES == [
+        "data_pipeline", "cnn_baseline_training",                       # Phase 1
+        "som_nnsom_training", "cluster_analysis", "error_pattern_analysis",
+        "error_pattern_baselines", "error_detector_budget", "som_optuna", "feature_layer_ablation",  # Phase 2
+        "novelty_detection", "held_out_class_novelty",                  # Phase 3
+        "guided_retraining", "guided_retraining_test",                  # Phase 4
+    ]
+
+
+def test_the_test_step_runs_only_when_asked_for() -> None:
+    default = run_all()
+    assert default.returncode == 0
+    assert "guided_retraining" not in default.stdout + default.stderr
+    only = run_all("--from", "guided_retraining")
+    assert "guided_retraining_test" not in only.stdout + only.stderr
+
+
+def test_a_step_without_its_config_is_skipped_with_a_message(tmp_path: Path) -> None:
+    (tmp_path / "base.yaml").write_text("dataset:\n  name: fashion_mnist\n", encoding="utf-8")
+    assert study_plan(STUDY_STEPS["held_out_class_novelty"], str(tmp_path), dry_run=True) == []
+
+
+def test_study_commands_are_listed_not_run_in_a_dry_run() -> None:
+    step = STUDY_STEPS["som_optuna"]
+    folder = FASHION_DIR
+    commands = step.commands(folder)
+    assert [c.label for c in commands][-1] == "som_optuna: summary table"
+    assert all(not c.listed_only for c in commands)
+    # study_plan marks them listed-only in a dry run (if the step is not finished already).
+    planned = study_plan(step, folder, dry_run=True)
+    assert all(c.listed_only for c in planned)
+
+
+def test_optuna_grids_come_from_the_config() -> None:
+    assert optuna_grids("src/v1_mnist/component/configs/som_optuna.yaml") == ["10x10", "15x15", "20x20"]
+
+
+def test_every_study_step_passes_its_own_config() -> None:
+    for name, step in STUDY_STEPS.items():
+        for command in step.commands("src/v1_mnist/component/configs"):
+            config = command.args[command.args.index("--config") + 1]
+            assert config.startswith("src/v1_mnist/component/configs/"), (name, command.label)
+            assert (REPO_ROOT / config).is_file(), (name, config)
+
+
+def test_reproductions_are_optional_only_for_mnist() -> None:
+    assert optional_steps() == REPRODUCTION_STEPS
+    assert optional_steps(FASHION_DIR) == frozenset()
+
+
+def test_phase3_runner_skips_steps_whose_config_is_not_in_the_folder(tmp_path: Path) -> None:
+    (tmp_path / "base.yaml").write_text("dataset:\n  name: fashion_mnist\n", encoding="utf-8")
+    result = run_runner("run_qe_novelty_detection.py", "--config-dir", str(tmp_path), "--dry-run")
+    assert result.returncode == 0, result.stderr
+    assert "not part of this dataset's study" in result.stdout + result.stderr

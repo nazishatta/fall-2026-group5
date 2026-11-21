@@ -63,7 +63,8 @@ def run_check(settings: ExperimentSettings, data: RetrainingData) -> dict[str, A
 
     device = resolve_device(settings.device)
     state = torch.load(settings.cnn_checkpoint, map_location="cpu")
-    model = load_model(state, settings.train.num_classes, device)
+    model = load_model(state, settings.train.num_classes, device,
+                       settings.train.in_channels, settings.train.image_size)
     ranges = ranges_from_options(settings.options)
     altered = make_copies(data.val.images, 1, settings.seeds[0], ranges)
     original_pred, _ = predict(model, data.val.images, device)

@@ -16,6 +16,15 @@ The proposal week is shown for orientation only; the code uses the step names.
 | 2 | `cluster_analysis` | 4 | `p2_som_training_visualization/run_cluster_analysis.py` | BMUs, purity, entropy, class–neuron intersection; class maps, purity map, class pie/stem; cluster heatmaps | ✅ Yes |
 | 2 | `error_pattern_analysis` | 5 | `p2_som_training_visualization/run_error_pattern_analysis.py` | Error geography and hotspots; hotspot images; error maps; error heatmaps; error-pattern robustness (15x15, 10x10, 20x20) and verdict | ✅ After `cluster_analysis` |
 | 2 | (report) | 3–5 | `p2_som_training_visualization/run_interactive_report.py` | Interactive HTML report | ✅ Yes |
+| 2 | `error_pattern_baselines` | – | `p2_som_training_visualization/run_error_pattern_baselines.py --stage all` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots | ✅ Skipped if its results exist |
+| 2 | `error_detector_budget` | – | `p2_som_training_visualization/run_error_detector_budget.py` | Same-budget comparison of the error detectors (exploratory) | ✅ Skipped if its results exist |
+| 2 | `som_optuna` | – | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py`, `optuna_confirmation.py` | Optuna search for every grid in `som_optuna.yaml`, the 5-seed confirmation of each, the summary table | ✅ Skipped if the summary table exists |
+| 2 | `feature_layer_ablation` | – | `p2_som_training_visualization/run_feature_layer_ablation.py` | fc1 against fc2: `--stage extract`, `som`, `compare` | ✅ Skipped if its results exist |
+| 3 | `novelty_detection` | – | `p3_novelty_detection/run_*.py` (see below) | The three Phase 3 runners, in the order their results depend on each other | ✅ Finished steps are skipped |
+| 3 | `held_out_class_novelty` | – | `p3_novelty_detection/run_held_out_class_novelty.py` | Near novelty with held-out classes: `--stage run`, then `compare` | ✅ Skipped if its results exist |
+| 4 | `guided_retraining` | – | `p4_guided_retraining/run_hard_example_mining.py`, `run_targeted_augmentation.py`, `run_curriculum_comparison.py` | Hard-image pools; transform `check`; both experiments `train` and `summary` (validation only) | ✅ Skipped if its results exist |
+| 4 | (protocol, by hand) | – | `p4_guided_retraining/run_protocol_stamp.py --config CONFIG` | Fill in the macro-F1 guard, then freeze the retraining protocol. **`run_all.py` never does this** | ✅ Once, before the next row |
+| 4 | `guided_retraining_test` | – | the same two experiment runners, `run_som_reanalysis.py`, `run_novelty_after_retraining.py` | The single test pass and its breakdown; SOM re-analysis (and the max-softmax arm, if configured); novelty after retraining | ✅ Only when asked for by name; refuses without the stamp |
 | 4 | `hard_example_mining` | 9 | `p4_guided_retraining/run_hard_example_mining.py` | Decide which training images are hard; SOM, max-softmax and random pool tables (training images only, no CNN trained, test split never loaded) | ✅ Once per run ID; a new `run.revision` in `configs/retraining.yaml` for a new run |
 | 4 | `hard_example_mining` (curriculum) | 9 | `p4_guided_retraining/run_curriculum_comparison.py` | Train standard and curriculum arms (5 seeds, validation images only); validation summary; the single test pass after the protocol is frozen | ✅ `--stage train`, then `summary`, then `final_test` |
 | 5 | `som_reanalysis` | 11 | `p4_guided_retraining/run_som_reanalysis.py` | Embeddings of the retrained CNNs; new SOM per cell; tables and figures | ✅ `--stage embeddings`, `train_som`, `analyze` |
@@ -23,7 +32,11 @@ The proposal week is shown for orientation only; the code uses the step names.
 | 4 | (protocol) | 9–10 | `p4_guided_retraining/run_protocol_stamp.py` | Freeze the retraining protocol once every open item is filled | ✅ Once |
 | – | – | – | `run_all.py` | Runs the steps above in order (default: `som_nnsom_training` to `error_pattern_analysis`, then the report) | ✅ Yes |
 
-The order is set in `common.py` (`STEP_RUNNERS`). Phase 3 has its own runners (see below); `run_all.py` runs them as the last step, `novelty_detection`, when asked. The Phase 4 runner is standalone for now and is not yet in `STEP_RUNNERS`.
+The Phase 1 and core Phase 2 runners are listed in `common.py` (`STEP_RUNNERS`); the later steps, from `error_pattern_baselines` on, are defined in `study_steps.py`; `run_all.py` puts them all in one list, `STEP_NAMES`, in proposal order. The default range is unchanged: it ends at `error_pattern_analysis` and the report. `--to STEP` runs on to a later step, and `--from STEP` alone, for a step after the report, runs just that step.
+
+Two rules decide which of the later steps run. A step whose config is not in the `--config-dir` folder is not part of that dataset's study and is skipped with a message. A step whose results all exist already is skipped too; each step's run folders are found by its own settings loader. A half-finished step is planned, and its script stops at the first part that exists.
+
+The Phase 4 steps around the test split are stop points. `guided_retraining` ends with the validation summaries. A person then fills in the macro-F1 guard (protocol and `retraining.yaml`) and runs `run_protocol_stamp.py --config CONFIG`. Only `--to guided_retraining_test` (or `--from` it) runs the test step, and its `final_test` stages refuse without the stamp.
 
 `data_pipeline` and `cnn_baseline_training` made the checkpoint and embeddings that every SOM result uses. Running them again would replace those files and change every result, so their runners refuse. A new CNN run needs a new `run.id` (see `configs/cnn_baseline.yaml`).
 
@@ -46,19 +59,14 @@ python src/v1_mnist/component/pipeline/p3_novelty_detection/run_novelty_benchmar
 python src/v1_mnist/component/pipeline/p3_novelty_detection/run_qe_novelty_detection.py --only qe_ood --dry-run
 ```
 
-## Standalone runners (not in `run_all.py`)
+## Running a later step by hand
 
-These steps each have their own config and run ID and are run by hand, in the order shown, after the steps above.
+Every step in `study_steps.py` can still be run alone, with its own config and stage, for example to finish a half-finished run or to repeat a stage under a new run ID:
 
-| Phase | Runner | Config | What it does |
-|---|---|---|---|
-| 2 | `p2_som_training_visualization/run_error_pattern_baselines.py` | `error_pattern_baselines.yaml` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots (`--stage som`, `kmeans`, `final`) |
-| 2 | `p2_som_training_visualization/run_error_detector_budget.py` | `error_detector_budget.yaml` | Same-budget comparison: mistakes caught when every score flags the same share of images (exploratory; reads the baseline run) |
-| 2 | `p2_som_training_visualization/run_feature_layer_ablation.py` | `feature_layer_ablation.yaml` | Feature-layer ablation: SOMs on fc1 and fc2, 5 SOM seeds each (`--stage extract`, `som`, `compare`) |
-| 2 | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py` (in the component folder, not in `pipeline/`) | `som_optuna.yaml` | Optuna tuning of the three grids and the 5-seed confirmation |
-| 3 | `p3_novelty_detection/run_held_out_class_novelty.py` | `held_out_class_novelty.yaml` | Near novelty: train on 6 digits, the other 4 are novel, 5 class splits (`--stage run`, then `compare`) |
-| 4 | `p4_guided_retraining/run_som_reanalysis.py --config configs/som_reanalysis_msp_arm.yaml` | `som_reanalysis_msp_arm.yaml` | Secondary SOM re-analysis with the least-confident (max-softmax) arm |
-| 4 | `p4_guided_retraining/run_novelty_after_retraining.py` | `novelty_after_retraining.yaml` | Phase 3's novelty scores on the retrained networks (`--stage score`, then `compare`) |
+```bash
+python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_feature_layer_ablation.py --config src/v1_mnist/component/configs/feature_layer_ablation.yaml --stage compare
+python src/v1_mnist/component/pipeline/p4_guided_retraining/run_protocol_stamp.py --config src/v1_mnist/component/configs/retraining.yaml
+```
 
 ## One pipeline, any dataset
 
@@ -67,7 +75,7 @@ The runners hold no dataset. The dataset comes from the folder of configs: every
 - MNIST: `python src/v1_mnist/component/pipeline/run_all.py` (or `bash src/v1_mnist/shellscripts/run_pipeline.sh`)
 - Fashion-MNIST: `python src/v1_fashion_mnist/component/pipeline/run_all.py --from data_pipeline` (or `bash src/v1_fashion_mnist/shellscripts/run_pipeline.sh`), which calls this `run_all.py` with `--config-dir src/v1_fashion_mnist/component/configs`
 
-A new dataset needs a config folder with its own `base.yaml` (and, if torchvision has not got it yet, one entry in `utils/image_datasets.py`).
+A new dataset needs a config folder with its own `base.yaml` (and, if torchvision has not got it yet, one entry in `utils/image_datasets.py`). For Phase 3 and later, that folder also needs its own `phase3_shared_provenance.yaml` (its checkpoint, embeddings and outside-set file, with their SHA-256): every Phase 3 script checks its inputs against the manifest in its own config folder, so a dataset can never be checked against another dataset's files. Result files and keys that MNIST names after itself (`qe_mnist_val_scores.npy`, `"mnist_validation"`) are named after the dataset (`utils/in_distribution.py`), so MNIST's own names are unchanged.
 
 ## Options every runner has
 
@@ -85,7 +93,7 @@ Extra options:
 | `run_som_nnsom_training.py` | `--run-id` (also used for the figures and convergence charts), `--skip-training` |
 | `run_error_pattern_analysis.py` | `--robustness-configs`, `--data-root` |
 | `run_interactive_report.py` | `--split` |
-| `run_all.py` | `--config-dir DIR`, `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report`, `--with-reproductions` |
+| `run_all.py` | `--config-dir DIR`, `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report`, `--with-reproductions` (MNIST only: for other datasets the three steps are first runs and always planned) |
 
 ## Common commands
 
@@ -103,6 +111,10 @@ python src/v1_mnist/component/pipeline/run_all.py --from cluster_analysis --to e
 # Phase 3 after the report (steps whose results exist are skipped), or only Phase 3
 python src/v1_mnist/component/pipeline/run_all.py --to novelty_detection --dry-run
 python src/v1_mnist/component/pipeline/run_all.py --from novelty_detection --dry-run
+
+# The whole study up to the stop before the test split, then (after the stamp) the test step
+python src/v1_mnist/component/pipeline/run_all.py --to guided_retraining --dry-run
+python src/v1_mnist/component/pipeline/run_all.py --from guided_retraining_test --dry-run
 
 # One step at a time
 python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_som_nnsom_training.py --skip-training

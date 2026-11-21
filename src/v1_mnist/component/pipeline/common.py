@@ -25,15 +25,14 @@ its own config (its own run ID), so each step names its config. Their options:
 
 from __future__ import annotations
 
-from types import SimpleNamespace
-
 import argparse
-from dataclasses import dataclass, field
 import os
-from pathlib import Path
 import shlex
 import subprocess
 import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from types import SimpleNamespace
 from typing import Callable, Optional, Sequence
 
 import yaml
@@ -78,6 +77,7 @@ class Step:
     script: Optional[Path] = None
     args: Sequence[str] = field(default_factory=list)
     func: Optional[Callable[[], None]] = None
+    listed_only: bool = False   # print the command but do not run it (a dry run of a script with no --dry-run)
 
     def describe(self) -> str:
         if self.func is not None:
@@ -129,7 +129,7 @@ def run_steps(title: str, steps: Sequence[Step], dry_run: bool) -> None:
     log.info("=" * 72)
     for i, step in enumerate(steps, start=1):
         log.info(f"\n[{i}/{len(steps)}] {step.label}\n    $ {step.describe()}")
-        if dry_run:
+        if dry_run or step.listed_only:
             continue
         if step.func is not None:
             step.func()
@@ -202,6 +202,14 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
         if args.steps is not None and step.name not in args.steps:
             continue
         config = args.config or f"{args.config_dir}/{step.config}"
+        if not resolve(config).is_file():
+            # A dataset's config folder lists the steps of its study; a step without a config is not one.
+            message = f"{step.name}: not part of this dataset's study (no {show(resolve(config))})"
+            if args.only:
+                log.error(message)
+                sys.exit(1)
+            log.info(f"Skipping {message}")
+            continue
         folder = results_folder(config)
         label = step.label
         if folder is not None and folder.exists():
@@ -221,7 +229,7 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
         plan.append(Step(label, P3 / step.script, ["--config", config, *step.flags]))
 
     if not plan:
-        log.info(f"{title}: every step already has results, nothing to run.")
+        log.info(f"{title}: nothing to run (every step already has results or is not part of this dataset's study).")
         return
     # The Phase 3 scripts import the project as src.v1_mnist...; make that work for each child process.
     os.environ["PYTHONPATH"] = os.pathsep.join(filter(None, [str(REPO_ROOT), os.environ.get("PYTHONPATH")]))
