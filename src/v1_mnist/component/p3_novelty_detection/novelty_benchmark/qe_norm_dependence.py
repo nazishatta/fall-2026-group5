@@ -21,6 +21,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_metric
     ood_metrics,
     stratified_auroc_interval,
 )
+from src.v1_mnist.component.utils.in_distribution import InDistribution
 
 
 def embedding_norms(features: NDArray[np.floating]) -> NDArray[np.float64]:
@@ -114,8 +115,13 @@ def analyze(
     *,
     qe_threshold: float,
     settings: dict[str, Any],
+    dataset: InDistribution | None = None,
 ) -> dict[str, Any]:
-    """Norm summaries, the QE reference, QE-norm correlations and the norm-band check."""
+    """Norm summaries, the QE reference, QE-norm correlations and the norm-band check.
+
+    ``dataset`` names the in-distribution keys (``mnist_train``, ...); MNIST if not given.
+    """
+    dataset = dataset or InDistribution()
     train_norms = embedding_norms(train)
     id_norms = embedding_norms(validation)
     ood_norms = embedding_norms(svhn)
@@ -136,16 +142,16 @@ def analyze(
         )
     )
     qe_reference["threshold"] = float(qe_threshold)
-    qe_reference["threshold_source"] = "frozen MNIST training-QE 95th percentile"
+    qe_reference["threshold_source"] = dataset.wording("frozen MNIST training-QE 95th percentile")
     return {
         "norms": {
-            "mnist_train": norm_summary(train_norms),
-            "mnist_validation": norm_summary(id_norms),
+            dataset.train_key: norm_summary(train_norms),
+            dataset.validation_key: norm_summary(id_norms),
             "svhn_test": norm_summary(ood_norms),
         },
         "qe_reference": qe_reference,
         "qe_norm_spearman": {
-            "mnist_validation": spearman(id_qe, id_norms),
+            dataset.validation_key: spearman(id_qe, id_norms),
             "svhn_test": spearman(ood_qe, ood_norms),
             "pooled": spearman(np.r_[id_qe, ood_qe], np.r_[id_norms, ood_norms]),
         },

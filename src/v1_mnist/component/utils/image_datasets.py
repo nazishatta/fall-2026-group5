@@ -11,7 +11,7 @@ images. Every step finds an image by this ID.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -47,6 +47,8 @@ class DatasetSpec:
     name: str = "mnist"
     channels: int = 1
     image_size: int = 28
+    # Word for one class in output names ("digit" for MNIST, "class" otherwise); not part of identity.
+    class_label: str = field(default="digit", compare=False)
 
 
 def dataset_source(name: str) -> DatasetSource:
@@ -70,6 +72,7 @@ def dataset_spec(config: Any) -> DatasetSpec:
         name=str(dataset.name),
         channels=int(getattr(dataset, "channels", None) or source.native_channels),
         image_size=int(getattr(dataset, "image_size", None) or source.native_size),
+        class_label=str(getattr(dataset, "class_label", None) or ("digit" if dataset.name == "mnist" else "class")),
     )
 
 

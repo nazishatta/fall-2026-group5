@@ -26,6 +26,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.svhn_som_over
     svhn_neuron_summary,
     top_missed_neurons,
 )
+from src.v1_mnist.component.utils.in_distribution import InDistribution, in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -62,11 +63,11 @@ def load_reference(config: dict[str, Any]) -> dict[str, NDArray[Any]]:
     val_bmu = np.load(paths["validation_bmu"], allow_pickle=False)
     val_qe = np.load(paths["validation_qe"], allow_pickle=False)
     if len(val_bmu) != int(expected["validation_samples"]) or val_qe.shape != val_bmu.shape:
-        raise RuntimeError("MNIST validation assignments have an unexpected size")
+        raise RuntimeError("Validation assignments have an unexpected size")
     return {"class_counts": counts, "validation_bmu": val_bmu, "validation_qe": val_qe}
 
 
-def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
+def compute_svhn_assignments(config: dict[str, Any], config_path: Path | None = None) -> dict[str, Any]:
     """Score SVHN test with the frozen CNN and SOM (needs torch, nnsom and the SVHN files)."""
     import torch
 
@@ -90,10 +91,10 @@ def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
     from src.v1_mnist.component.utils.som_io import som_coordinates
 
     expected = config["expected"]
-    manifest = load_manifest()
+    manifest = load_manifest(config_path)
     shared = dict(manifest["inputs"])
     shared["svhn_file"] = manifest["svhn_file"]
-    verify_shared_inputs(shared, required_keys=tuple(shared))
+    verify_shared_inputs(shared, required_keys=tuple(shared), config_path=config_path)
     settings = read_settings(repo_path(config["qe_config"]))
     model, som, _validation_qe, provenance = prepare(settings)
     if tuple(som.w.shape) != (int(expected["som_units"]), int(expected["embedding_dimensions"])):
@@ -101,7 +102,8 @@ def compute_svhn_assignments(config: dict[str, Any]) -> dict[str, Any]:
     if provenance["qe_threshold"] != float(expected["frozen_training_qe_threshold"]):
         raise RuntimeError("Frozen QE threshold mismatch")
     svhn_path = repo_path(manifest["svhn_file"])
-    loader = svhn_test_loader(svhn_path, tuple(settings['image_size']), int(config['batch_size']))
+    loader = svhn_test_loader(svhn_path, tuple(settings['image_size']), int(config['batch_size']),
+                              channels=int(settings["channels"]))
     torch.set_num_threads(1)
     features, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     if features.shape != (int(expected["svhn_samples"]), int(expected["embedding_dimensions"])):
@@ -136,8 +138,10 @@ def analyze(
     qe: NDArray[np.floating],
     threshold: float,
     reference: dict[str, NDArray[Any]],
+    dataset: InDistribution | None = None,
 ) -> dict[str, Any]:
-    """Compute all descriptive tables from the SVHN assignments."""
+    """Compute all descriptive tables from the SVHN assignments (MNIST names if no dataset)."""
+    dataset = dataset or InDistribution()
     units = int(config["expected"]["som_units"])
     classes = int(config["class_count"])
     dominant, purity = neuron_dominant_class(reference["class_counts"])
@@ -146,12 +150,12 @@ def analyze(
         "dominant": dominant,
         "purity": purity,
         "summary": summary,
-        "profile": class_landing_profile(bmu, qe, threshold, dominant, classes),
+        "profile": class_landing_profile(bmu, qe, threshold, dominant, classes, dataset),
         "typicality": miss_typicality(
             bmu, qe, threshold, reference["validation_bmu"], reference["validation_qe"],
-            units, int(config["min_validation_hits"]),
+            units, int(config["min_validation_hits"]), dataset,
         ),
-        "top_neurons": top_missed_neurons(summary, dominant, purity, int(config["top_missed_neurons"])),
+        "top_neurons": top_missed_neurons(summary, dominant, purity, int(config["top_missed_neurons"]), dataset),
     }
 
 
@@ -173,12 +177,14 @@ def write_run(
     scores: dict[str, Any],
     reference: dict[str, NDArray[Any]],
     history_gap: float,
+    dataset: InDistribution | None = None,
 ) -> dict[str, Any]:
     """Write every output of one run into a brand-new folder."""
+    dataset = dataset or InDistribution()
     bmu, qe, threshold = scores["bmu"], scores["qe"], float(scores["threshold"])
     if len(bmu) != int(config["expected"]["svhn_samples"]):
         raise RuntimeError("Unexpected number of SVHN assignments")
-    analysis = analyze(config, bmu, qe, threshold, reference)
+    analysis = analyze(config, bmu, qe, threshold, reference, dataset)
     summary = analysis["summary"]
     destination.mkdir(parents=True, exist_ok=False)
     for name in ("assignments", "tables", "pdf"):
@@ -187,7 +193,7 @@ def write_run(
     np.save(destination / "assignments" / "svhn_qe.npy", qe, allow_pickle=False)
     write_csv(
         destination / "tables" / "svhn_neuron_summary.csv",
-        ["neuron", "svhn_images", "missed", "miss_rate", "dominant_mnist_class", "class_purity"],
+        ["neuron", "svhn_images", "missed", "miss_rate", f"dominant_{dataset.name}_class", "class_purity"],
         [
             [n, int(summary["hits"][n]), int(summary["missed"][n]), float(summary["miss_rate"][n]),
              int(analysis["dominant"][n]), float(analysis["purity"][n])]
@@ -202,7 +208,7 @@ def write_run(
     )
     figure = save_svhn_overlay(
         scores["centers"], summary, analysis["dominant"], int(config["class_count"]),
-        threshold, float(config["hex_radius"]), destination / "pdf" / "svhn_som_overlay.pdf",
+        threshold, float(config["hex_radius"]), destination / "pdf" / "svhn_som_overlay.pdf", dataset,
     )
     missed = int(summary["missed"].sum())
     result = {
@@ -225,7 +231,7 @@ def write_run(
             "input_sha256": {key: sha256_file(repo_path(path)) for key, path in config["inputs"].items()},
             "frozen_input_sha256": scores["hashes"],
         },
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "SVHN test is the novel set and is used only for description. "
             "MNIST validation and the training class table are references. "
             "The QE cutoff comes from MNIST training and is not changed. "
@@ -249,10 +255,11 @@ def run(config_path: Path) -> dict[str, Any]:
     if destination.exists():
         raise FileExistsError(f"STOP: Existing run: {destination}")
     reference = load_reference(config)
-    scores = compute_svhn_assignments(config)
+    scores = compute_svhn_assignments(config, config_path)
     gap = check_against_history(config, scores["qe"])
     LOGGER.info("SVHN QE matches history within %.2e", gap)
-    result = write_run(destination, config, sha256_file(config_path), scores, reference, gap)
+    result = write_run(destination, config, sha256_file(config_path), scores, reference, gap,
+                       in_distribution(config_path))
     LOGGER.info("Missed %d of %d SVHN images", result["missed"], result["svhn_samples"])
     return result
 

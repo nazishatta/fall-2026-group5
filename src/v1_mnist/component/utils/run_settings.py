@@ -9,17 +9,16 @@ by train_som.py) and the hash stored in its metrics file.
 
 from __future__ import annotations
 
-from types import SimpleNamespace
-
 import csv
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from types import SimpleNamespace
 
-from src.v1_mnist.component.utils.som_io import sha256_file
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.dataset_info import DatasetInfo, dataset_info
 from src.v1_mnist.component.utils.som_data import resolve_embeddings_dir
+from src.v1_mnist.component.utils.som_io import sha256_file
 
 DEFAULT_CONFIG = "src/v1_mnist/component/configs/som.yaml"
 
@@ -40,6 +39,7 @@ class AnalysisSettings:
     feature_dim: int
     expected_model_sha256: str
     expected_inputs: dict[str, str]
+    class_label: str = "digit"   # word for one class in output names (dataset.class_label)
 
     @property
     def num_neurons(self) -> int:
@@ -100,6 +100,7 @@ def load_analysis_settings(config_path: str | Path | None, repo_root: Path) -> A
         feature_dim=info.feature_dim,
         expected_model_sha256=expected_hash_from_manifest(manifest_path, selected),
         expected_inputs=expected_inputs,
+        class_label=info.class_label,
     )
 
 

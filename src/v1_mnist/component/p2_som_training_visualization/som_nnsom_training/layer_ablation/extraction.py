@@ -23,8 +23,14 @@ from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.lay
     REFERENCE_LAYER,
     AblationSettings,
 )
-from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import svhn_test_loader
-from src.v1_mnist.component.utils.cnn_retraining import load_model, resolve_device
+from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
+    svhn_test_loader,
+)
+from src.v1_mnist.component.utils.cnn_retraining import (
+    load_model,
+    network_input,
+    resolve_device,
+)
 from src.v1_mnist.component.utils.frozen_split import load_train_val_images
 from src.v1_mnist.component.utils.run_provenance import write_json
 from src.v1_mnist.component.utils.som_io import sha256_file
@@ -77,13 +83,13 @@ def run_extraction(settings: AblationSettings) -> None:
     check_frozen_files(settings)
     device = resolve_device(settings.device)
     state = torch.load(settings.checkpoint, map_location="cpu", weights_only=True)
-    model = load_model(state, settings.num_classes, device)
+    model = load_model(state, settings.num_classes, device, settings.dataset.channels, settings.dataset.image_size)
     train, val = load_train_val_images(settings.data_root, settings.embeddings_dir, settings.dataset)
 
     record: dict[str, Any] = {"layers": list(settings.layers), "fc2_max_abs_difference": {}}
     sources = {
-        "train": DataLoader(TensorDataset(torch.as_tensor(train.images).unsqueeze(1)), batch_size=settings.batch_size),
-        "val": DataLoader(TensorDataset(torch.as_tensor(val.images).unsqueeze(1)), batch_size=settings.batch_size),
+        "train": DataLoader(TensorDataset(network_input(train.images)), batch_size=settings.batch_size),
+        "val": DataLoader(TensorDataset(network_input(val.images)), batch_size=settings.batch_size),
         "svhn": svhn_test_loader(settings.svhn_file, settings.image_size, settings.batch_size),
     }
     for split, loader in sources.items():

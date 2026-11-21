@@ -12,6 +12,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from src.v1_mnist.component.utils.figures import pdf_figure_path, save_pdf
+from src.v1_mnist.component.utils.in_distribution import InDistribution
 
 
 def aggregate_bmu_scores(
@@ -45,8 +46,10 @@ def save_novelty_overlay(
     grid_height: int,
     grid_width: int,
     destination: Path,
+    dataset: InDistribution | None = None,
 ) -> dict[str, int]:
-    """Map MNIST-validation mean QE to BMU locations; no SVHN claims."""
+    """Map validation mean QE to BMU locations (MNIST if no dataset is given); no SVHN claims."""
+    dataset = dataset or InDistribution()
     if destination.suffix.lower() != ".pdf":
         raise ValueError("Only PDF result figures are allowed")
     output = pdf_figure_path(destination)
@@ -56,7 +59,7 @@ def save_novelty_overlay(
     image = np.ma.masked_invalid(means.reshape(grid_height, grid_width))
     fig, ax = plt.subplots(figsize=(7, 5))
     heat = ax.imshow(image, interpolation="nearest", cmap="viridis")
-    ax.set(title="Mean MNIST validation QE by SOM BMU", xlabel="SOM column", ylabel="SOM row")
+    ax.set(title=dataset.wording("Mean MNIST validation QE by SOM BMU"), xlabel="SOM column", ylabel="SOM row")
     ax.set_xticks(range(grid_width))
     ax.set_yticks(range(grid_height))
     ax.tick_params(labelsize=7)

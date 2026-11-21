@@ -11,7 +11,9 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings import resolve_path
+from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings import (
+    resolve_path,
+)
 from src.v1_mnist.component.utils.config import load_config
 from src.v1_mnist.component.utils.image_datasets import DatasetSpec, dataset_spec
 from src.v1_mnist.component.utils.retraining_settings import TrainSettings
@@ -136,6 +138,8 @@ def load_held_out_settings(config_path: str | Path | None, repo_root: Path) -> H
             weight_decay=float(cnn.training.weight_decay), step_size=int(cnn.training.step_size),
             gamma=float(cnn.training.gamma), batch_size=int(cnn.dataloader.batch_size),
             num_classes=num_classes - int(sp["unknown_per_split"]),
+            in_channels=int(getattr(cnn.dataset, "channels", 1)),
+            image_size=int(getattr(cnn.dataset, "image_size", 28)),
         ),
         training_seed=int(raw["training"]["seed"]),
         device=str(raw["training"]["device"]),

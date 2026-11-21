@@ -13,6 +13,7 @@ import yaml
 from scipy.stats import spearmanr
 
 from src.v1_mnist.component.utils.figures import save_pdf
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -39,12 +40,13 @@ def run(config_path: Path) -> Path:
     if destination.exists():
         raise FileExistsError(f"STOP: Run already exists: {destination}")
 
+    dataset = in_distribution(config_path)
     folder = repository_path(config["scores_directory"])
     arrays = {}
     hashes = {}
 
     for name in ("qe", "u_matrix"):
-        source = folder / f"{name}_mnist_val_scores.npy"
+        source = folder / f"{name}_{dataset.val_tag}_scores.npy"
         actual = sha256_file(source)
         if actual != config["score_sha256"][name]:
             raise RuntimeError(f"SHA-256 mismatch: {source}")
@@ -90,7 +92,7 @@ def run(config_path: Path) -> Path:
     )
     ax.set_xlabel("Quantization error (distance to BMU)")
     ax.set_ylabel("U-Matrix novelty score")
-    ax.set_title("MNIST validation: QE versus U-Matrix")
+    ax.set_title(dataset.wording("MNIST validation: QE versus U-Matrix"))
     ax.text(
         0.03, 0.97,
         f"n = {len(qe):,} | Spearman rho = {correlation:.4f}",
@@ -115,7 +117,7 @@ def run(config_path: Path) -> Path:
         "source_summary_sha256": sha256_file(summary_path),
         "config_sha256": sha256_file(config_path),
         "figure_sha256": sha256_file(figure_path),
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Frozen MNIST validation scores only; no model fitting, "
             "threshold tuning, SVHN use, or final MNIST test access."
         ),

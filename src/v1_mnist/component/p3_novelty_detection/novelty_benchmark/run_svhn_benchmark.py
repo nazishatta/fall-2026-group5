@@ -39,6 +39,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
     sample_u_matrix,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.shared_provenance import (
     verify_shared_inputs,
@@ -102,10 +103,10 @@ def main() -> None:
             raise FileNotFoundError(f"Required frozen input missing: {path}")
 
     ood_config = read_settings(qe_config_path)
-    if benchmark["dataset"] != "mnist" or int(benchmark["seed"]) != int(ood_config["bootstrap"]["seed"]):
+    dataset = in_distribution(config_path)
+    if benchmark["dataset"] != dataset.name or int(benchmark["seed"]) != int(ood_config["bootstrap"]["seed"]):
         raise RuntimeError("Benchmark configuration differs from recorded protocol")
-    if (tuple(ood_config["image_size"]) != (28, 28)
-            or ood_config["feature_layer"] != "fc2"):
+    if ood_config["feature_layer"] != "fc2":
         raise RuntimeError("CNN preprocessing or feature layer protocol changed")
     train_path = ROOT / benchmark["embeddings"]["train"]
     val_path = ROOT / benchmark["embeddings"]["validation"]
@@ -120,6 +121,7 @@ def main() -> None:
             "checkpoint", "train_features",
             "validation_features", "svhn_file",
         ),
+        config_path=config_path,
     )
     expected_hashes = benchmark["expected_sha256"]
     hashes = {"train": sha256_file(train_path), "validation": sha256_file(val_path)}
@@ -133,15 +135,16 @@ def main() -> None:
     model, som, frozen_id_qe, provenance = prepare(ood_config)
     if provenance["qe_threshold"] != benchmark["expected"]["qe_threshold"]:
         raise RuntimeError("STOP: Frozen QE threshold unexpectedly changed")
-    if len(frozen_id_qe) != benchmark["expected"]["mnist_validation_count"] or tuple(som.w.shape) != (benchmark["expected"]["som_neurons"], benchmark["expected"]["feature_dim"]):
-        raise RuntimeError("STOP: MNIST reference or SOM dimensions changed")
+    if len(frozen_id_qe) != dataset.expected_count(benchmark["expected"], "validation") or tuple(som.w.shape) != (benchmark["expected"]["som_neurons"], benchmark["expected"]["feature_dim"]):
+        raise RuntimeError(dataset.wording("STOP: MNIST reference or SOM dimensions changed"))
     train = np.load(train_path, allow_pickle=False)
     validation = np.load(val_path, allow_pickle=False)
-    if len(train) != benchmark["expected"]["mnist_train_count"] or len(validation) != len(frozen_id_qe):
-        raise RuntimeError("STOP: Original MNIST split sizes changed")
+    if len(train) != dataset.expected_count(benchmark["expected"], "train") or len(validation) != len(frozen_id_qe):
+        raise RuntimeError(dataset.wording("STOP: Original MNIST split sizes changed"))
 
     # SVHN is used for scoring ONLY; no fitting, threshold calibration or selection.
-    loader = svhn_test_loader(svhn_file, tuple(ood_config['image_size']), int(ood_config['batch_size']))
+    loader = svhn_test_loader(svhn_file, tuple(ood_config['image_size']), int(ood_config['batch_size']),
+                              channels=int(ood_config["channels"]))
     torch.set_num_threads(1)
     features, labels, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     del model, loader
@@ -196,9 +199,9 @@ def main() -> None:
     )
     result: dict[str, object] = {
         "run_id": run_id,
-        "id_dataset": "mnist", "id_split": "validation",
+        "id_dataset": dataset.name, "id_split": "validation",
         "ood_dataset": "svhn", "ood_split": "test",
-        "sample_counts": {"mnist_train": len(train), "mnist_validation": cut,
+        "sample_counts": {dataset.train_key: len(train), dataset.validation_key: cut,
                           "svhn_test": len(features)},
         "methods": results,
         "qe_validation_max_absolute_difference": qe_error,
@@ -210,20 +213,20 @@ def main() -> None:
                        "train_embeddings_sha256": hashes["train"],
                        "validation_embeddings_sha256": hashes["validation"],
                        "previous_qe_metrics_sha256": sha256_file(qe_result)},
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "CNN and SOM remain frozen. Baselines fit only on MNIST train. "
             "MNIST validation and SVHN test used only for scoring; OOD scores "
             "not used for tuning. FPR@95%TPR is a ROC operating point measured "
             "on labeled evaluation samples, not a deployable frozen threshold."
         ),
-        "limitations": [
+        "limitations": [dataset.wording(line) for line in [
             ("One-Class SVM fitted on 10,000 MNIST train examples; other "
              "baselines used 49,000, so fitting budgets differ."),
             "This is a single-seed, single-OOD-dataset comparison.",
             "Sample-level miss IDs alone do not establish causes of failures.",
             ("U-Matrix scores indicate local SOM prototype separation, not "
              "direct sample-to-BMU distance."),
-        ],
+        ]],
     }
     # Output directory is created only after all scorers/metrics succeed.
     output.mkdir(parents=True, exist_ok=False)
@@ -234,7 +237,7 @@ def main() -> None:
     with (output / "svhn_labels.npy").open("xb") as file:
         np.save(file, labels, allow_pickle=False)
     for name, (id_s, ood_s) in scores.items():
-        for split, values in (("mnist_val", id_s), ("svhn_test", ood_s)):
+        for split, values in ((dataset.val_tag, id_s), ("svhn_test", ood_s)):
             with (output / f"{name}_{split}_scores.npy").open("xb") as file:
                 np.save(file, np.asarray(values, dtype=np.float64), allow_pickle=False)
     LOGGER.info("SAVED %s", output / "comparison_metrics.json")

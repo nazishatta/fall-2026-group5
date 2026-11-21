@@ -53,6 +53,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
     neuron_u_matrix,
     sample_u_matrix,
 )
+from src.v1_mnist.component.utils.in_distribution import InDistribution, in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -73,10 +74,19 @@ def repo_path(value: str) -> Path:
     return resolve_inside(ROOT, value)
 
 
-def check_protocol(config: dict[str, Any]) -> None:
+STUDY_TYPES = frozenset({"post_hoc_exploratory", "preregistered_exploratory"})
+
+
+def training_budget(config: dict[str, Any], dataset: InDistribution) -> int:
+    """Training rows per seed: ``fitting.<dataset>_training_budget`` (``mnist_training_budget``)."""
+    return int(config["fitting"][dataset.key("training_budget")])
+
+
+def check_protocol(config: dict[str, Any], dataset: InDistribution | None = None) -> None:
     """Validate study design independently of its numerical findings."""
+    dataset = dataset or InDistribution()
     seeds = config["fitting"]["seeds"]
-    budget = int(config["fitting"]["mnist_training_budget"])
+    budget = training_budget(config, dataset)
     run_id = config["run_id"]
     if len(seeds) < 5 or len(set(seeds)) != len(seeds):
         raise ValueError("Five unique seeds required")
@@ -89,14 +99,20 @@ def check_protocol(config: dict[str, Any]) -> None:
         raise ValueError("Invalid energy temperature")
     if int(config["scoring"]["bootstrap_iterations"]) < 1:
         raise ValueError("Bootstrap iterations must be positive")
+    if config.get("study_type", "post_hoc_exploratory") not in STUDY_TYPES:
+        raise ValueError(f"study_type must be one of {sorted(STUDY_TYPES)}")
 
 
-def load_inputs(config: dict[str, Any]) -> tuple[np.ndarray, np.ndarray, np.ndarray, Any, Any, np.ndarray, dict[str, Any], dict[str, str]]:
-    """Load frozen assets; verify shared manifest before touching OOD test data."""
-    manifest = load_manifest()
+def load_inputs(config: dict[str, Any], config_path: Path | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, Any, Any, np.ndarray, dict[str, Any], dict[str, str]]:
+    """Load frozen assets; verify shared manifest before touching OOD test data.
+
+    ``config_path`` picks the dataset's manifest; without it the MNIST manifest is used.
+    """
+    dataset = in_distribution(config_path) if config_path is not None else InDistribution()
+    manifest = load_manifest(config_path)
     inputs = dict(manifest["inputs"])
     inputs["svhn_file"] = manifest["svhn_file"]
-    verify_shared_inputs(inputs, required_keys=tuple(inputs))
+    verify_shared_inputs(inputs, required_keys=tuple(inputs), config_path=config_path)
     # Phase 1 saves each split's labels next to its features (embeddings/<split>_labels.npy).
     label_path = repo_path(inputs["train_features"]).with_name("train_labels.npy")
     if not label_path.is_file():
@@ -107,11 +123,11 @@ def load_inputs(config: dict[str, Any]) -> tuple[np.ndarray, np.ndarray, np.ndar
     expected = config["expected"]
     width = int(expected["embedding_dimensions"])
     if train.shape != (int(expected["training_samples"]), width):
-        raise RuntimeError("MNIST training embedding shape mismatch")
+        raise RuntimeError(dataset.wording("MNIST training embedding shape mismatch"))
     if validation.shape != (int(expected["validation_samples"]), width):
-        raise RuntimeError("MNIST validation embedding shape mismatch")
+        raise RuntimeError(dataset.wording("MNIST validation embedding shape mismatch"))
     if labels.shape != (len(train),) or not np.issubdtype(labels.dtype, np.integer):
-        raise RuntimeError("MNIST label mismatch")
+        raise RuntimeError(dataset.wording("MNIST label mismatch"))
     if not np.isfinite(train).all() or not np.isfinite(validation).all():
         raise RuntimeError("Nonfinite frozen embeddings")
     ood_config = read_settings(repo_path(config["qe_config"]))
@@ -151,10 +167,11 @@ def get_frozen_scores(
 
 def fit_seed(
     config: dict[str, Any], seed: int, train: np.ndarray, labels: np.ndarray,
-    joined: np.ndarray,
+    joined: np.ndarray, dataset: InDistribution | None = None,
 ) -> tuple[dict[str, np.ndarray], str, dict[str, float]]:
     """Fit five methods on the exact same selected MNIST training rows."""
-    indices = subset_indices(len(train), int(config["fitting"]["mnist_training_budget"]), seed)
+    dataset = dataset or InDistribution()
+    indices = subset_indices(len(train), training_budget(config, dataset), seed)
     subset = train[indices]
     joined = np.asarray(joined)
     settings = {
@@ -182,15 +199,17 @@ def fit_seed(
 def run(config_path: Path) -> Path:
     """Execute all nine methods; refuse overwrites and preserve frozen artifacts."""
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    check_protocol(config)
+    dataset = in_distribution(config_path)
+    check_protocol(config, dataset)
     output = repo_path(config["output_root"]) / config["run_id"]
     if output.exists():
         raise FileExistsError(f"STOP: Existing run: {output}")
-    train, validation, train_labels, model, som, val_qe, provenance, hashes = load_inputs(config)
-    manifest = load_manifest()
+    train, validation, train_labels, model, som, val_qe, provenance, hashes = load_inputs(config, config_path)
+    manifest = load_manifest(config_path)
     svhn_path = repo_path(manifest["svhn_file"])
     ood_settings = read_settings(repo_path(config["qe_config"]))
-    loader = svhn_test_loader(svhn_path, tuple(ood_settings['image_size']), int(config['scoring']['batch_size']))
+    loader = svhn_test_loader(svhn_path, tuple(ood_settings['image_size']), int(config['scoring']['batch_size']),
+                              channels=int(ood_settings["channels"]))
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
     if svhn.shape != (int(config["expected"]["svhn_samples"]), int(config["expected"]["embedding_dimensions"])):
@@ -215,7 +234,7 @@ def run(config_path: Path) -> Path:
         LOGGER.info("Frozen %s AUROC %.6f", name, point["auroc"])
     for seed in seeds:
         LOGGER.info("Fitting five common-budget methods for seed %d", seed)
-        fitted, subset_hash, losses = fit_seed(config, seed, train, train_labels, joined)
+        fitted, subset_hash, losses = fit_seed(config, seed, train, train_labels, joined, dataset)
         metrics = {}
         for name, values in fitted.items():
             if len(values) != len(joined):
@@ -233,32 +252,39 @@ def run(config_path: Path) -> Path:
         rng_null.random(n_id), rng_null.random(len(svhn)),
         float(config["scoring"]["target_tpr"]),
     )
+    study_type = str(config.get("study_type", "post_hoc_exploratory"))
+    post_hoc = study_type == "post_hoc_exploratory"
     payload = {
-        "run_id": config["run_id"], "study_type": "post_hoc_exploratory",
-        "data": {"id_split": "mnist_validation", "ood_split": "svhn_official_test", "mnist_training_samples": len(train), "mnist_validation_samples": n_id, "svhn_test_samples": len(svhn)},
+        "run_id": config["run_id"], "study_type": study_type,
+        "data": {"id_split": dataset.validation_key, "ood_split": "svhn_official_test", dataset.key("training_samples"): len(train), dataset.key("validation_samples"): n_id, "svhn_test_samples": len(svhn)},
         "methods": list(METHODS),
         "random_score_null_control": null_metrics,
         "reference_frozen_metrics": frozen_metrics,
         "fitted_methods_per_seed": rows,
         "fitted_methods_seed_summary": seed_summary(rows),
         "fitting": {
-            "common_training_rows_per_seed": int(config["fitting"]["mnist_training_budget"]),
+            "common_training_rows_per_seed": training_budget(config, dataset),
             "same_training_row_indices_within_seed": True,
             "frozen_reference_methods": list(FROZEN_NAMES),
             "freshly_fitted_methods": list(FIT_NAMES),
-            "autoencoder_input_standardization": "StandardScaler fitted on selected MNIST train subset only",
+            "autoencoder_input_standardization": dataset.wording("StandardScaler fitted on selected MNIST train subset only"),
             "methods_have_equal_compute_cost": False,
             "isolation_forest_internal_max_samples_per_tree": int(config["fitting"]["isolation_forest"]["max_samples"]),
         },
         "provenance": {"input_sha256": hashes, "config_sha256": sha256_file(config_path), "frozen_som": provenance},
         "metrics_protocol": "OOD positive; higher novelty; empirical FPR at target TPR on labeled evaluation, not a training-frozen deployment threshold",
-        "leakage_control": "All freshly fitted methods use MNIST training subsets only; scalers fit on training only. Validation and SVHN are evaluation-only. SVHN previously examined, therefore post-hoc exploratory. MNIST final test never accessed.",
+        "leakage_control": dataset.wording(
+            "All freshly fitted methods use MNIST training subsets only; scalers fit on training only. Validation and SVHN are evaluation-only. "
+            + ("SVHN previously examined, therefore post-hoc exploratory. " if post_hoc
+               else "Method set fixed in the protocol before any run; exploratory. ")
+            + "MNIST final test never accessed."),
         "limitations": [
             "Frozen CNN and SOM were trained on historical complete training data, not retrained for each 10k subset.",
-            "Five fitted methods share exact selected MNIST training rows, but not computational budgets or model families.",
+            dataset.wording("Five fitted methods share exact selected MNIST training rows, but not computational budgets or model families."),
             "Isolation Forest uses 256 samples per tree; total training pool has 10k rows.",
             "Bootstrap intervals of frozen methods condition on one frozen CNN/SOM; seed spread of fitted methods is not a bootstrap confidence interval.",
-            "All methods use SVHN as external OOD; this evaluation was informed by prior SVHN observations.",
+            "All methods use SVHN as external OOD; this evaluation was informed by prior SVHN observations." if post_hoc
+            else "All methods use SVHN as external OOD; the method set was chosen after MNIST's SVHN results, before any result on this dataset.",
             "Frozen SOM preprocessing and model selection follow historical settings; no new selection or tuning performed.",
         ],
     }

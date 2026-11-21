@@ -102,6 +102,7 @@ One line per file, taken from the file's own description. The trees above show w
 | `heatmaps.py` | Draws neuron-by-neuron heatmaps on the SOM grid. |
 | `hotspots.py` | The project's error-hotspot rule (Error Pattern Analysis). |
 | `image_transforms.py` | Label-preserving image changes for targeted augmentation (small affine moves only). |
+| `in_distribution.py` | The in-distribution dataset of a Phase 3 or 4 config (from the `base.yaml` in the config's folder), and the file names, result keys and wording built from it. MNIST keeps exactly its historical names (`mnist_val`, `mnist_validation`, ...). |
 | `logging.py` | Sets up logging to the console and to a log file. |
 | `paired_stats.py` | Uncertainty for the arm-against-arm comparison. |
 | `protocol_stamp.py` | Freeze the retraining protocol, and refuse the test split until it is frozen. |
@@ -121,7 +122,7 @@ One line per file, taken from the file's own description. The trees above show w
 | `run_provenance.py` | Run-ID preflight and SHA-256 provenance helpers shared by the Phase 4 steps. |
 | `run_settings.py` | Which SOM the cluster and error pattern analysis uses, and checks that it is the right one. |
 | `scores.py` | Per-sample scores computed from the CNN's output that several analyses share. |
-| `shared_provenance.py` | Validate Phase 3 frozen input provenance against the shared manifest. |
+| `shared_provenance.py` | Validate Phase 3 frozen input provenance against the manifest of the config's dataset (`phase3_shared_provenance.yaml` in its config folder; MNIST's when none is named). |
 | `som_cells.py` | Assign embeddings to the neurons (cells) of the selected SOM. |
 | `som_data.py` | Data loading and validation utilities for the SOM experiments. |
 | `som_figure_setup.py` | Shared setup for the SOM figure scripts of SOM training, cluster analysis and error pattern analysis. |

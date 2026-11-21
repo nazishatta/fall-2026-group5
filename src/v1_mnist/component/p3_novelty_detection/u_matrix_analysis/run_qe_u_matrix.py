@@ -14,6 +14,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.u_matrix_nove
     sample_u_matrix,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.in_distribution import InDistribution, in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.som_io import sha256_file
 from src.v1_mnist.component.utils.stats import finite_spearman
@@ -37,8 +38,10 @@ def evaluate_validation(
     topology: np.ndarray,
     bmu: np.ndarray,
     qe: np.ndarray,
+    dataset: InDistribution | None = None,
 ) -> dict[str, Any]:
-    """Calculate original Phase 3 U-Matrix validation statistics."""
+    """Calculate original Phase 3 U-Matrix validation statistics (MNIST if no dataset is given)."""
+    dataset = dataset or InDistribution()
     bmu_values = np.asarray(bmu)
     qe_values = np.asarray(qe, dtype=np.float64)
 
@@ -58,7 +61,7 @@ def evaluate_validation(
 
     return {
         "analysis": "qe_u_matrix_validation_comparison",
-        "dataset": "MNIST",
+        "dataset": dataset.display_name,
         "split": "validation",
         "validation_samples": int(qe_values.size),
         "som_neurons": len(neuron_scores),
@@ -67,7 +70,7 @@ def evaluate_validation(
         "spearman_correlation": correlation,
         "ood_evaluation": "not_performed",
         "qe_reconstruction_difference": "not_measured",
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "MNIST validation assignments and distances only; "
             "no final test or external OOD inputs."
         ),
@@ -141,6 +144,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         np.asarray(som.neuron_dist),
         bmu,
         qe,
+        in_distribution(config_path),
     )
 
     if result["som_neurons"] != int(config.grid_height) * int(config.grid_width):

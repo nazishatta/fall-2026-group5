@@ -32,6 +32,7 @@ from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.run_qe_ood
     prepare,
     read_settings,
 )
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.shared_provenance import (
     verify_shared_inputs,
@@ -71,12 +72,14 @@ def run(config_path: Path) -> Path:
     """Run exactly once with a new ID, preserving historical outputs."""
     config_path = config_path.resolve()
     settings: dict[str, Any] = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    dataset = in_distribution(config_path)
     verify_shared_inputs(
         settings["inputs"],
         required_keys=(
             "checkpoint", "train_features",
             "validation_features", "svhn_file",
         ),
+        config_path=config_path,
     )
     run_id = str(settings["run_id"])
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
@@ -90,7 +93,7 @@ def run(config_path: Path) -> Path:
         check_file(paths[key], str(expected_hash))
 
     qecfg = read_settings(ROOT / str(settings["qe_evaluation_config"]))
-    if tuple(qecfg["image_size"]) != (28, 28) or qecfg["feature_layer"] != "fc2":
+    if qecfg["feature_layer"] != "fc2":
         raise RuntimeError("Frozen CNN feature/preprocessing protocol mismatch")
     if int(settings["seed"]) != int(qecfg["bootstrap"]["seed"]):
         raise RuntimeError("Seed differs from historical evaluation")
@@ -100,16 +103,17 @@ def run(config_path: Path) -> Path:
     expected = settings["expected"]
     dim = int(expected["feature_dim"])
     if train.shape != (int(expected["training_samples"]), dim):
-        raise RuntimeError("Unexpected MNIST training shape")
+        raise RuntimeError(dataset.wording("Unexpected MNIST training shape"))
     if val.shape != (int(expected["validation_samples"]), dim):
-        raise RuntimeError("Unexpected MNIST validation shape")
+        raise RuntimeError(dataset.wording("Unexpected MNIST validation shape"))
 
     torch.set_num_threads(int(settings["inference"]["thread_count"]))
     # Historical preflight verifies the frozen CNN, SOM, threshold, and CNN checkpoint.
     model, _, frozen_id_qe, provenance = prepare(qecfg)
     if len(frozen_id_qe) != len(val):
         raise RuntimeError("Frozen validation features not aligned")
-    loader = svhn_test_loader(paths['svhn_file'], tuple(qecfg['image_size']), int(settings['inference']['batch_size']))
+    loader = svhn_test_loader(paths['svhn_file'], tuple(qecfg['image_size']), int(settings['inference']['batch_size']),
+                              channels=int(qecfg["channels"]))
     svhn, labels, _ = FeatureExtractor(model, "fc2").extract(
         loader, torch.device("cpu")
     )
@@ -130,15 +134,15 @@ def run(config_path: Path) -> Path:
     report: dict[str, Any] = {
         "run_id": run_id,
         "method": "autoencoder_train_standardized_diagnostic",
-        "id_dataset": "mnist", "id_split": "validation",
+        "id_dataset": dataset.name, "id_split": "validation",
         "ood_dataset": "svhn", "ood_split": "test",
         "metrics": metric,
         "losses": {"initial": losses[0], "final": losses[-1]},
-        "preprocessing": "StandardScaler fitted on MNIST training embeddings ONLY",
+        "preprocessing": dataset.wording("StandardScaler fitted on MNIST training embeddings ONLY"),
         "config_sha256": sha256_file(config_path),
         "input_sha256": {key: sha256_file(path) for key, path in paths.items()},
         "frozen_provenance": provenance,
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Frozen CNN and SOM. Train-fitted scaler and autoencoder see MNIST "
             "training features only. MNIST validation and SVHN test used only "
             "for evaluation. No threshold tuning or MNIST final test access."
@@ -146,6 +150,9 @@ def run(config_path: Path) -> Path:
         "limitation": (
             "Exploratory follow-up after observing anomalous historical OOD AUROC. "
             "Do not replace historical result or claim independent test-based selection."
+        ) if dataset.is_mnist else (
+            "Fixed before the run by the dataset's Phase 3 protocol: the autoencoder with "
+            "standardised inputs, as in MNIST's final setup. Not a follow-up to an observed result."
         ),
     }
     # Save only after full successful evaluation. The preflight forbids reuse.

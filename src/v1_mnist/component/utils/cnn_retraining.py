@@ -44,6 +44,12 @@ def resolve_device(name: str) -> torch.device:
     return torch.device(name)
 
 
+def network_input(images: np.ndarray | torch.Tensor) -> torch.Tensor:
+    """Images as N x C x H x W: grey N x H x W images get their channel axis, colour ones are kept."""
+    x = torch.as_tensor(images)
+    return x.unsqueeze(1) if x.ndim == 3 else x
+
+
 def predict(
     model: nn.Module, images: np.ndarray, device: torch.device, batch_size: int = 1000
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -52,7 +58,7 @@ def predict(
     preds, conf = [], []
     with torch.no_grad():
         for start in range(0, len(images), batch_size):
-            batch = torch.as_tensor(images[start:start + batch_size]).unsqueeze(1).to(device)
+            batch = network_input(images[start:start + batch_size]).to(device)
             probs = torch.softmax(model(batch), dim=1)
             top, index = probs.max(dim=1)
             preds.append(index.cpu().numpy())
@@ -78,12 +84,13 @@ def train_cnn(
     during training. Without hotspots (``None``) only the overall validation accuracy is recorded."""
     set_seed(seed)
     rng = np.random.default_rng(seed)
-    model = LeNet5(num_classes=settings.num_classes).to(device)
+    model = LeNet5(num_classes=settings.num_classes, in_channels=settings.in_channels,
+                   image_size=settings.image_size).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=settings.lr, weight_decay=settings.weight_decay)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=settings.step_size, gamma=settings.gamma)
     criterion = nn.CrossEntropyLoss()
 
-    x_all = torch.as_tensor(train_x).unsqueeze(1).to(device)
+    x_all = network_input(train_x).to(device)
     y_all = torch.as_tensor(train_y, dtype=torch.long).to(device)
 
     best_state: dict[str, torch.Tensor] = {}
@@ -128,8 +135,11 @@ def train_cnn(
     return TrainResult(best_state, best_epoch, best_acc, history)
 
 
-def load_model(state: dict[str, torch.Tensor], num_classes: int, device: torch.device) -> LeNet5:
-    """A LeNet-5 holding saved weights, ready for evaluation."""
-    model = LeNet5(num_classes=num_classes).to(device)
+def load_model(
+    state: dict[str, torch.Tensor], num_classes: int, device: torch.device,
+    in_channels: int = 1, image_size: int = 28,
+) -> LeNet5:
+    """A LeNet-5 holding saved weights, ready for evaluation (grey 28 x 28 input unless told otherwise)."""
+    model = LeNet5(num_classes=num_classes, in_channels=in_channels, image_size=image_size).to(device)
     model.load_state_dict(state)
     return model.eval()

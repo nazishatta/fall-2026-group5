@@ -23,6 +23,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.qe_norm_depen
     analyze,
 )
 from src.v1_mnist.component.utils.file_hash import sha256_file
+from src.v1_mnist.component.utils.in_distribution import InDistribution, in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -53,7 +54,7 @@ def read_config(config_path: Path) -> dict[str, Any]:
     return config
 
 
-def load_scores(config: dict[str, Any]) -> dict[str, Any]:
+def load_scores(config: dict[str, Any], config_path: Path | None = None) -> dict[str, Any]:
     """Load the frozen embeddings, embed SVHN with the frozen CNN and score QE."""
     import torch
 
@@ -76,10 +77,10 @@ def load_scores(config: dict[str, Any]) -> dict[str, Any]:
     )
 
     expected = config["expected"]
-    manifest = load_manifest()
+    manifest = load_manifest(config_path)
     shared = dict(manifest["inputs"])
     shared["svhn_file"] = manifest["svhn_file"]
-    verify_shared_inputs(shared, required_keys=tuple(shared))
+    verify_shared_inputs(shared, required_keys=tuple(shared), config_path=config_path)
     settings = read_settings(repo_path(config["qe_config"]))
     model, som, validation_qe, provenance = prepare(settings)
     train = np.load(repo_path(shared["train_features"]), allow_pickle=False)
@@ -88,6 +89,7 @@ def load_scores(config: dict[str, Any]) -> dict[str, Any]:
         repo_path(shared["svhn_file"]),
         tuple(settings["image_size"]),
         int(config["batch_size"]),
+        channels=int(settings["channels"]),
     )
     torch.set_num_threads(1)
     svhn, _, _ = FeatureExtractor(model, "fc2").extract(loader, torch.device("cpu"))
@@ -134,8 +136,11 @@ def write_run(
     config_sha256: str,
     data: dict[str, Any],
     analysis: dict[str, Any],
+    dataset: InDistribution | None = None,
 ) -> dict[str, Any]:
     """Write the metrics JSON and one summary table into a brand-new folder."""
+    dataset = dataset or InDistribution()
+    status = str(config.get("analysis_status", "post_hoc_exploratory"))
     destination.mkdir(parents=True, exist_ok=False)
     (destination / "tables").mkdir()
     band = analysis["norm_matched_qe"]
@@ -162,7 +167,7 @@ def write_run(
         writer.writerow(
             [
                 "subset",
-                "mnist_validation_images",
+                f"{dataset.validation_key}_images",
                 "svhn_images",
                 "qe_auroc",
                 "auroc_ci_low",
@@ -178,8 +183,8 @@ def write_run(
                 )
     result = {
         "run_id": config["run_id"],
-        "analysis_status": "post_hoc_exploratory",
-        "id_set": "MNIST validation",
+        "analysis_status": status,
+        "id_set": dataset.wording("MNIST validation"),
         "ood_set": "SVHN test",
         "feature_layer": "fc2",
         "seed": int(config["seed"]),
@@ -189,16 +194,20 @@ def write_run(
             "input_sha256": data["hashes"],
             "frozen_som": data["provenance"],
         },
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "The QE threshold and the norm band come from MNIST training "
             "embeddings only. MNIST validation and SVHN test are scored only. Nothing is "
             "fitted or tuned. The held-out MNIST test split is never opened."
         ),
         "limitations": [
-            "SVHN was examined in earlier runs, so this check is exploratory.",
-            "Fashion-MNIST and other OOD sets are not included.",
+            "SVHN was examined in earlier runs, so this check is exploratory." if dataset.is_mnist
+            else "Fixed in the protocol before any run on this dataset; exploratory.",
+            "Fashion-MNIST and other OOD sets are not included." if dataset.is_mnist
+            else "Other outside sets are not included.",
             "Correlation with the norm does not show that the norm causes the QE ranking.",
-            "The norm band keeps only SVHN images with MNIST-like norms, which may be unusual SVHN images.",
+            dataset.wording(
+                "The norm band keeps only SVHN images with MNIST-like norms, which may be unusual SVHN images."
+            ),
         ],
     }
     with (destination / METRICS_FILE).open("x", encoding="utf-8") as stream:
@@ -213,7 +222,8 @@ def run(config_path: Path) -> Path:
     destination = repo_path(config["output_root"]) / config["run_id"]
     if destination.exists():
         raise FileExistsError(f"STOP: Existing run: {destination}")
-    data = load_scores(config)
+    dataset = in_distribution(config_path)
+    data = load_scores(config, config_path)
     analysis = analyze(
         data["train"],
         data["validation"],
@@ -222,9 +232,10 @@ def run(config_path: Path) -> Path:
         data["svhn_qe"],
         qe_threshold=data["qe_threshold"],
         settings=config,
+        dataset=dataset,
     )
     check_qe_reference(analysis, config)
-    write_run(destination, config, sha256_file(config_path), data, analysis)
+    write_run(destination, config, sha256_file(config_path), data, analysis, dataset)
     LOGGER.info("Saved QE-norm dependence check to %s", destination)
     return destination
 

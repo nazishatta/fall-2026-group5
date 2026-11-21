@@ -71,7 +71,7 @@ def run(config_path: Path) -> Path:
     )
 
     config = load_config(config_path)
-    manifest = load_manifest()
+    manifest = load_manifest(config_path)
     run_id = str(config.run_id)
     check_run_id(run_id)
 
@@ -84,6 +84,7 @@ def run(config_path: Path) -> Path:
     verify_shared_inputs(
         {"checkpoint": checkpoint_rel, "svhn_file": svhn_rel},
         required_keys=("checkpoint", "svhn_file"),
+        config_path=config_path,
     )
 
     checkpoint = ROOT / checkpoint_rel
