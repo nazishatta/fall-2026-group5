@@ -1,0 +1,5 @@
+outs:
+- md5: 353799998e688cba47b61dee996107f8
+  size: 84128
+  hash: md5
+  path: one_class_svm_fashion_mnist_val_scores.npy

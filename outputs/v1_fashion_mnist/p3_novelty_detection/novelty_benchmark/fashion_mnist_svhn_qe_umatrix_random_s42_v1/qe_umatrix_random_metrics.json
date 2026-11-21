@@ -1,0 +1,35 @@
+{
+  "run_id": "fashion_mnist_svhn_qe_umatrix_random_s42_v1",
+  "dataset": "Fashion-MNIST validation vs SVHN test",
+  "paired_qe_vs_u_matrix": {
+    "qe_auroc": 0.7893755670676385,
+    "u_matrix_auroc": 0.8116903938742062,
+    "qe_minus_u_matrix": -0.02231482680656771,
+    "difference_ci_95": [
+      -0.029915114273275322,
+      -0.0144303519294933
+    ],
+    "bootstrap_iterations": 500
+  },
+  "random_score_null": {
+    "mean_auroc": 0.5001979066423742,
+    "simulation_interval_95": [
+      0.49380321573082214,
+      0.5065389688881083
+    ],
+    "simulations": 500,
+    "interval_type": "Monte Carlo simulation interval"
+  },
+  "seed": 42,
+  "n_id": 10500,
+  "n_ood": 26032,
+  "input_sha256": {
+    "qe_fashion_mnist_val_scores.npy": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+    "qe_svhn_test_scores.npy": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae",
+    "u_matrix_fashion_mnist_val_scores.npy": "001344c81d39d0d117aa459a09150e9d8859569c7d6eb0c528a9d4a19f9256a9",
+    "u_matrix_svhn_test_scores.npy": "824b98b0fecdd5988daca6e0f9f6bc5d5f1235fa65259d22f4682990a977a5eb"
+  },
+  "config_sha256": "c2eb41ffcd339e7358ba99a60e0b00fc8b3a361c32764bf0d0db5a7ebddfb9a0",
+  "leakage_control": "Historical frozen scores only; no model fitting, no threshold tuning, no official Fashion-MNIST final test.",
+  "limitation": "Paired inference assumes identical sample order within the historical score arrays; both methods share one run."
+}

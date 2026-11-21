@@ -1,0 +1,106 @@
+{
+  "run_id": "fashion_mnist_svhn_qe_norm_dependence_s42_v1",
+  "analysis_status": "preregistered_exploratory",
+  "id_set": "Fashion-MNIST validation",
+  "ood_set": "SVHN test",
+  "feature_layer": "fc2",
+  "seed": 42,
+  "norms": {
+    "fashion_mnist_train": {
+      "count": 49000,
+      "mean": 20.752443991336282,
+      "median": 19.723495001501345,
+      "sample_sd": 5.603399312383468,
+      "p05": 13.211555114739818,
+      "p95": 31.757485950821035
+    },
+    "fashion_mnist_validation": {
+      "count": 10500,
+      "mean": 20.72365893449244,
+      "median": 19.717450121037416,
+      "sample_sd": 5.594228767912153,
+      "p05": 13.211673087366858,
+      "p95": 31.504514533943976
+    },
+    "svhn_test": {
+      "count": 26032,
+      "mean": 8.504638806825259,
+      "median": 8.211099416859694,
+      "sample_sd": 1.7448805728482244,
+      "p05": 6.286722461999238,
+      "p95": 11.719308514251638
+    }
+  },
+  "qe_reference": {
+    "id_count": 10500,
+    "ood_count": 26032,
+    "auroc": 0.7893755670676385,
+    "aupr_ood": 0.8252907439139893,
+    "fpr_at_target_tpr": 0.4196190476190476,
+    "target_tpr": 0.95,
+    "ood_detection_rate": 0.030424093423478796,
+    "id_false_positive_rate": 0.05104761904761905,
+    "auroc_ci": [
+      0.7831694956939443,
+      0.795990636890128
+    ],
+    "threshold": 1.4214525859373504,
+    "threshold_source": "frozen Fashion-MNIST training-QE 95th percentile"
+  },
+  "qe_norm_spearman": {
+    "fashion_mnist_validation": -0.024589950771790933,
+    "svhn_test": 0.1347542432142552,
+    "pooled": -0.29043317320450635
+  },
+  "norm_matched_qe": {
+    "band_percentiles": [
+      5.0,
+      95.0
+    ],
+    "band_norms": [
+      13.211555114739818,
+      31.757485950821035
+    ],
+    "id_count": 9478,
+    "ood_count": 532,
+    "qe": {
+      "id_count": 9478,
+      "ood_count": 532,
+      "auroc": 0.9576133570897065,
+      "aupr_ood": 0.42884436921831165,
+      "fpr_at_target_tpr": 0.12112259970457903,
+      "target_tpr": 0.95,
+      "ood_detection_rate": 0.7142857142857143,
+      "id_false_positive_rate": 0.04842793838362524,
+      "auroc_ci": [
+        0.9528584795497924,
+        0.9619790071824423
+      ]
+    }
+  },
+  "provenance": {
+    "config_sha256": "d8dc88fd10a32acb2c4f54ad7264915e10d58bc4e6870069f225c244cca6a54e",
+    "input_sha256": {
+      "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+    },
+    "frozen_som": {
+      "qe_threshold": 1.4214525859373504,
+      "som_model": "som_15x15_nb11_ep250_s42",
+      "som_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+      "cnn_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "train_qe_sha256": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+      "val_qe_sha256": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7"
+    }
+  },
+  "leakage_control": "The QE threshold and the norm band come from Fashion-MNIST training embeddings only. Fashion-MNIST validation and SVHN test are scored only. Nothing is fitted or tuned. The held-out Fashion-MNIST test split is never opened.",
+  "limitations": [
+    "Fixed in the protocol before any run on this dataset; exploratory.",
+    "Other outside sets are not included.",
+    "Correlation with the norm does not show that the norm causes the QE ranking.",
+    "The norm band keeps only SVHN images with Fashion-MNIST-like norms, which may be unusual SVHN images."
+  ]
+}

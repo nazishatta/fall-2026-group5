@@ -1,0 +1,17 @@
+{
+  "run_id": "fashion_mnist_qe_umatrix_validation_figure_s42_v1",
+  "figure": "qe_u_matrix_validation.pdf",
+  "sample_count": 10500,
+  "qe_mean": 0.8528676812283084,
+  "u_matrix_mean": 0.6977572375947183,
+  "spearman_correlation": 0.38318296997269147,
+  "input_sha256": {
+    "qe": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+    "u_matrix": "001344c81d39d0d117aa459a09150e9d8859569c7d6eb0c528a9d4a19f9256a9"
+  },
+  "source_summary_sha256": "0b141111b74a2398b378e66652fee60bcc7cd2a92cc460e22ee304b40de91da8",
+  "config_sha256": "deb100df0fe4998ca3c352bb3412141cbac186dad340a6873384bdf6632863d1",
+  "figure_sha256": "05fb2414b03cc07c17d547dff09066989dc117cdcec572cf60de07f54fa95e7a",
+  "leakage_control": "Frozen Fashion-MNIST validation scores only; no model fitting, threshold tuning, SVHN use, or final Fashion-MNIST test access.",
+  "reproduction_note": "Reproduces historical summary statistics and score data, not necessarily the original figure's visual layout."
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: f7bd2c88afedee0bb8e37855cebc38df
+  size: 2116928
+  hash: md5
+  path: normal_features.npy

@@ -1,0 +1,33 @@
+{
+  "method": "som_bmu_quantization_distance",
+  "threshold_source": "train_only",
+  "threshold_percentile": 95.0,
+  "threshold_rule": "distance > threshold",
+  "threshold": 1.4214525859373504,
+  "train_count": 49000,
+  "train_flagged": 2450,
+  "validation_count": 10500,
+  "validation_flagged": 536,
+  "validation_flag_rate": 0.05104761904761905,
+  "external_ood_evaluated": false,
+  "final_test_used": false,
+  "som_run": "som_15x15_nb11_ep250_s42",
+  "model_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+  "input_sha256": {
+    "train_bmu_distance": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+    "val_bmu_distance": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+    "val_correct": "8eab235e19b1e03c21626c9b4f73e75962fbe22f0de0db57139ae2c7cf771828"
+  },
+  "error_association": {
+    "validation_samples": 10500,
+    "flagged_samples": 536,
+    "cnn_errors": 876,
+    "flagged_and_error": 73,
+    "flagged_and_correct": 463,
+    "unflagged_and_error": 803,
+    "unflagged_and_correct": 9161,
+    "final_test_used": false,
+    "external_ood_evaluated": false
+  },
+  "run_id": "fashion_mnist_qe_training_calibrated_s42_v1"
+}

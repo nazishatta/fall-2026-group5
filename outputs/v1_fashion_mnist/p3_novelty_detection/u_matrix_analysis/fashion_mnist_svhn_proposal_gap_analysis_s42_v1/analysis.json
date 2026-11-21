@@ -1,0 +1,31 @@
+{
+  "run_id": "fashion_mnist_svhn_proposal_gap_analysis_s42_v1",
+  "analysis": "proposal_gap_descriptive_review",
+  "overlay": {
+    "samples": 10500,
+    "occupied_neurons": 222,
+    "empty_neurons": 3
+  },
+  "svhn_qe_failures": {
+    "svhn_samples": 26032,
+    "detected": 792,
+    "missed": 25240,
+    "miss_rate": 0.9695759065765212,
+    "missed_qe_median": 1.0740317157371413,
+    "missed_qe_min": 0.49645949886037016,
+    "missed_qe_max": 1.4214015282046104,
+    "interpretation": "Misses fall at or below the frozen QE cutoff. This is a score-based description, not proof of visual or causal mechanisms."
+  },
+  "qe_threshold": 1.4214525859373504,
+  "provenance": {
+    "config_sha256": "3f468b316ff4473991cd01206af01419991ca190f2c121816b089a7cf85e1a06",
+    "input_sha256": {
+      "validation_bmu": "d3433eb4b1ebf6be975ffe96a34ef80a1479cfbfad33b8bd9804da877cd8ed33",
+      "validation_qe": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+      "qe_summary": "c0bd916ba16d9b698eaab88cef0f9eb5aa88a96f90bc0e7172c89cddff9391c9",
+      "svhn_qe": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae"
+    }
+  },
+  "leakage_control": "Fashion-MNIST validation used only for visualization; SVHN scores used for descriptive failure analysis only. No hyperparameter tuning, threshold changes, or final Fashion-MNIST test use.",
+  "limitation": "The saved SVHN sample-to-BMU assignments were not provided. This analysis cannot establish why individual images were missed or produce an SVHN miss-rate SOM overlay."
+}

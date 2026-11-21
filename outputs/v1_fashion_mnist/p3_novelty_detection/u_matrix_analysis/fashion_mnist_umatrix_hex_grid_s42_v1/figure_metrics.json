@@ -1,0 +1,17 @@
+{
+  "run_id": "fashion_mnist_umatrix_hex_grid_s42_v1",
+  "figure": "u_matrix_novelty_som_grid.pdf",
+  "som_model": "som_15x15_nb11_ep250_s42",
+  "model_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+  "config_sha256": "6ad6f64458a15745e4e06e772c50038c0ef4380d651ff3ff0d5c0a3ab619563d",
+  "figure_sha256": "153383aced70c9a400085a8ed0402e4b61ce8e519ac8baafed1282a685e7f424",
+  "grid_height": 15,
+  "grid_width": 15,
+  "feature_dim": 84,
+  "neuron_count": 225,
+  "u_matrix_min": 0.3855207730059744,
+  "u_matrix_max": 1.7928643576697911,
+  "u_matrix_mean": 0.7712633302793606,
+  "leakage_control": "Frozen trained SOM only; no fitting, threshold tuning, or access to the Fashion-MNIST final test set.",
+  "reproduction_note": "Reconstructed from original SOM neuron weights, topology and coordinates; visual styling may differ from historical PDF."
+}

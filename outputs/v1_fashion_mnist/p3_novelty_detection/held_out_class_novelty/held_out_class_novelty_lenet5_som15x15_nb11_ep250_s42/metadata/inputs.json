@@ -1,0 +1,45 @@
+{
+  "cnn_config_sha256": "1de7135b3057f0f54e149a15c5173c38302db9658456a02007cbd1c808d1e717",
+  "config_sha256": "f29f007674507e0623a980bb8b01cace80a1e22ae635b5c500529c069a862f58",
+  "frozen_split_sha256": {
+    "train_labels.npy": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+    "train_sample_ids.npy": "a3bea004755d426a5b0f36009a66c706491a014d19c258c7761db2c9557c5b72",
+    "val_labels.npy": "ca683bf329bb6354160efb86806f2b86549f720039caa31c0ba6231877128d8a",
+    "val_sample_ids.npy": "89b13768297dbaf718d760ec3ea3f4c1e4c105370badca5c4f572542cbba9b26"
+  },
+  "protocol_sha256": "5acd32e080bf68265527c4a7fdb120e644a07804f006b5ffb7d9f6a7a08a7c4a",
+  "run_id": "held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42",
+  "som_config_sha256": "0c0cbfe2ba9fba8fa48e0e2bc5aafcf76104051ddf16063096115846f139b1f3",
+  "unknown_digits": [
+    [
+      0,
+      1,
+      5,
+      6
+    ],
+    [
+      2,
+      3,
+      5,
+      8
+    ],
+    [
+      1,
+      5,
+      6,
+      7
+    ],
+    [
+      2,
+      5,
+      6,
+      8
+    ],
+    [
+      0,
+      4,
+      5,
+      8
+    ]
+  ]
+}

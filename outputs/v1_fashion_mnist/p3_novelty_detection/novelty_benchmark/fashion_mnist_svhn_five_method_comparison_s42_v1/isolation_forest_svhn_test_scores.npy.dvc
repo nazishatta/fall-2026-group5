@@ -1,0 +1,5 @@
+outs:
+- md5: 4a4ee39d1e8835e723e28dd781e34936
+  size: 208384
+  hash: md5
+  path: isolation_forest_svhn_test_scores.npy

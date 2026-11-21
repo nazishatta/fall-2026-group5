@@ -1,0 +1,201 @@
+{
+  "run_id": "fashion_mnist_svhn_fair_budget_baselines_s42_46_v1",
+  "analysis_status": "preregistered_exploratory",
+  "training_sample_count": 10000,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "per_seed_results": [
+    {
+      "seed": 42,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.322123942693242,
+          "aupr": 0.581196213770667
+        },
+        "one_class_svm": {
+          "auroc": 0.7344923537331344,
+          "aupr": 0.8113301786152114
+        },
+        "autoencoder": {
+          "auroc": 0.3623683598208798,
+          "aupr": 0.597752687262574
+        }
+      },
+      "autoencoder_initial_loss": 4.835559437561035,
+      "autoencoder_final_loss": 0.06872466871142388
+    },
+    {
+      "seed": 43,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.2922824728539234,
+          "aupr": 0.5715190029943131
+        },
+        "one_class_svm": {
+          "auroc": 0.7351489375713407,
+          "aupr": 0.8120117505565863
+        },
+        "autoencoder": {
+          "auroc": 0.3727148326601692,
+          "aupr": 0.6032629027585192
+        }
+      },
+      "autoencoder_initial_loss": 5.011539635467529,
+      "autoencoder_final_loss": 0.07642042901515961
+    },
+    {
+      "seed": 44,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.23031208841864956,
+          "aupr": 0.5525743840978108
+        },
+        "one_class_svm": {
+          "auroc": 0.7454128837767436,
+          "aupr": 0.8202340488134233
+        },
+        "autoencoder": {
+          "auroc": 0.4354404231422133,
+          "aupr": 0.6301105277494893
+        }
+      },
+      "autoencoder_initial_loss": 4.677637105178833,
+      "autoencoder_final_loss": 0.07674640345573425
+    },
+    {
+      "seed": 45,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.24726849372201248,
+          "aupr": 0.557735479488052
+        },
+        "one_class_svm": {
+          "auroc": 0.7414151118037874,
+          "aupr": 0.8171615445095098
+        },
+        "autoencoder": {
+          "auroc": 0.3921099983170896,
+          "aupr": 0.6114747939517587
+        }
+      },
+      "autoencoder_initial_loss": 4.760244626998901,
+      "autoencoder_final_loss": 0.07192191529273986
+    },
+    {
+      "seed": 46,
+      "training_samples_per_method": 10000,
+      "subset_indices_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f",
+      "methods": {
+        "isolation_forest": {
+          "auroc": 0.2677493561038429,
+          "aupr": 0.5638773180045785
+        },
+        "one_class_svm": {
+          "auroc": 0.7324370445166388,
+          "aupr": 0.8143864848257554
+        },
+        "autoencoder": {
+          "auroc": 0.41170962661339894,
+          "aupr": 0.6212924714641563
+        }
+      },
+      "autoencoder_initial_loss": 4.796323322296143,
+      "autoencoder_final_loss": 0.06374367924928666
+    }
+  ],
+  "summary": {
+    "isolation_forest": {
+      "auroc": {
+        "mean": 0.271947270758334,
+        "sample_sd": 0.03637090795761594,
+        "per_seed": [
+          0.322123942693242,
+          0.2922824728539234,
+          0.23031208841864956,
+          0.24726849372201248,
+          0.2677493561038429
+        ]
+      },
+      "aupr": {
+        "mean": 0.5653804796710843,
+        "sample_sd": 0.011319458029479134,
+        "per_seed": [
+          0.581196213770667,
+          0.5715190029943131,
+          0.5525743840978108,
+          0.557735479488052,
+          0.5638773180045785
+        ]
+      }
+    },
+    "one_class_svm": {
+      "auroc": {
+        "mean": 0.737781266280329,
+        "sample_sd": 0.0054257079108328944,
+        "per_seed": [
+          0.7344923537331344,
+          0.7351489375713407,
+          0.7454128837767436,
+          0.7414151118037874,
+          0.7324370445166388
+        ]
+      },
+      "aupr": {
+        "mean": 0.8150248014640973,
+        "sample_sd": 0.0037026372589725196,
+        "per_seed": [
+          0.8113301786152114,
+          0.8120117505565863,
+          0.8202340488134233,
+          0.8171615445095098,
+          0.8143864848257554
+        ]
+      }
+    },
+    "autoencoder": {
+      "auroc": {
+        "mean": 0.3948686481107502,
+        "sample_sd": 0.029514225014209184,
+        "per_seed": [
+          0.3623683598208798,
+          0.3727148326601692,
+          0.4354404231422133,
+          0.3921099983170896,
+          0.41170962661339894
+        ]
+      },
+      "aupr": {
+        "mean": 0.6127786766372996,
+        "sample_sd": 0.01314256619336594,
+        "per_seed": [
+          0.597752687262574,
+          0.6032629027585192,
+          0.6301105277494893,
+          0.6114747939517587,
+          0.6212924714641563
+        ]
+      }
+    }
+  },
+  "input_sha256": {
+    "train": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "validation": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+    "svhn_mat": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "config_sha256": "61619d357c8e9fbaa38c2143af6a1e58d707c1f6b5fb802bea2c3a4c6da8adca",
+  "leakage_control": "All three baselines trained only on the same 10,000 Fashion-MNIST training examples per seed. Fashion-MNIST validation and SVHN test used for evaluation, not fitting; final Fashion-MNIST test untouched.",
+  "limitation": "Exploratory analysis fixed in the protocol before any run. Training-pool sizes are equal, but computational budgets, model preprocessing, and optimization costs are not equal. Seed spread is not an independent-data confidence interval."
+}

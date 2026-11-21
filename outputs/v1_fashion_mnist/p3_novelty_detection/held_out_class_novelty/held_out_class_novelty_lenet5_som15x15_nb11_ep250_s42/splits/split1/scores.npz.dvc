@@ -1,0 +1,5 @@
+outs:
+- md5: 29ef3165499373f7f5e1c9c476960304
+  size: 526021
+  hash: md5
+  path: scores.npz

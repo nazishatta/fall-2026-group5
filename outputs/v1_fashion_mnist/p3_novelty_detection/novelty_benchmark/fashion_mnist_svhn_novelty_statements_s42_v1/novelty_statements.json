@@ -1,0 +1,366 @@
+{
+  "run_id": "fashion_mnist_svhn_novelty_statements_s42_v1",
+  "id_dataset": "fashion_mnist",
+  "id_split": "validation",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "n_id": 10500,
+  "n_ood": 26032,
+  "aupr_chance_level": 0.7125807511223037,
+  "settings": {
+    "bootstrap_iterations": 2000,
+    "bootstrap_seed": 42,
+    "paired_iterations": 2000,
+    "paired_seed": 42,
+    "shuffle_iterations": 1000,
+    "shuffle_seed": 42,
+    "target_tpr": 0.95,
+    "competitive_margin": 0.01,
+    "protocol_statements": true
+  },
+  "scores": {
+    "qe": {
+      "score_id": "S1",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.7893755670676385,
+      "aupr": 0.8252907439139893,
+      "fpr_at_95_tpr": 0.4196190476190476,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.7831694956939443,
+          0.795990636890128
+        ],
+        "aupr": [
+          0.8203738068019301,
+          0.8307158800136597
+        ],
+        "fpr_at_95_tpr": [
+          0.40818809523809524,
+          0.43104761904761907
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    },
+    "u_matrix": {
+      "score_id": "S2",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.8116903938742062,
+      "aupr": 0.891912221886052,
+      "fpr_at_95_tpr": 0.25257142857142856,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8051137398659526,
+          0.8181608962046711
+        ],
+        "aupr": [
+          0.8884260857848812,
+          0.8954811733671567
+        ],
+        "fpr_at_95_tpr": [
+          0.2440952380952381,
+          0.26057142857142856
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    },
+    "max_softmax": {
+      "score_id": "S3",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.8837241526911932,
+      "aupr": 0.9355365706353104,
+      "fpr_at_95_tpr": 0.30733333333333335,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8796404114350104,
+          0.8878904261604764
+        ],
+        "aupr": [
+          0.9328819687472325,
+          0.9381782022442197
+        ],
+        "fpr_at_95_tpr": [
+          0.2978071428571428,
+          0.3165738095238095
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    },
+    "energy": {
+      "score_id": "S4",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.9821428168993472,
+      "aupr": 0.9879640425517824,
+      "fpr_at_95_tpr": 0.06342857142857143,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9805822739229374,
+          0.9837284110033072
+        ],
+        "aupr": [
+          0.9861335708014801,
+          0.9897607027352442
+        ],
+        "fpr_at_95_tpr": [
+          0.05857142857142857,
+          0.06885714285714285
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    },
+    "mahalanobis": {
+      "score_id": "S5",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.7129084167471537,
+      "aupr": 0.7678876416020748,
+      "fpr_at_95_tpr": 0.4542857142857143,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.7056074119398834,
+          0.720169827611438
+        ],
+        "aupr": [
+          0.7627963163856187,
+          0.7730190293121023
+        ],
+        "fpr_at_95_tpr": [
+          0.44361904761904764,
+          0.4637142857142857
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    },
+    "knn": {
+      "score_id": "S6",
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.8636147891240086,
+      "aupr": 0.8984210048232433,
+      "fpr_at_95_tpr": 0.3141904761904762,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8587287003907278,
+          0.8686747009175521
+        ],
+        "aupr": [
+          0.894024668347797,
+          0.9030350084807166
+        ],
+        "fpr_at_95_tpr": [
+          0.3042833333333333,
+          0.3238095238095238
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty",
+      "aupr_chance_level": 0.7125807511223037
+    }
+  },
+  "paired_against_qe": {
+    "u_matrix": {
+      "comparison": "S1 qe minus S2 u_matrix",
+      "qe_auroc": 0.7893755670676385,
+      "other_auroc": 0.8116903938742062,
+      "qe_minus_other_auroc": -0.02231482680656771,
+      "difference_ci_95": [
+        -0.03043464833574793,
+        -0.01441259091374739
+      ],
+      "bootstrap_iterations": 2000,
+      "seed": 42
+    },
+    "max_softmax": {
+      "comparison": "S1 qe minus S3 max_softmax",
+      "qe_auroc": 0.7893755670676385,
+      "other_auroc": 0.8837241526911932,
+      "qe_minus_other_auroc": -0.09434858562355475,
+      "difference_ci_95": [
+        -0.10113599635613311,
+        -0.08771821970029568
+      ],
+      "bootstrap_iterations": 2000,
+      "seed": 42
+    },
+    "energy": {
+      "comparison": "S1 qe minus S4 energy",
+      "qe_auroc": 0.7893755670676385,
+      "other_auroc": 0.9821428168993472,
+      "qe_minus_other_auroc": -0.1927672498317088,
+      "difference_ci_95": [
+        -0.198798262577926,
+        -0.18644236983053825
+      ],
+      "bootstrap_iterations": 2000,
+      "seed": 42
+    },
+    "mahalanobis": {
+      "comparison": "S1 qe minus S5 mahalanobis",
+      "qe_auroc": 0.7893755670676385,
+      "other_auroc": 0.7129084167471537,
+      "qe_minus_other_auroc": 0.07646715032048479,
+      "difference_ci_95": [
+        0.07073828566306663,
+        0.08217045019682732
+      ],
+      "bootstrap_iterations": 2000,
+      "seed": 42
+    },
+    "knn": {
+      "comparison": "S1 qe minus S6 knn",
+      "qe_auroc": 0.7893755670676385,
+      "other_auroc": 0.8636147891240086,
+      "qe_minus_other_auroc": -0.07423922205637012,
+      "difference_ci_95": [
+        -0.07835996063453027,
+        -0.07015336700983409
+      ],
+      "bootstrap_iterations": 2000,
+      "seed": 42
+    }
+  },
+  "label_shuffle_control": {
+    "observed_auroc": 0.7893755670676385,
+    "shuffled_mean": 0.49984424721222226,
+    "shuffled_low": 0.4937524165313022,
+    "shuffled_high": 0.5062236729702638,
+    "shuffled_max": 0.510410553311675,
+    "iterations": 1000,
+    "p_value": 0.000999000999000999
+  },
+  "proposal_criteria": {
+    "RQ3": {
+      "criterion": "the SOM score (S1 QE) detects outside images: AUROC interval excludes 0.5",
+      "interval": [
+        0.7831694956939443,
+        0.795990636890128
+      ],
+      "verdict": "met"
+    },
+    "RQ4": {
+      "criterion": "competitive with the best baseline: lower end of the paired interval of S1 minus the best of S3-S6 above -0.01",
+      "best_baseline": "energy",
+      "best_baseline_auroc": 0.9821428168993472,
+      "interval": [
+        -0.198798262577926,
+        -0.18644236983053825
+      ],
+      "verdict": "not met",
+      "note": "The best baseline is picked by its AUROC on these images, as the criterion says. The classical baselines (Isolation Forest, One-Class SVM, autoencoder) are compared in their own steps; if one of them has a higher AUROC, RQ4 is checked against it there."
+    }
+  },
+  "statements": {
+    "O1": {
+      "statement": "the SOM (S1 QE) detects outside images",
+      "primary": false,
+      "interval": [
+        0.7831694956939443,
+        0.795990636890128
+      ],
+      "verdict": "met"
+    },
+    "O2": {
+      "statement": "the SOM is competitive with max-softmax (S1 minus S3)",
+      "primary": true,
+      "interval": [
+        -0.10113599635613311,
+        -0.08771821970029568
+      ],
+      "verdict": "not met"
+    },
+    "O3": {
+      "statement": "the SOM is competitive with energy, Mahalanobis and nearest neighbours",
+      "primary": false,
+      "per_score": {
+        "energy": {
+          "interval": [
+            -0.198798262577926,
+            -0.18644236983053825
+          ],
+          "verdict": "not met"
+        },
+        "mahalanobis": {
+          "interval": [
+            0.07073828566306663,
+            0.08217045019682732
+          ],
+          "verdict": "met"
+        },
+        "knn": {
+          "interval": [
+            -0.07835996063453027,
+            -0.07015336700983409
+          ],
+          "verdict": "not met"
+        }
+      }
+    },
+    "O4": {
+      "statement": "the U-Matrix (S2) detects outside images",
+      "primary": false,
+      "interval": [
+        0.8051137398659526,
+        0.8181608962046711
+      ],
+      "verdict": "met"
+    }
+  },
+  "rules": {
+    "detection": "met if the AUROC interval lies above 0.5; not met if at or below 0.5; else inconclusive",
+    "competitive": "d = AUROC(S1) - AUROC(other); met if the lower end of d's paired interval is above -0.01; not met if its upper end is below -0.01; else inconclusive"
+  },
+  "provenance": {
+    "config_sha256": "e8ca25679da3f0f80d79652c6ff0d0a7251d753162e4052ffb716554adecd612",
+    "input_sha256": {
+      "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "train_labels": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+      "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+      "validation_predictions": "81ec1b60cfc36f65b6100f4a8cdcc3904dd3c62b2e9f2af034ab2af8ed9b9d1d",
+      "validation_confidence": "da790c1a27cd0133193ebb967b1f82ea516b53d388a8030b910a5bf847179ea7",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+    },
+    "frozen_som": {
+      "qe_threshold": 1.4214525859373504,
+      "som_model": "som_15x15_nb11_ep250_s42",
+      "som_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+      "cnn_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "train_qe_sha256": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+      "val_qe_sha256": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+      "qe_reconstruction_max_abs_difference": 0.0
+    }
+  },
+  "test_split_read": false,
+  "leakage_control": "Frozen CNN and SOM. Mahalanobis and nearest-neighbour references fitted on Fashion-MNIST training embeddings only. Fashion-MNIST validation and SVHN test used for scoring only; nothing is tuned or chosen on SVHN. The Fashion-MNIST test split is never opened.",
+  "limitations": [
+    "One network and one map, so no claim of 'better' is made (the proposal requires 5 seeds for that).",
+    "One outside set (SVHN): the statements speak to far novelty only.",
+    "Paired comparisons assume the identical, unshuffled image order of every score, which this run ensures."
+  ]
+}
