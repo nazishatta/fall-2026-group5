@@ -5,8 +5,8 @@
            som_optuna                Optuna search per grid, 5-seed confirmation, summary table
            feature_layer_ablation    fc1 against fc2: embeddings, 2 x 5 SOMs, comparison
   Phase 3  (novelty_detection: the three Phase 3 runners, planned in run_all.py)
-           novelty_statements        the six scores in one run and the protocol's statements O1-O4
-                                     (only for a dataset whose protocol states them; MNIST's does not)
+           novelty_statements        the six scores in one run; the proposal's RQ3 and RQ4 (and O1-O4
+                                     where the dataset's protocol states them)
            held_out_class_novelty    one network and map per held-out split, then the comparison
   Phase 4  guided_retraining         pools, transform check, both experiments trained and summarised
            guided_retraining_test    the single test pass, breakdown, SOM re-analysis, novelty after retraining

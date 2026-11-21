@@ -1,8 +1,9 @@
-"""Score all six novelty scores on the same images in one run and judge statements O1 to O4.
+"""Score all six novelty scores on the same images in one run and judge the Phase 3 criteria.
 
-For a dataset whose Phase 3 protocol states O1 to O4 in advance (Fashion-MNIST:
-src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 3). MNIST has
-no config for this step: its protocol did not state these statements before its results were known.
+Every dataset gets the group proposal's RQ3 and RQ4 (RQ4 against the best of max-softmax, energy,
+Mahalanobis and nearest neighbours, as the project rules require). A dataset whose own Phase 3
+protocol states O1 to O4 in advance (Fashion-MNIST, NOVELTY_DETECTION_PROTOCOL.md section 3) also
+gets those; its config sets evaluation.protocol_statements to true.
 
 Usage (from the code root):
   python src/v1_mnist/component/p3_novelty_detection/novelty_benchmark/run_novelty_statements.py --config CONFIG
@@ -217,7 +218,8 @@ def run(config_path: Path) -> dict[str, Any]:
     scores, provenance = compute_scores(config, data)
     judged = judge(scores, statement_settings(config["evaluation"]))
     result = write_run(destination, config, config_path, scores, judged, hashes, provenance)
-    for key, item in result["statements"].items():
+    judged_items = {**result["proposal_criteria"], **result.get("statements", {})}
+    for key, item in judged_items.items():
         verdicts = item.get("verdict") or {n: v["verdict"] for n, v in item["per_score"].items()}
         LOGGER.info("%s: %s", key, verdicts)
     LOGGER.info("Saved %s", destination)

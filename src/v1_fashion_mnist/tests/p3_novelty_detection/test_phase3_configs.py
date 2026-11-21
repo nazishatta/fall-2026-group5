@@ -103,7 +103,7 @@ def test_statements_use_the_protocols_numbers() -> None:
         "bootstrap_iterations": 2000, "bootstrap_seed": 42,
         "paired_iterations": 2000, "paired_seed": 42,
         "shuffle_iterations": 1000, "shuffle_seed": 42,
-        "competitive_margin": 0.01,
+        "competitive_margin": 0.01, "protocol_statements": True,
     }
 
 

@@ -82,3 +82,21 @@ def test_settings_from_the_config_keep_their_types() -> None:
                                    "energy_temperature": 1.0, "knn_neighbors": 5})
     assert settings.bootstrap_iterations == 2000 and isinstance(settings.bootstrap_iterations, int)
     assert settings.competitive_margin == 0.01
+
+
+def test_proposal_criteria_use_the_best_baseline() -> None:
+    result = judge(_scores(np.random.default_rng(3)), FAST)
+    rq4 = result["proposal_criteria"]["RQ4"]
+    aurocs = {name: result["scores"][name]["auroc"] for name in ("max_softmax", "energy", "mahalanobis", "knn")}
+    assert rq4["best_baseline"] == max(aurocs, key=aurocs.get)
+    assert rq4["interval"] == result["paired_against_qe"][rq4["best_baseline"]]["difference_ci_95"]
+    assert result["proposal_criteria"]["RQ3"]["verdict"] == result["statements"]["O1"]["verdict"]
+
+
+def test_protocol_statements_only_when_asked_for() -> None:
+    scores = _scores(np.random.default_rng(4))
+    without = judge(scores, StatementSettings(bootstrap_iterations=20, paired_iterations=20,
+                                              shuffle_iterations=20, protocol_statements=False))
+    assert "statements" not in without and set(without["proposal_criteria"]) == {"RQ3", "RQ4"}
+    assert statement_settings({"protocol_statements": False}).protocol_statements is False
+

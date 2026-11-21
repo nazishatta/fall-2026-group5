@@ -1,6 +1,6 @@
-# Fashion-MNIST only: the six novelty scores in one run, and statements O1 to O4 judged by the rules
-# fixed in the protocol before any run (src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 3).
-# Every number below is the protocol's; no MNIST config exists for this step.
+# The six novelty scores in one run, the group proposal's RQ3 and RQ4, and statements O1 to O4, judged by
+# the rules fixed in the protocol before any run (src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 3).
+# Every number below is the protocol's.
 run_id: fashion_mnist_svhn_novelty_statements_s42_v1
 output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
 qe_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
@@ -41,3 +41,4 @@ evaluation:
   shuffle_iterations: 1000         # label-shuffle control for the S1 AUROC
   shuffle_seed: 42
   competitive_margin: 0.01         # O2, O3: lower end of S1 minus other above -0.01
+  protocol_statements: true        # judge O1 to O4 too (the proposal's RQ3 and RQ4 are always judged)

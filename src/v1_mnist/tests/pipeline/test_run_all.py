@@ -247,10 +247,13 @@ SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
 
 
 def test_every_phase3_config_is_a_step_or_listed_as_supporting() -> None:
-    """A new Phase 3 config must be added to a runner (or listed here), so no analysis is left out."""
+    """A new Phase 3 config must belong to a runner or a run_all study step (or be listed here)."""
+    from src.v1_mnist.component.pipeline.study_steps import STUDY_STEPS
+
     step_configs = {step.config for steps in RUNNERS.values() for step in steps}
+    study_configs = {config for step in STUDY_STEPS.values() for config in step.configs}
     on_disk = {path.name for path in (REPO_ROOT / CONFIG_DIR).glob("*.yaml")}
-    missing = on_disk - OTHER_PHASE_CONFIGS - SUPPORTING_CONFIGS - step_configs
+    missing = on_disk - OTHER_PHASE_CONFIGS - SUPPORTING_CONFIGS - step_configs - study_configs
     assert not missing, f"Configs that no Phase 3 runner uses: {sorted(missing)}"
     assert not step_configs - on_disk, "A step names a config that does not exist"
 
@@ -336,8 +339,7 @@ def test_optuna_grids_come_from_the_config() -> None:
 
 def test_every_study_step_passes_its_own_config() -> None:
     mnist = "src/v1_mnist/component/configs"
-    # Only novelty_statements has no MNIST config: MNIST's protocol never stated O1-O4.
-    assert [name for name, step in STUDY_STEPS.items() if step.missing(mnist)] == ["novelty_statements"]
+    assert [name for name, step in STUDY_STEPS.items() if step.missing(mnist)] == []
     for name, step in STUDY_STEPS.items():
         if step.missing(mnist):
             continue

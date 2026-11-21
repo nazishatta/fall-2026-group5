@@ -1,0 +1,48 @@
+# The six novelty scores in one run (MNIST validation against SVHN test), and the group proposal's
+# Phase 3 criteria RQ3 and RQ4 (proposals/Group_proposal.md, success criteria).
+# Run after MNIST's Phase 3 results were known: it applies RQ3 and RQ4 as fixed on 2026-11-10, with RQ4
+# against the best baseline as the criterion says (MNIST's earlier check used max-softmax), and adds
+# the paired QE-against-Mahalanobis interval that the project rules require. Nothing here is chosen
+# from results; the settings are the ones of the other Phase 3 steps. See src/v1_mnist/docs/DEVIATIONS.md.
+# Never overwrite a run; a new run needs a new run_id.
+run_id: mnist_svhn_novelty_statements_s42_v1
+output_root: outputs/v1_mnist/p3_novelty_detection/novelty_benchmark
+qe_config: src/v1_mnist/component/configs/qe_ood_evaluation.yaml
+inputs:
+  checkpoint: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_best.pth
+  train_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  train_labels: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_labels.npy
+  validation_features: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+  validation_predictions: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_preds.npy
+  validation_confidence: outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_confidence.npy
+  svhn_file: data/ood_svhn/test_32x32.mat
+expected_sha256:
+  checkpoint: 0d5f3d6543de6e87fb6510c4790ca131b996a6f86d0f96880197858d8a150b6d
+  train_features: 26faeeac9af896cbd72776b0ad87bc3573218916894d615cedcbdb3c9cd68d65
+  validation_features: e48dd43f769cbf2988dbfbab80c06d83b6f25e4fdbe39b74bf75472b2521671d
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  classes: 10
+inference:
+  feature_layer: fc2
+  image_size: [28, 28]
+  batch_size: 256
+  thread_count: 1
+  confidence_tolerance: 1.0e-05
+tolerances:
+  qe_reconstruction: 1.0e-4
+evaluation:
+  energy_temperature: 1.0          # as in the other Phase 3 steps
+  knn_neighbors: 5
+  target_tpr: 0.95
+  bootstrap_iterations: 2000       # stratified bootstrap for every AUROC interval (PREREGISTRATION_qe_novelty.md)
+  bootstrap_seed: 42
+  paired_iterations: 2000          # paired bootstrap, as in svhn_paired_comparison.yaml
+  paired_seed: 42
+  shuffle_iterations: 1000         # label-shuffle control, as in qe_threshold_sweep.yaml
+  shuffle_seed: 42
+  competitive_margin: 0.01         # RQ4 margin (Group_proposal.md)
+  protocol_statements: false       # MNIST's protocol states RQ3 and RQ4 only, not O1 to O4

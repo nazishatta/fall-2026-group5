@@ -51,4 +51,4 @@ Once every value is filled in, `python src/v1_fashion_mnist/component/pipeline/r
 
 ## What answers the protocol's statements
 
-Statements O1 to O4 are judged in one place, `novelty_statements` (`outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_novelty_statements_s42_v1/novelty_statements.json`), by the rules in the protocol's section 3 (amendment A2). The other steps give the further results the protocol lists (the QE flag and its rates, the threshold sweep, the controls, the classical baselines, the norm check, the figures); their own paired comparisons are supporting results.
+Statements O1 to O4, and the group proposal's RQ3 and RQ4, are judged in one place, `novelty_statements` (`outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_novelty_statements_s42_v1/novelty_statements.json`), by the rules in the protocol's section 3 (amendment A2). The other steps give the further results the protocol lists (the QE flag and its rates, the threshold sweep, the controls, the classical baselines, the norm check, the figures); their own paired comparisons are supporting results.

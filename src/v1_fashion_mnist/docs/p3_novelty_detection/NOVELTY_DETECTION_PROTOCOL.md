@@ -112,6 +112,9 @@ existed. It fills in what this section left unsaid; no rule above changes.)*
   control for S1 (1,000 shuffles, seed 42). The paired comparisons in the other steps (QE against
   max-softmax, energy, nearest neighbours and the U-Matrix) are reported as supporting results; the
   statements are taken from `novelty_statements` only. It is the only step with QE against Mahalanobis.
+  The same step also reports the group proposal's RQ3 and RQ4 (`proposals/Group_proposal.md`), by the same two
+  rules: RQ3 as O1; RQ4 as O2 but against the best of S3 to S6 by AUROC, as the proposal defines it. O1 to
+  O4 remain this protocol's statements; RQ3 and RQ4 are reported so both datasets answer the same questions.
 - **Which MNIST steps run.** `qe_random_control` (are QE-flagged validation images more often CNN errors
   than random picks?) and `qe_u_matrix` (QE against the U-Matrix on validation) re-created earlier runs on
   MNIST, which is why they are called reproductions above. Fashion-MNIST has no earlier runs, so here they
