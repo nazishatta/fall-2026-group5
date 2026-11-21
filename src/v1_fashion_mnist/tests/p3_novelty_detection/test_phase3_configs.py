@@ -37,6 +37,14 @@ MAY_WAIT = {
     "qe_umatrix_validation_figure.yaml", "svhn_som_overlay.yaml",
 }
 
+MNIST_CONFIG_DIR = REPO_ROOT / "src" / "v1_mnist" / "component" / "configs"
+# Settings a Fashion-MNIST config has on purpose and its MNIST original does not.
+ADDED_ON_PURPOSE = {
+    "base.yaml": {"dataset.class_names"},
+    "missed_svhn_figure.yaml": {"scores_subfolder"},
+    "qe_norm_dependence.yaml": {"analysis_status"},
+    "unified_novelty_benchmark.yaml": {"study_type"},
+}
 
 def _load(name: str) -> dict[str, Any]:
     return yaml.safe_load((CONFIG_DIR / name).read_text(encoding="utf-8"))
@@ -117,3 +125,26 @@ def test_the_outside_set_is_svhn_test_only() -> None:
     ood = _load("qe_ood_evaluation.yaml")["ood_datasets"]
     assert [(entry["name"], entry["split"]) for entry in ood] == [("svhn", "test")]
     assert _load("dataset/fashion_mnist.yaml")["dataset"]["ood_dataset"] == "svhn"
+
+
+def _keys(value: Any, prefix: str = "") -> set[str]:
+    """Every setting name in a config, nested names joined with dots."""
+    if not isinstance(value, dict):
+        return set()
+    names: set[str] = set()
+    for key, item in value.items():
+        name = f"{prefix}{key}"
+        names |= {name} | _keys(item, f"{name}.")
+    return names
+
+
+def test_no_setting_of_the_mnist_original_was_dropped() -> None:
+    """Each Fashion-MNIST copy keeps every MNIST setting; only MNIST names become Fashion-MNIST names."""
+    for path in sorted(CONFIG_DIR.glob("*.yaml")):
+        original = MNIST_CONFIG_DIR / path.name
+        if not original.exists():
+            continue
+        expected = {name.replace("mnist", "fashion_mnist") for name in _keys(yaml.safe_load(original.read_text(encoding="utf-8")))}
+        actual = _keys(_load(path.name))
+        assert expected - actual == set(), f"{path.name} lost settings"
+        assert actual - expected <= ADDED_ON_PURPOSE.get(path.name, set()), f"{path.name} has unexpected settings"

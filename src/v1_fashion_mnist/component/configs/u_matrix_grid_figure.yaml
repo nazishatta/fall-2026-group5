@@ -6,6 +6,7 @@
 run_id: fashion_mnist_umatrix_hex_grid_s42_v1
 output_root: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis
 model_path: outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/som_models/som_15x15_nb11_ep250_s42
+model_sha256: 6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281
 grid_height: 15
 grid_width: 15
 feature_dim: 84
