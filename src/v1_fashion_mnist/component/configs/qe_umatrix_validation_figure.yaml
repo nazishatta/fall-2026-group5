@@ -9,7 +9,7 @@ scores_directory: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmar
 source_summary: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis/fashion_mnist_qe_u_matrix_validation_s42_v1/qe_u_matrix_metrics.json
 figure_name: qe_u_matrix_validation.pdf
 score_sha256:
-  qe: "[TBD: SHA-256 of qe_fashion_mnist_val_scores.npy, filled in after stage 2]"
-  u_matrix: "[TBD: SHA-256 of u_matrix_fashion_mnist_val_scores.npy, filled in after stage 2]"
+  qe: ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7
+  u_matrix: 001344c81d39d0d117aa459a09150e9d8859569c7d6eb0c528a9d4a19f9256a9
 correlation_tolerance: 1.0e-10
 mean_tolerance: 1.0e-10

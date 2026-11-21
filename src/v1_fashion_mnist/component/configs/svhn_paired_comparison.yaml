@@ -38,8 +38,8 @@ evaluation:
 paired_qe:
   id_scores: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1/qe_fashion_mnist_val_scores.npy
   ood_scores: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1/qe_svhn_test_scores.npy
-  id_sha256: "[TBD: SHA-256 of qe_fashion_mnist_val_scores.npy, filled in after stage 2]"
-  ood_sha256: "[TBD: SHA-256 of qe_svhn_test_scores.npy, filled in after stage 2]"
-  expected_qe_auroc: "[TBD: QE AUROC of the five-method run, filled in after stage 2]"
+  id_sha256: ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7
+  ood_sha256: add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae
+  expected_qe_auroc: 0.7893755670676385
   expected_msp_auroc: 0.8837241526911932
   auroc_tolerance: 1.0e-10

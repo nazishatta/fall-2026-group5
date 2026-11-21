@@ -12,7 +12,7 @@ random_simulations: 500
 expected_id_count: 10500
 expected_ood_count: 26032
 expected_sha256:
-  qe_fashion_mnist_val_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
-  qe_svhn_test_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
-  u_matrix_fashion_mnist_val_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
-  u_matrix_svhn_test_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
+  qe_fashion_mnist_val_scores.npy: ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7
+  qe_svhn_test_scores.npy: add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae
+  u_matrix_fashion_mnist_val_scores.npy: 001344c81d39d0d117aa459a09150e9d8859569c7d6eb0c528a9d4a19f9256a9
+  u_matrix_svhn_test_scores.npy: 824b98b0fecdd5988daca6e0f9f6bc5d5f1235fa65259d22f4682990a977a5eb
