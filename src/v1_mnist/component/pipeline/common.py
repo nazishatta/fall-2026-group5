@@ -41,6 +41,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]          # code root (holds src/
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.v1_mnist.component.utils.in_distribution import in_distribution  # noqa: E402
 from src.v1_mnist.component.utils.logging import get_console_logger  # noqa: E402
 
 log = get_console_logger()
@@ -211,7 +212,8 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
             log.info(f"Skipping {message}")
             continue
         folder = results_folder(config)
-        label = step.label
+        # Labels are written for MNIST; show the dataset of this config folder instead.
+        label = in_distribution(resolve(config)).wording(step.label)
         if folder is not None and folder.exists():
             if args.only:
                 message = (f"These results already exist:\n  - {show(folder)}\n"

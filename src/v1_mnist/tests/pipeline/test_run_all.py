@@ -361,6 +361,16 @@ def test_every_study_step_script_starts_without_pythonpath(tmp_path: Path) -> No
                                 capture_output=True, text=True, check=False)
         assert result.returncode == 0, (script.name, result.stderr[-500:])
 
+
+def test_phase3_step_labels_name_the_configs_dataset() -> None:
+    """A Fashion-MNIST run prints Fashion-MNIST in its step names; MNIST's names are unchanged."""
+    steps = ("--steps", "qe_u_matrix", "qe_umatrix_validation_figure", "--dry-run")
+    fashion = run_runner("run_u_matrix_analysis.py", "--config-dir", FASHION_DIR, *steps)
+    mnist = run_runner("run_u_matrix_analysis.py", *steps)
+    assert fashion.returncode == 0 and mnist.returncode == 0, fashion.stderr + mnist.stderr
+    assert "on Fashion-MNIST validation" in fashion.stdout and " MNIST validation" not in fashion.stdout
+    assert "on MNIST validation" in mnist.stdout
+
 def test_reproductions_are_optional_only_for_mnist() -> None:
     assert optional_steps() == REPRODUCTION_STEPS
     assert optional_steps(FASHION_DIR) == frozenset()
