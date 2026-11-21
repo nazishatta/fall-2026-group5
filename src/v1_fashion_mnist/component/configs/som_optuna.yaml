@@ -1,6 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/som_optuna.yaml with only the
 # dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
-# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md
 # ==============================================================================
 # Optuna tuning of the SOM settings for the 10x10, 15x15 and 20x20 grids.
 # Protocol: docs/p2_som_training_visualization/som_nnsom_training/OPTUNA_TUNING_PROTOCOL.md

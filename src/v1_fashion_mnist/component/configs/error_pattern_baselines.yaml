@@ -1,6 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/error_pattern_baselines.yaml with only the
 # dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
-# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md
 # ==============================================================================
 # Error pattern baselines (Phase 2: SOM training and visualization)
 # Is the SOM's error-geography result special, or do simple alternatives find the

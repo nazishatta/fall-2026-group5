@@ -1,6 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/error_detector_budget.yaml with only the
 # dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
-# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md
 # ==============================================================================
 # Same-budget comparison of the error detectors (Phase 2, exploratory).
 # If kNN impurity and max-softmax flag the same share of validation images as the SOM's (and k-means')

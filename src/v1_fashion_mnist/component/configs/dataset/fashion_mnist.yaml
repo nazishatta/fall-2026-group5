@@ -6,4 +6,4 @@ dataset:
   channels: 1
   image_size: 28
   feature_dim: 84 # Penultimate dimension for LeNet-5
-  ood_dataset: "[TBD: chosen with the professor; see FASHION_MNIST_PROTOCOL.md section 5]"
+  ood_dataset: "svhn" # fixed 2026-11-21: docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 2

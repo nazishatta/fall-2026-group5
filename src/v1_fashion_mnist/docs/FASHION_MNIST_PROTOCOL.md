@@ -85,11 +85,36 @@ listed in section 5, once chosen; L3 is run only after that. `fc2` stays the hea
 **In-distribution reference.** The 10,500 Fashion-MNIST validation images. The Fashion-MNIST test split is
 not used in Phase 3.
 
-**Outside sets (never used for training, fitting, thresholds or choices).** Which datasets are used is
-**[TBD: to be agreed with the professor and written here before any Phase 3 run]**. Candidates are SVHN
-(as for MNIST), MNIST and KMNIST. Whatever is chosen, each set is loaded at 28x28 grayscale with pixels in
-[0, 1], used only to compute novelty scores, and recorded here with its licence and citation. The rules
-below do not depend on the choice.
+**Outside sets (never used for training, fitting, thresholds or choices).** One outside set: **SVHN**
+(Street View House Numbers; Netzer et al., 2011), the same set as for MNIST. Chosen by the professor and
+written here on 2026-11-21, before any Phase 3 step was run on Fashion-MNIST and before any novelty score was
+computed with the Fashion-MNIST network (amendment A1, section 11). The other candidates (MNIST, KMNIST) are
+not used.
+
+| Item | Fixed value |
+|---|---|
+| Split and size | SVHN test split, cropped-digit format (`test_32x32.mat`), all 26,032 images, in file order; the SVHN training and extra splits are not used |
+| File | `data/ood_svhn/test_32x32.mat`, the same file as for MNIST, SHA-256 `cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b`, checked before every run; not downloaded again |
+| Conversion | the MNIST transform, unchanged (`ood_adapters.image_transform("svhn", (28, 28))`): RGB to grey with the ITU-R BT.601 weights (0.299, 0.587, 0.114), resize from 32x32 to 28x28 with bilinear interpolation and anti-aliasing, pixels scaled to [0, 1]. No normalisation, no inversion of light and dark, no cropping |
+| Labels | the SVHN digit labels are not used by any score; images are labelled only as "outside" |
+| Licence | the SVHN authors allow non-commercial use only; this study is non-commercial research |
+
+Fashion-MNIST images are divided by 255 in the same way (section 2), so both sets reach the network on the
+same [0, 1] scale and at the same size.
+
+*Why this set is a sound test, and what it can and cannot show.* SVHN and Fashion-MNIST share no class
+(house-number digits against clothing), so every SVHN image is a true outside image. SVHN also differs in
+how the images look (photographs with textured, often bright backgrounds, against centred objects on a black
+background), so it tests a large shift: far novelty. Using the same SVHN images as for MNIST keeps the
+outside set fixed while the training data changes, so the MNIST and Fashion-MNIST AUROCs can be set side by
+side as the same test on two networks. They are not pooled, and no statistical test is made between the two
+datasets (they are separate networks and maps). Near novelty, where outside images resemble the training
+classes, is tested separately by the held-out classes (below). A set that is visually close to
+Fashion-MNIST, such as MNIST, is a known hard case for some novelty scores (Nalisnick et al., 2019 report
+it for likelihood models trained on Fashion-MNIST); it is not tested here (section 8).
+
+*Imbalance.* 26,032 outside images against 10,500 validation images (71.3% outside). AUROC and FPR at 95% TPR
+do not depend on this ratio; AUPR-out does, so it is reported with its chance level of 0.713.
 
 **Scores** (higher means "more novel"; anything fitted is fitted on the Fashion-MNIST training embeddings
 only; the functions are the MNIST Phase 3 functions, called unchanged):
@@ -103,7 +128,7 @@ only; the functions are the MNIST Phase 3 functions, called unchanged):
 | S5 | Mahalanobis: smallest squared distance to the class means, one shared Ledoit-Wolf covariance |
 | S6 | nearest-neighbour distance: mean distance to the 5 nearest training embeddings |
 
-**Measures.** Per outside set and score: AUROC (outside images positive), AUPR-out and FPR at 95% TPR, with a
+**Measures.** Per score (on SVHN): AUROC (outside images positive), AUPR-out and FPR at 95% TPR, with a
 stratified bootstrap 95% interval for the AUROC (2,000 resamples, seed 42). Differences between S1 and each
 other score use the paired bootstrap over images. **Control:** the S1 AUROC with the labels shuffled 1,000
 times (seed 42); it should sit near 0.5.
@@ -188,7 +213,10 @@ unchanged. Training and validation images only.
   recipe on Fashion-MNIST, not the best possible Fashion-MNIST setup.
 - The hotspots come from the SOM, which gives the SOM-guided arms a built-in advantage on hotspot error (as for MNIST).
 - If more than one outside set is used, they differ from Fashion-MNIST in different ways; results are
-  reported per set and not averaged.
+  reported per set and not averaged. *(Added 2026-11-21, amendment A1:)* only SVHN is used, so O1 to O4
+  speak to far novelty only. A high AUROC on SVHN does not show that the scores detect outside images
+  that look like clothing; near novelty is covered only by the held-out classes, which come from the same
+  dataset.
 - The held-out-class splits share classes, so they are not independent.
 
 ## 9. Where things go
@@ -202,7 +230,7 @@ unchanged. Training and validation images only.
 
 | Change | Why |
 |---|---|
-| Outside sets to be agreed with the professor (MNIST used SVHN only) | for Fashion-MNIST, MNIST itself could be an outside set; the choice is left to the professor |
+| None for the outside set: SVHN test split, same file and conversion as MNIST (decided 2026-11-21, A1) | the choice was left open in this protocol's first version because MNIST itself could be an outside set for Fashion-MNIST; the professor chose SVHN, which keeps the outside set the same for both datasets |
 | Macro-F1 guard re-measured | it measures the spread of the network's own results, which differs by dataset |
 | MNIST's history-checking steps not repeated (section 5) | they re-created or audited earlier MNIST runs; Fashion-MNIST has none |
 | U-Matrix and nearest-neighbour scores judged (O3, O4) in one run | the MNIST unified benchmark compared them in a historical run; here they are fixed in advance |
@@ -211,12 +239,41 @@ unchanged. Training and validation images only.
 
 | Date | What changed | Why | Run affected |
 |---|---|---|---|
-| | Protocol committed: commit [TBD: hash of the commit that adds this file] | | none |
+| 2026-11-17 | Protocol committed: commit `5dd164c` | first version, before any run | none |
+| 2026-11-21 | **A1.** Outside set fixed: SVHN test split only (section 5); the section 8 limitation and the section 10 row updated to match | section 5 left the choice to the professor, to be written here before any Phase 3 run. The decision came from the professor, not from any result: when it was made, no Phase 3 step had run on Fashion-MNIST and no Fashion-MNIST novelty score existed. Phase 1 and 2 results were known, but they contain no outside images. With one set, "on every outside set" in O1 to O4 means "on SVHN" | none: no Phase 3 run, no L3 run and no novelty-after-retraining run existed |
+| 2026-11-21 | Optuna outcome recorded (section 12); no rule changed | section 4 fixes the headline map as 15x15, neighbourhood 11, 250 epochs whatever Optuna finds | none |
 
 ## 12. Recorded outcome
 
-Filled in after the runs, without changing sections 2 to 8. [TBD]
+Filled in after the runs, without changing sections 2 to 8.
+
+**Phase 2, Optuna tuning (recorded 2026-11-21).** Stage 2 confirmation, Optuna's choice minus the 3-point
+setting, 5 new SOM seeds (1-5, not the search seed), mean and paired 95% t-interval on validation.
+Negative is better for Optuna. Source: `outputs/v1_fashion_mnist/p2_som_training_visualization/som_optuna_tuning/som_optuna_confirm_<grid>_seeds5_v1/confirmation.json`.
+
+| Grid | 3-point setting | Optuna setting | QE | TE1 (points) | TE1+2 (points) | Verdict |
+|---|---|---|---|---|---|---|
+| 10x10 | nb 7, 250 epochs | nb 7, 300 epochs | +0.020 [+0.007, +0.034] | +0.79 [+0.37, +1.21] | +0.22 [-0.33, +0.78] | 3-point setting better |
+| 15x15 | nb 11, 250 epochs | nb 7, 200 epochs | -0.014 [-0.024, -0.004] | +2.36 [+1.55, +3.17] | +1.53 [+0.94, +2.11] | trade-off |
+| 20x20 | nb 15, 250 epochs | nb 14, 350 epochs | -0.007 [-0.018, +0.005] | +0.12 [-0.80, +1.03] | -0.25 [-1.10, +0.60] | no clear difference |
+
+Optuna's setting is not better than the 3-point setting on any grid. On the headline 15x15 grid it gives
+a slightly lower quantization error but a clearly higher topographic error (+2.4 points first-order), so
+it fits the data a little more closely while keeping neighbours less well together. The headline map stays
+15x15, neighbourhood 11, 250 epochs, as section 4 requires, and this is not a limitation of the headline
+map: no setting found improves both measures. No test data was used (`test_evaluated: false`).
+
+Everything else: [TBD]
 
 ## 13. References
 
-As in the MNIST protocols and `references.bib`; the outside sets' references are added when they are chosen.
+As in the MNIST protocols and `references.bib`. Added for this protocol (keys in
+`reports/Latex_report/v1_mnist/Final_report/references.bib` and the Phase 3 `references.bib`):
+
+- Xiao, H., Rasul, K. and Vollgraf, R. (2017). Fashion-MNIST: a novel image dataset for benchmarking machine
+  learning algorithms. arXiv:1708.07747. (`xiao2017fashion`)
+- Netzer, Y., Wang, T., Coates, A., Bissacco, A., Wu, B. and Ng, A. Y. (2011). Reading digits in natural
+  images with unsupervised feature learning. NIPS Workshop on Deep Learning and Unsupervised Feature
+  Learning. (`netzer2011reading`)
+- Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D. and Lakshminarayanan, B. (2019). Do deep generative
+  models know what they don't know? ICLR. (`nalisnick2019deep`)

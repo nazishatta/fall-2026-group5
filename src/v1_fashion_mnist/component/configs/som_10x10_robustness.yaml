@@ -1,6 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/som_10x10_robustness.yaml with only the
 # dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
-# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md
 # ==============================================================================
 # SOM Milestone Configuration
 # NNSOM Training, Model Selection, Convergence Tracking, and Visualization
@@ -43,7 +43,7 @@ paths:
 # (docs/p2_som_training_visualization/som_nnsom_training/PREREGISTRATION_grid_comparison.md): each grid tried
 # init_neighborhood at 0.20 / 0.47 / 0.73 x side, 250 epochs; 7 was chosen
 # for 10x10 by the within-grid rank sum on MNIST (validation features only). Fashion-MNIST
-# uses the same settings (FASHION_MNIST_PROTOCOL.md, section 2).
+# uses the same settings (SOM_ANALYSIS_PROTOCOL.md, section 1).
 # ==============================================================================
 
 # Frozen LeNet-5 embeddings used by the grid study and the pre-registered

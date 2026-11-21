@@ -1,6 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/cnn_baseline.yaml with only the
 # dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
-# src/v1_fashion_mnist/docs/FASHION_MNIST_PROTOCOL.md
+# src/v1_fashion_mnist/docs/p1_model_training_baseline/MODEL_TRAINING_PROTOCOL.md
 # ==============================================================================
 # Milestone Configuration: Baseline Data Preparation & LeNet-5 Training
 # Outputs saved to: ./outputs/v1_fashion_mnist/p1_model_training_baseline/
