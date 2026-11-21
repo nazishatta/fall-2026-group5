@@ -1,0 +1,18 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_u_matrix_random_ood.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE against the U-Matrix score (paired), and the random-score control.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_qe_umatrix_random_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+source_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1
+seed: 42
+bootstrap_iterations: 500
+random_simulations: 500
+expected_id_count: 10500
+expected_ood_count: 26032
+expected_sha256:
+  qe_fashion_mnist_val_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
+  qe_svhn_test_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
+  u_matrix_fashion_mnist_val_scores.npy: "[TBD: SHA-256, filled in after stage 2]"
+  u_matrix_svhn_test_scores.npy: "[TBD: SHA-256, filled in after stage 2]"

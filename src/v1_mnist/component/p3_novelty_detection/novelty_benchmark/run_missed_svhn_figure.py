@@ -41,8 +41,11 @@ def run(config_path: Path) -> Path:
         raise FileExistsError(f"Existing run: {destination}")
 
     historical = repository_path(config["historical_run"])
-    scores_path = historical / "score_arrays/qe_svhn_test_scores.npy"
-    labels_path = historical / "score_arrays/svhn_labels.npy"
+    # MNIST's historical run keeps its arrays in score_arrays/; runs of the current benchmark code
+    # write them in the run folder itself (scores_subfolder: "").
+    arrays = historical / str(config.get("scores_subfolder", "score_arrays"))
+    scores_path = arrays / "qe_svhn_test_scores.npy"
+    labels_path = arrays / "svhn_labels.npy"
     comparison_path = historical / "comparison_metrics.json"
     # The verified SVHN file may be a symlink to external data storage.
     # Restrict the configured location and retain the SHA-256 check below.

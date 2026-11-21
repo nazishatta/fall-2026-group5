@@ -1,0 +1,28 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_energy_knn_paired.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE against energy and kNN, paired over the same images.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_qe_energy_knn_paired_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+seed: 42
+bootstrap_iterations: 2000
+expected_counts:
+  fashion_mnist_validation: 10500
+  svhn_test: 26032
+scores:
+  qe:
+    directory: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1
+    sha256:
+      fashion_mnist_val: "[TBD: SHA-256 of qe_fashion_mnist_val_scores.npy, filled in after stage 2]"
+      svhn_test: "[TBD: SHA-256 of qe_svhn_test_scores.npy, filled in after stage 2]"
+  energy:
+    directory: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_energy_knn_score_export_s42_v1
+    sha256:
+      fashion_mnist_val: "[TBD: SHA-256 of energy_fashion_mnist_val_scores.npy, filled in after stage 2]"
+      svhn_test: "[TBD: SHA-256 of energy_svhn_test_scores.npy, filled in after stage 2]"
+  knn:
+    directory: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_energy_knn_score_export_s42_v1
+    sha256:
+      fashion_mnist_val: "[TBD: SHA-256 of knn_fashion_mnist_val_scores.npy, filled in after stage 2]"
+      svhn_test: "[TBD: SHA-256 of knn_svhn_test_scores.npy, filled in after stage 2]"

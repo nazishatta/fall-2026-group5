@@ -108,6 +108,12 @@ def test_steps_come_after_the_steps_whose_results_they_read() -> None:
         assert benchmark < names.index(later), later
 
 
+def test_qe_ood_comes_before_the_benchmark_that_reproduces_it() -> None:
+    """svhn_benchmark checks its QE AUROC against qe_ood's metrics (qe_reference_metrics)."""
+    names = flat(include_reproductions=True)
+    assert names.index("qe_ood") < names.index("svhn_benchmark")
+
+
 def test_planned_steps_keep_each_runners_own_order() -> None:
     """Splitting a runner into groups must not reorder its steps."""
     for runner, steps in RUNNER_STEPS.items():
@@ -295,7 +301,7 @@ def test_steps_follow_the_proposal_order() -> None:
         "data_pipeline", "cnn_baseline_training",                       # Phase 1
         "som_nnsom_training", "cluster_analysis", "error_pattern_analysis",
         "error_pattern_baselines", "error_detector_budget", "som_optuna", "feature_layer_ablation",  # Phase 2
-        "novelty_detection", "held_out_class_novelty",                  # Phase 3
+        "novelty_detection", "novelty_statements", "held_out_class_novelty",   # Phase 3
         "guided_retraining", "guided_retraining_test",                  # Phase 4
     ]
 
@@ -329,8 +335,13 @@ def test_optuna_grids_come_from_the_config() -> None:
 
 
 def test_every_study_step_passes_its_own_config() -> None:
+    mnist = "src/v1_mnist/component/configs"
+    # Only novelty_statements has no MNIST config: MNIST's protocol never stated O1-O4.
+    assert [name for name, step in STUDY_STEPS.items() if step.missing(mnist)] == ["novelty_statements"]
     for name, step in STUDY_STEPS.items():
-        for command in step.commands("src/v1_mnist/component/configs"):
+        if step.missing(mnist):
+            continue
+        for command in step.commands(mnist):
             config = command.args[command.args.index("--config") + 1]
             assert config.startswith("src/v1_mnist/component/configs/"), (name, command.label)
             assert (REPO_ROOT / config).is_file(), (name, config)

@@ -86,7 +86,8 @@ from src.v1_mnist.component.utils.in_distribution import in_distribution  # noqa
 #Phase 3 has three runners, but their steps depend on each other across runners, so
 #they cannot simply run one runner after another:
 #
-#  1. qe_novelty               writes the QE summary that nearly everything reads.
+#  1. qe_novelty               writes the QE summary that nearly everything reads; then
+#     qe_ood (QE on SVHN), whose metrics svhn_benchmark must reproduce.
 #  2. the whole novelty_benchmark runner
 #                              svhn_benchmark writes the SVHN score arrays that the
 #                              threshold sweep, the figures and the gap analysis read.
@@ -115,9 +116,9 @@ RUNNER_STEPS: dict[str, list[P3Step]] = {
 }
 # (runner, steps to run from it; None means all of its steps), in dependency order.
 ORDER: tuple[tuple[str, tuple[str, ...] | None], ...] = (
-    ("run_qe_novelty_detection.py", ("qe_novelty", "qe_score_distribution_figure")),
+    ("run_qe_novelty_detection.py", ("qe_novelty", "qe_score_distribution_figure", "qe_ood")),
     ("run_novelty_benchmark.py", None),
-    ("run_qe_novelty_detection.py", ("qe_ood", "qe_random_control", "qe_threshold_sweep")),
+    ("run_qe_novelty_detection.py", ("qe_random_control", "qe_threshold_sweep")),
     ("run_u_matrix_analysis.py", None),
 )
 

@@ -5,6 +5,8 @@
            som_optuna                Optuna search per grid, 5-seed confirmation, summary table
            feature_layer_ablation    fc1 against fc2: embeddings, 2 x 5 SOMs, comparison
   Phase 3  (novelty_detection: the three Phase 3 runners, planned in run_all.py)
+           novelty_statements        the six scores in one run and the protocol's statements O1-O4
+                                     (only for a dataset whose protocol states them; MNIST's does not)
            held_out_class_novelty    one network and map per held-out split, then the comparison
   Phase 4  guided_retraining         pools, transform check, both experiments trained and summarised
            guided_retraining_test    the single test pass, breakdown, SOM re-analysis, novelty after retraining
@@ -103,6 +105,11 @@ def _feature_layer_ablation(d: str) -> list[Step]:
                    f"{d}/feature_layer_ablation.yaml", ("extract", "som", "compare"))
 
 
+def _novelty_statements(d: str) -> list[Step]:
+    return [Step("novelty_statements", COMPONENT / "p3_novelty_detection" / "novelty_benchmark" /
+                 "run_novelty_statements.py", ["--config", f"{d}/novelty_statements.yaml"])]
+
+
 def _held_out_class_novelty(d: str) -> list[Step]:
     return _staged("held_out_class_novelty", P3 / "run_held_out_class_novelty.py",
                    f"{d}/held_out_class_novelty.yaml", ("run", "compare"))
@@ -166,6 +173,11 @@ def _ablation_results(d: str) -> list[Path]:
     return [load_ablation_settings(f"{d}/feature_layer_ablation.yaml", REPO_ROOT).output_dir]
 
 
+def _statements_results(d: str) -> list[Path]:
+    raw = yaml.safe_load(resolve(f"{d}/novelty_statements.yaml").read_text(encoding="utf-8")) or {}
+    return [resolve(raw["output_root"]) / str(raw["run_id"])]
+
+
 def _held_out_results(d: str) -> list[Path]:
     from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.settings import (
         load_held_out_settings,
@@ -213,6 +225,7 @@ PHASE2_STUDY_STEPS = (
     StudyStep("feature_layer_ablation", ("feature_layer_ablation.yaml",), _feature_layer_ablation, _ablation_results),
 )
 LATER_STUDY_STEPS = (
+    StudyStep("novelty_statements", ("novelty_statements.yaml",), _novelty_statements, _statements_results),
     StudyStep("held_out_class_novelty", ("held_out_class_novelty.yaml",), _held_out_class_novelty, _held_out_results),
     StudyStep("guided_retraining", ("retraining.yaml",), _guided_retraining, _retraining_results),
     StudyStep("guided_retraining_test",

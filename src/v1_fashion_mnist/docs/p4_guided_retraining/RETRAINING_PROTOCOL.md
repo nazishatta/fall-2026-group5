@@ -69,7 +69,7 @@ The MNIST documents named above are in `src/v1_mnist/docs/p4_guided_retraining/`
 
 ## 5. Recorded outcome
 
-Filled in after the runs, without changing sections 1 to 4. [TBD]
+Filled in after the runs, without changing sections 1 to 4. Not run yet.
 
 ## 6. References
 

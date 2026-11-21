@@ -1,0 +1,58 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/fair_budget_baselines.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Same-budget comparison: every fitted baseline gets the same 10,000 training rows per seed.
+# Fixed in the protocol before any run (MNIST ran it post hoc), so it is pre-registered but exploratory.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_fair_budget_baselines_s42_46_v1
+analysis_status: preregistered_exploratory
+dataset: fashion_mnist
+seed_list:
+- 42
+- 43
+- 44
+- 45
+- 46
+training_sample_count: 10000
+sampling:
+  method: numpy_default_rng_choice
+  replace: false
+  same_indices_for_all_methods: true
+embeddings:
+  train: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+expected_sha256:
+  train: e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527
+  validation: ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d
+expected:
+  svhn_count: 26032
+  fashion_mnist_train_count: 49000
+  fashion_mnist_validation_count: 10500
+  som_neurons: 225
+  feature_dim: 84
+  qe_threshold: "[TBD: QE threshold from the qe_novelty summary, filled in after stage 1]"
+svhn_file: data/ood_svhn/test_32x32.mat
+qe_evaluation_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+one_class_svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: scale
+  max_training_samples: 10000
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
+metrics:
+- auroc
+- aupr
+selection_policy: No hyperparameter tuning or selection using SVHN scores.
+leakage_control: Fit on Fashion-MNIST train only. Score Fashion-MNIST validation and SVHN test without
+  refitting. Do not access the Fashion-MNIST test split.

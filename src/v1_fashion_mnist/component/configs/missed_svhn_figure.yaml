@@ -1,0 +1,17 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/missed_svhn_figure.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# The SVHN images QE misses at the frozen 95th-percentile cutoff, drawn from the original SVHN file.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_missed_qe_figure_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+historical_run: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1
+# The current benchmark code writes its score arrays in the run folder itself (MNIST's old run: score_arrays/).
+scores_subfolder: ""
+svhn_file: data/ood_svhn/test_32x32.mat
+svhn_sha256: cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b
+qe_scores_sha256: "[TBD: SHA-256 of qe_svhn_test_scores.npy, filled in after stage 2]"
+expected_samples: 26032
+expected_misses: "[TBD: frozen_threshold_misses count of the five-method run, filled in after stage 2]"
+example_count: 20
+figure_name: qe_missed_svhn_examples.pdf

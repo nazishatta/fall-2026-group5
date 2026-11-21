@@ -1,0 +1,10 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_novelty.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE calibration on training QE only; no outside images, no test split. This one run also saves
+# the score-distribution figure, so MNIST's qe_score_distribution_figure repair step is not needed.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+som_config: src/v1_fashion_mnist/component/configs/som.yaml
+threshold_percentile: 95.0
+output_dir: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection
+run_id: fashion_mnist_qe_training_calibrated_s42_v1

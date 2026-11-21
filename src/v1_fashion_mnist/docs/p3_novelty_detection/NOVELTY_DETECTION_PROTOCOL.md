@@ -98,6 +98,30 @@ runs to re-check. Diagnostics that MNIST added to explain a problem it found (th
 and the SVHN length diagnostic) are run only if the same problem appears, and that is recorded in
 `../DEVIATIONS.md`.
 
+*(Added 2026-11-21, amendment A2, before any Fashion-MNIST Phase 3 run and before any novelty score
+existed. It fills in what this section left unsaid; no rule above changes.)*
+
+- **Verdicts.** O1 and O4: *met* if the AUROC interval lies above 0.5; *not met* if it lies at or below
+  0.5; *inconclusive* if it contains 0.5. O2 and O3, with d = AUROC(S1) minus AUROC(other) and its paired
+  interval: *met* if the lower end is above -0.01; *not met* if the upper end is below -0.01;
+  *inconclusive* otherwise. O3 gets one verdict for each of S4, S5 and S6.
+- **Where O1 to O4 are judged.** One step, `novelty_statements`, computes all six scores on the same
+  10,500 validation and 26,032 SVHN images in one run, with the MNIST Phase 3 functions, and applies the
+  rules above: AUROC with its stratified bootstrap interval, AUPR-out with its chance level, FPR at 95%
+  TPR, the paired bootstrap of S1 minus each other score (2,000 resamples, seed 42), and the label-shuffle
+  control for S1 (1,000 shuffles, seed 42). The paired comparisons in the other steps (QE against
+  max-softmax, energy, nearest neighbours and the U-Matrix) are reported as supporting results; the
+  statements are taken from `novelty_statements` only. It is the only step with QE against Mahalanobis.
+- **Which MNIST steps run.** `qe_random_control` (are QE-flagged validation images more often CNN errors
+  than random picks?) and `qe_u_matrix` (QE against the U-Matrix on validation) re-created earlier runs on
+  MNIST, which is why they are called reproductions above. Fashion-MNIST has no earlier runs, so here they
+  are first runs of those analyses, and they run: the first is the random-image control listed above, and
+  the second gives the numbers the U-Matrix validation figure is checked against.
+  `qe_score_distribution_figure` is not repeated: it re-ran MNIST's `qe_novelty` only because the first run
+  did not keep its figure, and the Fashion-MNIST `qe_novelty` run keeps it.
+- **Order.** `qe_novelty` (the frozen training-QE threshold) first, then `qe_ood`, whose metrics the
+  five-method benchmark must reproduce, then the benchmark and the steps that read its score files.
+
 ## 4. Near novelty (held-out classes)
 
 `src/v1_mnist/docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md`

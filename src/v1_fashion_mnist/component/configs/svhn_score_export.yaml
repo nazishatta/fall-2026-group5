@@ -1,0 +1,42 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/svhn_score_export.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Saves the energy and kNN score arrays for the paired comparisons; must reproduce the AUROCs of
+# fashion_mnist_svhn_required_baselines_knn_s42_v1.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_energy_knn_score_export_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+inputs:
+  checkpoint: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_fashion_mnist_s42.pth
+  train_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  train_labels: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_labels.npy
+  validation_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+  validation_predictions: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_preds.npy
+  validation_confidence: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_confidence.npy
+  svhn_file: data/ood_svhn/test_32x32.mat
+expected_sha256:
+  checkpoint: 3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860
+  train_features: e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527
+  validation_features: ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  classes: 10
+inference:
+  feature_layer: fc2
+  image_size: [28, 28]
+  batch_size: 256
+  thread_count: 1
+  confidence_tolerance: 1.0e-05
+evaluation:
+  energy_temperature: 1.0
+  target_tpr: 0.95
+  bootstrap_iterations: 2000
+  bootstrap_seed: 42
+  knn_neighbors: 5
+export_scores_only: true
+expected_export_auroc:
+  energy: "[TBD: energy AUROC of fashion_mnist_svhn_required_baselines_knn_s42_v1, 6 decimals, filled in after stage 1]"
+  knn: "[TBD: kNN AUROC of fashion_mnist_svhn_required_baselines_knn_s42_v1, 6 decimals, filled in after stage 1]"
