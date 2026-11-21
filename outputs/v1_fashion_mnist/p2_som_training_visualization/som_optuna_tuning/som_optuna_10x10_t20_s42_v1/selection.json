@@ -1,0 +1,40 @@
+{
+  "run_id": "som_optuna_10x10_t20_s42_v1",
+  "grid": "10x10",
+  "n_trials": 20,
+  "smoke_test": false,
+  "distinct_settings_trained": 19,
+  "selected": {
+    "trial": 10,
+    "init_neighborhood": 7,
+    "epochs": 300,
+    "val_qe": 1.0377302962933623,
+    "val_te1_pct": 4.285714285714286,
+    "val_te12_pct": 1.866666666666667
+  },
+  "pareto_trials": [
+    1,
+    8,
+    10,
+    11,
+    12,
+    16
+  ],
+  "search_space": {
+    "nb_fraction_min": 0.1,
+    "nb_fraction_max": 1.0,
+    "epochs_min": 100,
+    "epochs_max": 400,
+    "epochs_step": 50
+  },
+  "sampler": "TPESampler",
+  "sampler_seed": 42,
+  "n_startup_trials": 8,
+  "search_seed": 42,
+  "optuna_version": "4.9.0",
+  "protocol_sha256": "e774a295f0e024b9907df173f340f1610f8a72e7a94b03be775ccd73bf7a5719",
+  "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+  "val_features_sha256": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+  "labels_used": false,
+  "test_evaluated": false
+}

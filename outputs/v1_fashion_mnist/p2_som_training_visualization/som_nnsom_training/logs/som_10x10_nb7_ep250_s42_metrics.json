@@ -1,0 +1,82 @@
+{
+  "experiment": {
+    "run_id": "som_10x10_nb7_ep250_s42",
+    "run": "som",
+    "stage": "som",
+    "input_run": "cnn_baseline",
+    "smoke_test": false
+  },
+  "som": {
+    "grid_height": 10,
+    "grid_width": 10,
+    "num_neurons": 100,
+    "init_neighborhood": 7,
+    "epochs": 250,
+    "steps": 250,
+    "requested_backend": "auto",
+    "actual_backend": "cpu (NumPy loop; NNSOM class: gpu)",
+    "training_implementation": "train_som_with_history: NumPy batch SOM, winners recomputed every epoch",
+    "random_seed": 42,
+    "track_qe_history": true,
+    "qe_history_every": 1
+  },
+  "preprocessing": {
+    "scaler": "minmax",
+    "feature_range": [
+      -1.0,
+      1.0
+    ],
+    "fit_split": "train"
+  },
+  "data": {
+    "train_shape": [
+      49000,
+      84
+    ],
+    "validation_shape": [
+      10500,
+      84
+    ],
+    "held_out_test_shape": [
+      10500,
+      84
+    ],
+    "embeddings_dir": "/home/ubuntu/GIT/fall-2026-group5/outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings",
+    "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "val_features_sha256": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d"
+  },
+  "train_metrics": {
+    "n_samples": 49000,
+    "quantization_error": 1.0172548213982902,
+    "topological_error_1st_order_pct": 4.226530612244898,
+    "topological_error_1st_2nd_order_pct": 1.6551020408163266,
+    "occupied_neurons": 100,
+    "empty_neurons": 0,
+    "total_neurons": 100,
+    "occupancy_rate": 1.0,
+    "mean_hits_per_occupied_neuron": 490.0,
+    "max_hits_per_neuron": 1296
+  },
+  "validation_metrics": {
+    "n_samples": 10500,
+    "quantization_error": 1.0076845152798182,
+    "topological_error_1st_order_pct": 4.257142857142857,
+    "topological_error_1st_2nd_order_pct": 1.7619047619047619,
+    "occupied_neurons": 99,
+    "empty_neurons": 1,
+    "total_neurons": 100,
+    "occupancy_rate": 0.99,
+    "mean_hits_per_occupied_neuron": 106.06060606060606,
+    "max_hits_per_neuron": 274
+  },
+  "qe_history_artifacts": {
+    "json": "/home/ubuntu/GIT/fall-2026-group5/outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/logs/som_10x10_nb7_ep250_s42_qe_history.json",
+    "csv": "/home/ubuntu/GIT/fall-2026-group5/outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/tables/som_10x10_nb7_ep250_s42_qe_history.csv",
+    "figure_pdf": "/home/ubuntu/GIT/fall-2026-group5/outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/figures/pdf/convergence/som_10x10_nb7_ep250_s42_qe_curve.pdf"
+  },
+  "test_evaluated": false,
+  "model": {
+    "path": "/home/ubuntu/GIT/fall-2026-group5/outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/som_models/som_10x10_nb7_ep250_s42",
+    "sha256": "26848c9d5e86847ad505b1addf6c12c08b77049e7c973995c2ac4d8fc3172912"
+  }
+}
