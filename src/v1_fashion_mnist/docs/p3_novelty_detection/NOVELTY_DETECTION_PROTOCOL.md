@@ -1,0 +1,144 @@
+# Protocol: novelty detection on Fashion-MNIST (Phase 3)
+
+Part of the Fashion-MNIST protocol, one file per phase:
+[Phase 1](../p1_model_training_baseline/MODEL_TRAINING_PROTOCOL.md) ·
+[Phase 2](../p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md) ·
+[Phase 3](NOVELTY_DETECTION_PROTOCOL.md) ·
+[Phase 4](../p4_guided_retraining/RETRAINING_PROTOCOL.md).
+Changes and deviations: [`../DEVIATIONS.md`](../DEVIATIONS.md).
+
+Written on 2026-11-17, **before any Fashion-MNIST data was loaded, any network trained or any result seen**,
+and committed as one file in `5dd164c` (`docs/FASHION_MNIST_PROTOCOL.md`). The outside set, left open in that
+version, was fixed on 2026-11-21 (amendment A1 in `../DEVIATIONS.md`), before any Phase 3 run. Split into one
+file per phase on the same day with no rule changed. Sections 1 to 6 are not changed; a change needs a written
+reason in `../DEVIATIONS.md` and, for a run already made, a new run ID.
+
+**Rule for every phase:** every step done for MNIST is done for Fashion-MNIST, with the MNIST design copied
+unchanged, unless the dataset makes that impossible. Inputs: the Phase 1 network and embeddings and the Phase 2
+headline map ([Phase 1](../p1_model_training_baseline/MODEL_TRAINING_PROTOCOL.md) and
+[Phase 2](../p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md) protocols, section 1).
+
+## 1. In-distribution reference
+
+The 10,500 Fashion-MNIST validation images. The Fashion-MNIST test split is not used in Phase 3.
+
+## 2. Outside set
+
+**Never used for training, fitting, thresholds or choices.** One outside set: **SVHN** (Street View House
+Numbers; Netzer et al., 2011), the same set as for MNIST. Chosen by the professor and written here on
+2026-11-21, before any Phase 3 step was run on Fashion-MNIST and before any novelty score was computed with
+the Fashion-MNIST network (amendment A1). The other candidates (MNIST, KMNIST) are not used.
+
+| Item | Fixed value |
+|---|---|
+| Split and size | SVHN test split, cropped-digit format (`test_32x32.mat`), all 26,032 images, in file order; the SVHN training and extra splits are not used |
+| File | `data/ood_svhn/test_32x32.mat`, the same file as for MNIST, SHA-256 `cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b`, checked before every run; not downloaded again |
+| Conversion | the MNIST transform, unchanged (`ood_adapters.image_transform("svhn", (28, 28))`): RGB to grey with the ITU-R BT.601 weights (0.299, 0.587, 0.114), resize from 32x32 to 28x28 with bilinear interpolation and anti-aliasing, pixels scaled to [0, 1]. No normalisation, no inversion of light and dark, no cropping |
+| Labels | the SVHN digit labels are not used by any score; images are labelled only as "outside" |
+| Licence | the SVHN authors allow non-commercial use only; this study is non-commercial research |
+
+Fashion-MNIST images are divided by 255 in the same way (Phase 1 protocol, section 1), so both sets reach the
+network on the same [0, 1] scale and at the same size.
+
+*Why this set is a sound test, and what it can and cannot show.* SVHN and Fashion-MNIST share no class
+(house-number digits against clothing), so every SVHN image is a true outside image. SVHN also differs in
+how the images look (photographs with textured, often bright backgrounds, against centred objects on a black
+background), so it tests a large shift: far novelty. Using the same SVHN images as for MNIST keeps the
+outside set fixed while the training data changes, so the MNIST and Fashion-MNIST AUROCs can be set side by
+side as the same test on two networks. They are not pooled, and no statistical test is made between the two
+datasets (they are separate networks and maps). Near novelty, where outside images resemble the training
+classes, is tested separately by the held-out classes (section 4). A set that is visually close to
+Fashion-MNIST, such as MNIST, is a known hard case for some novelty scores (Nalisnick et al., 2019 report
+it for likelihood models trained on Fashion-MNIST); it is not tested here (section 6).
+
+*Imbalance.* 26,032 outside images against 10,500 validation images (71.3% outside). AUROC and FPR at 95% TPR
+do not depend on this ratio; AUPR-out does, so it is reported with its chance level of 0.713.
+
+## 3. Scores, measures and statements
+
+**Scores** (higher means "more novel"; anything fitted is fitted on the Fashion-MNIST training embeddings
+only; the functions are the MNIST Phase 3 functions, called unchanged):
+
+| ID | Score |
+|---|---|
+| S1 | SOM quantization error (QE) |
+| S2 | U-Matrix value of the best-matching neuron |
+| S3 | max-softmax: 1 minus the largest softmax probability |
+| S4 | energy: minus log-sum-exp of the logits, temperature 1 |
+| S5 | Mahalanobis: smallest squared distance to the class means, one shared Ledoit-Wolf covariance |
+| S6 | nearest-neighbour distance: mean distance to the 5 nearest training embeddings |
+
+**Measures.** Per score (on SVHN): AUROC (outside images positive), AUPR-out and FPR at 95% TPR, with a
+stratified bootstrap 95% interval for the AUROC (2,000 resamples, seed 42). Differences between S1 and each
+other score use the paired bootstrap over images. **Control:** the S1 AUROC with the labels shuffled 1,000
+times (seed 42); it should sit near 0.5.
+
+**Statements** (each is met, not met, or inconclusive; a statement that is not met is reported as it is):
+
+| ID | Statement | Met if |
+|---|---|---|
+| O1 (RQ3) | the SOM detects outside images | on every outside set, the S1 AUROC interval lies above 0.5 |
+| **O2 (RQ4, primary)** | the SOM is competitive with max-softmax | on every outside set, the lower end of the paired interval of S1 minus S3 is above -0.01 |
+| O3 (RQ4) | the SOM is competitive with energy, Mahalanobis and nearest neighbours | as O2, for S4, S5 and S6 separately |
+| O4 | the U-Matrix detects outside images | on every outside set, the S2 AUROC interval lies above 0.5 |
+
+With one outside set (section 2), "on every outside set" means "on SVHN". There is one network and one map
+here, so no claim of "better" is made: the group proposal (RQ4) requires at least 5 seeds for that.
+
+**Further Phase 3 steps, as on MNIST** (`PREREGISTRATION_qe_novelty.md` and the novelty-benchmark and U-Matrix
+documents): the QE flag at the 95th percentile of the training QE with its detection and false-alarm rates;
+the threshold sweep; the random-image control; the classical baselines (Isolation Forest, One-Class SVM and
+the autoencoder, with standardised inputs as in MNIST's final setup); the same-budget baseline comparison; the
+check of how much QE depends on the embedding length; and the U-Matrix figures and outside-set overlays.
+
+**Not repeated:** MNIST steps whose only job was to re-create or audit MNIST's own earlier runs (the historical
+baseline verification, the historical SVHN inspection, the U-Matrix and random-control reproductions, the
+provenance audit, the 2026-11-02 reorganisation and the evidence consolidation). Fashion-MNIST has no earlier
+runs to re-check. Diagnostics that MNIST added to explain a problem it found (the autoencoder scaling checks
+and the SVHN length diagnostic) are run only if the same problem appears, and that is recorded in
+`../DEVIATIONS.md`.
+
+## 4. Near novelty (held-out classes)
+
+`src/v1_mnist/docs/p3_novelty_detection/held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md`
+unchanged, with Fashion-MNIST classes. The five splits are the same five sets of class numbers, drawn by the
+same rule (numpy `default_rng(2026)`, 4 unknown classes per split), so they are not chosen with knowledge of
+the clothing classes: [0, 1, 5, 6], [2, 3, 5, 8], [1, 5, 6, 7], [2, 5, 6, 8], [0, 4, 5, 8]. One network and
+one map per split, recipes as in the Phase 1 and Phase 2 protocols (section 1). Statements H1, H2 (primary:
+SOM better than max-softmax) and H3 unchanged. Training and validation images only.
+
+## 5. Leakage control
+
+- The SOM scaler and map, the Mahalanobis means and covariance, the nearest-neighbour reference and the
+  thresholds are all fitted or chosen on training or validation data.
+- The outside set is used only to compute novelty scores; nothing is fitted or chosen on it.
+- The held-out-class networks never see their unknown classes, and their test split is never read.
+- Every run records the SHA-256 of its inputs; a finished run is never overwritten.
+- **Declared:** this protocol was written after the MNIST results were known. It copies MNIST's design
+  instead of adapting it to those results, and no Fashion-MNIST result existed when it was written.
+
+## 6. Limitations stated before the run
+
+- One CNN and one SOM, as for MNIST; seed-to-seed variation is measured only in the layer ablation
+  (SOM seeds) and Phase 4 (CNN seeds).
+- If more than one outside set is used, they differ from Fashion-MNIST in different ways; results are
+  reported per set and not averaged. *(Added 2026-11-21, amendment A1:)* only SVHN is used, so O1 to O4
+  speak to far novelty only. A high AUROC on SVHN does not show that the scores detect outside images
+  that look like clothing; near novelty is covered only by the held-out classes, which come from the same
+  dataset.
+- The held-out-class splits share classes, so they are not independent.
+
+## 7. Recorded outcome
+
+Filled in after the runs, without changing sections 1 to 6. [TBD]
+
+## 8. References
+
+Keys in `reports/Latex_report/v1_mnist/Final_report/references.bib` and the Phase 3 `references.bib`.
+
+- Netzer, Y., Wang, T., Coates, A., Bissacco, A., Wu, B. and Ng, A. Y. (2011). Reading digits in natural
+  images with unsupervised feature learning. NIPS Workshop on Deep Learning and Unsupervised Feature
+  Learning. (`netzer2011reading`)
+- Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D. and Lakshminarayanan, B. (2019). Do deep generative
+  models know what they don't know? ICLR. (`nalisnick2019deep`)
+- The score and baseline references as in the MNIST Phase 3 protocols.

@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[5]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.image_dataset import get_dataloaders
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import FeatureExtractor, save_embeddings
 from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.lenet5 import LeNet5
 from src.v1_mnist.component.utils.config import get_device, load_config, set_seed
@@ -137,13 +137,17 @@ def extract_embeddings(
 
     logger.info("Run ID: %s (seed %d)", run_paths.run_id, config.training.seed)
     logger.info("Using device: %s", device)
-    # Official embeddings must keep a fixed row order and carry the original MNIST
+    # Official embeddings must keep a fixed row order and carry the dataset's original
     # sample IDs, so every row can be traced back to its image.
     train_loader, val_loader, test_loader, _, _, _ = get_dataloaders(
         config, train_shuffle=False, return_sample_ids=True
     )
 
-    model = LeNet5(num_classes=config.dataset.num_classes).to(device)
+    model = LeNet5(
+        num_classes=config.dataset.num_classes,
+        in_channels=int(config.dataset.channels),
+        image_size=int(config.dataset.image_size),
+    ).to(device)
     state_dict = torch.load(checkpoint_file, map_location=device)
     model.load_state_dict(state_dict)
     model.eval()

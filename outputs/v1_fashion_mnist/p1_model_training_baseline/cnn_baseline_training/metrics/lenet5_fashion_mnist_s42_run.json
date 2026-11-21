@@ -1,0 +1,19 @@
+{
+    "run_id": "lenet5_fashion_mnist_s42",
+    "created_utc": "2026-11-18T00:56:41.789773+00:00",
+    "config": "src/v1_fashion_mnist/component/configs/cnn_baseline.yaml",
+    "config_sha256": "f6847755f567385fa75bf3125a44ee0f1ec32e582af8d829f5d8a0766c605d92",
+    "seed": 42,
+    "epochs": 20,
+    "best_val_accuracy": 0.9165714285714286,
+    "test_accuracy": 0.908952380952381,
+    "checkpoint": "outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_fashion_mnist_s42.pth",
+    "checkpoint_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+    "device": "cuda",
+    "library_versions": {
+        "torch": "2.13.0+cu130",
+        "torchvision": "0.28.0+cu130",
+        "numpy": "2.4.4"
+    },
+    "git_commit": "0e841d77c0d391be42e497f036482231379a7b7e"
+}

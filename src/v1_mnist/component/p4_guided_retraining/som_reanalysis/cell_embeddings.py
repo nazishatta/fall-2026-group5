@@ -78,7 +78,7 @@ def extract_cell(settings: ReanalysisSettings, arm: str, seed: int, train: Split
 def run_embeddings(settings: ReanalysisSettings, repo_root: Path) -> None:
     """Extract the embeddings of every cell. The test split is not loaded."""
     retr = settings.retraining
-    train, val = load_train_val_images(retr.data_root, retr.embeddings_dir)
+    train, val = load_train_val_images(retr.data_root, retr.embeddings_dir, retr.dataset)
     device = resolve_device(settings.device)
     for arm in settings.arms:
         for seed in settings.seeds:

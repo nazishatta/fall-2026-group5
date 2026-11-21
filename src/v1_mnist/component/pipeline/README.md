@@ -60,6 +60,15 @@ These steps each have their own config and run ID and are run by hand, in the or
 | 4 | `p4_guided_retraining/run_som_reanalysis.py --config configs/som_reanalysis_msp_arm.yaml` | `som_reanalysis_msp_arm.yaml` | Secondary SOM re-analysis with the least-confident (max-softmax) arm |
 | 4 | `p4_guided_retraining/run_novelty_after_retraining.py` | `novelty_after_retraining.yaml` | Phase 3's novelty scores on the retrained networks (`--stage score`, then `compare`) |
 
+## One pipeline, any dataset
+
+The runners hold no dataset. The dataset comes from the folder of configs: every config merges the `base.yaml` in its own folder, which names the dataset (`dataset.name`, classes, image size) and the results folder (`project.output_root`). `run_all.py --config-dir DIR` runs every step with the configs in `DIR` (default: the MNIST folder, `src/v1_mnist/component/configs`); the Phase 3 runners take `--config-dir` too.
+
+- MNIST: `python src/v1_mnist/component/pipeline/run_all.py` (or `bash src/v1_mnist/shellscripts/run_pipeline.sh`)
+- Fashion-MNIST: `python src/v1_fashion_mnist/component/pipeline/run_all.py --from data_pipeline` (or `bash src/v1_fashion_mnist/shellscripts/run_pipeline.sh`), which calls this `run_all.py` with `--config-dir src/v1_fashion_mnist/component/configs`
+
+A new dataset needs a config folder with its own `base.yaml` (and, if torchvision has not got it yet, one entry in `utils/image_datasets.py`).
+
 ## Options every runner has
 
 | Option | Meaning |
@@ -74,9 +83,9 @@ Extra options:
 | Runner | Options |
 |---|---|
 | `run_som_nnsom_training.py` | `--run-id` (also used for the figures and convergence charts), `--skip-training` |
-| `run_error_pattern_analysis.py` | `--robustness-configs`, `--mnist-root` |
+| `run_error_pattern_analysis.py` | `--robustness-configs`, `--data-root` |
 | `run_interactive_report.py` | `--split` |
-| `run_all.py` | `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report`, `--with-reproductions` |
+| `run_all.py` | `--config-dir DIR`, `--from STEP`, `--to STEP`, `--cnn-config`, `--som-config`, `--skip-training`, `--no-report`, `--with-reproductions` |
 
 ## Common commands
 

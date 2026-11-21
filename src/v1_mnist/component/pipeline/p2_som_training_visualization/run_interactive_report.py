@@ -4,7 +4,7 @@ Steps:
   1. visualize_som_interactive: one self-contained HTML page with the SOM map,
      class composition, errors and the samples behind each neuron.
 
-Result: outputs/v1_mnist/p2_som_training_visualization/interactive_report/interactive_report.html
+Result: <output_root>/p2_som_training_visualization/interactive_report/interactive_report.html
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_interactive_report.py \

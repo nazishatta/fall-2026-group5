@@ -1,0 +1,6 @@
+outs:
+- md5: 26ab65ffaa43ec1dba3e21d4e3acf60a.dir
+  size: 286471734
+  nfiles: 3
+  hash: md5
+  path: som_models

@@ -139,7 +139,7 @@ def run_split(settings: HeldOutSettings, split: int, train: SplitImages, val: Sp
 def run_splits(settings: HeldOutSettings, only: list[int] | None = None) -> None:
     """Run every split (or only the named ones). The MNIST test split is not loaded."""
     start_run(settings)
-    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir)
+    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir, settings.dataset)
     device = resolve_device(settings.device)
     for split in settings.split_ids:
         if only and split not in only:

@@ -19,8 +19,13 @@ only Phase 3. Phase 3 steps whose results exist are skipped; the three steps tha
 repeat historical results (qe_ood, qe_random_control, qe_u_matrix) run only with
 --with-reproductions.
 
+The dataset is chosen by the folder of configs (--config-dir): every config in it merges that
+folder's base.yaml, which names the dataset and the output folder. The default is the MNIST
+folder; src/v1_fashion_mnist/component/pipeline/run_all.py calls this script with the
+Fashion-MNIST folder.
+
 Usage (from the code root, the folder that holds src/ and outputs/):
-  python src/v1_mnist/component/pipeline/run_all.py [--from STEP] [--to STEP]
+  python src/v1_mnist/component/pipeline/run_all.py [--config-dir DIR] [--from STEP] [--to STEP]
       [--cnn-config CFG] [--som-config CFG] [--skip-training] [--no-report]
       [--with-reproductions] [--dry-run]
 
@@ -34,11 +39,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import sys
+from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from src.v1_mnist.component.pipeline.common import (  # noqa: E402
-    CNN_CONFIG, CNN_STEPS, PIPELINE, REPORT_RUNNER, SOM_CONFIG, STEP_RUNNERS, P3Step, Step, run_steps,
+    CNN_STEPS, CONFIG_DIR, PIPELINE, REPORT_RUNNER, STEP_RUNNERS, P3Step, Step, run_steps,
 )
 from src.v1_mnist.component.pipeline.p3_novelty_detection import (  # noqa: E402
     run_novelty_benchmark, run_qe_novelty_detection, run_u_matrix_analysis,
@@ -92,11 +98,12 @@ def groups(include_reproductions: bool) -> list[tuple[str, list[str]]]:
     return result
 
 
-def phase3_steps(dry_run: bool, include_reproductions: bool = False) -> list[Step]:
+def phase3_steps(dry_run: bool, include_reproductions: bool = False, config_dir: str = CONFIG_DIR) -> list[Step]:
     """One ``Step`` per group, each run with ``--steps`` (a runner skips steps that already have results)."""
     return [
         Step(f"Phase 3 {Path(runner).stem.removeprefix('run_')}: {', '.join(names)}",
-             P3_PIPELINE / runner, ["--steps", *names, *(["--dry-run"] if dry_run else [])])
+             P3_PIPELINE / runner,
+             ["--steps", *names, "--config-dir", config_dir, *(["--dry-run"] if dry_run else [])])
         for runner, names in groups(include_reproductions)
     ]
 
@@ -105,22 +112,29 @@ PHASE2_NAMES = list(STEP_RUNNERS)
 STEP_NAMES = [*PHASE2_NAMES, PHASE3_STEP]
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the step runners in proposal order.")
+    parser.add_argument("--config-dir", default=CONFIG_DIR,
+                        help=f"Folder of configs, one per dataset (default: {CONFIG_DIR}).")
     parser.add_argument("--from", dest="first", default="som_nnsom_training", choices=STEP_NAMES,
                         help="First step to run (default: som_nnsom_training).")
     parser.add_argument("--to", dest="last", default=None, choices=STEP_NAMES,
                         help=f"Last step to run (default: {PHASE2_NAMES[-1]}, or {PHASE3_STEP} when --from is "
                              f"{PHASE3_STEP}; {PHASE3_STEP} adds Phase 3).")
-    parser.add_argument("--cnn-config", default=CNN_CONFIG, help=f"Config for {' and '.join(CNN_STEPS)}.")
-    parser.add_argument("--som-config", default=SOM_CONFIG, help="Config for the SOM steps and the report.")
+    parser.add_argument("--cnn-config", default=None,
+                        help=f"Config for {' and '.join(CNN_STEPS)} (default: cnn_baseline.yaml in --config-dir).")
+    parser.add_argument("--som-config", default=None,
+                        help="Config for the SOM steps and the report (default: som.yaml in --config-dir).")
     parser.add_argument("--skip-training", action="store_true",
                         help="som_nnsom_training: use the existing SOM instead of training a new one.")
     parser.add_argument("--no-report", action="store_true", help="Do not build the interactive report.")
     parser.add_argument("--with-reproductions", action="store_true",
                         help="Phase 3: also run qe_ood, qe_random_control and qe_u_matrix, which repeat historical results.")
     parser.add_argument("--dry-run", action="store_true", help="Print every runner's steps without running them.")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    config_dir = args.config_dir.rstrip("/")
+    cnn_config = args.cnn_config or f"{config_dir}/cnn_baseline.yaml"
+    som_config = args.som_config or f"{config_dir}/som.yaml"
     last = args.last or (PHASE3_STEP if args.first == PHASE3_STEP else PHASE2_NAMES[-1])
     start, end = STEP_NAMES.index(args.first), STEP_NAMES.index(last)
     if start > end:
@@ -132,14 +146,14 @@ def main() -> None:
     for name in STEP_NAMES[start:end + 1]:
         if name == PHASE3_STEP:
             continue
-        extra = ["--config", args.cnn_config if name in CNN_STEPS else args.som_config]
+        extra = ["--config", cnn_config if name in CNN_STEPS else som_config]
         if name == "som_nnsom_training" and args.skip_training:
             extra.append("--skip-training")
         plan.append(Step(name, STEP_RUNNERS[name], [*extra, *common]))
     if start <= len(PHASE2_NAMES) - 1 <= end and not args.no_report:
-        plan.append(Step("interactive report", REPORT_RUNNER, ["--config", args.som_config, *common]))
+        plan.append(Step("interactive report", REPORT_RUNNER, ["--config", som_config, *common]))
     if end >= STEP_NAMES.index(PHASE3_STEP):
-        plan.extend(phase3_steps(args.dry_run, args.with_reproductions))
+        plan.extend(phase3_steps(args.dry_run, args.with_reproductions, config_dir))
 
     run_steps("run_all: " + ", ".join(step.label for step in plan), plan, dry_run=False)
 

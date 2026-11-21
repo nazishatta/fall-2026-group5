@@ -1,3 +1,5 @@
+"""The dataset named in the config, split 70/15/15 (stratified, seeded) into PyTorch loaders."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -6,16 +8,20 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Dataset
-from torchvision import datasets
 
 from src.v1_mnist.component.utils.config import require_seed
+from src.v1_mnist.component.utils.image_datasets import (
+    dataset_spec,
+    load_raw_images,
+    to_model_input,
+)
 from src.v1_mnist.component.utils.logging import get_logger
 
 logger = get_logger("v1_mnist.data")
 
 
-class CustomMNISTDataset(Dataset):
-    """MNIST arrays with optional stable sample identifiers."""
+class ImageArrayDataset(Dataset):
+    """Image arrays (N x H x W, or N x C x H x W) with optional stable sample identifiers."""
 
     def __init__(
         self,
@@ -40,7 +46,9 @@ class CustomMNISTDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx: int) -> Tuple[Any, ...]:
-        image = torch.as_tensor(self.data[idx], dtype=torch.float32).unsqueeze(0)
+        image = torch.as_tensor(self.data[idx], dtype=torch.float32)
+        if image.ndim == 2:  # grey image stored as H x W
+            image = image.unsqueeze(0)
         label = torch.as_tensor(self.labels[idx], dtype=torch.long)
         if self.return_sample_id:
             sample_id = torch.as_tensor(self.sample_ids[idx], dtype=torch.long)
@@ -51,14 +59,20 @@ class CustomMNISTDataset(Dataset):
 def compute_class_distribution(
     labels: Sequence[int] | np.ndarray,
     split_name: str,
+    num_classes: Optional[int] = None,
 ) -> dict[int, dict[str, float]]:
-    """Compute per-class counts and percentages and log summary."""
+    """Compute per-class counts and percentages and log summary.
+
+    ``num_classes`` should come from the config (dataset.num_classes); without it the classes
+    0 .. largest label are counted.
+    """
     counts = Counter(np.asarray(labels).tolist())
     total = len(labels)
     distribution: dict[int, dict[str, float]] = {}
 
     logger.info("Class Distribution for %s split (%d samples):", split_name, total)
-    for class_id in range(10):
+    n_classes = int(num_classes) if num_classes is not None else int(np.max(labels)) + 1
+    for class_id in range(n_classes):
         count = counts.get(class_id, 0)
         percentage = (count / total) * 100 if total else 0.0
         distribution[class_id] = {"count": float(count), "percentage": percentage}
@@ -77,22 +91,16 @@ def get_dataloaders(
     Defaults preserve baseline-training behavior. Official embedding extraction
     must call this with train_shuffle=False and return_sample_ids=True.
 
-    Stable sample IDs refer to positions in the combined array: original MNIST
-    training samples are 0..59999 and original MNIST test samples 60000..69999.
+    The dataset is ``dataset.name`` in the config (see utils/image_datasets.py). Stable sample
+    IDs refer to positions in the combined array: the original training images first, then the
+    original test images (for MNIST and Fashion-MNIST: 0..59999 and 60000..69999).
     """
     data_root = getattr(config.paths, "data_root", "../../All_Data")
     seed = require_seed(config)
 
-    original_train = datasets.MNIST(root=data_root, train=True, download=True)
-    original_test = datasets.MNIST(root=data_root, train=False, download=True)
-
-    all_data = np.concatenate(
-        (original_train.data.numpy(), original_test.data.numpy()), axis=0
-    ).astype(np.float32)
-    all_data /= 255.0
-    all_labels = np.concatenate(
-        (original_train.targets.numpy(), original_test.targets.numpy()), axis=0
-    )
+    spec = dataset_spec(config)
+    raw_images, all_labels = load_raw_images(data_root, spec.name, download=True)
+    all_data = to_model_input(raw_images, spec.channels, spec.image_size)
     all_sample_ids = np.arange(len(all_labels), dtype=np.int64)
 
     train_data, temp_data, train_labels, temp_labels, train_ids, temp_ids = (
@@ -120,11 +128,11 @@ def get_dataloaders(
         )
     )
 
-    train_ds = CustomMNISTDataset(
+    train_ds = ImageArrayDataset(
         train_data, train_labels, train_ids, return_sample_ids
     )
-    val_ds = CustomMNISTDataset(val_data, val_labels, val_ids, return_sample_ids)
-    test_ds = CustomMNISTDataset(
+    val_ds = ImageArrayDataset(val_data, val_labels, val_ids, return_sample_ids)
+    test_ds = ImageArrayDataset(
         test_data, test_labels, test_ids, return_sample_ids
     )
 

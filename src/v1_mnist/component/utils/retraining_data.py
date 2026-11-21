@@ -57,7 +57,7 @@ def load_retraining_data(settings: ExperimentSettings, repo_root: Path) -> Retra
     pools = json.loads(results_path.read_text(encoding="utf-8"))
     hotspots = np.array(pools["hotspot_neurons"], dtype=np.int64)
 
-    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir)
+    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir, settings.dataset)
 
     table = _csv_columns(
         difficulty_path,
