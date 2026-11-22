@@ -55,7 +55,41 @@ reaches; that is expected and is not a weakness of the analysis.
 
 ## 5. Recorded outcome
 
-Filled in after the run, without changing sections 1 to 4. [TBD]
+Filled in after the run, without changing sections 1 to 4. Recorded 2026-11-21 from run
+`lenet5_fashion_mnist_s42` (trained 2026-11-18, config SHA-256 `f6847755…`). Sources:
+`outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/metrics/lenet5_fashion_mnist_s42_run.json`,
+`…_test_evaluation.json`, `logs/lenet5_fashion_mnist_s42_train_baseline.log`,
+`embeddings/embedding_manifest.json` and `data_pipeline/metrics/split_stats.json`.
+
+**Split.** 49,000 / 10,500 / 10,500 images, exactly 4,900 / 1,050 / 1,050 per class (10% of every split).
+
+**Training.** Validation accuracy peaked at 91.66% in epoch 16, the checkpoint kept; training accuracy
+93.24% at that checkpoint. The settings were used exactly as fixed in section 1; nothing was tuned.
+
+**Test split, evaluated once at the end of training** (reported only; nothing was chosen from it):
+
+| Measure | Fashion-MNIST | MNIST (for reference) |
+|---|---|---|
+| Accuracy | 90.90% (9,544 / 10,500) | 99.18% (10,414 / 10,500) |
+| 95% Wilson interval | 90.33% to 91.43% | 98.99% to 99.34% |
+| Macro-F1 | 0.909 | 0.992 |
+| Test mistakes | 956 | 86 |
+| Validation mistakes (best epoch) | 876 | 92 |
+
+Per-class F1 on the test split: T-shirt/top 0.866, Trouser 0.987, Pullover 0.851, Dress 0.920, Coat 0.840,
+Sandal 0.977, Shirt **0.746** (lowest), Sneaker 0.958, Bag 0.978, Ankle boot 0.968. The largest test
+confusions are between upper-body garments: Shirt called T-shirt/top (110), T-shirt/top called Shirt (105),
+Pullover called Coat (90), Shirt called Coat (79), Pullover and Coat called Shirt (62 each).
+
+**Embeddings.** `fc2` (84 numbers) saved for all three splits with sample IDs, labels, predictions and
+confidence; every value finite, every sample ID unique, counts matching the split; each file fingerprinted
+with SHA-256 in the manifest. Mean confidence on validation: 0.942 when right, 0.686 when wrong
+(MNIST: 0.997 and 0.833).
+
+**Reading.** As expected in section 1, the untuned MNIST recipe reaches clearly lower accuracy on
+Fashion-MNIST, and its mistakes concentrate in a few similar classes. With about ten times as many
+validation mistakes as MNIST, Phases 2 to 4 have much more to study. No deviation from sections 1 to 4.
+Report: `reports/Latex_report/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_report.tex`.
 
 ## 6. References
 
