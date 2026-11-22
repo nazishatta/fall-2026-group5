@@ -4,7 +4,7 @@ Every written deliverable except the paper (which is in `research_paper/`). The 
 
 | Path | What it is |
 |---|---|
-| [`Latex_report/`](Latex_report/README.md) | The LaTeX reports: one per phase and the final report |
+| [`Latex_report/`](Latex_report/README.md) | The LaTeX reports: a final report for each dataset and one for both |
 | [`Progress_Report/`](Progress_Report/README.md) | The running progress report |
 | [`Word_Report/`](Word_Report/README.md) | The early CNN baseline report as a Word file |
 | [`Markdown_Report/`](Markdown_Report/README.md) | Kept for Markdown reports; empty (the reports moved to LaTeX) |

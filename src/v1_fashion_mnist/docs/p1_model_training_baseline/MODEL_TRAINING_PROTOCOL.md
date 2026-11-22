@@ -89,7 +89,7 @@ with SHA-256 in the manifest. Mean confidence on validation: 0.942 when right, 0
 **Reading.** As expected in section 1, the untuned MNIST recipe reaches clearly lower accuracy on
 Fashion-MNIST, and its mistakes concentrate in a few similar classes. With about ten times as many
 validation mistakes as MNIST, Phases 2 to 4 have much more to study. No deviation from sections 1 to 4.
-Report: `reports/Latex_report/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_report.tex`.
+Report: `reports/Latex_report/v1_fashion_mnist/Final_report/final_report.tex` (Phase 1 section).
 
 ## 6. References
 
