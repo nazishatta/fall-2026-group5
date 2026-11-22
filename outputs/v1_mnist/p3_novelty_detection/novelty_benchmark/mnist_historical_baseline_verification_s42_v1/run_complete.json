@@ -1,0 +1,7 @@
+{
+  "config": "historical_baseline_verification.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/run_historical_baseline_verification.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "historical_baseline_verification"
+}

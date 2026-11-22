@@ -226,14 +226,41 @@ def test_results_folder_is_output_folder_plus_run_id(tmp_path: Path) -> None:
     assert results_folder(unnamed) is None
 
 
+def _phase3_run(tmp_path: Path, recorded: bool) -> tuple[P3Step, Path]:
+    """The first QE step's config in a dataset folder of its own, with its run folder already made."""
+    step = RUNNERS["run_qe_novelty_detection.py"][0]
+    (tmp_path / "configs").mkdir()
+    (tmp_path / "configs" / step.config).write_text(
+        yaml.safe_dump({"run_id": "run_a", "output_root": str(tmp_path / "out")}))
+    folder = tmp_path / "out" / "run_a"
+    folder.mkdir(parents=True)
+    if recorded:
+        (folder / "run_complete.json").write_text("{}")
+    return step, tmp_path / "configs"
+
+
 def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
-    (tmp_path / "out" / "run_a").mkdir(parents=True)
-    config = tmp_path / "config.yaml"
-    config.write_text(yaml.safe_dump({"run_id": "run_a", "output_root": str(tmp_path / "out")}))
-    first = RUNNERS["run_qe_novelty_detection.py"][0]
-    result = run_runner("run_qe_novelty_detection.py", "--only", first.name, "--config", str(config))
+    step, configs = _phase3_run(tmp_path, recorded=True)
+    result = run_runner("run_qe_novelty_detection.py", "--only", step.name, "--config", str(configs / step.config))
     assert result.returncode != 0
     assert "never overwritten" in result.stdout + result.stderr
+
+
+def test_a_recorded_phase3_run_is_skipped(tmp_path: Path) -> None:
+    step, configs = _phase3_run(tmp_path, recorded=True)
+    result = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs))
+    assert result.returncode == 0
+    assert "Skipping" in result.stdout + result.stderr
+
+
+def test_a_phase3_run_folder_without_its_record_stops_the_run(tmp_path: Path) -> None:
+    """The folder is made when the step starts: without a record the step may have been cut off."""
+    step, configs = _phase3_run(tmp_path, recorded=False)
+    result = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs))
+    assert result.returncode != 0
+    assert "has no run_complete.json" in result.stdout + result.stderr
+    dry = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs), "--dry-run")
+    assert dry.returncode == 0 and "a real run would stop here" in dry.stdout + dry.stderr
 
 
 # Configs of the other phases (1, 2 and 4); only Phase 3 configs must belong to a Phase 3 runner.

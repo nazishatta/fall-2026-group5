@@ -1,0 +1,7 @@
+{
+  "config": "held_out_class_novelty.yaml",
+  "role": "result",
+  "script": "pipeline/p3_novelty_detection/run_held_out_class_novelty.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "held_out_class_novelty"
+}

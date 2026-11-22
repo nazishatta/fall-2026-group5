@@ -31,9 +31,11 @@ Usage (from the code root, the folder that holds src/ and outputs/):
 
 Every step has its own config in src/v1_mnist/component/configs/ (shown by --dry-run).
 Needs the frozen CNN checkpoint and embeddings (Phase 1), the trained SOM (Phase 2)
-and the SVHN test file (DVC). A step whose results folder already exists is skipped
-(results are never overwritten); to repeat a step, give it a new run_id in a new
-config and run it with --only STEP --config.
+and the SVHN test file (DVC). 
+A step whose run folder holds its completion record (``run_complete.json``, written by the runner
+when the step's script succeeds) is skipped; a run folder without one stops the run (an interrupted
+step is never skipped or redone silently). Results are never overwritten; to repeat a step, give it
+a new run_id in a new config and run it with --only STEP --config.
 """
 
 from __future__ import annotations

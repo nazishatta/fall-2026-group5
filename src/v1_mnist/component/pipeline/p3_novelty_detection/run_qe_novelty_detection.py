@@ -20,8 +20,10 @@ Usage (from the code root, the folder that holds src/ and outputs/):
 Every step has its own config in src/v1_mnist/component/configs/ (shown by --dry-run).
 Needs the trained SOM and its cluster-analysis distances (Phase 2). Step 5 also reads
 the SVHN QE score array written by the svhn_benchmark step of run_novelty_benchmark.py.
-A step whose results folder already exists is skipped (results are never overwritten);
-to repeat a step, give it a new run_id in a new config and run it with --only STEP --config.
+A step whose run folder holds its completion record (``run_complete.json``, written by the runner
+when the step's script succeeds) is skipped; a run folder without one stops the run (an interrupted
+step is never skipped or redone silently). Results are never overwritten; to repeat a step, give it
+a new run_id in a new config and run it with --only STEP --config.
 """
 
 from __future__ import annotations

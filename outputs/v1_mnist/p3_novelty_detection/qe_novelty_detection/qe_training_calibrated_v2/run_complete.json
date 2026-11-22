@@ -1,0 +1,7 @@
+{
+  "config": "qe_score_distribution_figure.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/qe_novelty_detection/run_qe_novelty.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "qe_score_distribution_figure"
+}

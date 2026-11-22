@@ -41,6 +41,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]          # code root (holds src/
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.v1_mnist.component.pipeline.completion import RECORD, is_complete, write_record  # noqa: E402
 from src.v1_mnist.component.utils.in_distribution import in_distribution  # noqa: E402
 from src.v1_mnist.component.utils.logging import get_console_logger  # noqa: E402
 
@@ -79,6 +80,7 @@ class Step:
     args: Sequence[str] = field(default_factory=list)
     func: Optional[Callable[[], None]] = None
     listed_only: bool = False   # print the command but do not run it (a dry run of a script with no --dry-run)
+    on_success: Optional[Callable[[], None]] = None  # called once the script has exited with code 0
     done: Optional[Path] = None  # the file whose existence means this part is finished (the one its script
                                  # refuses to overwrite); run_all skips the part when it exists
 
@@ -141,6 +143,8 @@ def run_steps(title: str, steps: Sequence[Step], dry_run: bool) -> None:
         if result.returncode != 0:
             log.error(f"\nStopped: step {i} ({step.label}) failed with exit code {result.returncode}.")
             sys.exit(result.returncode)
+        if step.on_success is not None:
+            step.on_success()
     log.info(f"\nDone: {title}" if not dry_run else "\nDry run finished.")
 
 
@@ -177,6 +181,13 @@ def show(path: Path) -> str:
         return path.relative_to(REPO_ROOT).as_posix()
     except ValueError:
         return str(path)
+
+
+def _recorder(folder: Path | None, name: str, script: Path, config: Path) -> Callable[[], None] | None:
+    """The completion record to write once the step's script has succeeded (none if it names no folder)."""
+    if folder is None:
+        return None
+    return lambda: write_record(folder, name, script, config, REPO_ROOT)
 
 
 def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
@@ -216,7 +227,17 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
         folder = results_folder(config)
         # Labels are written for MNIST; show the dataset of this config folder instead.
         label = in_distribution(resolve(config)).wording(step.label)
-        if folder is not None and folder.exists():
+        if folder is not None and folder.exists() and not is_complete(folder):
+            # Made when the step started, but never recorded as finished: an interrupted (or unrecorded) run.
+            message = (f"{show(folder)} exists but has no {RECORD}: {step.name} did not finish, or finished "
+                       "before completion records existed. Check the folder: if the run is complete and listed in "
+                       "the run manifest, record it with pipeline/completion.py --manifest ...; otherwise move "
+                       "the folder aside and run the step again.")
+            if not args.dry_run:
+                log.error(message)
+                sys.exit(1)
+            log.info(f"NOTE (dry run): a real run would stop here.\n{message}\n")
+        elif folder is not None and folder.exists():
             if args.only:
                 message = (f"These results already exist:\n  - {show(folder)}\n"
                            "Results are never overwritten (project rule). "
@@ -230,7 +251,8 @@ def run_phase3(title: str, description: str, steps: Sequence[P3Step]) -> None:
             else:
                 log.info(f"Skipping {step.name}: results already exist in {show(folder)}")
                 continue
-        plan.append(Step(label, P3 / step.script, ["--config", config, *step.flags]))
+        plan.append(Step(label, P3 / step.script, ["--config", config, *step.flags],
+                         on_success=_recorder(folder, step.name, P3 / step.script, resolve(config))))
 
     if not plan:
         log.info(f"{title}: nothing to run (every step already has results or is not part of this dataset's study).")

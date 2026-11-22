@@ -14,6 +14,8 @@
 - Every Phase 3 run folder has a row in run_manifest.csv naming the script and
   config that wrote it; where a result stores its config's SHA-256, today's config
   still has it (every output traces to its code).
+  Every listed run folder holds its completion record (run_complete.json), so
+  the Phase 3 runners skip it; a folder without one is an interrupted run.
 - Every row of each dataset's DEVIATIONS.md names its commit: a commit ID, "same
   commit as <file>" for a row written in the commit it describes, or "– (no commit:
   <reason>)" when nothing was committed (every deviation traces to its change).
@@ -176,6 +178,14 @@ def recorded_config_hashes(value: Any) -> Iterator[str]:
     elif isinstance(value, list):
         for item in value:
             yield from recorded_config_hashes(item)
+
+
+@DATASETS
+def test_every_listed_run_folder_is_recorded_complete(dataset: Phase3Outputs) -> None:
+    """The Phase 3 runners skip a run folder only with its run_complete.json (pipeline/completion.py)."""
+    unrecorded = [f"{row['step_folder']}/{row['run_folder']}" for row in manifest_rows(dataset)
+                  if not (dataset.outputs / row["step_folder"] / row["run_folder"] / "run_complete.json").is_file()]
+    assert not unrecorded, f"run without a completion record: {unrecorded}"
 
 
 @DATASETS

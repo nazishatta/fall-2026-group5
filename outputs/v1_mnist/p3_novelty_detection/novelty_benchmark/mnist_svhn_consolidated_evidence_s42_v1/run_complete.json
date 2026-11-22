@@ -1,0 +1,7 @@
+{
+  "config": "phase3_evidence_consolidation.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/consolidate_phase3_evidence.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "consolidate_evidence"
+}

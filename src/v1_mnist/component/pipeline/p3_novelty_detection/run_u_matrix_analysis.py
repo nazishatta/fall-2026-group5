@@ -19,9 +19,11 @@ Every step has its own config in src/v1_mnist/component/configs/ (shown by --dry
 Needs the trained SOM (Phase 2) and the QE summary from run_qe_novelty_detection.py.
 Steps 2 and 4 also read the SVHN score arrays written by the svhn_benchmark step
 of run_novelty_benchmark.py. Step 5 scores the SVHN test images itself, so it also needs
-PyTorch, NNSOM, the frozen CNN and the SVHN test file (DVC). A step whose results folder
-already exists is skipped (results are never overwritten); to repeat a step, give it a
-new run_id in a new config and run it with --only STEP --config.
+PyTorch, NNSOM, the frozen CNN and the SVHN test file (DVC). 
+A step whose run folder holds its completion record (``run_complete.json``, written by the runner
+when the step's script succeeds) is skipped; a run folder without one stops the run (an interrupted
+step is never skipped or redone silently). Results are never overwritten; to repeat a step, give it
+a new run_id in a new config and run it with --only STEP --config.
 """
 
 from __future__ import annotations

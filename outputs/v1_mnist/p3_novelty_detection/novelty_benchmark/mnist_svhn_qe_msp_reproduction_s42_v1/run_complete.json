@@ -1,0 +1,7 @@
+{
+  "config": "svhn_paired_comparison.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/run_required_baselines.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "qe_msp_paired_comparison"
+}

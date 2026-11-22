@@ -1,0 +1,7 @@
+{
+  "config": "phase3_reorganization/reorg_20261102/qe_ood_rerun.yaml",
+  "role": "reproduction",
+  "script": "p3_novelty_detection/qe_novelty_detection/run_qe_ood.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "qe_ood"
+}
