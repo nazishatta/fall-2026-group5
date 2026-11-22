@@ -377,7 +377,7 @@ Guided retraining, which helped on MNIST, did not carry over. The SOM-chosen cop
 
 On Fashion-MNIST, a SOM trained on a CNN's embeddings shows where the CNN's mistakes gather: in a broad region where upper-body garments overlap, about four times more than chance. It does not find mistakes better than k-means or the CNN's confidence. As a novelty detector it is weak against SVHN but beats the CNN's confidence on clothing classes the network never saw.
 Using its hotspots to guide retraining, which worked on MNIST, gave no clear gain here, and curriculum learning made the CNN worse on both datasets. Across the two datasets the SOM is most useful as an \emph{explainer}, showing where and between which classes a network fails, rather than as a selector of training images.
-The next steps are to test a pool rule and schedule chosen for Fashion-MNIST under a new protocol, to repeat the near-novelty test on the retrained networks, and to run the pipeline on CIFAR-10.
+The next steps are to test a pool rule and schedule chosen for Fashion-MNIST under a new protocol, and to repeat the near-novelty test on the retrained networks.
 
 \clearpage
 \printbibliography[title={References}]
