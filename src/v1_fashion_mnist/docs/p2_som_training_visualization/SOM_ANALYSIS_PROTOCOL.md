@@ -115,6 +115,24 @@ against +0.005), so the layer choice trades error finding against far-novelty de
 headline layer, as fixed in section 2. The `fc2` maps' QE AUROC on SVHN ranges from 0.766 to 0.884 over the
 5 seeds (Phase 3 protocol, section 7). No test data was used.
 
+**Error-pattern baselines and the same-budget comparison (recorded 2026-11-21; exploratory, as on MNIST).**
+Predicting which of the 876 validation images the network gets wrong, on the same validation embeddings.
+Sources: `outputs/v1_fashion_mnist/p2_som_training_visualization/error_pattern_analysis/error_pattern_baselines/error_pattern_baselines_som_15x15/summary.csv`
+and `.../error_detector_budget/error_detector_budget_som_15x15/summary.csv`.
+
+| Method | AUROC [95% interval] | Hotspot ratio | Mistakes caught at the SOM hotspots' share of images (3.5%) | MNIST AUROC |
+|---|---|---|---|---|
+| SOM cell error rate | 0.811 [0.796, 0.824] | 3.9 [3.2, 4.4] | 13.7% | 0.685 |
+| k-means cell error rate (10 seeds) | 0.812 [0.805, 0.821] | 4.0 [3.7, 4.5] | (15.8% at its own 4.0%) | 0.693 |
+| Nearest-neighbour impurity | 0.876 [0.864, 0.888] | | 21.1% [19.2, 22.9] | 0.874 |
+| Max-softmax | 0.906 [0.898, 0.914] | | 21.9% [19.8, 24.1] | 0.981 |
+
+As on MNIST, the SOM's cells find mistakes no better than k-means cells, and the network's own confidence
+finds them best. The gap is smaller on Fashion-MNIST (max-softmax minus SOM: 0.095 AUROC, against 0.296 on
+MNIST), because the mistakes lie in large mixed regions of the map rather than in a few small cells. The
+SOM's value in Phase 2 is the map of where classes mix and where the mistakes sit, not error detection. The
+SOM hotspot analysis reproduced the Phase 2 robustness result exactly.
+
 Everything else: [TBD]
 
 ## 6. References
