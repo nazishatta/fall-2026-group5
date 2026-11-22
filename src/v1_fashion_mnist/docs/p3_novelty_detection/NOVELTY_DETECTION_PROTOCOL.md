@@ -157,7 +157,78 @@ SOM better than max-softmax) and H3 unchanged. Training and validation images on
 
 ## 7. Recorded outcome
 
-Filled in after the runs, without changing sections 1 to 6. [TBD]
+Filled in after the runs, without changing sections 1 to 6. Recorded 2026-11-21. One LeNet-5 and one SOM
+(15x15, seed 42) unless stated; Fashion-MNIST validation (10,500 images) against SVHN test (26,032 images);
+the Fashion-MNIST test split was never read. Every run folder is listed in
+`outputs/v1_fashion_mnist/p3_novelty_detection/run_manifest.csv`.
+
+**Far novelty: SVHN** (`novelty_benchmark/fashion_mnist_svhn_novelty_statements_s42_v1`). AUROC with its
+stratified bootstrap 95% interval:
+
+| Score | AUROC | Paired S1 minus this score |
+|---|---|---|
+| S4 energy | 0.982 [0.981, 0.984] | -0.193 [-0.199, -0.186] |
+| S3 max-softmax | 0.884 [0.880, 0.888] | -0.094 [-0.101, -0.088] |
+| S6 nearest neighbours | 0.864 [0.859, 0.869] | -0.074 [-0.078, -0.070] |
+| S2 U-Matrix | 0.812 [0.805, 0.818] | -0.022 [-0.030, -0.014] |
+| S1 SOM QE | 0.789 [0.783, 0.796] | |
+| S5 Mahalanobis | 0.713 [0.706, 0.720] | +0.076 [+0.071, +0.082] |
+
+| Statement | Verdict |
+|---|---|
+| O1 (RQ3): the SOM detects outside images | **met** |
+| **O2 (RQ4, primary): the SOM is competitive with max-softmax** | **not met** |
+| O3: competitive with energy / Mahalanobis / nearest neighbours | not met / met / not met |
+| O4: the U-Matrix detects outside images | **met** |
+| Group proposal RQ3 / RQ4 (RQ4 against the best of S3 to S6, energy) | met / not met |
+
+Control: with the labels shuffled 1,000 times the S1 AUROC averaged 0.500 (largest 0.510). The QE-against-
+max-softmax interval of `qe_msp_paired_comparison` equals the one above to every printed digit.
+
+**The frozen QE flag fails on SVHN.** At the 95th percentile of the training QE (1.4215) the flag marks 5.1%
+of the validation images but only 3.0% of SVHN (792 of 26,032); on MNIST the same rule caught 96.2%. The
+threshold sweep (`fashion_mnist_svhn_qe_threshold_sweep_s42_v1`) shows the SVHN detection rate below the
+validation false-alarm rate at every cut-off from the 95th percentile up; only the 90th percentile flags
+slightly more SVHN than validation images (13.1% against 10.1%). The SOM ranks SVHN above most validation
+images (AUROC 0.789), but SVHN sits in the middle of the QE range, below the validation images' upper tail.
+
+**Embedding length** (`fashion_mnist_svhn_qe_norm_dependence_s42_v1`, exploratory as on MNIST). SVHN
+embeddings are much shorter than Fashion-MNIST's (mean length 8.5 against 20.7; 95% of SVHN below 11.7,
+95% of validation above 13.2). Among the 532 SVHN images whose length lies in the validation 5-95% band,
+the QE AUROC is 0.958 [0.953, 0.962]. This fits the explanation that SVHN's short embeddings are what hide it
+from QE, but the 532 images are a small, selected subset, so it is not shown.
+
+**Classical baselines** (`fashion_mnist_svhn_five_method_comparison_s42_v1`): Isolation Forest 0.266, One-
+Class SVM 0.734, autoencoder 0.583; the autoencoder with standardised inputs
+(`fashion_mnist_svhn_ae_train_standardized_s42_v1`) 0.676. Isolation Forest below 0.5 ranks SVHN as more
+normal than Fashion-MNIST, as on MNIST (0.238), and the autoencoder again changes strongly with its input
+scaling and training size. Both are the problems the two MNIST diagnostics in section 3 were written for, so
+by section 3 they run (`../DEVIATIONS.md`, 2026-11-21): results [TBD].
+
+**Near novelty: held-out classes** (`held_out_class_novelty/held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42`).
+Per split, a new LeNet-5 and SOM never see 4 classes; QE minus each score, mean and 95% t-interval over the
+5 splits:
+
+| Statement | Result | Verdict |
+|---|---|---|
+| H1: the SOM detects the held-out classes | QE AUROC 0.739 to 0.831; every interval above 0.5 | **shown** |
+| **H2 (primary): the SOM is better than max-softmax** | **+0.046 [+0.034, +0.057]**, larger in all 5 splits | **shown** |
+| H3: not worse by more than 0.01 than max-softmax / energy / Mahalanobis | +0.046 / +0.011 [-0.041, +0.064] / -0.028 [-0.071, +0.014] | shown / inconclusive / inconclusive |
+| H4: the map adds to nearest neighbours | -0.048 [-0.071, -0.026] | **opposite shown** (nearest neighbours better) |
+
+The embedding length alone scores below QE in every split (mean AUROC 0.687 against 0.794), so QE's
+advantage over max-softmax is not a length effect. On MNIST, H2 was inconclusive.
+
+**Seed-to-seed variation** (from the Phase 2 feature-layer ablation, which trains 5 SOMs on the same `fc2`
+embeddings with seeds 1 to 5): the QE AUROC on SVHN ranges from 0.766 to 0.884 with the SOM seed alone. The
+intervals above come from one map and reflect only which images were sampled; they do not include this
+variation, which is several times larger. The gap to energy (0.982) remains at every seed.
+
+**What this means.** On Fashion-MNIST the SOM detects both kinds of novelty better than chance. Against
+*far* novelty (SVHN) it is clearly behind the network's own scores (O2 not met) and its frozen threshold is
+not usable; against *near* novelty (unseen clothing classes) it beats max-softmax in every split (H2 shown),
+which it did not show on MNIST. Nearest-neighbour distance on the same embeddings is better than the SOM in
+both settings.
 
 ## 8. References
 

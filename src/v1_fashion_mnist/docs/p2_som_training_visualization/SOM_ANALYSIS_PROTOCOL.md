@@ -99,6 +99,22 @@ it fits the data a little more closely while keeping neighbours less well togeth
 15x15, neighbourhood 11, 250 epochs, as section 2 requires, and this is not a limitation of the headline
 map: no setting found improves both measures. No test data was used (`test_evaluated: false`).
 
+**Feature-layer ablation (recorded 2026-11-21).** SOMs on `fc1` and `fc2`, same recipe as the headline map,
+SOM seeds 1-5, paired by seed; fc1 minus fc2, mean and 95% t-interval over the 5 seeds. Source:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/feature_layer_ablation/feature_layer_ablation_som15x15_nb11_ep250_seeds5/tables/statements.csv`.
+
+| Statement | fc1 minus fc2 | Seeds where fc1 is larger | Verdict | MNIST |
+|---|---|---|---|---|
+| L1 (primary): error-cell AUROC | -0.055 [-0.066, -0.043] | 0 of 5 | **fc2 better** | fc2 better |
+| L2: weighted purity | -0.048 [-0.051, -0.045] | 0 of 5 | **fc2 better** | fc2 better |
+| L3: QE novelty AUROC on SVHN | +0.087 [+0.027, +0.148] | 5 of 5 | **fc1 better** | fc1 better (+0.005) |
+
+As on MNIST, `fc2`, the headline layer, gives maps that find the network's mistakes better and hold purer
+classes, while `fc1` separates SVHN better. On Fashion-MNIST the L3 gap is much larger than on MNIST (+0.087
+against +0.005), so the layer choice trades error finding against far-novelty detection. `fc2` stays the
+headline layer, as fixed in section 2. The `fc2` maps' QE AUROC on SVHN ranges from 0.766 to 0.884 over the
+5 seeds (Phase 3 protocol, section 7). No test data was used.
+
 Everything else: [TBD]
 
 ## 6. References

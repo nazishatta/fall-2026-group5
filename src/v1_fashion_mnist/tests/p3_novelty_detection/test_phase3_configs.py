@@ -22,12 +22,12 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 CONFIG_DIR = REPO_ROOT / "src" / "v1_fashion_mnist" / "component" / "configs"
 RUNNER_STEPS = [*run_qe_novelty_detection.STEPS, *run_novelty_benchmark.STEPS, *run_u_matrix_analysis.STEPS]
 
-# Protocol section 3: MNIST steps that only re-created or repaired MNIST's own earlier runs, and the
-# two diagnostics run only if MNIST's problem appears. None of them has a Fashion-MNIST config.
+# Protocol section 3: MNIST steps that only re-created or repaired MNIST's own earlier runs. None of them
+# has a Fashion-MNIST config. The two diagnostics that run only if MNIST's problem appears are not listed:
+# it appeared, so they have configs (docs/DEVIATIONS.md, 2026-11-21).
 NOT_REPEATED = {
     "qe_score_distribution_figure",      # re-ran qe_novelty because MNIST's first run lost its figure
     "historical_baseline_verification", "historical_svhn_inspection", "consolidate_evidence",
-    "svhn_inverted_norm_diagnostic", "autoencoder_scaling_diagnostic",
 }
 # Values that only an earlier Fashion-MNIST step can give (filled in stages; see the Phase 3 README).
 MAY_WAIT = {

@@ -20,6 +20,7 @@ P=src/v1_mnist/component/pipeline/p3_novelty_detection
 | 2 | `svhn_benchmark`, `svhn_score_export`, `fair_budget_baselines`, `unified_novelty_benchmark`, `qe_norm_dependence`; `qe_threshold_sweep`; `proposal_gap_analysis`, `svhn_som_overlay` | stage 1 values |
 | fill | SHA-256 of the score files of `svhn_benchmark` and `svhn_score_export`, the QE AUROC and miss count of `svhn_benchmark` | stage 2 results |
 | 3 | `qe_msp_paired_comparison`, `qe_energy_knn_paired`, `qe_umatrix_random_ood`, `missed_svhn_figure`; `qe_umatrix_validation_figure` | stage 2 values |
+| after | `svhn_inverted_norm_diagnostic`, `autoencoder_scaling_diagnostic` (exploratory; protocol section 3, `../DEVIATIONS.md`) | the stage 2 results |
 
 ```bash
 # Stage 1
@@ -36,6 +37,9 @@ python $P/run_u_matrix_analysis.py    --config-dir $F --steps proposal_gap_analy
 # Stage 3 (after the stage 2 values are filled in)
 python $P/run_novelty_benchmark.py    --config-dir $F --steps qe_msp_paired_comparison qe_energy_knn_paired qe_umatrix_random_ood missed_svhn_figure
 python $P/run_u_matrix_analysis.py    --config-dir $F --steps qe_umatrix_validation_figure
+
+# Triggered diagnostics (protocol section 3): run because MNIST's two baseline problems appeared again
+python $P/run_novelty_benchmark.py    --config-dir $F --steps svhn_inverted_norm_diagnostic autoencoder_scaling_diagnostic
 ```
 
 A runner skips any step whose results already exist, so a stage can be repeated after a failure. Each runner also takes `--dry-run`.
