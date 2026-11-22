@@ -230,14 +230,14 @@
 
 - Topics of discussion
   - **PHASE 3: NOVELTY DETECTION**
-  - Near-novelty test with held-out classes: a LeNet-5 and a SOM are trained on 6 digits and the other 4 digits are treated as novel, over 5 class splits (the standard open-set setup). Wrote the protocol before any run, built the code and tests, and ran it on EC2. The SOM detects the held-out digits in every split (mean AUROC 0.912), but plain nearest-neighbour distance does better in every split (0.966) and the comparison with maximum softmax probability (0.944) is inconclusive.
+  - Near-novelty test with held-out classes: a LeNet-5 and a SOM are trained on 6 digits and the other 4 digits are treated as novel, over 5 class splits (the standard open-set setup). Wrote the protocol before any run, built the code and tests, and ran it on EC2.
   - **PHASE 4: GUIDED RETRAINING**
-  - Novelty detection after retraining: scored the 15 retrained models with quantization error, maximum softmax probability, energy and Mahalanobis on MNIST against SVHN. The SOM still detects SVHN after every kind of retraining (lowest AUROC 0.965); SOM-guided retraining did not change it clearly, and maximum softmax probability and energy remain better.
+  - Novelty detection after retraining: scored the 15 retrained models with quantization error, maximum softmax probability, energy and Mahalanobis on MNIST against SVHN.
   - **PHASE 5: PAPER WRITING & CODE RELEASE**
   - Completed the final report: a figure explaining how the SOM works (with the Competitive Networks chapter cited), the contribution statement in the abstract, the Optuna and novelty-after-retraining results, all diagrams redrawn in draw.io, and clearer result tables.
-  - Same-budget comparison of the error detectors: flagging the same 1.6% of validation images as the SOM's hotspot cells, the least-confident images hold 53.3% of the CNN's mistakes and kNN impurity 48.7%, against 18.1% in the hotspot cells (exploratory).
-  - SOM re-analysis of the least-confident retraining arm (secondary run, protocol addendum written before the run): its new maps show no clear hotspot drop against normal training (-0.036, interval -0.093 to +0.021), and SOM guidance is not clearly better than confidence guidance (hotspot error -0.018, -0.076 to +0.039). With 5 seeds no difference can be shown. The shared cells reproduced the primary run exactly. Added to the final report's retraining table and the Phase 4 report.
-  - Feature-layer ablation (asked for in the proposal's paper outline; protocol written before the run): SOMs on the earlier layer fc1 locate the CNN's mistakes worse than SOMs on fc2 (error-cell AUROC 0.622 against 0.685, 5 SOM seeds each, interval -0.073 to -0.052) and have less pure cells, so the choice of fc2 is supported. fc1 separates SVHN slightly better (+0.005 AUROC). Added to the final report and the Phase 2 report.
+  - Same-budget comparison of the error detectors: flagged the same share of validation images as the SOM's hotspot cells and counted how many of the CNN's mistakes each detector holds (exploratory).
+  - SOM re-analysis of the least-confident retraining arm (secondary run, protocol addendum written before the run). Added to the final report's retraining table and the Phase 4 report.
+  - Feature-layer ablation (asked for in the proposal's paper outline; protocol written before the run): trained SOMs on the earlier layer fc1 and compared them with SOMs on fc2, with 5 SOM seeds each. Added to the final report and the Phase 2 report.
   - Plan after that: run Phases 2 to 4 on Fashion-MNIST (technical freeze on November 22), merge develop into main through a reviewed pull request, and write the research paper with one results table per dataset.
 
 - Action Items:
@@ -249,27 +249,69 @@
 * [x] SOM re-analysis of the least-confident retraining arm
 * [x] Same-budget comparison of the error detectors
 * [x] README in every folder, matching the real folder tree; full author name in all reports and slides
+* [x] Feature-layer ablation: protocol, code and tests (fc1 against fc2, 5 SOM seeds)
+* [x] Feature-layer ablation results
 * [ ] Pull request feature/dataset-mnist-fixes into develop, reviewed by Nazish
 * [ ] Merge develop into main
-* [ ] Fashion-MNIST pipeline and results
+* [x] Fashion-MNIST pipeline and results
 * [ ] Research paper draft
 
 ---
 
-## Date: Week 14 - November 24, 2026 (planned)
+## Date: Week 14 - November 24, 2026 (work done November 17 to 22; technical freeze on November 22)
 
 - Topics of discussion
+  - **FASHION-MNIST: same pipeline as MNIST**
+  - Made the dataset a config-folder choice, so Fashion-MNIST runs through the same code, SOM settings and statistics as MNIST, with one protocol per phase written before each run and every change recorded in `DEVIATIONS.md`.
+  - Made the runner resume a half-finished step, and made a Phase 3 run folder count as finished only when it holds its completion record (`run_complete.json`).
+  - **PHASE 1: MODEL TRAINING BASELINE**
+  - Trained the LeNet-5 baseline on Fashion-MNIST with MNIST's recipe, and extracted and saved the 84-dimensional `fc2` embeddings.
+  - **PHASE 2: SOM TRAINING & VISUALIZATION**
+  - Trained the 15x15 SOM and ran the cluster analysis, error pattern analysis, grid comparison, Optuna tuning and feature-layer ablation, with the same statistics as MNIST.
+  - Compared the SOM's error hotspots with k-means cells, kNN impurity and the CNN's maximum softmax probability.
+  - **PHASE 3: NOVELTY DETECTION**
+  - Ran novelty detection with SVHN as outside data against maximum softmax probability, energy, Mahalanobis and nearest-neighbour scores, the classical baselines and their diagnostics, and the held-out-class test.
+  - **PHASE 4: GUIDED RETRAINING**
+  - Built the hard-example pools and checked the augmentation ranges on Fashion-MNIST; MNIST's ranges did not pass, so they were halved by a rule written before re-checking.
+  - Trained the augmentation and curriculum arms over 5 seeds, stamped the rules, read the test set once, re-analysed the SOM on the retrained models, and measured novelty detection after retraining.
   - **PHASE 5: PAPER WRITING & CODE RELEASE**
-  - Fashion-MNIST results through Phases 2 to 4, using the same code, SOM settings and statistics as MNIST.
-  - Research paper draft with the MNIST and Fashion-MNIST results.
-  - Prepare the poster (due November 29) and the final presentation (due December 1); recorded videos and the journal submission follow by December 8.
+  - Wrote the Fashion-MNIST reports for Phases 1 to 4 and a combined MNIST and Fashion-MNIST report, and updated the MNIST reports.
+  - Cleaned the last placeholder mentions in the group proposal (ticket #35).
+  - Read instructor review #10: from the technical freeze on November 22 the work is documents, merging and repo clean-up only.
 
 - Action Items:
 
-* [ ] Fashion-MNIST results
-* [ ] Research paper draft
-* [ ] Poster
-* [ ] Final presentation
-* [ ] Ask the instructor: ResNet comparison (11-10 note) and one Jupyter notebook per phase (proposal, Week 14) in the time left
-* [x] Feature-layer ablation: protocol, code and tests (fc1 against fc2, 5 SOM seeds)
-* [x] Feature-layer ablation results
+* [x] Fashion-MNIST pipeline: config-driven datasets, protocols for every phase, `run_all`
+* [x] Fashion-MNIST Phase 1: LeNet-5 baseline and embeddings
+* [x] Fashion-MNIST Phase 2: SOM, hotspots, grid comparison, Optuna, feature-layer ablation
+* [x] Fashion-MNIST Phase 3: SVHN novelty, diagnostics, held-out classes
+* [x] Fashion-MNIST Phase 4: transform check, training, stamp, single test pass, re-analysis, novelty after retraining
+* [x] Fashion-MNIST reports (Phases 1 to 4) and combined MNIST and Fashion-MNIST report
+* [x] Runner resumes half-finished steps; Phase 3 completion records; full test suite passes on EC2
+* [x] Proposal: no open placeholder left (ticket #35); owners table to be confirmed with Nazish
+* [ ] Pull request for Fashion-MNIST Phases 3 and 4 into develop, reviewed by Nazish (written comments)
+* [ ] Pull request develop into main (Fashion-MNIST)
+
+---
+
+## Date: Week 15 - December 1, 2026 (planned: only documents and repo clean-up; no new experiments)
+
+- Topics of discussion
+  - **Today, 11-22:** open the pull requests that bring the Fashion-MNIST work into develop and develop into main, with Nazish reviewing them in writing.
+  - **By 11-26:** open, review and merge the paper (`feature/integrated-research-paper`) and add the Fashion-MNIST results to it. The paper states the SOM's contribution as the map, not as a better detector, and states that LeNet-5 is the only CNN (no ResNet run). Confirm the target journal in ticket #40 (Neurocomputing was chosen in Week 12) and move the paper into its template. Every pull request merged or closed; delete the merged branches and the `backup/*` branches once main has everything; reply on the review issue (#30).
+  - **By 11-29:** both of us proof-read the paper; build the paper and reports from a clean clone (citations need `biber`); poster draft (Nazish); progress report brought up to date.
+  - **By 12-01 (last working session):** final presentation deck, poster and the script for the one-minute video; dry run of the talk.
+  - **By 12-08:** journal submission and its confirmation e-mail, final presentation, poster, recorded video, one-minute video, Blackboard uploads.
+
+- Action Items:
+
+* [ ] Fashion-MNIST merged into main
+* [ ] Paper merged into main, with both datasets, in the journal template
+* [ ] Journal named in #40; submission confirmation e-mail (12-08)
+* [ ] Every pull request merged or closed; merged branches and `backup/*` deleted
+* [ ] Paper and reports build from a clean clone (with `biber`)
+* [ ] Poster draft by 11-29; poster final by 12-01
+* [ ] Final presentation deck and one-minute video script by 12-01
+* [ ] Recorded video and one-minute video by 12-08
+* [ ] Decide whether one Jupyter notebook per phase (proposal) fits in the time left
+* [ ] Progress report: add the December 1 and final entries

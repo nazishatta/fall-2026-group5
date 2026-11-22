@@ -160,7 +160,7 @@ The diagram is in the README (`demo/project_pipeline/nnsom_project_pipeline.draw
 
 **Reproducibility rules.** Every run has a name that encodes its setup (for example
 `fashion_mnist_lenet5_penultimate_som15x15_seed42`). Every reported number can be traced from
-config to raw result to table or figure. Unmeasured values are written as `[TBD]`, never guessed.
+config to raw result to table or figure. Unmeasured values are marked as still to be determined, never guessed.
 
 ---
 
@@ -238,7 +238,7 @@ A weaker result against strong baselines will be reported as such.
 ## 6. Success criteria
 
 The rules below are fixed **before** the test set is examined for each question. This proposal
-said the thresholds marked `[TBD]` would be filled in here by the **2026-10-06** working session.
+said the thresholds still open at that time would be filled in here by the **2026-10-06** working session.
 Instead they were fixed in the phase protocols, before any test-set use (RQ2:
 `ERROR_PATTERN_ROBUSTNESS_CRITERIA.md`, written 2026-10-06; RQ5: `RETRAINING_PROTOCOL.md`, stamped
 2026-11-03). They were copied into this table unchanged on 2026-11-15 (see
@@ -300,7 +300,7 @@ in working sessions**.
 | -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | 2026-09-22     | Solutions and first results                   | MNIST baseline, embeddings, 15x15 SOM, first figures                                                                                                                                                    | Yes       |
 | 2026-09-29     | Working session                               | Cluster analysis, error-pattern and hotspot analysis (in review), LaTeX report skeleton                                                                                                                 | In review |
-| **2026-10-06** | Working session                               | **Proposal in repo. Literature review draft committed. Success-criteria thresholds fixed. Owners set for RQ3 to RQ6. GitHub tickets and milestones created.**                                           | Planned   |
+| **2026-10-06** | Working session                               | **Proposal in repo. Literature review draft committed. Success-criteria thresholds fixed. Owners set for RQ3 to RQ6. GitHub tickets and milestones created.**                                           | Partly    |
 | 2026-10-13     | No class (Fall Break)                         | (Optional buffer for RQ2 write-up)                                                                                                                                                                      | n/a       |
 | **2026-10-20** | **Preliminary presentation**                  | RQ1 and RQ2 complete on MNIST. First RQ3 results (SOM novelty score vs. maximum softmax probability). Literature review complete. Slides in `presentation/`. Paper skeleton started. | Planned   |
 | 2026-10-27     | Working session                               | RQ4: reproduce the OOD baselines (Isolation Forest, One-Class SVM, autoencoder, MSP, energy, Mahalanobis, nearest-neighbour)                                                                            | Planned   |
