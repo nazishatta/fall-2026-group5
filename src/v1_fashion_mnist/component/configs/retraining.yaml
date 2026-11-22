@@ -54,9 +54,11 @@ evaluation:
   # the random arm's by at most this much. Left empty until it is measured on validation data
   # (2 x the standard arm's seed-to-seed standard deviation); the final test stage refuses to run
   # while it is empty.
-  # Fashion-MNIST: empty until the augmentation summary measures it (protocol section 2); MNIST's
-  # value (0.00157) is not reused.
-  macro_f1_guard:
+  # Fashion-MNIST: measured 2026-11-22 by the protocol's rule (section 2): 2 x the standard arm's validation
+  # macro-F1 standard deviation over seeds 1-5, the larger of the two experiments' validation summaries
+  # (both give the same value: the standard arm is the same network with the same seeds). MNIST's value
+  # (0.00157) is not reused.
+  macro_f1_guard: 0.0033172971219787802
   # "No damage elsewhere": the upper end of the 95% interval of (arm minus standard) on the
   # non-hotspot test error may not exceed this (0.002 = 0.2 percentage points).
   non_hotspot_damage_tolerance: 0.002

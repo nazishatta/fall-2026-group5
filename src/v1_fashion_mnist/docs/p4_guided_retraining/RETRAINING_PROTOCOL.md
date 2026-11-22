@@ -42,7 +42,10 @@ section 1. Seeds: retraining seeds 1-5.
   ranges are made smaller under a new revision before any arm runs, and that is recorded in `../DEVIATIONS.md`.
 - **Macro-F1 guard:** the same rule as MNIST, 2 times the sample standard deviation of the `standard` arm's
   validation macro-F1 over the 5 seeds (the larger of the two experiments), measured before any arms are
-  compared. Value: **[TBD: measured by the rule, copied here and into `retraining.yaml` before the test stage]**.
+  compared. Value: **0.0033172971219787802**, measured on 2026-11-22: the `standard` arm's validation macro-F1
+  standard deviation over the 5 seeds is 0.0016586 in both experiments (the `standard` arm is the same network
+  with the same seeds), from each experiment's `tables/validation_summary.json`; copied into `retraining.yaml`
+  before the protocol was stamped.
   The MNIST value (0.00157) is not reused, because it measures MNIST's seed-to-seed spread.
 - **Statements**, unchanged: A1 (primary: `augmented_som` beats `augmented_random` on hotspot test error,
   interval excludes 0, guard holds), A2, A3 (non-hotspot damage at most 0.002), C1, C2. Paired bootstrap
