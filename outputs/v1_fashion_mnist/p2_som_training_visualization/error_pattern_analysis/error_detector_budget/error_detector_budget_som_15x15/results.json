@@ -1,0 +1,78 @@
+{
+  "baseline_results_sha256": "b1f8e5cd22c294d150d4d57af6725b9573cebf8e58e0f7c7860b9c71c8dceb62",
+  "baseline_run_id": "error_pattern_baselines_som_15x15",
+  "budgets": {
+    "same_share_as_kmeans_cell": {
+      "cells": {
+        "error_share": 0.1582853881278539,
+        "image_share": 0.03980590476190476,
+        "ratio": 3.9764298556865603
+      },
+      "scores": {
+        "knn_impurity": {
+          "error_share": 0.23463318112633177,
+          "error_share_high": 0.2542833372688968,
+          "error_share_low": 0.21512358564990358,
+          "image_share": 0.03980590476190476,
+          "images_flagged": 417.96199999999993,
+          "ratio": 5.894431555563625
+        },
+        "max_softmax": {
+          "error_share": 0.24429223744292236,
+          "error_share_high": 0.2654165372903794,
+          "error_share_low": 0.22089176524066292,
+          "image_share": 0.03980590476190476,
+          "images_flagged": 417.96199999999993,
+          "ratio": 6.137085412431477
+        }
+      }
+    },
+    "same_share_as_som_cell": {
+      "cells": {
+        "error_share": 0.1368835616438356,
+        "image_share": 0.035310476190476184,
+        "ratio": 3.876570820099995
+      },
+      "scores": {
+        "knn_impurity": {
+          "error_share": 0.21068493150684928,
+          "error_share_high": 0.22909460697722117,
+          "error_share_low": 0.19224207349684522,
+          "image_share": 0.035310476190476184,
+          "images_flagged": 370.75999999999993,
+          "ratio": 5.966640901990284
+        },
+        "max_softmax": {
+          "error_share": 0.21890410958904102,
+          "error_share_high": 0.24071995736743929,
+          "error_share_low": 0.19801897136022328,
+          "image_share": 0.035310476190476184,
+          "images_flagged": 370.75999999999993,
+          "ratio": 6.199409727815652
+        }
+      }
+    }
+  },
+  "config_sha256": "389f1aa7c9212763f4a7ba3ecd0e7851e7cf0516affe2452970a584977613103",
+  "environment": {
+    "numpy": "2.4.4",
+    "python": "3.13.14"
+  },
+  "exploratory": true,
+  "inputs_sha256": {
+    "som_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+    "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "val_cells_som": "d3433eb4b1ebf6be975ffe96a34ef80a1479cfbfad33b8bd9804da877cd8ed33",
+    "val_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d"
+  },
+  "run_id": "error_detector_budget_som_15x15",
+  "settings": {
+    "bootstrap_resamples": 2000,
+    "bootstrap_seed": 2026,
+    "knn_neighbors": 15
+  },
+  "split": "val",
+  "test_used": false,
+  "validation_errors": 876,
+  "validation_samples": 10500
+}
