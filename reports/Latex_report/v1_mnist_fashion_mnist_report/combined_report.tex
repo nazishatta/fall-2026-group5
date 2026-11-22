@@ -6,6 +6,10 @@
 \usepackage{graphicx}
 \usepackage{array, booktabs, tabularx, multirow}
 \usepackage{xcolor}
+\usepackage{caption}
+\captionsetup[figure]{name=Fig., labelsep=period, font=small, justification=justified, singlelinecheck=true}
+\captionsetup[table]{name=TABLE, labelsep=newline, font=small, labelfont=normalfont, textfont=sc, justification=centering, skip=4pt}
+\renewcommand{\thetable}{\Roman{table}}
 \usetikzlibrary{arrows.meta, positioning}
 \definecolor{GWBlue}{RGB}{0,51,102}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
@@ -129,7 +133,7 @@ The remainder of the report is organised as follows. Section~\ref{sec:problem} s
 % ------------------------------------------------------------------------------------------------------------------------
 \section{Solution and Methodology}\label{sec:method}
 
-The project follows the four phases of the proposal: model training baseline, SOM training and visualization, novelty detection, and guided retraining (Figure~\ref{fig:pipeline}). The same code, hyperparameters and success criteria were used for both datasets. The Fashion-MNIST protocol replicated the MNIST protocol and was written before any Fashion-MNIST data were loaded.
+The project follows the four phases of the proposal: model training baseline, SOM training and visualization, novelty detection, and guided retraining (Fig.~\ref{fig:pipeline}). The same code, hyperparameters and success criteria were used for both datasets. The Fashion-MNIST protocol replicated the MNIST protocol and was written before any Fashion-MNIST data were loaded.
 
 \begin{figure}[H]
 \centering
@@ -163,7 +167,7 @@ The project follows the four phases of the proposal: model training baseline, SO
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{diagrams/som_explained.pdf}
-\caption{How the self-organizing map works in this project, following the competitive-network chapter of Hagan et al.~\cite{hagan2014nnd_ch16} and its batch version~\cite{hagan2014nnd_ch26}. (a)~Each image (here an MNIST digit) is turned into an 84-number embedding by the fixed CNN. (b)~The neuron whose weight vector is closest wins, and the winner and its grid neighbours move toward the embedding. (c)~After training, each cell is labelled by its images: their most common class, how mixed the classes are, and how often the CNN is wrong there (hotspots). An image far from its best cell (large quantization error, QE) is unlike the training data. The grids are schematic; the real maps have 15$\times$15 hexagonal cells.}
+\caption{How the self-organizing map works in this project. (a)~Each image (here an MNIST digit) is turned into an 84-number embedding by the fixed CNN. (b)~The neuron whose weight vector is closest wins, and the winner and its grid neighbours move toward the embedding. (c)~After training, each cell is labelled by its images: their most common class, how mixed the classes are, and how often the CNN is wrong there (hotspots). An image far from its best cell (large quantization error, QE) is unlike the training data. The grids are schematic; the real maps have 15$\times$15 hexagonal cells. Adapted from~\cite{hagan2014nnd_ch16,hagan2014nnd_ch26}.}
 \label{fig:som_explained}
 \end{figure}
 
@@ -235,6 +239,8 @@ This section first describes the experimental protocol, then presents the result
 
 \begin{table}[H]
 \centering
+\caption{Baseline LeNet-5 on Both Datasets}
+\label{tab:baseline}
 \renewcommand{\arraystretch}{1.12}
 \small
 \begin{tabular}{|L{0.36\textwidth}|C{0.26\textwidth}|C{0.26\textwidth}|}
@@ -246,8 +252,9 @@ Mistakes: test / validation / training & 86 / 92 / 29 & 956 / 876 / 3,311 \\ \hl
 Mean confidence when right / wrong (validation) & 0.997 / 0.833 & 0.942 / 0.686 \\ \hline
 Most common confusions & 5$\rightarrow$0, 9$\rightarrow$4, 4$\rightarrow$9 & Shirt$\leftrightarrow$T-shirt/top, Pullover$\rightarrow$Coat \\ \hline
 \end{tabular}
-\caption{Baseline LeNet-5 on both datasets. On Fashion-MNIST, confusions among T-shirt/top, Pullover, Coat and Shirt make up 638 of the 956 test mistakes (67\%), and Shirt is the weakest class (F1 0.746).}
-\label{tab:baseline}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent On Fashion-MNIST, confusions among T-shirt/top, Pullover, Coat and Shirt make up 638 of the 956 test mistakes (67\%), and Shirt is the weakest class (F1 0.746).\par}
 \end{table}
 
 Fashion-MNIST produces about ten times as many errors as MNIST, and the network is often wrong with high confidence. These errors are concentrated in a few groups of visually similar classes, which is the pattern examined on the map in Phase 2.
@@ -256,6 +263,8 @@ Fashion-MNIST produces about ten times as many errors as MNIST, and the network 
 
 \begin{table}[H]
 \centering
+\caption{SOM Structure and Error Concentration}
+\label{tab:som}
 \renewcommand{\arraystretch}{1.12}
 \small
 \begin{tabular}{|L{0.50\textwidth}|C{0.18\textwidth}|C{0.18\textwidth}|}
@@ -272,8 +281,9 @@ Spearman, cell error rate vs.\ class mix (entropy) & $+0.816$ & $+0.956$ \\ \hli
 Cells holding each of the top three confusions & 4 to 5 & 24 to 27 \\ \hline
 Mean distance to cell, wrong / correct images & 1.349 / 0.960 & 0.994 / 0.840 \\ \hline
 \end{tabular}
-\caption{The SOM on both datasets. All label-shuffle tests give $p=0.001$ (purity) or $p=0.005$ (hotspots, Spearman). The concentration ratio cannot exceed one divided by the error rate (about 114 on MNIST, about 12 on Fashion-MNIST), so the two ratios are not comparable.}
-\label{tab:som}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent All label-shuffle tests give $p=0.001$ (purity) or $p=0.005$ (hotspots, Spearman). The concentration ratio cannot exceed one divided by the error rate (about 114 on MNIST, about 12 on Fashion-MNIST), so the two ratios are not comparable.\par}
 \end{table}
 
 \begin{itemize}
@@ -284,6 +294,8 @@ Mean distance to cell, wrong / correct images & 1.349 / 0.960 & 0.994 / 0.840 \\
 
 \begin{table}[H]
 \centering
+\caption{Ablations: Grid Size, Settings and Feature Layer}
+\label{tab:ablation}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.40\textwidth}|C{0.25\textwidth}|C{0.25\textwidth}|}
@@ -296,12 +308,15 @@ Mistake AUROC, fc1 vs fc2 map (main) & 0.622 vs 0.685, $-0.062$ ($-0.073$, $-0.0
 Purity, fc1 vs fc2 map & 0.961 vs 0.982, $-0.021$ ($-0.022$, $-0.020$): fc2 better & 0.842 vs 0.890, $-0.048$ ($-0.051$, $-0.045$): fc2 better \\ \hline
 SVHN QE AUROC, fc1 vs fc2 map & 0.986 vs 0.981, $+0.005$ ($+0.003$, $+0.006$): fc1 better & 0.902 vs 0.815, $+0.087$ ($+0.027$, $+0.148$): fc1 better \\ \hline
 \end{tabular}
-\caption{Ablations (grid size, settings, feature layer). Grid differences are 95\% ranges over 200 half-splits; the Optuna and feature-layer comparisons are 95\% $t$-intervals over 5 SOM seeds. With 876 mistakes instead of 92, the Fashion-MNIST grid ranges are about three times narrower. On MNIST, tuning found a better 10$\times$10 setting, which is used only for the robustness check.}
-\label{tab:ablation}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent Grid differences are 95\% ranges over 200 half-splits; the Optuna and feature-layer comparisons are 95\% $t$-intervals over 5 SOM seeds. With 876 mistakes instead of 92, the Fashion-MNIST grid ranges are about three times narrower. On MNIST, tuning found a better 10$\times$10 setting, which is used only for the robustness check.\par}
 \end{table}
 
 \begin{table}[H]
 \centering
+\caption{Error Detection by the SOM and Simple Baselines}
+\label{tab:baselines}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.28\textwidth}|C{0.13\textwidth}|C{0.13\textwidth}|C{0.13\textwidth}|C{0.13\textwidth}|}
@@ -313,8 +328,9 @@ k-means cell error rate (225) & 0.693 & 20.4\%$^*$ & 0.812 & 15.8\%$^*$ \\ \hlin
 15-nearest-neighbour impurity & 0.874 & 48.7\% & 0.876 & 21.1\% \\ \hline
 Network max-softmax confidence & \textbf{0.981} & \textbf{53.3\%} & \textbf{0.906} & \textbf{21.9\%} \\ \hline
 \end{tabular}
-\caption{How well each score finds the network's validation mistakes. ``Mistakes caught'': share of mistakes among the images flagged when every method flags the same share as the SOM's hotspots (MNIST 1.6\%, Fashion-MNIST 3.5\%); $^*$k-means flags its own hotspot share (3.8\% and 4.0\%). The same-budget check is exploratory.}
-\label{tab:baselines}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent ``Mistakes caught'': share of mistakes among the images flagged when every method flags the same share as the SOM's hotspots (MNIST 1.6\%, Fashion-MNIST 3.5\%); $^*$k-means flags its own hotspot share (3.8\% and 4.0\%). The same-budget check is exploratory.\par}
 \end{table}
 
 \textbf{The SOM is not the best error detector.} On both datasets, k-means clustering locates the errors as well as the SOM, and the network's own confidence performs best. The gap is smaller on Fashion-MNIST, where the network is more often wrong with high confidence.
@@ -323,6 +339,8 @@ Network max-softmax confidence & \textbf{0.981} & \textbf{53.3\%} & \textbf{0.90
 
 \begin{table}[H]
 \centering
+\caption{Far Novelty Detection Against SVHN}
+\label{tab:far}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.38\textwidth}|C{0.10\textwidth}|C{0.10\textwidth}|C{0.10\textwidth}|C{0.10\textwidth}|}
@@ -340,8 +358,9 @@ Isolation Forest & 0.238 & 0.872 & 0.266 & 0.934 \\ \hline
 Autoencoder (raw inputs) & 0.008 & 0.9999 & 0.583 & 0.744 \\ \hline
 SVHN caught by the fixed QE alarm (normal flagged) & \multicolumn{2}{c|}{96.2\% (5.1\%)} & \multicolumn{2}{c|}{3.0\% (5.1\%)} \\ \hline
 \end{tabular}
-\caption{Far novelty: 10,500 validation images (normal) against 26,032 SVHN test images (novel), one network and one map per dataset. FPR@95: share of normal images flagged when 95\% of SVHN is caught. A random score gives AUROC 0.505; label shuffles give 0.500. The classical detectors are exploratory.}
-\label{tab:far}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent 10,500 validation images (normal) against 26,032 SVHN test images (novel), one network and one map per dataset. FPR@95: share of normal images flagged when 95\% of SVHN is caught. A random score gives AUROC 0.505; label shuffles give 0.500. The classical detectors are exploratory.\par}
 \end{table}
 
 \begin{itemize}
@@ -355,6 +374,8 @@ SVHN caught by the fixed QE alarm (normal flagged) & \multicolumn{2}{c|}{96.2\% 
 
 \begin{table}[H]
 \centering
+\caption{Near Novelty Detection on Held-Out Classes}
+\label{tab:near}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.25\textwidth}|C{0.30\textwidth}|C{0.30\textwidth}|}
@@ -368,8 +389,9 @@ Nearest-neighbour distance & \textbf{0.966} & \textbf{0.842} \\ \hline
 QE minus max-softmax (95\% interval) & $-0.032$ ($-0.095$, $+0.032$): inconclusive & $+0.046$ ($+0.034$, $+0.057$): \textbf{QE better} \\ \hline
 QE minus nearest neighbour (95\% interval) & $-0.054$ ($-0.084$, $-0.024$) & $-0.048$ ($-0.071$, $-0.026$) \\ \hline
 \end{tabular}
-\caption{Near novelty: 4 classes held out of training in each of 5 splits, with a new network and map per split. Statements fixed before the run; intervals are $t$-intervals over the 5 splits.}
-\label{tab:near}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent 4 classes held out of training in each of 5 splits, with a new network and map per split. Statements fixed before the run; intervals are $t$-intervals over the 5 splits.\par}
 \end{table}
 
 \begin{itemize}
@@ -386,6 +408,8 @@ QE minus nearest neighbour (95\% interval) & $-0.054$ ($-0.084$, $-0.024$) & $-0
 
 \begin{table}[H]
 \centering
+\caption{Phase 4 Settings}
+\label{tab:p4settings}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.36\textwidth}|C{0.25\textwidth}|C{0.25\textwidth}|}
@@ -397,12 +421,15 @@ Validation accuracy on altered images (original) & 98.21\% (99.12\%) & 90.46\% (
 Macro-F1 guard & 0.0016 & 0.0033 \\ \hline
 Test images on the hotspots & 146 & 422 \\ \hline
 \end{tabular}
-\caption{Phase 4 settings. The first augmentation ranges failed the check on both datasets (MNIST with 2-pixel shifts; Fashion-MNIST with MNIST's ranges and with them halved), and were reduced by rules written down before the next check. Clothing fills the frame, so turns and zooms cut off the sleeves and hems that separate similar garments.}
-\label{tab:p4settings}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent The first augmentation ranges failed the check on both datasets (MNIST with 2-pixel shifts; Fashion-MNIST with MNIST's ranges and with them halved), and were reduced by rules written down before the next check. Clothing fills the frame, so turns and zooms cut off the sleeves and hems that separate similar garments.\par}
 \end{table}
 
 \begin{table}[H]
 \centering
+\caption{Baseline and Post-Retraining Test Accuracy}
+\label{tab:retraining}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|l|C{0.11\textwidth}|C{0.11\textwidth}|C{0.11\textwidth}|C{0.11\textwidth}|}
@@ -416,12 +443,15 @@ Augmentation, SOM-chosen images (CF2) & 99.21\% & \textbf{7.8\%} & 90.62\% & 34.
 Curriculum, SOM order & 98.66\% & 21.4\% & 87.37\% & 51.8\% \\ \hline
 Curriculum, random order & 99.07\% & 12.2\% & 89.15\% & 42.1\% \\ \hline
 \end{tabular}
-\caption{Retraining results on the test split (baseline accuracy and post-retraining accuracy). Hotspot error is measured on the test images that fall on the 11 hotspot cells of the original map. The single Phase 1 networks scored 99.18\% and 90.90\%.}
-\label{tab:retraining}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent Hotspot error is measured on the test images that fall on the 11 hotspot cells of the original map. The single Phase 1 networks scored 99.18\% and 90.90\%.\par}
 \end{table}
 
 \begin{table}[H]
 \centering
+\caption{Phase 4 Success Criteria}
+\label{tab:criteria}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.40\textwidth}|C{0.24\textwidth}|C{0.24\textwidth}|}
@@ -433,8 +463,9 @@ A3: no damage outside the hotspots (upper end $\le 0.2$) & $-0.05$ ($-0.13$, $+0
 C1: SOM curriculum beats normal training & $+0.45$: worse & $+3.29$: worse \\ \hline
 C2: SOM curriculum beats random curriculum on hotspots & $+9.18$: worse & $+9.76$: worse \\ \hline
 \end{tabular}
-\caption{The Phase 4 success criteria: difference in test error (percentage points, first arm minus second) with the 95\% paired bootstrap interval. C1, C2, A1 and A2 also require the macro-F1 guard to hold.}
-\label{tab:criteria}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent Difference in test error (percentage points, first arm minus second) with the 95\% paired bootstrap interval. C1, C2, A1 and A2 also require the macro-F1 guard to hold.\par}
 \end{table}
 
 \begin{itemize}
@@ -447,6 +478,8 @@ C2: SOM curriculum beats random curriculum on hotspots & $+9.18$: worse & $+9.76
 
 \begin{table}[H]
 \centering
+\caption{SOM Re-Analysis and Novelty Detection After Retraining}
+\label{tab:reanalysis}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.42\textwidth}|C{0.23\textwidth}|C{0.23\textwidth}|}
@@ -461,8 +494,9 @@ Map not less ordered (R5) & met & not met \\ \hline
 SVHN QE AUROC: normal / random / SOM-guided & 0.976 / 0.983 / 0.984 & 0.838 / 0.744 / 0.715 \\ \hline
 Effect of SOM guidance on novelty AUROC & $+0.008$ ($-0.014$, $+0.030$): inconclusive & $-0.123$ ($-0.151$, $-0.094$): lowered \\ \hline
 \end{tabular}
-\caption{SOM re-analysis and novelty detection after retraining: a new 15$\times$15 SOM for each retrained network, 5 seeds per arm, statements fixed before the run. Intervals are $t$-intervals over seeds. On both datasets the least-confident arm's new maps could not be told apart from the SOM-guided arm's.}
-\label{tab:reanalysis}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent A new 15$\times$15 SOM for each retrained network, 5 seeds per arm, statements fixed before the run. Intervals are $t$-intervals over seeds. On both datasets the least-confident arm's new maps could not be told apart from the SOM-guided arm's.\par}
 \end{table}
 
 \begin{itemize}
@@ -473,6 +507,8 @@ Effect of SOM guidance on novelty AUROC & $+0.008$ ($-0.014$, $+0.030$): inconcl
 
 \begin{table}[H]
 \centering
+\caption{End-to-End Comparison of CF1 and CF2}
+\label{tab:endtoend}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.44\textwidth}|C{0.22\textwidth}|C{0.22\textwidth}|}
@@ -484,8 +520,9 @@ Seeds with fewer hotspot mistakes in CF2 & 5 of 5 & 4 of 5 \\ \hline
 Mistakes fixed / new mistakes per seed & about 40 / 30 & about 335 / 340 \\ \hline
 Net change over all images, range over seeds & $-12$ to $+31$ & $-49$ to $+69$ \\ \hline
 \end{tabular}
-\caption{End-to-end comparison of path 1 (CNN, CF1) and path 2 (SOM-guided retraining, then CNN, CF2) on the same 10,500 test images.}
-\label{tab:endtoend}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent Path 1 (CNN, CF1) and path 2 (SOM-guided retraining, then CNN, CF2) on the same 10,500 test images.\par}
 \end{table}
 
 \subsection{Graphs}
@@ -516,7 +553,7 @@ Figure~\ref{fig:errormaps} shows the location of the validation errors on each m
 \label{fig:umatrix}
 \end{figure}
 
-Figure~\ref{fig:overlay} shows where the SVHN images are mapped. On both datasets they collapse onto a few cells within a single class region. This view, which no scalar score provides, indicates which known class the novel images most resemble in the network's feature space.
+Figure~\ref{fig:overlay} shows where the SVHN images are mapped. On both datasets they collapse onto a few cells within a single class region. This view, which a single scalar score does not convey, indicates which known class the novel images most resemble in the network's feature space.
 
 \begin{figure}[H]
 \centering
@@ -550,6 +587,8 @@ Figure~\ref{fig:cf} compares CF1 and CF2. On MNIST, a few confusions become less
 \section{Discussion}\label{sec:discussion}
 
 \textbf{Main contribution.} On MNIST, the SOM was as effective as the network's own confidence for guiding retraining and, unlike the confidence score, it also showed where the errors cluster and why: in a few cells where two classes overlap. On Fashion-MNIST the same design no longer improved retraining, but the map still identified the group of classes that the network cannot separate.
+
+\textbf{The SOM's contribution is the map, not the score.} As a scoring method, the SOM does not outperform the strongest simple baselines on either dataset, although its quantization error is better than the Mahalanobis distance on both datasets for SVHN. For error detection, the SOM cell error rate (AUROC 0.685 on MNIST and 0.811 on Fashion-MNIST) is no better than k-means clustering (0.693 and 0.812) and is clearly worse than the network's maximum softmax probability (0.981 and 0.906). For far novelty detection, the SOM's quantization error (0.981 and 0.789) is below both the energy score (0.9998 and 0.982) and the maximum softmax probability (0.9985 and 0.884). The only setting in which a SOM score outperforms the network's confidence is the detection of unseen clothing classes on Fashion-MNIST (Table~\ref{tab:near}), and even there the nearest-neighbour distance is better. We therefore do not present the SOM as a better detector. Its contribution is the map itself: a single, topology-preserving view of the feature space that shows where errors concentrate, which classes overlap, and where novel inputs are placed, information that a single scalar score does not convey.
 
 \textbf{What the SOM reveals beyond standard metrics.}
 \begin{itemize}
@@ -595,6 +634,8 @@ We used a SOM trained on the embeddings of a fixed CNN as a post-training analys
 
 \begin{table}[H]
 \centering
+\caption{Project Objectives and Findings}
+\label{tab:summary}
 \renewcommand{\arraystretch}{1.12}
 \footnotesize
 \begin{tabular}{|L{0.30\textwidth}|L{0.62\textwidth}|}
@@ -607,11 +648,14 @@ Novelty detection & QE detects SVHN (0.981 and 0.789) but energy is better; the 
 Guided retraining & SOM-guided augmentation reduced hotspot mistakes on MNIST (11.4\% to 7.8\%) but not clearly on Fashion-MNIST; least-confident images work as well; curriculum learning hurt on both. \\ \hline
 Reusable pipeline & The same code and protocol ran on both datasets with only the forced changes recorded. \\ \hline
 \end{tabular}
-\caption{The proposal's objectives and what the project found.}
-\label{tab:summary}
+
 \end{table}
 
-The SOM is most valuable as an \emph{explanatory} tool: it shows where, and between which classes, a network fails, and where unfamiliar inputs are mapped. It does not detect errors or far out-of-distribution inputs better than the network's own scores, and it does not select retraining images better than the network's confidence. Future work should adapt the hard-example rule and the curriculum to each dataset under a new protocol, repeat the near-novelty experiment after retraining, and apply the pipeline to CIFAR-10 to test whether the approach scales to richer visual features.
+The contribution of the SOM is the map, not its scores. It is most valuable as an \emph{explanatory} tool: it shows where, and between which classes, a network fails, and where unfamiliar inputs are mapped. It does not detect errors or far out-of-distribution inputs better than the network's own scores, and it does not select retraining images better than the network's confidence. Future work should adapt the hard-example rule and the curriculum to each dataset under a new protocol, repeat the near-novelty experiment after retraining, and apply the pipeline to CIFAR-10 to test whether the approach scales to richer visual features.
+
+\section*{Acknowledgment}
+
+The authors thank Dr.\ Amir Jafari for supervising this project. In preparing this report, the authors used Claude (Anthropic), a large language model, to draw the diagrams in Figs.~\ref{fig:pipeline}--\ref{fig:endtoend} in draw.io (17 November 2026; relabelled for both datasets on 22 November 2026) and to compile Tables~\ref{tab:baseline}--\ref{tab:summary} from the project's experimental results (22 November 2026). All values were checked against the experiment outputs, and the authors take full responsibility for the content of this report.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
