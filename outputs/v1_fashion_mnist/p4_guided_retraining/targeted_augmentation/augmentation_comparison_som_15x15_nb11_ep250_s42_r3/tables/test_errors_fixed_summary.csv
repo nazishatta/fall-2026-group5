@@ -1,0 +1,15 @@
+arm,subset,fixed_mean,new_mean,net_fixed_mean,net_fixed_std
+augmented_som,overall,335.4,340.0,-4.6,47.42
+augmented_som,hotspot,55.8,47.4,8.4,8.26
+augmented_random,overall,318.8,325.6,-6.8,19.7
+augmented_random,hotspot,50.0,46.0,4.0,8.09
+augmented_msp,overall,329.0,338.6,-9.6,36.42
+augmented_msp,hotspot,49.2,46.0,3.2,8.64
+augmented_hotspot,overall,255.0,269.4,-14.4,23.05
+augmented_hotspot,hotspot,38.2,39.8,-1.6,11.08
+augmented_random_hotspot,overall,223.0,237.0,-14.0,22.06
+augmented_random_hotspot,hotspot,32.4,35.2,-2.8,9.26
+augmented_som_paced,overall,241.2,242.6,-1.4,15.45
+augmented_som_paced,hotspot,35.2,31.2,4.0,4.53
+augmented_random_paced,overall,242.0,248.4,-6.4,11.28
+augmented_random_paced,hotspot,36.6,38.8,-2.2,2.86

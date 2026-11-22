@@ -1,0 +1,6 @@
+outs:
+- md5: 5814260bbe432afdaf46faacb1b5c757.dir
+  size: 21964262
+  nfiles: 16
+  hash: md5
+  path: scores
