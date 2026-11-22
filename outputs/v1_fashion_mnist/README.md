@@ -7,4 +7,4 @@ Results of the Fashion-MNIST runs, in the same phase and step folders as `output
 | [`p1_model_training_baseline/`](p1_model_training_baseline/) | 1: data split and the LeNet-5 baseline | run |
 | [`p2_som_training_visualization/`](p2_som_training_visualization/) | 2: SOM training, clusters and error patterns | run |
 | [`p3_novelty_detection/`](p3_novelty_detection/README.md) | 3: novelty detection (SVHN and held-out classes) | run |
-| [`p4_guided_retraining/`](p4_guided_retraining/) | 4: SOM-guided retraining | not run yet |
+| [`p4_guided_retraining/`](p4_guided_retraining/README.md) | 4: SOM-guided retraining | run |

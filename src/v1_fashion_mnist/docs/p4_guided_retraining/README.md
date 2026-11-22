@@ -2,7 +2,7 @@
 
 Phase 4, guided retraining: does retraining on images the map picks beat picking at random?
 
-Protocol: [`RETRAINING_PROTOCOL.md`](RETRAINING_PROTOCOL.md). Configs:
+Protocol: [`RETRAINING_PROTOCOL.md`](RETRAINING_PROTOCOL.md) (stamped: `retraining_protocol_stamp.txt`). Results: [`RETRAINING_RESULTS.md`](RETRAINING_RESULTS.md). Configs:
 `src/v1_fashion_mnist/component/configs/` (`retraining.yaml`, `som_reanalysis.yaml`,
 `som_reanalysis_msp_arm.yaml`, `novelty_after_retraining.yaml`). Code: shared with MNIST.
 
@@ -31,5 +31,8 @@ the runners are in `src/v1_mnist/component/pipeline/p4_guided_retraining/`.
 `run_all.py --config-dir src/v1_fashion_mnist/component/configs --from guided_retraining` runs steps 1 to 3
 and stops; `--from guided_retraining_test`, asked for by name, runs steps 6 and 7 once the stamp exists.
 
-Record the outcome in the protocol's section 5 only after step 7: the stamp records the protocol file's
-SHA-256, and the test-pass stages check it.
+## Outcome
+
+[`RETRAINING_RESULTS.md`](RETRAINING_RESULTS.md): every statement (A1–A3, C1–C2, R1–R5, S1–S2, N1–N4) beside
+MNIST's. It is kept apart from the protocol so the stamped protocol stays byte-identical and its stamp can
+still be checked, as for MNIST; a test checks both stamps.
