@@ -8,7 +8,8 @@ Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage breakdown
 
 ``check`` looks at the altered images (contact sheet, Phase 1 CNN accuracy on altered validation
-images). Options: --config CONFIG (every stage; default: the MNIST retraining.yaml), --arm NAME,
+images). When the config sets a transform-check limit, ``train`` refuses to start until the check has
+passed it (``--smoke`` trials are exempt: they write to their own folder). Options: --config CONFIG (every stage; default: the MNIST retraining.yaml), --arm NAME,
 --seed N, --smoke. Same rules as the curriculum comparison.
 """
 
@@ -26,6 +27,7 @@ from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentat
     make_augmentation_builder,
 )
 from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_check import (  # noqa: E402
+    require_passed_check,
     run_check,
 )
 from src.v1_mnist.component.utils.logging import setup_logger  # noqa: E402
@@ -52,6 +54,8 @@ def main() -> None:
         setup_logger("v1_mnist", settings.output_dir / "logs" / "check.log")
         run_check(settings, load_retraining_data(settings, REPO_ROOT))
         return
+    if "--stage" in sys.argv and sys.argv[sys.argv.index("--stage") + 1] == "train" and "--smoke" not in sys.argv:
+        require_passed_check(load_experiment_settings("augmentation", check_config(sys.argv[1:]), REPO_ROOT))
     run_experiment_cli("augmentation", "Targeted augmentation: standard vs augmented arms.",
                        make_augmentation_builder, REPO_ROOT)
 

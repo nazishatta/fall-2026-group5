@@ -4,10 +4,15 @@ Two checks, both written down before the arms are compared:
 1. a contact sheet: original image next to its altered copies, for a few pool images;
 2. the Phase 1 CNN's accuracy on altered validation images against its accuracy on the originals.
    If the altered images are much harder than the originals, the ranges are too strong.
+
+When the config sets ``augmentation.transform_check.max_accuracy_drop`` (Fashion-MNIST), the check
+records whether it passed and the train stage refuses to start until it has. Without that setting
+(MNIST, whose check was judged by hand before this existed) nothing is enforced.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -54,10 +59,35 @@ def contact_sheet(data: RetrainingData, settings: ExperimentSettings, path: Path
     return save_pdf(fig, path)
 
 
+def check_path(settings: ExperimentSettings) -> Path:
+    """Where the transform check writes its result."""
+    return settings.output_dir / "check" / "augmentation_check.json"
+
+
+def accuracy_drop_limit(settings: ExperimentSettings) -> float | None:
+    """The largest allowed accuracy drop on altered images, or None when the config sets none."""
+    limit = (settings.options.get("transform_check") or {}).get("max_accuracy_drop")
+    return None if limit is None else float(limit)
+
+
+def require_passed_check(settings: ExperimentSettings) -> None:
+    """Stop the train stage unless the transform check ran and passed (only when a limit is set)."""
+    if accuracy_drop_limit(settings) is None:
+        return
+    path = check_path(settings)
+    if not path.is_file():
+        raise RuntimeError(f"{path} is missing: run --stage check before --stage train.")
+    result = json.loads(path.read_text(encoding="utf-8"))
+    if not result.get("passed"):
+        raise RuntimeError(
+            f"The transform check failed (accuracy drop {result.get('accuracy_drop')}, allowed "
+            f"{result.get('max_accuracy_drop')}): make the ranges smaller under a new revision "
+            "and record it in DEVIATIONS.md before any arm runs.")
+
+
 def run_check(settings: ExperimentSettings, data: RetrainingData) -> dict[str, Any]:
     """Write the contact sheet and augmentation_check.json (once)."""
-    out = settings.output_dir / "check"
-    result_path = out / "augmentation_check.json"
+    result_path = check_path(settings)
     ensure_not_done(result_path)
     sheet = contact_sheet(data, settings, settings.output_dir / "figures" / "augmentation_contact_sheet")
 
@@ -82,7 +112,15 @@ def run_check(settings: ExperimentSettings, data: RetrainingData) -> dict[str, A
         "transforms": settings.options["transforms"],
         "contact_sheet": sheet.name,
     }
+    limit = accuracy_drop_limit(settings)
+    if limit is not None:
+        result["accuracy_drop"] = result["accuracy_original"] - result["accuracy_altered"]
+        result["max_accuracy_drop"] = limit
+        result["passed"] = bool(result["accuracy_drop"] <= limit)
     write_json(result_path, result)
     LOGGER.info("Accuracy on validation images: original %.4f, altered %.4f",
                 result["accuracy_original"], result["accuracy_altered"])
+    if limit is not None:
+        LOGGER.info("Transform check %s: accuracy drop %.4f, allowed %.4f. Look at the contact sheet too.",
+                    "PASSED" if result["passed"] else "FAILED", result["accuracy_drop"], limit)
     return result

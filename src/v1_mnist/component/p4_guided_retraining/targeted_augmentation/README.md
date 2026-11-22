@@ -7,7 +7,7 @@ Arms (`configs/retraining.yaml`, section `augmentation`): `standard`; `augmented
 | File | What it does |
 |---|---|
 | `augmentation_arms.py` | builds each arm's training set: the original images plus the altered copies, with true labels |
-| `augmentation_check.py` | contact sheet and the Phase 1 CNN's accuracy on altered validation images (the transform check) |
+| `augmentation_check.py` | contact sheet and the Phase 1 CNN's accuracy on altered validation images (the transform check); when the config sets `augmentation.transform_check.max_accuracy_drop` (Fashion-MNIST), it records pass or fail and the train stage waits until it has passed |
 | `../../utils/image_transforms.py` | small rotation, shift, zoom, shear; no flips; seeded |
 
 Runner: `pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage check|train|summary|final_test`; commands in `../HOW_TO_RUN.md`.

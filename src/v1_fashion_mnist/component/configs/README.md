@@ -21,3 +21,13 @@ Each made from the MNIST config of the same name with only the dataset-specific 
 
 One config per step of the Phase 3 protocol (`docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md`), each made from the MNIST config of the same name with only the dataset-specific values changed. `phase3_shared_provenance.yaml` holds the frozen Phase 3 inputs and their SHA-256; every Phase 3 script checks its inputs against it. `novelty_statements.yaml` judges the group proposal's RQ3 and RQ4 and this protocol's statements O1 to O4 in one run. MNIST steps that only re-created or repaired MNIST's own earlier runs have no config here, so the runners skip them. Values marked `[TBD]` are filled in from earlier steps' results, in the stages described in `docs/p3_novelty_detection/README.md`.
 
+## Phase 4
+
+Each made from the MNIST config of the same name with only the dataset-specific values changed, plus the values the Phase 4 protocol sets for Fashion-MNIST itself (`docs/p4_guided_retraining/RETRAINING_PROTOCOL.md`, section 2).
+
+| Config | Step |
+|---|---|
+| `retraining.yaml` | Hard-image pools, the curriculum comparison and targeted augmentation. Its own values: the macro-F1 guard (empty until the validation summaries measure it), the Fashion-MNIST protocol and stamp files, the first revision, and the transform-check limit (2 percentage points; the train stage waits until the check has passed) |
+| `som_reanalysis.yaml` | New SOMs on the retrained networks: `augmented_som` against `standard` and `augmented_random` |
+| `som_reanalysis_msp_arm.yaml` | The secondary re-analysis with the max-softmax arm |
+| `novelty_after_retraining.yaml` | Phase 3's novelty scores (SVHN) on the retrained networks |

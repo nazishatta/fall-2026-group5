@@ -44,6 +44,8 @@ ADDED_ON_PURPOSE = {
     "missed_svhn_figure.yaml": {"scores_subfolder"},
     "qe_norm_dependence.yaml": {"analysis_status"},
     "unified_novelty_benchmark.yaml": {"study_type"},
+    # The protocol's transform-check limit, enforced by the code (MNIST's check was judged by hand).
+    "retraining.yaml": {"augmentation.transform_check", "augmentation.transform_check.max_accuracy_drop"},
 }
 # Settings the MNIST original has and a Fashion-MNIST copy leaves out on purpose: only MNIST has an
 # original grid-comparison run to reproduce.
