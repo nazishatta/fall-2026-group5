@@ -1,8 +1,9 @@
 """The Fashion-MNIST Phase 4 configs match the protocol (docs/p4_guided_retraining/RETRAINING_PROTOCOL.md).
 
 Every MNIST setting is copied unchanged except the dataset's own paths and the few values the protocol
-names: the macro-F1 guard (measured by its rule), the protocol and stamp files, the first run's revision
-and the transform-check limit. The guard is either still empty or exactly what its rule gives.
+names: the macro-F1 guard (measured by its rule), the protocol and stamp files, the transform-check limit,
+and the augmentation ranges and revision set by the halving rule in docs/DEVIATIONS.md after MNIST's ranges
+failed the transform check. The guard is either still empty or exactly what its rule gives.
 """
 
 from __future__ import annotations
@@ -19,21 +20,29 @@ CONFIGS = REPO_ROOT / "src" / "v1_fashion_mnist" / "component" / "configs"
 MNIST_CONFIGS = REPO_ROOT / "src" / "v1_mnist" / "component" / "configs"
 PROTOCOL = REPO_ROOT / "src" / "v1_fashion_mnist" / "docs" / "p4_guided_retraining" / "RETRAINING_PROTOCOL.md"
 PHASE4 = ("retraining.yaml", "som_reanalysis.yaml", "som_reanalysis_msp_arm.yaml", "novelty_after_retraining.yaml")
-P4_OUT = REPO_ROOT / "outputs" / "v1_fashion_mnist" / "p4_guided_retraining"
-# The validation summaries the guard is measured from (protocol section 2: the larger of the two).
-SUMMARIES = (
-    P4_OUT / "hard_example_mining" / "curriculum_comparison_som_15x15_nb11_ep250_s42" / "tables" / "validation_summary.json",
-    P4_OUT / "targeted_augmentation" / "augmentation_comparison_som_15x15_nb11_ep250_s42" / "tables" / "validation_summary.json",
-)
 # Values the protocol sets for Fashion-MNIST itself (retraining.yaml).
 OWN_VALUES = {
     ("evaluation", "macro_f1_guard"), ("protocol", "document"), ("protocol", "stamp"),
-    ("augmentation", "run", "revision"), ("augmentation", "transform_check"),
+    ("augmentation", "run", "revision"), ("augmentation", "transform_check"), ("augmentation", "transforms"),
 }
+# docs/DEVIATIONS.md (2026-11-21): MNIST's ranges halved once per revision, at most twice.
+HALVINGS = {"r2": 1, "r3": 2}
 
 
 def _load(folder: Path, name: str) -> dict[str, Any]:
     return yaml.safe_load((folder / name).read_text(encoding="utf-8"))
+
+
+def _summaries() -> list[Path]:
+    """The validation summaries the guard is measured from (protocol section 2: the larger of the two)."""
+    config = _load(CONFIGS, "retraining.yaml")
+    som = _load(CONFIGS, "som.yaml")["visualization"]["selected_model"]
+    paths = []
+    for block in (config["curriculum"], config["augmentation"]):
+        revision = block["run"]["revision"]
+        run_id = f"{block['run']['name']}_{som}" + (f"_{revision}" if revision else "")
+        paths.append(REPO_ROOT / block["paths"]["output_root"] / run_id / "tables" / "validation_summary.json")
+    return paths
 
 
 def _as_mnist(value: Any) -> Any:
@@ -81,11 +90,18 @@ def test_the_protocol_and_its_stamp_are_fashion_mnist_files() -> None:
     assert protocol["stamp"].startswith("src/v1_fashion_mnist/docs/p4_guided_retraining/")
 
 
-def test_the_first_run_uses_mnists_final_ranges_and_the_protocols_check_limit() -> None:
+def test_the_ranges_are_mnists_halved_by_the_recorded_rule_and_the_check_limit_is_the_protocols() -> None:
     fashion = _load(CONFIGS, "retraining.yaml")["augmentation"]
-    assert fashion["transforms"] == _load(MNIST_CONFIGS, "retraining.yaml")["augmentation"]["transforms"]
-    assert fashion["transforms"]["max_shift_pixels"] == 1.0
-    assert fashion["run"]["revision"] == ""
+    mnist = _load(MNIST_CONFIGS, "retraining.yaml")["augmentation"]["transforms"]
+    factor = 0.5 ** HALVINGS[fashion["run"]["revision"]]
+    expected = {
+        "max_rotation_degrees": mnist["max_rotation_degrees"] * factor,
+        "max_shift_pixels": mnist["max_shift_pixels"] * factor,
+        "min_zoom": 1 - (1 - mnist["min_zoom"]) * factor,
+        "max_zoom": 1 + (mnist["max_zoom"] - 1) * factor,
+        "max_shear_degrees": mnist["max_shear_degrees"] * factor,
+    }
+    assert fashion["transforms"] == pytest.approx(expected)
     assert fashion["transform_check"] == {"max_accuracy_drop": 0.02}      # 2 percentage points
 
 
@@ -95,6 +111,6 @@ def test_the_macro_f1_guard_is_empty_or_follows_its_rule() -> None:
     if guard is None:
         assert "[TBD: measured by the rule" in protocol
         return
-    suggestions = [json.loads(p.read_text(encoding="utf-8"))["macro_f1_guard_suggestion"] for p in SUMMARIES]
+    suggestions = [json.loads(p.read_text(encoding="utf-8"))["macro_f1_guard_suggestion"] for p in _summaries()]
     assert guard == pytest.approx(max(suggestions), rel=1e-12)
     assert "[TBD: measured by the rule" not in protocol

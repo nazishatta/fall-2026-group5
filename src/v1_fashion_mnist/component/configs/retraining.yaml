@@ -1,5 +1,6 @@
 # Fashion-MNIST settings. Made from src/v1_mnist/component/configs/retraining.yaml with only the
-# dataset-specific values changed (paths), the empty macro-F1 guard and the transform-check limit; protocol:
+# dataset-specific values changed (paths), the empty macro-F1 guard, the transform-check limit and the
+# halved augmentation ranges (revision r2); protocol:
 # src/v1_fashion_mnist/docs/p4_guided_retraining/RETRAINING_PROTOCOL.md
 # ==============================================================================
 # Guided retraining (Phase 4)
@@ -92,7 +93,7 @@ curriculum:
 augmentation:
   run:
     name: augmentation_comparison
-    revision: ""               # first Fashion-MNIST run, with the MNIST ranges after its r2 change
+    revision: "r2"             # r1 (MNIST's ranges) failed the transform check: accuracy 0.9166 -> 0.8360
   paths:
     output_root: ./outputs/v1_fashion_mnist/p4_guided_retraining/targeted_augmentation
   copies_per_image: 3          # k; a middle value, not from a paper
@@ -101,12 +102,14 @@ augmentation:
   # refuses to start until --stage check has passed it.
   transform_check:
     max_accuracy_drop: 0.02
+  # MNIST's ranges halved by the rule in docs/DEVIATIONS.md (2026-11-21), written before this check ran:
+  # r1 used rotation 10, shift 1.0, zoom 0.9-1.1, shear 8. If r2 fails, all four are halved once more (r3).
   transforms:                  # label-preserving: small moves only; checked on a contact sheet
-    max_rotation_degrees: 10.0
-    max_shift_pixels: 1.0      # MNIST's final value (MNIST r1 used 2.0 and failed its transform check)
-    min_zoom: 0.9
-    max_zoom: 1.1
-    max_shear_degrees: 8.0
+    max_rotation_degrees: 5.0
+    max_shift_pixels: 0.5
+    min_zoom: 0.95
+    max_zoom: 1.05
+    max_shear_degrees: 4.0
   # Gradual pacing for the added copies (same schedule as the curriculum): the project's
   # protection against unstable training when the hard-example share is too high too early.
   schedules:

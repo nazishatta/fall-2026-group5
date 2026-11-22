@@ -27,7 +27,7 @@ Each made from the MNIST config of the same name with only the dataset-specific 
 
 | Config | Step |
 |---|---|
-| `retraining.yaml` | Hard-image pools, the curriculum comparison and targeted augmentation. Its own values: the macro-F1 guard (empty until the validation summaries measure it), the Fashion-MNIST protocol and stamp files, the first revision, and the transform-check limit (2 percentage points; the train stage waits until the check has passed) |
+| `retraining.yaml` | Hard-image pools, the curriculum comparison and targeted augmentation. Its own values: the macro-F1 guard (empty until the validation summaries measure it), the Fashion-MNIST protocol and stamp files, the transform-check limit (2 percentage points; the train stage waits until the check has passed), and revision r2, in which MNIST's augmentation ranges are halved because they failed that check (rule in `docs/DEVIATIONS.md`) |
 | `som_reanalysis.yaml` | New SOMs on the retrained networks: `augmented_som` against `standard` and `augmented_random` |
 | `som_reanalysis_msp_arm.yaml` | The secondary re-analysis with the max-softmax arm |
 | `novelty_after_retraining.yaml` | Phase 3's novelty scores (SVHN) on the retrained networks |
