@@ -33,8 +33,9 @@ section 1. Seeds: retraining seeds 1-5.
     `augmented_hotspot`, `augmented_random_hotspot`, `augmented_som_paced`, `augmented_random_paced`; 3 altered
     copies per pool image (rotation up to 10 degrees, shift up to 1 pixel, zoom 0.9-1.1, shear up to 8
     degrees, no flips), pacing as on MNIST; these ranges failed the transform check, so all four were halved
-    under revision r2 (5 degrees, 0.5 pixel, 0.95-1.05, 4 degrees) by a rule written in `../DEVIATIONS.md`
-    before the next check;
+    by a rule written in `../DEVIATIONS.md` before the next check: once under revision r2 (5 degrees,
+    0.5 pixel, 0.95-1.05, 4 degrees), which also failed, and again under r3 (2.5 degrees, 0.25 pixel,
+    0.975-1.025, 2 degrees);
   - curriculum: `standard`, `curriculum_som`, `curriculum_random`, `curriculum_msp`, with the MNIST schedule.
 - **Transform check** (validation only, before any arm is compared): the Phase 1 network's accuracy on
   altered validation images must be within 2 percentage points of its accuracy on the originals. If not, the
