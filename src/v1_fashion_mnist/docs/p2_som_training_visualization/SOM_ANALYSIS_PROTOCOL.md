@@ -133,7 +133,64 @@ MNIST), because the mistakes lie in large mixed regions of the map rather than i
 SOM's value in Phase 2 is the map of where classes mix and where the mistakes sit, not error detection. The
 SOM hotspot analysis reproduced the Phase 2 robustness result exactly.
 
-Everything else: [TBD]
+**SOM training (recorded 2026-11-21).** The three maps of section 1, seed 42, measured on the 10,500
+validation images. Source: `outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/tables/som_grid_ablation.csv`.
+
+| Grid | Neighbourhood | QE | TE1 (%) | TE1+2 (%) | Neurons used |
+|---|---|---|---|---|---|
+| 10x10 | 7 | 1.008 | 4.26 | 1.76 | 99 of 100 |
+| 15x15 (headline) | 11 | 0.899 | 5.37 | 3.55 | 222 of 225 |
+| 20x20 | 15 | 0.822 | 7.33 | 4.75 | 396 of 400 |
+
+As on MNIST, bigger maps fit the images more closely (lower QE) but keep neighbours together less well
+(higher topographic error), so no grid is best on every measure. The table's rank sum (10x10: 5, 15x15: 6,
+20x20: 7) is for reference only; the headline map stays 15x15 as fixed in section 1. Purity for each grid
+comes from the grid comparison (10 maps per grid): [TBD] until it finishes.
+
+**RQ1: how well the map keeps classes apart (recorded 2026-11-21; descriptive, no pass/fail).** Source:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/cluster_summary.json`.
+
+| Measure | Fashion-MNIST | MNIST |
+|---|---|---|
+| Weighted purity on validation | 0.893 | 0.982 |
+| Label-shuffled baseline, mean [95% range] (1,000 shuffles, seed 20261010) | 0.173 [0.170, 0.177] | 0.174 [0.170, 0.177] |
+| p-value (smallest possible with 1,000 shuffles: 0.001) | 0.001 | 0.001 |
+
+The map keeps the classes far better than chance: the highest of the 1,000 shuffles was 0.180. Purity is lower than on
+MNIST, which fits the network's higher validation error rate (8.3% against 0.9%): more images sit in
+neurons where classes mix. Purity on the training images is 0.900, so the map is not much purer on the
+images it was trained on. The class maps are in `outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/figures/` and the interactive
+report is `outputs/v1_fashion_mnist/p2_som_training_visualization/interactive_report/interactive_report.html` (DVC).
+
+**RQ2: where the mistakes sit (recorded 2026-11-21).** The network gets 876 of the 10,500 validation images
+wrong (8.3%); its mean confidence is 0.686 on these and 0.942 on the rest. Hotspots are picked on one half
+of the mistakes and judged on the other half (section 2). The held-out ratio is the hotspots' error rate
+divided by the overall error rate (1 = no concentration). Sources:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/error_pattern_analysis/robustness/*_error_pattern_robustness.json` and
+`error_pattern_robustness_verdict.json` in the same folder.
+
+| Map | Hotspots | Held-out ratio, median [2.5th, 97.5th percentile] | Chance median (95th percentile) | p | Error rate against purity (Spearman) | Verdict | MNIST median ratio |
+|---|---|---|---|---|---|---|---|
+| 15x15 (headline) | 11 | 3.90 [3.23, 4.44] | 1.00 (1.16) | 0.005 | -0.95 | **passes** | 11.1 |
+| 10x10 | 5 | 3.81 [3.07, 4.37] | 1.00 (1.22) | 0.005 | -0.93 | holds | 10.5 |
+| 20x20 | 20 | 3.81 [3.14, 4.35] | 1.00 (1.18) | 0.005 | -0.95 | holds | 13.4 |
+
+p = 0.005 is the smallest possible with 200 shuffles. On the headline map both pre-written criteria pass:
+the mistakes are concentrated in the hotspots (median ratio above chance with p < 0.05, 2.5th percentile
+above 1), and the neurons with more mistakes are the ones where classes mix (error rate falls as purity
+rises, and rises with class entropy, rho = 0.96). The result holds on the 10x10 and 20x20 maps.
+
+The ratios are much lower than on MNIST, but the two are not comparable in size: a ratio cannot exceed one
+divided by the overall error rate, which is about 12 on Fashion-MNIST and about 114 on MNIST. The
+Fashion-MNIST mistakes are spread over larger mixed regions of the map rather than packed into a few
+cells, which also explains the error-detection results above. On the images used to pick them, the 11
+hotspots hold 4.0% of the images and 19.7% of the mistakes; this overstates the concentration and is
+descriptive only. Mistakes also sit a little further from their neuron than correct images (mean distance
+0.994 against 0.840).
+
+No test data was used in any of these runs (`test_used: false`, `test_evaluated: false`).
+
+**Grid comparison:** running; recorded here when it finishes ([TBD]).
 
 ## 6. References
 
