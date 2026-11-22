@@ -1,0 +1,68 @@
+# ==============================================================================
+# Pre-registered SOM grid comparison (Phase 2): do 10x10, 15x15 and 20x20 maps differ in how well their
+# cells predict which validation images the CNN gets wrong, on images not used to estimate those rates?
+# Rules (written and stamped before any run, unchanged):
+#   src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/PREREGISTRATION_grid_comparison.md
+# Every value below is the pre-registration's. Only training and validation data are read.
+# Do not change after the first run; a change needs a new run.revision.
+# ==============================================================================
+
+run:
+  name: grid_comparison
+  # Run folder: <name>_g<grids>_b<bootstrap maps>_r<repeats>[_<revision>]. Empty for the first run.
+  revision: ""
+
+inputs:
+  cnn_config: src/v1_mnist/component/configs/cnn_baseline.yaml   # number of classes
+  som_config: src/v1_mnist/component/configs/som.yaml            # frozen embeddings folder
+
+paths:
+  output_root: ./outputs/v1_mnist/p2_som_training_visualization/grid_comparison
+
+protocol:
+  document: src/v1_mnist/docs/p2_som_training_visualization/som_nnsom_training/PREREGISTRATION_grid_comparison.md
+
+design:
+  grids: [10, 15, 20]
+  candidate_fractions: [0.20, 0.47, 0.73]   # Stage 1 neighbourhoods = round(fraction x side): 10x10 2/5/7, 15x15 3/7/11, 20x20 4/9/15
+  epochs: 250                               # epochs = steps for every grid
+  tune_seed: 42                             # Stage 1: full training set, exact random stream
+  bootstrap_maps: 10                        # Stage 2: B maps per grid, resample b drawn with default_rng(1000 + b), trainer seed b
+  resample_seed_base: 1000
+
+endpoint:
+  reps: 200                      # repeat r uses default_rng(5000 + r) for the stratified halves and their bootstraps
+  split_seed_base: 5000
+  margin: 0.02                   # practical-equivalence margin (AUROC)
+  low_confidence_quantile: 0.05  # secondary target: lowest 5% of validation confidence
+
+comparisons:
+  primary: {big: 20, small: 15, metric: auroc_err}
+  secondary:
+    - {big: 20, small: 15, metric: ap_err}
+    - {big: 20, small: 15, metric: auroc_lowconf}
+    - {big: 20, small: 15, metric: ap_lowconf}
+    - {big: 15, small: 10, metric: auroc_err}
+    - {big: 15, small: 10, metric: auroc_lowconf}
+  # Added 2026-11-21, after the MNIST results were known (docs/DEVIATIONS.md): not part of the decision.
+  exploratory:
+    - {big: 20, small: 10, metric: auroc_err}
+    - {big: 20, small: 10, metric: auroc_lowconf}
+
+expected:
+  train_samples: 49000
+  validation_samples: 10500
+  validation_errors: 92
+  low_confidence_images: 525
+
+# The original run (2026-10-06), brought into the repository unchanged. The criteria were fixed on
+# 2026-11-21, before the port was run: the port on the original's saved maps must give its numbers
+# (largest difference <= saved_maps_tolerance, same verdicts); a fresh retrain must give the same verdicts
+# and each grid's mean held-out AUROC within retrain_auroc_tolerance (library versions differ slightly
+# from the original's: numpy 2.5.3, scipy 1.18.1, scikit-learn 1.9.1).
+reproduction:
+  maps_dir: ./outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_initial/models
+  model_pattern: "gsB_boot_{grid}x{grid}_nb{nb}_ep{epochs}_b{b}.npz"
+  results: ./outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_initial/results.json
+  saved_maps_tolerance: 1.0e-12
+  retrain_auroc_tolerance: 0.01

@@ -12,6 +12,7 @@ Runner: `pipeline/p2_som_training_visualization/run_som_nnsom_training.py`. Resu
 |---|---|
 | [`convergence_plots/`](convergence_plots/README.md) | Three interactive HTML charts of how a SOM trained: the quantization error (QE) per epoch, the training and validation quality, and the shrinking neighbourhood radius. |
 | [`layer_ablation/`](layer_ablation/README.md) | SOMs on two layers of the frozen Phase 1 LeNet-5, `fc1` (120 numbers) and `fc2` (84 numbers, the layer every other step uses), with the same Phase 2 recipe and 5 SOM seeds each. |
+| [`grid_comparison/`](grid_comparison/README.md) | The pre-registered comparison of the 10x10, 15x15 and 20x20 maps on predicting held-out CNN mistakes (10 bootstrap maps per grid, 200 repeats). |
 
 ## Files
 

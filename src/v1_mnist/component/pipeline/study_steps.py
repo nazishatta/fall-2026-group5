@@ -83,6 +83,11 @@ def _error_detector_budget(d: str) -> list[Step]:
                  ["--config", f"{d}/error_detector_budget.yaml"])]
 
 
+def _grid_comparison(d: str) -> list[Step]:
+    return [Step("grid_comparison", P2 / "run_grid_comparison.py",
+                 ["--config", f"{d}/grid_comparison.yaml", "--stage", "all"])]
+
+
 def optuna_grids(config: str) -> list[str]:
     """The grids named in a som_optuna.yaml (``optuna.grids``)."""
     raw = yaml.safe_load(resolve(config).read_text(encoding="utf-8")) or {}
@@ -161,6 +166,13 @@ def _budget_results(d: str) -> list[Path]:
     return [load_budget_settings(f"{d}/error_detector_budget.yaml", REPO_ROOT).output_dir]
 
 
+def _grid_results(d: str) -> list[Path]:
+    from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.grid_comparison.settings import (
+        load_grid_settings,
+    )
+    return [load_grid_settings(f"{d}/grid_comparison.yaml", REPO_ROOT).results_path]
+
+
 def _optuna_results(d: str) -> list[Path]:
     raw = yaml.safe_load(resolve(f"{d}/som_optuna.yaml").read_text(encoding="utf-8")) or {}
     return [resolve(raw["paths"]["summary_table"])]
@@ -221,6 +233,7 @@ def _test_results(d: str) -> list[Path]:
 PHASE2_STUDY_STEPS = (
     StudyStep("error_pattern_baselines", ("error_pattern_baselines.yaml",), _error_pattern_baselines, _baseline_results),
     StudyStep("error_detector_budget", ("error_detector_budget.yaml",), _error_detector_budget, _budget_results),
+    StudyStep("grid_comparison", ("grid_comparison.yaml",), _grid_comparison, _grid_results),
     StudyStep("som_optuna", ("som_optuna.yaml",), _som_optuna, _optuna_results),
     StudyStep("feature_layer_ablation", ("feature_layer_ablation.yaml",), _feature_layer_ablation, _ablation_results),
 )

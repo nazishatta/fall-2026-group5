@@ -18,6 +18,7 @@ The proposal week is shown for orientation only; the code uses the step names.
 | 2 | (report) | 3–5 | `p2_som_training_visualization/run_interactive_report.py` | Interactive HTML report | ✅ Yes |
 | 2 | `error_pattern_baselines` | – | `p2_som_training_visualization/run_error_pattern_baselines.py --stage all` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots | ✅ Skipped if its results exist |
 | 2 | `error_detector_budget` | – | `p2_som_training_visualization/run_error_detector_budget.py` | Same-budget comparison of the error detectors (exploratory) | ✅ Skipped if its results exist |
+| 2 | `grid_comparison` | – | `p2_som_training_visualization/run_grid_comparison.py --stage all` | Pre-registered grid comparison: 10x10, 15x15 and 20x20 maps on predicting held-out CNN mistakes (MNIST also checks the original run) | ✅ Skipped if its results exist |
 | 2 | `som_optuna` | – | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py`, `optuna_confirmation.py` | Optuna search for every grid in `som_optuna.yaml`, the 5-seed confirmation of each, the summary table | ✅ Skipped if the summary table exists |
 | 2 | `feature_layer_ablation` | – | `p2_som_training_visualization/run_feature_layer_ablation.py` | fc1 against fc2: `--stage extract`, `som`, `compare` | ✅ Skipped if its results exist |
 | 3 | `novelty_detection` | – | `p3_novelty_detection/run_*.py` (see below) | The three Phase 3 runners, in the order their results depend on each other | ✅ Finished steps are skipped |
@@ -66,6 +67,7 @@ Every step in `study_steps.py` can still be run alone, with its own config and s
 
 ```bash
 python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_feature_layer_ablation.py --config src/v1_mnist/component/configs/feature_layer_ablation.yaml --stage compare
+python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_grid_comparison.py --config src/v1_mnist/component/configs/grid_comparison.yaml --stage verify_saved
 python src/v1_mnist/component/pipeline/p4_guided_retraining/run_protocol_stamp.py --config src/v1_mnist/component/configs/retraining.yaml
 ```
 

@@ -45,6 +45,13 @@ ADDED_ON_PURPOSE = {
     "qe_norm_dependence.yaml": {"analysis_status"},
     "unified_novelty_benchmark.yaml": {"study_type"},
 }
+# Settings the MNIST original has and a Fashion-MNIST copy leaves out on purpose: only MNIST has an
+# original grid-comparison run to reproduce.
+LEFT_OUT_ON_PURPOSE = {
+    "grid_comparison.yaml": {"reproduction", "reproduction.maps_dir", "reproduction.model_pattern",
+                             "reproduction.results", "reproduction.saved_maps_tolerance",
+                             "reproduction.retrain_auroc_tolerance"},
+}
 
 def _load(name: str) -> dict[str, Any]:
     return yaml.safe_load((CONFIG_DIR / name).read_text(encoding="utf-8"))
@@ -146,5 +153,5 @@ def test_no_setting_of_the_mnist_original_was_dropped() -> None:
             continue
         expected = {name.replace("mnist", "fashion_mnist") for name in _keys(yaml.safe_load(original.read_text(encoding="utf-8")))}
         actual = _keys(_load(path.name))
-        assert expected - actual == set(), f"{path.name} lost settings"
+        assert expected - actual == LEFT_OUT_ON_PURPOSE.get(path.name, set()), f"{path.name} lost settings"
         assert actual - expected <= ADDED_ON_PURPOSE.get(path.name, set()), f"{path.name} has unexpected settings"

@@ -242,6 +242,7 @@ OTHER_PHASE_CONFIGS = {
     "error_pattern_baselines.yaml", "som_optuna.yaml", "retraining.yaml", "som_reanalysis.yaml",
     "novelty_after_retraining.yaml", "held_out_class_novelty.yaml",
     "som_reanalysis_msp_arm.yaml", "error_detector_budget.yaml", "feature_layer_ablation.yaml",
+    "grid_comparison.yaml",
 }
 # Not a step: the shared input fingerprints.
 SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
@@ -304,7 +305,8 @@ def test_steps_follow_the_proposal_order() -> None:
     assert STEP_NAMES == [
         "data_pipeline", "cnn_baseline_training",                       # Phase 1
         "som_nnsom_training", "cluster_analysis", "error_pattern_analysis",
-        "error_pattern_baselines", "error_detector_budget", "som_optuna", "feature_layer_ablation",  # Phase 2
+        "error_pattern_baselines", "error_detector_budget", "grid_comparison", "som_optuna",
+        "feature_layer_ablation",                                       # Phase 2
         "novelty_detection", "novelty_statements", "held_out_class_novelty",   # Phase 3
         "guided_retraining", "guided_retraining_test",                  # Phase 4
     ]
