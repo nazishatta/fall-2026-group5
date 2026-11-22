@@ -203,7 +203,27 @@ Class SVM 0.734, autoencoder 0.583; the autoencoder with standardised inputs
 (`fashion_mnist_svhn_ae_train_standardized_s42_v1`) 0.676. Isolation Forest below 0.5 ranks SVHN as more
 normal than Fashion-MNIST, as on MNIST (0.238), and the autoencoder again changes strongly with its input
 scaling and training size. Both are the problems the two MNIST diagnostics in section 3 were written for, so
-by section 3 they run (`../DEVIATIONS.md`, 2026-11-21): results [TBD].
+by section 3 they ran (`../DEVIATIONS.md`, 2026-11-21; exploratory, as on MNIST):
+
+- *Training size and scaling* (`fashion_mnist_svhn_autoencoder_scaling_diagnostic_s42_46_v1`, seeds 42-46,
+  mean ± standard deviation). Autoencoder: raw inputs 0.395 ± 0.030 (10,000 training rows) and 0.553 ± 0.028
+  (49,000); standardised inputs 0.742 ± 0.089 and 0.716 ± 0.069. Isolation Forest (standardised): 0.272 ±
+  0.036 and 0.244 ± 0.054. The autoencoder depends mainly on input scaling, not on training size (as on
+  MNIST, where the effect was far larger), and Isolation Forest stays below chance at both sizes, so its
+  reversal is not caused by too little training data. Both match the unified run's seeds (largest AUROC
+  difference 0.0009).
+- *Embedding length.* Scoring by length alone ("shorter is more novel") separates SVHN from Fashion-MNIST
+  almost perfectly: AUROC 0.995 (the run reports 0.005 for "longer is more novel",
+  [0.0046, 0.0056]). Inverting SVHN's grey levels, so that its images are light on dark like
+  Fashion-MNIST, lengthens the embeddings only slightly (mean 8.50 to 9.18; longer for 61% of the images;
+  `fashion_mnist_svhn_inverted_embedding_norm_s42_v1`), so the brightness direction explains little of the gap
+  to Fashion-MNIST's 20.7.
+
+So SVHN differs from Fashion-MNIST in one simple feature, the embedding length, which a trivial rule already
+uses. A far-novelty AUROC on SVHN therefore mostly measures how strongly a score follows that length.
+Isolation Forest, which treats the short SVHN embeddings as typical, is reversed; QE follows it only weakly
+(AUROC 0.789), which fits the norm-matched result above. Why the network gives SVHN short embeddings is not
+shown by these runs.
 
 **Near novelty: held-out classes** (`held_out_class_novelty/held_out_class_novelty_lenet5_som15x15_nb11_ep250_s42`).
 Per split, a new LeNet-5 and SOM never see 4 classes; QE minus each score, mean and 95% t-interval over the
