@@ -1,0 +1,21 @@
+{
+  "accuracy_altered": 0.836,
+  "accuracy_altered_hotspot": 0.5106382978723404,
+  "accuracy_drop": 0.08057142857142863,
+  "accuracy_original": 0.9165714285714286,
+  "accuracy_original_hotspot": 0.5910165484633569,
+  "checkpoint": "lenet5_fashion_mnist_s42.pth",
+  "checkpoint_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+  "contact_sheet": "augmentation_contact_sheet.pdf",
+  "max_accuracy_drop": 0.02,
+  "passed": false,
+  "run_id": "augmentation_comparison_som_15x15_nb11_ep250_s42",
+  "transforms": {
+    "max_rotation_degrees": 10.0,
+    "max_shear_degrees": 8.0,
+    "max_shift_pixels": 1.0,
+    "max_zoom": 1.1,
+    "min_zoom": 0.9
+  },
+  "validation_images": 10500
+}
