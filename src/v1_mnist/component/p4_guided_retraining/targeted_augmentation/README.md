@@ -8,6 +8,7 @@ Arms (`configs/retraining.yaml`, section `augmentation`): `standard`; `augmented
 |---|---|
 | `augmentation_arms.py` | builds each arm's training set: the original images plus the altered copies, with true labels |
 | `augmentation_check.py` | contact sheet and the Phase 1 CNN's accuracy on altered validation images (the transform check); when the config sets `augmentation.transform_check.max_accuracy_drop` (Fashion-MNIST), it records pass or fail and the train stage waits until it has passed |
+| `transform_rule.py` | the transform-check rule: the accuracy-drop limit and, with `transform_check.max_halvings`, halving all four ranges after a failed check (at most that many times; every attempt recorded; training uses the accepted ranges). Fashion-MNIST applied the same rule by hand; later datasets set `max_halvings: 2` |
 | `../../utils/image_transforms.py` | small rotation, shift, zoom, shear; no flips; seeded |
 
 Runner: `pipeline/p4_guided_retraining/run_targeted_augmentation.py --stage check|train|summary|final_test`; commands in `../HOW_TO_RUN.md`.

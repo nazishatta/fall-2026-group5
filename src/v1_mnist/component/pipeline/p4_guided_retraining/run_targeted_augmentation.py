@@ -9,7 +9,8 @@ Usage (from the code root, the folder that holds src/ and outputs/):
 
 ``check`` looks at the altered images (contact sheet, Phase 1 CNN accuracy on altered validation
 images). When the config sets a transform-check limit, ``train`` refuses to start until the check has
-passed it (``--smoke`` trials are exempt: they write to their own folder). Options: --config CONFIG (every stage; default: the MNIST retraining.yaml), --arm NAME,
+passed it (``--smoke`` trials are exempt: they write to their own folder); with ``max_halvings`` the
+check halves failed ranges by itself (``targeted_augmentation/transform_rule.py``). Options: --config CONFIG (every stage; default: the MNIST retraining.yaml), --arm NAME,
 --seed N, --smoke. Same rules as the curriculum comparison.
 """
 
