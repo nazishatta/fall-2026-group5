@@ -130,6 +130,24 @@ The loop is: SOM analysis $\rightarrow$ targeted retraining $\rightarrow$ re-ana
   \item \textbf{Evaluate once on the test split (10{,}500 images).} CF1 is the confusion matrix of the \texttt{standard} arm, CF2 that of a retrained arm. Differences between arms are paired bootstrap intervals over the test images (2{,}000 resamples), computed on the mean of the 5 seeds.
 \end{enumerate}
 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\small
+\begin{tabular}{|l|C{0.11\textwidth}|C{0.13\textwidth}|C{0.17\textwidth}|}
+\hline
+\textbf{Pool (training images)} & \textbf{Images} & \textbf{Share of 49,000} & \textbf{Training errors inside} \\ \hline
+On a hotspot neuron (hotspot pool) & 685 & 1.4\% & 7 \\ \hline
+In a neuron with purity $<0.95$ & 2,147 & 4.4\% & 16 \\ \hline
+Distance to neuron above the 95th percentile & 2,450 & 5.0\% & 4 \\ \hline
+\textbf{SOM pool} (any of the three) & \textbf{4,217} & \textbf{8.6\%} & \textbf{18} \\ \hline
+msp pool (same size) & 4,217 & 8.6\% & 28 \\ \hline
+In both the SOM and the msp pool & 1,965 & 4.0\% & 18 \\ \hline
+\end{tabular}
+\caption{The hard-image pools. The Phase 1 network makes only 29 mistakes on the training images; 18 of them are in the SOM pool and 28 in the msp pool. By digit, the SOM pool is largest for digit 2 (984 images) and smallest for digit 1 (146). Each augmentation arm adds 3 altered copies of every pool image, 12,651 images. Source: \texttt{tables/hard\_example\_mining/hard\_example\_pools/}.}
+\label{tab:pools}
+\end{table}
+
 \textbf{Success criteria} (written down before the test split was used): C1, curriculum\_som has lower overall error than standard; C2, curriculum\_som has lower hotspot error than curriculum\_random; A1, augmented\_som has lower hotspot error than augmented\_random; A2, augmented\_som has lower hotspot error than standard; A3, augmented\_som does not raise the error outside the hotspots by more than 0.2 points. C1, C2, A1 and A2 also need an interval that excludes 0 and a macro-F1 that does not fall by more than 0.0016.
 
 \subsection*{Re-analysis with new SOMs}
@@ -151,6 +169,57 @@ Table~\ref{tab:arms} gives baseline and post-retraining accuracy; Table~\ref{tab
 \input{tables/summary/arm_results.tex}
 
 \input{tables/summary/criteria_results.tex}
+
+\textbf{Every arm against normal training.} The protocol also asks for every arm compared with \texttt{standard} (Table~\ref{tab:vs_standard}; not success criteria). All three full-pool augmentation arms lower the overall test error by a small amount whose interval excludes 0, including random copies ($-0.07$ points) and least-confident copies ($-0.14$ points), so part of the gain comes from adding altered copies of any images. Only \texttt{augmented\_som} also has a hotspot interval that excludes 0. The hotspot-pool and paced arms do not differ clearly from \texttt{standard}. The paced arms are worse than their unpaced twins on overall error (+0.07 points for random, +0.09 for SOM copies), and the two paced arms cannot be told apart on the hotspots ($-0.27$ points, $-2.47$ to $+1.92$). Random-order curriculum is not clearly worse than \texttt{standard}; the SOM and least-confident orders are.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\footnotesize
+{\setlength{\tabcolsep}{4pt}\begin{tabular}{|l|C{0.22\textwidth}|C{0.22\textwidth}|C{0.22\textwidth}|}
+\hline
+\textbf{Arm $-$ standard} & \textbf{All test images} & \textbf{Hotspot images} & \textbf{Non-hotspot images} \\ \hline
+augmented\_som & \textbf{$-$0.10 [$-$0.18, $-$0.02]} & \textbf{$-$3.56 [$-$5.75, $-$1.37]} & $-$0.05 [$-$0.13, +0.02] \\ \hline
+augmented\_random & \textbf{$-$0.07 [$-$0.13, $-$0.01]} & $-$1.10 [$-$3.42, +1.37] & $-$0.06 [$-$0.11, +0.00] \\ \hline
+augmented\_msp & \textbf{$-$0.14 [$-$0.23, $-$0.04]} & $-$2.88 [$-$6.16, +0.28] & \textbf{$-$0.10 [$-$0.18, $-$0.02]} \\ \hline
+augmented\_hotspot & $-$0.03 [$-$0.10, +0.04] & $-$1.92 [$-$4.38, +0.68] & 0.00 [$-$0.06, +0.05] \\ \hline
+augmented\_random\_hotspot & $-$0.01 [$-$0.07, +0.05] & +0.27 [$-$1.51, +2.19] & $-$0.01 [$-$0.07, +0.04] \\ \hline
+augmented\_som\_paced & $-$0.01 [$-$0.08, +0.06] & $-$0.14 [$-$2.74, +2.33] & $-$0.01 [$-$0.07, +0.06] \\ \hline
+augmented\_random\_paced & +0.00 [$-$0.06, +0.06] & +0.14 [$-$1.78, +2.05] & +0.00 [$-$0.05, +0.06] \\ \hline
+curriculum\_som & \textbf{+0.45 [+0.33, +0.57]} & \textbf{+10.00 [+6.30, +13.70]} & \textbf{+0.31 [+0.20, +0.42]} \\ \hline
+curriculum\_random & +0.04 [$-$0.02, +0.11] & +0.82 [$-$1.51, +3.15] & +0.03 [$-$0.03, +0.09] \\ \hline
+curriculum\_msp & \textbf{+0.42 [+0.30, +0.54]} & \textbf{+11.23 [+7.12, +15.48]} & \textbf{+0.27 [+0.16, +0.38]} \\ \hline
+\end{tabular}}
+\caption{Every arm minus \texttt{standard}: difference in test error, percentage points, with the 95\% paired bootstrap interval over test images (mean of 5 seeds). Bold: the interval excludes 0. Also reported, not success criteria. Source: \texttt{test\_comparisons.csv} of the two comparison folders under \texttt{tables/}.}
+\label{tab:vs_standard}
+\end{table}
+
+\textbf{Validation results.} The validation split was used before the test pass, for the checks only: the macro-F1 guard is twice the standard deviation of the \texttt{standard} row's macro-F1 ($2\times0.0008=0.0016$). Table~\ref{tab:validation} gives every arm on it, for completeness; no arm, threshold or setting was chosen from it. The ordering is the same as on the test split: \texttt{augmented\_som} and \texttt{augmented\_msp} have the lowest hotspot error, and the SOM and least-confident curricula the highest.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\footnotesize
+\begin{tabular}{|l|C{0.18\textwidth}|C{0.18\textwidth}|C{0.18\textwidth}|}
+\hline
+\textbf{Arm} & \textbf{Validation error (\%)} & \textbf{Hotspot error (\%)} & \textbf{Macro-F1} \\ \hline
+standard & 0.92 (0.08) & 16.4 (1.3) & 0.9908 (0.0008) \\ \hline
+\multicolumn{4}{|l|}{\textit{Curriculum}} \\ \hline
+curriculum\_som & 1.44 (0.04) & 24.7 (1.7) & 0.9855 (0.0004) \\ \hline
+curriculum\_random & 0.96 (0.07) & 17.4 (1.0) & 0.9903 (0.0008) \\ \hline
+curriculum\_msp & 1.51 (0.03) & 24.9 (1.2) & 0.9848 (0.0004) \\ \hline
+\multicolumn{4}{|l|}{\textit{Targeted augmentation}} \\ \hline
+augmented\_som & 0.75 (0.08) & 12.1 (1.1) & 0.9924 (0.0008) \\ \hline
+augmented\_random & 0.86 (0.11) & 15.7 (2.2) & 0.9913 (0.0011) \\ \hline
+augmented\_msp & 0.70 (0.05) & 12.5 (1.5) & 0.9930 (0.0006) \\ \hline
+augmented\_hotspot & 0.82 (0.08) & 13.1 (0.9) & 0.9917 (0.0008) \\ \hline
+augmented\_random\_hotspot & 0.91 (0.06) & 16.1 (1.8) & 0.9908 (0.0006) \\ \hline
+augmented\_som\_paced & 0.87 (0.04) & 15.9 (1.2) & 0.9913 (0.0004) \\ \hline
+augmented\_random\_paced & 0.91 (0.05) & 16.3 (2.1) & 0.9909 (0.0005) \\ \hline
+\end{tabular}
+\caption{Validation results, mean (standard deviation) over 5 seeds, on the 10,500 validation images; hotspot error is on the validation images that fall on the 11 hotspot neurons. Source: \texttt{tables/validation\_summary.csv} of the two comparison runs.}
+\label{tab:validation}
+\end{table}
 
 \begin{figure}[H]
 \centering
@@ -186,7 +255,7 @@ Table~\ref{tab:reanalysis} gives all measures and Figures~\ref{fig:reanalysis_me
   \item \textbf{R3, not met.} Against the random-image control the purity difference is $+0.0012$ with an interval from $-0.0016$ to $+0.0039$.
   \item \textbf{R4, not met.} Against the random-image control the hotspot error rate is lower by 3.1 points, but the interval ($-0.0705$ to $+0.0075$) includes 0, so we cannot say the SOM-chosen images are better than random ones here.
   \item \textbf{R5, met.} Topographic error did not rise ($-0.29$ points, interval $-1.11$ to $+0.54$; the upper end is below the 1.0 tolerance), so the map stayed as well ordered as after plain training.
-  \item \textbf{Also reported.} The low-purity share and the class scatter index show no clear change. The share of all errors that sit in hotspots is larger than for the random control by $+0.063$ (larger in 5 of 5 seeds), but not larger than for \texttt{standard}. Overall validation error is lower for \texttt{augmented\_som} than for both other arms (about 0.17 and 0.11 points). CKA between networks is 0.89 to 0.93 within an arm and 0.91 between arms, so the arms do not differ more from each other than seeds do within an arm, except that \texttt{augmented\_som} networks are somewhat less alike (0.893).
+  \item \textbf{Also reported.} The low-purity share and the class scatter index show no clear change. The share of all errors that sit in hotspots is larger than for the random control by $+0.063$ (larger in 5 of 5 seeds), but not larger than for \texttt{standard}. Overall validation error is lower for \texttt{augmented\_som} than for both other arms (about 0.17 and 0.11 points). CKA between networks is 0.89 to 0.93 within an arm and 0.91 between arms, so the arms do not differ more from each other than seeds do within an arm, except that \texttt{augmented\_som} networks are somewhat less alike (0.893). The mean quantization error of the new maps is 1.021 (\texttt{standard}), 1.084 (\texttt{augmented\_som}) and 1.053 (\texttt{augmented\_random}), against 1.041 for the Phase 2 map; each map is trained on a different network's embeddings, so these values are not directly comparable. Every new map uses 223 to 225 of its 225 neurons, and its 11 hotspots hold on average 160, 178 and 142 validation images (Phase 2 map: 174).
   \item \textbf{Secondary run: the least-confident arm.} Added after these results were seen (addendum \texttt{MSP\_ARM\_ADDENDUM.md}, run \texttt{som\_reanalysis\_msp\_arm\_som\_15x15\_nb11\_ep250\_s42\_v2}). The new maps of \texttt{augmented\_msp} have a hotspot error rate of 0.193 against 0.229 for \texttt{standard} ($-0.036$, interval $-0.093$ to $+0.021$, S1 not met). \texttt{augmented\_som} is not clearly better than \texttt{augmented\_msp} on hotspot error ($-0.018$, $-0.076$ to $+0.039$, S2 not met) or purity ($-0.0006$, $-0.0029$ to $+0.0017$, S3 not met). With 5 seeds no difference between SOM and confidence guidance can be shown. The \texttt{standard} and \texttt{augmented\_som} cells reproduced the primary run exactly.
 \end{itemize}
 
@@ -210,11 +279,11 @@ Table~\ref{tab:reanalysis} gives all measures and Figures~\ref{fig:reanalysis_me
 
 Two questions from the reviews are answered here. Both were added on 2026-11-17, after the single test pass, from the test predictions saved by that pass: no network was retrained or re-run, and no criterion or threshold changed. They are descriptive, not success criteria.
 
-\textbf{How many errors does retraining actually fix?} Percentages hide how few mistakes MNIST leaves, so Table~\ref{tab:errors_fixed} gives counts. Normal training makes about 93 errors on the 10{,}500 test images, 17 of them on the 146 hotspot images. Retraining moves many individual errors: \texttt{augmented\_som} fixes about 40 of \texttt{standard}'s errors per seed and makes about 30 new ones. On the hotspot images the net effect is consistent: \texttt{augmented\_som} has fewer hotspot errors than \texttt{standard} in all 5 seeds (1 to 8 fewer, about 5 on average), while \texttt{augmented\_random} and \texttt{augmented\_msp} each have at least one seed with more. Over all images the net gain (about 11 errors) varies from $-12$ to $+31$ between seeds, so it is not reliable at this sample size. Curriculum training adds 29 to 64 errors in every seed.
+\textbf{How many errors does retraining actually fix?} Percentages hide how few mistakes MNIST leaves, so Table~\ref{tab:errors_fixed} gives counts. Normal training makes about 93 errors on the 10{,}500 test images, 17 of them on the 146 hotspot images. Retraining moves many individual errors: \texttt{augmented\_som} fixes about 40 of \texttt{standard}'s errors per seed and makes about 30 new ones. On the hotspot images the net effect is consistent: \texttt{augmented\_som} has fewer hotspot errors than \texttt{standard} in all 5 seeds (1 to 8 fewer, about 5 on average), while \texttt{augmented\_random} and \texttt{augmented\_msp} each have at least one seed with more. Over all images the net gain is about 11 errors. The bootstrap interval over test images excludes 0 ($-0.10$ points, $-0.18$ to $-0.02$; Table~\ref{tab:vs_standard}), but the gain varies from $-12$ to $+31$ between seeds, so it depends strongly on the seed. Curriculum training adds 29 to 64 errors in every seed. The other arms are in the same table: the hotspot-only pool (\texttt{augmented\_hotspot}) also has fewer hotspot errors than \texttt{standard} in all 5 seeds (1 to 6 fewer), its random control and both paced arms do not, and \texttt{curriculum\_random} stays close to \texttt{standard} while \texttt{curriculum\_msp} adds 39 to 56 errors in every seed.
 
 \input{tables/summary/errors_fixed.tex}
 
-\textbf{Is the gain only on the SOM's own cells?} Hotspot error favours SOM-guided arms, because the SOM defines the hotspots. Digits are defined by no arm, so Table~\ref{tab:per_class} gives error per digit. No arm helps one digit clearly more than the others. \texttt{augmented\_som} has lower error than \texttt{standard} on 7 of the 10 digits, and its gain is clear only for digit 9 ($-0.33$ points, interval $-0.67$ to $-0.04$). Against its controls, 3 of the 20 per-digit intervals exclude 0, in both directions: \texttt{augmented\_som} is better than \texttt{augmented\_random} on digit 3 and worse on digit 8, and worse than \texttt{augmented\_msp} on digit 1. With 20 intervals about one would exclude 0 by chance alone, so we read these as noise, not as digit-specific effects.
+\textbf{Is the gain only on the SOM's own cells?} Hotspot error favours SOM-guided arms, because the SOM defines the hotspots. Digits are defined by no arm, so Table~\ref{tab:per_class} gives error per digit. No arm helps one digit clearly more than the others. \texttt{augmented\_som} has lower error than \texttt{standard} on 7 of the 10 digits, and its gain is clear only for digit 9 ($-0.33$ points, interval $-0.67$ to $-0.04$). Against its controls, 3 of the 20 per-digit intervals exclude 0, in both directions: \texttt{augmented\_som} is better than \texttt{augmented\_random} on digit 3 and worse on digit 8, and worse than \texttt{augmented\_msp} on digit 1. With 20 intervals about one would exclude 0 by chance alone, so we read these as noise, not as digit-specific effects. The curriculum rows show where its loss comes from: \texttt{curriculum\_som} has higher error than \texttt{standard} on every digit except 4 (equal), most on digit 1 (+0.83 points) and digit 2 (+0.89).
 
 \input{tables/summary/per_class_error.tex}
 
@@ -225,6 +294,22 @@ Phase 3 showed that the SOM's quantization error (QE) can tell novel images from
 As a check of the code, the Phase 1 network reproduces the Phase 3 results exactly (QE AUROC 0.981, QE minus max-softmax $-0.017$).
 
 \input{tables/summary/novelty_after_retraining.tex}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\footnotesize
+{\setlength{\tabcolsep}{4pt}\begin{tabular}{|l|C{0.11\textwidth}|C{0.13\textwidth}|C{0.20\textwidth}|C{0.13\textwidth}|C{0.13\textwidth}|}
+\hline
+\textbf{Network} & \textbf{QE AUPR} & \textbf{QE FPR@95} & \textbf{QE alarm: SVHN caught / normal flagged} & \textbf{Max-softmax FPR@95} & \textbf{Energy FPR@95} \\ \hline
+Phase 1 (reference) & 0.977 & 0.045 & 0.962 / 0.051 & 0.008 & 0.000 \\ \hline
+standard & 0.978 & 0.079 & 0.907 / 0.053 & 0.011 & 0.001 \\ \hline
+augmented\_som & 0.985 & 0.049 & 0.950 / 0.052 & 0.011 & 0.001 \\ \hline
+augmented\_random & 0.983 & 0.050 & 0.948 / 0.052 & 0.012 & 0.001 \\ \hline
+\end{tabular}}
+\caption{More measures from the same novelty run, mean over 5 seeds. AUPR treats SVHN as the positive class. FPR@95 is the share of normal images flagged when 95\% of SVHN is caught (lower is better). The QE alarm uses the threshold set from the training images (95th percentile of training QE). The QE alarm still catches about 95\% of SVHN after augmentation, and its false-alarm rate stays at the intended 5\%. Source: \texttt{tables/cell\_scores.csv} of the novelty run.}
+\label{tab:novelty_more}
+\end{table}
 
 \begin{itemize}[leftmargin=1.4em, itemsep=2pt]
   \item \textbf{The SOM still detects novelty (shown).} In all 10 networks retrained with augmentation, the QE AUROC is clearly above chance (0.965 to 0.993).
@@ -238,7 +323,7 @@ As a check of the code, the Phase 1 network reproduces the Phase 3 results exact
 \textbf{How to read the tables.} In Table~\ref{tab:arms}, a higher accuracy and a lower error are better. In Table~\ref{tab:criteria}, the difference is ``first arm minus second arm'' in percentage points of error, so a \emph{negative} number means the first arm made fewer mistakes. If the interval in brackets does not include 0, the difference is probably real. Our test set has 10{,}500 images, so 0.1 points is about 11 images; the hotspots hold only 146 test images, so one image is about 0.7 points.
 
 \begin{itemize}[leftmargin=1.4em, itemsep=2pt]
-  \item \textbf{Augmentation fixed some hotspot mistakes (A1, A2 met).} Normal training gets about 17 of the 146 hotspot images wrong; augmentation with SOM-chosen images gets about 11 wrong, i.e.\ about 5 fewer (3.6 points). It also beat the same number of random images by 2.5 points. The error on the other 10{,}354 images did not rise (A3), so the CNN did not pay for the gain elsewhere. Overall accuracy rose from 99.11\% to 99.21\%, about 11 fewer mistakes out of 10{,}500. This is a small but real gain.
+  \item \textbf{Augmentation fixed some hotspot mistakes (A1, A2 met).} Normal training gets about 17 of the 146 hotspot images wrong; augmentation with SOM-chosen images gets about 11 wrong, i.e.\ about 5 fewer (3.6 points). It also beat the same number of random images by 2.5 points. The error on the other 10{,}354 images did not rise (A3), so the CNN did not pay for the gain elsewhere. Overall accuracy rose from 99.11\% to 99.21\%, about 11 fewer mistakes out of 10{,}500. This is a small but real gain, though random and least-confident copies give a similar overall gain (Table~\ref{tab:vs_standard}), so the overall part is not specific to the SOM.
   \item \textbf{But the SOM was not better than ``least sure''.} Using the least-sure images (msp) gave almost the same result (R1 of Table~\ref{tab:criteria}: the difference $-0.7$ points, interval includes 0, so we cannot tell them apart). So the SOM is not a better \emph{picker}; it is a useful \emph{explainer}, because it shows which regions of the data are weak. The hotspot-only pool also could not be told apart from its random control (R3 of Table~\ref{tab:criteria}).
   \item \textbf{Slow introduction of the copies made things worse (R2 of Table~\ref{tab:criteria}).} Adding the copies step by step gave a worse hotspot result than adding them all at once (+3.4 points).
   \item \textbf{Curriculum learning lost to normal training (C1, C2 not met).} The curriculum CNNs made about 47 more mistakes out of 10{,}500 (+0.45 points), and the learning curves (Figure~\ref{fig:curves}) show they were behind from the first epochs and never caught up. A possible reason, which we did not test, is that the schedule only ever shows 40\% of the hard images, so the CNN sees fewer of them. We report this result as it is; a criterion that is not met is still a result.
@@ -261,9 +346,9 @@ The first set of augmentation ranges (shift up to 2 pixels) failed the check mad
   \item The 11 hotspots were chosen from validation errors; this is declared, and it is why the final judgement is made on the test split.
   \item Criteria, thresholds and the guard value were written down and stamped (SHA-256 of the protocol and the configuration) before the test split was opened. It was opened once and not re-run.
   \item All arms use the same data, seeds and training recipe. Finished runs are never overwritten; the changed augmentation run got a new run ID.
-  \item The re-analysis uses training and validation images only; the test split was not read.
+  \item The re-analysis uses training and validation images only; the test split was not read. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
   \item The secondary re-analysis run with the least-confident arm uses training and validation images only, and its statements were written in an addendum before its cells were computed.
-  \item The novelty test after retraining fits everything on training images, uses MNIST validation and SVHN test images for scoring only, and does not read the MNIST test split. Its statements and margin were fixed before the run. Its measures, statements R1 to R5 and the tolerance were fixed before the run, and the run is stamped with SHA-256 checks of its inputs.
+  \item The novelty test after retraining fits everything on training images, uses MNIST validation and SVHN test images for scoring only, and does not read the MNIST test split. Its statements and margin were fixed before the run, and it records SHA-256 checks of its inputs.
 \end{itemize}
 
 \section{Limitations and future work}\label{sec:open}
@@ -311,6 +396,19 @@ Each figure shows CF1 (standard), CF2 of the named arm, and their difference, as
 \centering
 \includegraphics[width=\textwidth]{fig/som_reanalysis/embedding_similarity_cka.pdf}
 \caption{Linear CKA between the embeddings of the 15 retrained networks (validation images).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/som_reanalysis/msp_arm/map_measures_by_arm.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{fig/som_reanalysis/msp_arm/purity_maps.pdf}
+\caption{Secondary re-analysis run with the least-confident arm: map measures per arm (top, as in Figure~\ref{fig:reanalysis_measures}) and neuron purity maps, seed 1 (bottom, as in Figure~\ref{fig:reanalysis_purity}). The least-confident arm's new maps look like those of the other augmented arms.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=0.5\textheight,keepaspectratio]{fig/targeted_augmentation/failed_check/augmentation_contact_sheet_r1.pdf}
+\caption{The first augmentation ranges (shift up to 2 pixels, revision r1), which failed the transform check (validation accuracy 99.12\% to 95.83\%). Kept as the record; no arm was trained with them.}
 \end{figure}
 
 \end{document}

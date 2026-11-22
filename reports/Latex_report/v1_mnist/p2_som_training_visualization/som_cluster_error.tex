@@ -89,7 +89,7 @@ class structure, density patterns, and localized validation weaknesses
 \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.52\textwidth}|X|}
 \hline
 \textbf{What Phase 2 asks for} & \textbf{Where} \\ \hline
-Set up NNSOM, choose grid size and training settings & Section~\ref{sec:training}, Table~\ref{tab:grids} \\ \hline
+Set up NNSOM, choose grid size and training settings (grid comparison, Optuna check) & Section~\ref{sec:training}, Table~\ref{tab:grids}, Figure~\ref{fig:gridcmp} \\ \hline
 Train on training embeddings, monitor quantization error per epoch & Figure~\ref{fig:qe} \\ \hline
 Component planes, hit histogram, U-matrix & Figures~\ref{fig:umatrix} and~\ref{fig:planes} \\ \hline
 Assign each image to its best-matching cell; colour the map by digit & Section~\ref{sec:cluster}, Figure~\ref{fig:classmap} \\ \hline
@@ -130,6 +130,10 @@ AUROC & How well a score separates mistakes from correct answers: 1 is perfect, 
 
 \item \textbf{Grid size.} The project proposal suggests a grid such as 10$\times$10 or 15$\times$15. We compared 10$\times$10, 15$\times$15 and 20$\times$20 fairly: the same data, three starting neighbourhood sizes per grid, ten maps per grid on resampled training data, and validation images only. Table~\ref{tab:grids} shows the result. Larger grids fit the data more closely and have slightly purer cells, but a higher topological error. The test we fixed in advance, how well a cell's error rate predicts the CNN's mistakes on new images, could not separate the grids: the AUROC difference between 20$\times$20 and 15$\times$15 is $+0.001$ (95\% range $-0.100$ to $+0.089$). We therefore use 15$\times$15 for the main analysis and check the error findings on the other two grids (Section~\ref{sec:error}).
 
+\item \textbf{The grid comparison reproduces.} The comparison code was later brought into the repository and checked against this run, by two criteria fixed before it ran. On the 30 saved maps it recomputes all 102 numbers (largest difference $6\times10^{-18}$). On 39 newly trained maps it picks the same starting radii (7, 11, 15) and gives the same six verdicts (all inconclusive); each grid's AUROC moved by less than the 0.01 allowed, and the primary difference is $+0.002$ ($-0.101$ to $+0.101$). The same design on Fashion-MNIST, with 876 mistakes instead of 92, does decide the question: 15$\times$15 beats 20$\times$20 there.
+
+\item \textbf{Optuna check of the settings.} As a further check, the starting neighbourhood radius and the number of epochs of each grid were tuned with Optuna's TPE sampler \cite{akiba2019optuna}: 20 trials per grid, scored on validation QE and topological error only (no labels), then the best setting checked against ours with five new SOM seeds. For 15$\times$15 the tuned setting (radius 15, 250 epochs) was not clearly different (QE $+0.005$, 95\% interval $-0.003$ to $+0.013$; TE1 $-0.14$ points, $-0.81$ to $+0.53$), so the map stays the same. For 20$\times$20 the tuned setting was worse on topological error; for 10$\times$10 it was better on all three measures (radius 8, 100 epochs), so the 10$\times$10 robustness map is slightly below its best setting. The headline map was fixed before tuning and would not have changed whatever Optuna found.
+
 \item \textbf{The chosen map.} The 15$\times$15 map has QE 1.039 on training images and 1.041 on validation images, and TE1 5.73\% and 6.18\%. All 225 cells receive images (217.8 training images per cell on average, at most 681). Training and validation numbers are almost the same, so the map describes new images as well as it describes the images it was trained on.
 
 \item \textbf{Training curve (Figure~\ref{fig:qe}).} The QE falls from 4.49 to about 1.0 within the first few epochs, when the large neighbourhood pulls the whole map into the shape of the data. It then moves up and down a little (between about 1.0 and 1.4) as the radius shrinks step by step and the cells reorganise, and it settles at 1.04 in the last epochs, when the radius is close to 1. The curve is flat at the end, so 250 epochs are enough.
@@ -154,6 +158,13 @@ AUROC for CNN mistakes (95\% range) & 0.694 (0.582--0.799) & 0.629 (0.548--0.725
 \caption{Fair comparison of three grid sizes. Each grid tried three starting radii and kept the best by QE and topological error, without using labels; ten maps per grid. The AUROC is measured on validation images that were not used to work out each cell's error rate (200 random half-splits). None of the AUROC differences is clear, so the choice of 15$\times$15 rests on its balance of purity and topological error.}
 \label{tab:grids}
 \end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig/som_nnsom_training/grid_comparison/grid_comparison_results.pdf}
+\caption{Fair grid comparison. Left and middle: held-out AUROC per grid for the CNN's 92 mistakes and for the 525 least-confident images (mean and 95\% range). Right: the 200 differences between 20$\times$20 and 15$\times$15; the range crosses 0 and is wider than the $\pm0.02$ band, so the result is inconclusive.}
+\label{fig:gridcmp}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -183,7 +194,7 @@ AUROC for CNN mistakes (95\% range) & 0.694 (0.582--0.799) & 0.629 (0.548--0.725
 
 \subsection{Feature-layer ablation}
 
-We also checked the choice of layer, as the proposal asks. We trained SOMs with the same recipe on the earlier layer fc1 (120 numbers) and on fc2, five SOM seeds each, and compared them on rules fixed before the run (Table~\ref{tab:layer_ablation}). The fc2 maps locate the CNN's mistakes clearly better (error-cell AUROC 0.685 against 0.622) and have purer cells, so the choice of fc2 is supported by the data. The fc1 maps separate SVHN slightly better, but by only 0.005 AUROC, far less than the gap to max-softmax and energy. The SOM recipe was tuned on fc2, which may favour it. The fc2 maps of the new seeds also reproduce the main map's values (0.685, 0.982 and 0.981).
+We also checked the choice of layer, as the proposal asks. We trained SOMs with the same recipe on the earlier layer fc1 (120 numbers) and on fc2, five SOM seeds each, and compared them on rules fixed before the run (Table~\ref{tab:layer_ablation}). The fc2 maps locate the CNN's mistakes clearly better (error-cell AUROC 0.685 against 0.622) and have purer cells, so the choice of fc2 is supported by the data. The fc1 maps separate SVHN slightly better, but by only 0.005 AUROC, far less than the gap to max-softmax and energy. The SOM recipe was tuned on fc2, which may favour it. The fc2 maps of the new seeds also reproduce the main map's values (0.685, 0.982 and 0.981). The fc2 maps also put more of the mistakes in their hotspots; the fc1 maps are slightly better ordered (lower topographic error).
 
 \begin{table}[H]
 \centering
@@ -195,6 +206,10 @@ We also checked the choice of layer, as the proposal asks. We trained SOMs with 
 Error-cell AUROC (main) & 0.622 & 0.685 & $-0.062$ ($-0.073$ to $-0.052$) & fc2 better \\ \hline
 Weighted purity & 0.961 & 0.982 & $-0.021$ ($-0.022$ to $-0.020$) & fc2 better \\ \hline
 QE novelty AUROC (SVHN) & 0.986 & 0.981 & $+0.005$ ($+0.003$ to $+0.006$) & fc1 better \\ \hline
+\multicolumn{5}{|l|}{\textit{Also reported (not judged)}} \\ \hline
+Hotspot error rate & 0.130 & 0.196 & $-0.065$ ($-0.077$ to $-0.054$) & \\ \hline
+Hotspot share of all mistakes & 0.317 & 0.376 & $-0.059$ ($-0.085$ to $-0.032$) & \\ \hline
+Topographic error TE1 (\%) & 5.45 & 6.35 & $-0.90$ ($-1.07$ to $-0.74$) & \\ \hline
 \end{tabular}
 \caption{Feature-layer ablation: SOMs on the 120-number layer fc1 and the 84-number layer fc2 of the same network, same recipe, mean over 5 SOM seeds each. Statements and rules fixed before the run.}
 \label{tab:layer_ablation}

@@ -204,6 +204,9 @@ Training percentile & QE cutoff & MNIST validation flagged & SVHN detected & SVH
 \end{table}
 Detection collapses at the strictest cutoffs because most SVHN images (78\%) have QE between the 95th and 99th percentiles of MNIST training QE, only a little above the frozen cutoff.
 
+\subsection{QE flags and the CNN's own mistakes (random control)}
+Within MNIST validation, the frozen cutoff flags 539 of the 10,500 images. They contain 22 of the CNN's 92 misclassifications (24\% of the errors, from 5.1\% of the images). A uniform random selection of the same 539 images would be expected to hold 4.7 errors; five seeded random draws held 5 to 6, and the exact one-sided test gives $p < 10^{-9}$. So a large QE also points to in-distribution images the CNN gets wrong, consistent with the larger BMU distance of misclassified images in Phase 2. The random selection is a control, not a novelty detector. Source run: \run{reorg_20261102_random_control_s42_v2}, which repeats \run{qe_random_control_evaluation_initial} with the same counts.
+
 \section{U-Matrix Association and Failure Analysis}
 Across 10,500 MNIST validation samples, QE and the U-Matrix BMU score have a recorded Spearman rank correlation of $0.4396$. The moderate association is consistent with related but distinct SOM geometry signals.
 \par\medskip
@@ -215,6 +218,14 @@ The historical QE experiment missed 996 SVHN samples at its frozen threshold. Se
 
 \subsection{Where SVHN lands on the map}\label{sec:overlay}
 The proposal asks for novelty scores shown on the SOM grid. Run \run{mnist_svhn_som_overlay_s42_v1} assigns every SVHN test image to its best-matching unit with the frozen CNN and SOM; the recomputed QE values agree with the saved historical scores to within $10^{-6}$. The 26,032 SVHN images occupy only 28 of the 225 units, and a single unit (unit 79, whose MNIST training digits are mostly 4s, class purity 0.75) receives 22,521 of them (86.5\%). The 996 images missed at the frozen cutoff fall in 23 units, 355 of them in unit 79. Even the missed images lie farther from their prototype than ordinary digits in the same unit: their median QE is 1.23 times the median MNIST-validation QE of their unit, and only 7.6\% are at or below it.
+
+Figure~\ref{fig:valqe} shows the other side: the QE of the MNIST validation images on the same grid (all 225 units occupied). The 996 missed SVHN images all have a QE at or below the cutoff (median 1.500, range 0.780 to 1.569), so they sit inside the range of ordinary digits, mostly just below the cutoff.
+
+\par\medskip
+\begin{minipage}{0.98\linewidth}\centering
+\includegraphics[width=0.52\linewidth,height=5.0cm,keepaspectratio]{fig/u_matrix_analysis/mnist_validation_qe_som_overlay.pdf}
+\captionof{figure}{Mean QE of the MNIST validation images in each SOM unit. Descriptive only. Source run: \runcap{mnist_svhn_proposal_gap_analysis_s42_v1}.}\label{fig:valqe}
+\end{minipage}\par\medskip
 
 These numbers describe where SVHN lands and where the detector fails; they do not explain why. They are also what the SOM adds beyond a single novelty score such as MSP: the map names the few regions where novel inputs collapse and the units that hold the misses.
 \par\medskip

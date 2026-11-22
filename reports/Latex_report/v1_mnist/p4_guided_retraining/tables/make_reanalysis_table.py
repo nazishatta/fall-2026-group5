@@ -21,7 +21,7 @@ PAIRS = ["augmented_som_vs_standard", "augmented_som_vs_augmented_random"]
 # (column name, label, decimals, scale to percent points)
 MEASURES = [
     ("weighted_purity", r"Weighted purity (R1, R3)", 4),
-    ("low_purity_share", r"Share of neurons with purity $<0.95$", 4),
+    ("low_purity_share", r"Share of images in neurons with purity $<0.95$", 4),
     ("class_scatter_index", r"Class scatter index", 2),
     ("topographic_error_pct", r"Topographic error, \% (R5)", 2),
     ("hotspot_error_rate", r"Hotspot error rate (R2, R4)", 4),

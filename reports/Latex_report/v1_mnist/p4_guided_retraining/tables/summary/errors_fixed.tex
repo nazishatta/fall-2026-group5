@@ -2,7 +2,7 @@
 \centering
 \renewcommand{\arraystretch}{1.1}
 \footnotesize
-\begin{tabular}{|l|C{0.08\textwidth}|C{0.25\textwidth}|C{0.08\textwidth}|C{0.25\textwidth}|}
+{\setlength{\tabcolsep}{3pt}\begin{tabular}{|l|C{0.07\textwidth}|C{0.23\textwidth}|C{0.07\textwidth}|C{0.21\textwidth}|}
 \hline
  & \multicolumn{2}{c|}{\textbf{All 10,500 test images}} & \multicolumn{2}{c|}{\textbf{146 hotspot test images}} \\ \hline
 \textbf{Arm} & \textbf{Errors} & \textbf{Net fixed, per seed} & \textbf{Errors} & \textbf{Net fixed, per seed} \\ \hline
@@ -10,8 +10,14 @@ standard (CF1) & 93.2 & -- & 16.6 & -- \\ \hline
 augmented\_som & 82.6 & $-12, -2, +17, +31, +19$ & 11.4 & $+1, +4, +6, +8, +7$ \\ \hline
 augmented\_random & 85.8 & $-3, -5, +6, +27, +12$ & 15.0 & $-2, +8, -2, +5, -1$ \\ \hline
 augmented\_msp & 78.6 & $+8, +8, +10, +30, +17$ & 12.4 & $+2, +8, +5, +7, -1$ \\ \hline
+augmented\_hotspot & 90.2 & $-5, -10, +7, +11, +12$ & 13.8 & $+2, +6, +1, +2, +3$ \\ \hline
+augmented\_random\_hotspot & 92.2 & $-7, -8, +1, +8, +11$ & 17.0 & $-4, +5, -4, +1, +0$ \\ \hline
+augmented\_som\_paced & 92.2 & $-13, -17, +14, +11, +10$ & 16.4 & $-5, +2, +0, +0, +4$ \\ \hline
+augmented\_random\_paced & 93.6 & $-8, -12, +0, +16, +2$ & 16.8 & $-5, +6, +1, +2, -5$ \\ \hline
 curriculum\_som & 140.2 & $-64, -54, -36, -29, -52$ & 31.2 & $-13, -12, -12, -16, -20$ \\ \hline
-\end{tabular}
+curriculum\_random & 97.6 & $-25, -9, +3, +12, -3$ & 17.8 & $-7, +2, -1, +1, -1$ \\ \hline
+curriculum\_msp & 137.2 & $-56, -44, -41, -39, -40$ & 33.0 & $-17, -11, -13, -19, -22$ \\ \hline
+\end{tabular}}
 \caption{Test errors as counts (mean over the 5 seeds) and the net number of standard's errors each arm removed, per seed (seeds 1 to 5; positive means fewer errors than \texttt{standard} with the same seed). Net fixed = errors of \texttt{standard} that the arm gets right, minus new errors the arm makes. Exploratory, computed after the test pass from the saved predictions; all arms in the \texttt{test\_errors\_fixed.csv} files of the two comparison folders under \texttt{tables/}.}
 \label{tab:errors_fixed}
 \end{table}
