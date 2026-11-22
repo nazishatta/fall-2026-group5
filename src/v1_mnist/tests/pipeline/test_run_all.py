@@ -383,3 +383,12 @@ def test_phase3_runner_skips_steps_whose_config_is_not_in_the_folder(tmp_path: P
     result = run_runner("run_qe_novelty_detection.py", "--config-dir", str(tmp_path), "--dry-run")
     assert result.returncode == 0, result.stderr
     assert "not part of this dataset's study" in result.stdout + result.stderr
+
+
+def test_missing_robustness_maps_are_trained_before_the_headline_map() -> None:
+    from src.v1_mnist.component.pipeline.run_all import robustness_maps
+    for config_dir in (CONFIG_DIR, FASHION_DIR):
+        todo = robustness_maps(str(config_dir), exists=lambda path: False)
+        assert [Path(c).name for c in todo] == ["som_20x20_robustness.yaml", "som_10x10_robustness.yaml"]
+        assert robustness_maps(str(config_dir), exists=lambda path: True) == []
+

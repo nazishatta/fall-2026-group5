@@ -3,12 +3,13 @@
   Phase 1  data_pipeline            p1_model_training_baseline/run_data_pipeline.py
            cnn_baseline_training    p1_model_training_baseline/run_cnn_baseline_training.py
   Phase 2  som_nnsom_training       p2_som_training_visualization/run_som_nnsom_training.py
+                                    (first the 10x10 and 20x20 robustness maps, if not trained yet)
            cluster_analysis         p2_som_training_visualization/run_cluster_analysis.py
            error_pattern_analysis   p2_som_training_visualization/run_error_pattern_analysis.py
            (report)                 p2_som_training_visualization/run_interactive_report.py,
                                     after error_pattern_analysis
-           error_pattern_baselines, error_detector_budget, som_optuna, feature_layer_ablation
-                                    (study_steps.py)
+           error_pattern_baselines, error_detector_budget, grid_comparison, som_optuna,
+           feature_layer_ablation   (study_steps.py)
   Phase 3  novelty_detection        p3_novelty_detection/run_*.py (three runners, run in the
                                     order their results depend on each other; see
                                     ORDER below)
@@ -50,7 +51,7 @@ import argparse
 import sys
 from dataclasses import replace
 from pathlib import Path
-from typing import Sequence
+from typing import Callable, Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -63,7 +64,9 @@ from src.v1_mnist.component.pipeline.common import (  # noqa: E402
     STEP_RUNNERS,
     P3Step,
     Step,
+    load,
     log,
+    resolve,
     run_steps,
     show,
 )
@@ -167,6 +170,23 @@ def study_plan(step: StudyStep, config_dir: str, dry_run: bool) -> list[Step]:
     return [replace(command, listed_only=dry_run) for command in step.commands(config_dir)]
 
 
+def robustness_maps(config_dir: str, exists: Callable[[Path], bool] = Path.exists) -> list[str]:
+    """The dataset's robustness-map configs (som_<grid>_robustness.yaml) whose map is not trained yet.
+
+    The error-pattern robustness check and the grid-size table need these maps, so som_nnsom_training
+    trains them before the headline map. A map that exists is never retrained.
+    """
+    todo = []
+    for config in sorted(resolve(config_dir).glob("som_*_robustness.yaml"), reverse=True):
+        cfg = load(config)
+        model = resolve(cfg.paths.som_models_dir) / str(cfg.visualization.selected_model)
+        if exists(model):
+            log.info(f"Robustness map {model.name} already trained; kept.")
+        else:
+            todo.append(f"{config_dir}/{config.name}")
+    return todo
+
+
 PHASE2_NAMES = list(STEP_RUNNERS)
 STEP_NAMES = [*PHASE2_NAMES, *(s.name for s in PHASE2_STUDY_STEPS), PHASE3_STEP,
               *(s.name for s in LATER_STUDY_STEPS)]
@@ -211,6 +231,10 @@ def main(argv: Sequence[str] | None = None) -> None:
             plan.extend(study_plan(STUDY_STEPS[name], config_dir, args.dry_run))
         else:
             extra = ["--config", cnn_config if name in CNN_STEPS else som_config]
+            if name == "som_nnsom_training":
+                # The 10x10 and 20x20 maps first: the headline run's grid table and the robustness check need them.
+                plan.extend(Step(f"som_nnsom_training ({Path(cfg).stem}, robustness map)", STEP_RUNNERS[name],
+                                 ["--config", cfg, *common]) for cfg in robustness_maps(config_dir))
             if name == "som_nnsom_training" and args.skip_training:
                 extra.append("--skip-training")
             plan.append(Step(name, STEP_RUNNERS[name], [*extra, *common]))
