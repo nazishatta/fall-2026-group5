@@ -95,6 +95,8 @@ def test_every_stage_runs_and_nothing_is_overwritten(tmp_path: Path) -> None:
     assert result["n_errors"] == 12 and result["n_lowconf"] == 8 and len(result["exploratory"]) == 1
     assert json.loads(s.results_path.read_text())["primary"]["metric"] == "auroc_err"
     assert figure.run_figure(s).suffix == ".pdf"
+    for table in ("stage1.csv", "endpoint_reps.csv"):    # plain line endings, like the project's other tables
+        assert b"\r" not in (s.tables_dir / table).read_bytes()
     with pytest.raises(FileExistsError):
         analysis.run_analyze(s, data, choice)
     with pytest.raises(FileExistsError):

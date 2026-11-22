@@ -15,4 +15,8 @@ Run folder `grid_comparison_g10_15_20_b10_r200/`:
 | `metadata/inputs.json` | SHA-256 of the rules, configs and embeddings |
 | `logs/` (+ `logs.dvc`) | Run logs (DVC) |
 
-Not run yet: the run folder appears once the step runs.
+Result (2026-11-21): the primary comparison is decided. 20x20 finds the network's mistakes less well than the
+headline 15x15 map: held-out AUROC 0.744 against 0.786, difference -0.042, 95% range -0.077 to -0.008
+(**15x15 better**). 15x15 against 10x10 is inconclusive. Exploratory (not part of the decision): 20x20 minus
+10x10, -0.061 [-0.100, -0.020], 10x10 better. All numbers and their reading: Fashion-MNIST Phase 2 protocol,
+section 5 (`src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md`).

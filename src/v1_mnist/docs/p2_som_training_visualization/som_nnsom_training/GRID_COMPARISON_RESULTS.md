@@ -98,10 +98,30 @@ The official models were later retrained through the project pipeline (`train_so
 - 15x15 and 10x10 match this test's runs exactly.
 - 20x20 differs very slightly (pipeline val QE 0.969655 and TE1 6.2762%, vs 0.967245 and 6.3905% here). The fast trainer used in this test drifts a little on 20x20 over 250 epochs, and is exact on the other grids. The pipeline value is the reference. This does not change the result, because the rules specified the fast trainer for every grid.
 
+## Reproduction with the repository code (2026-11-21)
+
+The code was brought into the repository on 2026-11-21 and checked against this run by two criteria fixed
+in its config before it ran. Both passed.
+
+- **On the original 30 saved maps** (`outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_g10_15_20_b10_r200/reproduction/saved_maps_check.json`): all 102 numbers in this
+  report are recomputed; the largest difference is 6.1e-18 (rounding noise; tolerance 1e-12), with the
+  same verdicts.
+- **On 39 maps trained again** (`outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_g10_15_20_b10_r200/reproduction/retrain_check.json`; library versions differ slightly
+  from 2026-10-06): the same neighbourhoods are chosen (7, 11, 15) and all six verdicts are the same
+  (all inconclusive). Each grid's held-out AUROC for mistakes is within the 0.01 allowed: it moved by
+  0.0099 (10x10), 0.0062 (15x15) and 0.0073 (20x20). The 10x10 change is close to the limit.
+  The retrained primary comparison is +0.002, 95% range -0.101 to +0.101.
+- The exploratory 20x20 minus 10x10 comparison gives the same picture on the retrained maps: mistakes
+  -0.047 [-0.164, +0.067] (inconclusive), low-confidence images -0.059 [-0.106, -0.003] (10x10 better).
+
+**Fashion-MNIST** ran the same design unchanged (Fashion-MNIST Phase 2 protocol, section 5). With 876
+mistakes instead of 92 its ranges are about three times narrower, and the primary comparison is decided:
+20x20 minus 15x15, -0.042 [-0.077, -0.008], **15x15 better**.
+
 ## Files
 
 - In this folder: the rules (`PREREGISTRATION_grid_comparison.md`, `prereg_stamp.txt`; unchanged, the fingerprint still matches), this report, and the chart (`figures/grid_comparison_results.pdf`). The rules still name the working folder where the test was first run; they are left as stamped.
-- Code (brought into the repository on 2026-11-21, maths unchanged): `src/v1_mnist/component/p2_som_training_visualization/som_nnsom_training/grid_comparison/`, run by `src/v1_mnist/component/pipeline/p2_som_training_visualization/run_grid_comparison.py` with `src/v1_mnist/component/configs/grid_comparison.yaml`. On the original run's 30 saved maps it gives every number in this report exactly (102 numbers, largest difference 0).
+- Code (brought into the repository on 2026-11-21, maths unchanged): `src/v1_mnist/component/p2_som_training_visualization/som_nnsom_training/grid_comparison/`, run by `src/v1_mnist/component/pipeline/p2_som_training_visualization/run_grid_comparison.py` with `src/v1_mnist/component/configs/grid_comparison.yaml`. On the original run's 30 saved maps it gives every number in this report (102 numbers, largest difference 6.1e-18; see the reproduction section above).
 - The original run (2026-10-06): `outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_initial/`: the run list (`run_manifest.csv`, all 39 runs with model fingerprints), every repeat's scores (`endpoint_reps.csv`), `results.json`, `stage1_choice.json`, and the trained maps (`models/`, kept with DVC).
-- To reproduce: `python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_grid_comparison.py --stage verify_saved` (the port on the original maps), or `--stage all` for a fresh run under a new run ID, which ends by comparing itself with the original (`reproduction/retrain_check.json`).
+- To reproduce: `python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_grid_comparison.py --stage verify_saved` (the port on the original maps), or `--stage all` for a fresh run under a new run ID, which ends by comparing itself with the original (`reproduction/retrain_check.json`). Both have been run: `outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_g10_15_20_b10_r200/`.
 - Exploratory, added 2026-11-21 after this result was known: 20x20 minus 10x10 (`results.json`, key `exploratory`). On the original maps: held-out AUROC for mistakes -0.064 [-0.188, +0.050] (inconclusive); for low-confidence images -0.058 [-0.102, -0.010] (10x10 better). Not part of the decision.

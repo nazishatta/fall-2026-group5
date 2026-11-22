@@ -119,7 +119,7 @@ def run_analyze(settings: GridSettings, data: dict[str, np.ndarray], choice: dic
                        "were known; they are not part of the pre-registered decision.")})
     settings.tables_dir.mkdir(parents=True, exist_ok=True)
     with (settings.tables_dir / "endpoint_reps.csv").open("x", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     write_json(settings.results_path, result)

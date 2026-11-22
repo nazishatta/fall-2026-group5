@@ -144,8 +144,8 @@ validation images. Source: `outputs/v1_fashion_mnist/p2_som_training_visualizati
 
 As on MNIST, bigger maps fit the images more closely (lower QE) but keep neighbours together less well
 (higher topographic error), so no grid is best on every measure. The table's rank sum (10x10: 5, 15x15: 6,
-20x20: 7) is for reference only; the headline map stays 15x15 as fixed in section 1. Purity for each grid
-comes from the grid comparison (10 maps per grid): [TBD] until it finishes.
+20x20: 7) is for reference only; the headline map stays 15x15 as fixed in section 1. Purity for each grid,
+from the grid comparison's 10 maps per grid (below): 87.9%, 89.0% and 89.5%.
 
 **RQ1: how well the map keeps classes apart (recorded 2026-11-21; descriptive, no pass/fail).** Source:
 `outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/cluster_summary.json`.
@@ -190,7 +190,45 @@ descriptive only. Mistakes also sit a little further from their neuron than corr
 
 No test data was used in any of these runs (`test_used: false`, `test_evaluated: false`).
 
-**Grid comparison:** running; recorded here when it finishes ([TBD]).
+**Grid comparison (recorded 2026-11-21).** MNIST's pre-registered design, unchanged
+(`PREREGISTRATION_grid_comparison.md`): how well do a map's cells predict which validation images the
+network gets wrong, on images not used to work out the cells' error rates? Each grid tried three
+neighbourhoods and kept one by QE, TE1 and TE1+2 (labels not used): 7, 11 and 15, the settings of
+section 1. Each grid then trained 10 maps on resampled training data, scored over 200 repeated splits.
+876 mistakes; the 525 low-confidence images are the 5% the network is least sure about. Decision rule,
+fixed in advance: the whole 95% range inside ±0.02 means the grids are the same, the whole range on one
+side of 0 means one is better, otherwise inconclusive. Source: `outputs/v1_fashion_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_g10_15_20_b10_r200/results.json`.
+
+| Comparison | Measure | Difference | 95% range | Bigger grid better in | Verdict |
+|---|---|---|---|---|---|
+| **20x20 minus 15x15 (primary)** | **AUROC, mistakes** | **-0.042** | **-0.077 to -0.008** | **0% of repeats** | **15x15 better** |
+| 20x20 minus 15x15 | Average precision, mistakes | -0.023 | -0.064 to +0.016 | 11.5% | inconclusive |
+| 20x20 minus 15x15 | AUROC, low-confidence images | -0.046 | -0.096 to +0.003 | 4% | inconclusive |
+| 20x20 minus 15x15 | Average precision, low-confidence | -0.025 | -0.093 to +0.041 | 27% | inconclusive |
+| 15x15 minus 10x10 | AUROC, mistakes | -0.019 | -0.054 to +0.009 | 9% | inconclusive |
+| 15x15 minus 10x10 | AUROC, low-confidence images | -0.022 | -0.065 to +0.019 | 16% | inconclusive |
+| 20x20 minus 10x10 (exploratory) | AUROC, mistakes | -0.061 | -0.100 to -0.020 | 0% | 10x10 better |
+| 20x20 minus 10x10 (exploratory) | AUROC, low-confidence images | -0.068 | -0.112 to -0.030 | 0% | 10x10 better |
+
+The 20x20 minus 10x10 comparison was added after the MNIST result was known and before this run; it is
+not part of the decision.
+
+| Per grid (mean over 10 maps) | 10x10 | 15x15 | 20x20 |
+|---|---|---|---|
+| Held-out AUROC, mistakes [95% range] | 0.806 [0.780, 0.830] | 0.786 [0.757, 0.812] | 0.744 [0.714, 0.775] |
+| Held-out AUROC, low-confidence images | 0.864 [0.831, 0.889] | 0.843 [0.809, 0.874] | 0.796 [0.753, 0.834] |
+| QE (NNSOM definition) | 1.054 | 0.913 | 0.844 |
+| TE1 / TE1+2 (%) | 4.84 / 2.44 | 6.26 / 3.77 | 7.66 / 5.06 |
+| Purity (%) | 87.9 ± 0.3 | 89.0 ± 0.2 | 89.5 ± 0.2 |
+| Neighbours with a different main class (%) | 37.4 | 25.4 | 20.6 |
+
+The primary comparison is decided: the 20x20 map finds the network's mistakes less well than the headline
+15x15 map, which supports the headline choice. 15x15 and 10x10 cannot be told apart. As on MNIST, a
+bigger map is sharper (lower QE, purer cells) but no better at finding mistakes; here it is worse,
+probably because each of its cells holds fewer images, so its error rates are noisier. On MNIST the same
+comparison was inconclusive (difference +0.001, range -0.100 to +0.089): with 92 mistakes it could not
+see differences below about 0.1. With 876 mistakes the ranges here are about three times narrower. No
+test data was used (`test_split_read: false`).
 
 ## 6. References
 
