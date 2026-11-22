@@ -1,0 +1,7 @@
+pool,images,share_of_training,training_errors_inside
+in_hotspot,1909,0.038959,521
+low_purity,18537,0.378306,3071
+qe_flag,2450,0.05,164
+som_pool (any of the three),19997,0.408102,3092
+msp_pool (same size),19997,0.408102,3264
+som_and_msp_overlap,16213,0.330878,3077

@@ -1,0 +1,6 @@
+outs:
+- md5: b50f0b08c98d70a8cd9a03b524a32875.dir
+  size: 3716187
+  nfiles: 1
+  hash: md5
+  path: difficulty
