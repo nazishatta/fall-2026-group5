@@ -23,7 +23,7 @@ Every run folder is listed in [`run_manifest.csv`](run_manifest.csv), one row pe
 columns as MNIST's (`outputs/v1_mnist/p3_novelty_detection/run_manifest.csv`, whose README explains them).
 A test in `src/v1_mnist/tests/test_repository_rules.py` checks, for both datasets, that every folder has
 exactly one row, that every script and config named exists, and that each recorded config hash still matches
-today's config file. All Fashion-MNIST runs are first runs of the current code, so every row has the role
+today's config file. Every run folder also holds `run_complete.json`, the record that the run finished: the Phase 3 runners write it when a step's script succeeds and skip a folder only when it is there (`src/v1_mnist/component/pipeline/completion.py`). The runs made before 2026-11-22 got theirs from this manifest, and their record says so. All Fashion-MNIST runs are first runs of the current code, so every row has the role
 `result`; `qe_novelty` and `qe_ood` do not record their config hash (as on MNIST).
 
 Score arrays (`.npy`, `.npz`), networks, maps and PDFs are kept with DVC; the `.json` and `.csv` results are in

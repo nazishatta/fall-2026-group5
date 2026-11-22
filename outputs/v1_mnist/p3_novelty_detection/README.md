@@ -47,7 +47,7 @@ Use this table when you only want a number. The "Date" column in the tables belo
 
 ## Which code wrote which folder
 
-Every run folder is listed in [`run_manifest.csv`](run_manifest.csv), one row per folder, like Phase 2's `run_manifest.csv`. The tables below show the same rows. A test in `src/v1_mnist/tests/test_repository_rules.py` checks that every folder has a row, that every script and config named here exists, and that recorded config hashes still match.
+Every run folder is listed in [`run_manifest.csv`](run_manifest.csv), one row per folder, like Phase 2's `run_manifest.csv`. The tables below show the same rows. A test in `src/v1_mnist/tests/test_repository_rules.py` checks that every folder has a row, that every script and config named here exists, and that recorded config hashes still match. Every run folder also holds `run_complete.json`, the record that the run finished: the Phase 3 runners write it when a step's script succeeds and skip a folder only when it is there (`src/v1_mnist/component/pipeline/completion.py`). The runs made before 2026-11-22 got theirs from this manifest, and their record says so.
 
 Columns:
 
