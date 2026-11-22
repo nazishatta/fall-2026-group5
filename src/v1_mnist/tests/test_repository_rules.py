@@ -14,6 +14,9 @@
 - Every Phase 3 run folder has a row in run_manifest.csv naming the script and
   config that wrote it; where a result stores its config's SHA-256, today's config
   still has it (every output traces to its code).
+- Every row of each dataset's DEVIATIONS.md names its commit: a commit ID, "same
+  commit as <file>" for a row written in the commit it describes, or "– (no commit:
+  <reason>)" when nothing was committed (every deviation traces to its change).
 """
 
 from __future__ import annotations
@@ -235,3 +238,22 @@ def test_every_kept_reproduction_config_is_used() -> None:
         for path in (CONFIGS / "phase3_reorganization").rglob("*.yaml")
     }
     assert kept <= used
+
+
+DEVIATIONS_FILES = [REPO_ROOT / "src" / "v1_mnist" / "docs" / "DEVIATIONS.md",
+                    REPO_ROOT / "src" / "v1_fashion_mnist" / "docs" / "DEVIATIONS.md"]
+COMMIT_CELL = re.compile(r"[0-9a-f]{7,40}|same commit as |– \(no commit: ")
+
+
+@pytest.mark.parametrize("path", DEVIATIONS_FILES, ids=lambda p: p.parent.parent.name)
+def test_every_deviation_names_its_commit(path: Path) -> None:
+    rows, column = [], None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if "Commit" in cells:
+            column = cells.index("Commit")
+        elif column is not None and line.startswith("| 20"):
+            rows.append(cells)
+    assert rows
+    missing = [f"{cells[0]}: {cells[column]}" for cells in rows if not COMMIT_CELL.search(cells[column])]
+    assert not missing, f"rows without a commit in {path.name}: {missing}"

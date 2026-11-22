@@ -79,6 +79,8 @@ class Step:
     args: Sequence[str] = field(default_factory=list)
     func: Optional[Callable[[], None]] = None
     listed_only: bool = False   # print the command but do not run it (a dry run of a script with no --dry-run)
+    done: Optional[Path] = None  # the file whose existence means this part is finished (the one its script
+                                 # refuses to overwrite); run_all skips the part when it exists
 
     def describe(self) -> str:
         if self.func is not None:

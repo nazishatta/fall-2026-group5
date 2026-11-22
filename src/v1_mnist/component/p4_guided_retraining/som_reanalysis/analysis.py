@@ -27,7 +27,7 @@ from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import 
 from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.som_measures import (
     all_measures,
 )
-from src.v1_mnist.component.utils.run_provenance import write_json
+from src.v1_mnist.component.utils.run_provenance import ensure_not_done, write_json
 
 log = logging.getLogger("v1_mnist.som_reanalysis")
 
@@ -106,7 +106,8 @@ def _write_comparison_table(path: Path, comparisons: dict[str, dict[str, Any]]) 
 
 
 def run_analysis(settings: ReanalysisSettings) -> dict[str, Any]:
-    """Write tables/ from the stored assignments, embeddings and predictions."""
+    """Write tables/ from the stored assignments, embeddings and predictions (once; never overwritten)."""
+    ensure_not_done(settings.folder("tables") / "statements.json")
     ana = settings.retraining.analysis
     labels = np.load(ana.embeddings_dir / "val_labels.npy").astype(np.int64)
     table: dict[str, dict[str, Any]] = {}

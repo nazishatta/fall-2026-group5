@@ -14,8 +14,12 @@
 Every step reads its configs from the dataset's config folder (``--config-dir``); a step whose
 config is not in that folder is not part of that dataset's study and is skipped with a message.
 A step whose results all exist already is skipped too, as in Phase 3 (each step's run folders are
-found by its own settings loader, so the run-ID rules live in one place). A half-finished step is
-planned, and its script stops at the first part that exists, as in Phases 1 and 2.
+found by its own settings loader, so the run-ID rules live in one place). A half-finished Phase 4 step
+continues: each part names the file its script refuses to overwrite (``Step.done``), and a part whose
+file exists is skipped, so the step resumes at the first missing part. Parts that resume by themselves
+(training, embeddings, SOMs and scores skip what exists, cell by cell) are planned again; they only fill
+what is missing. In the other multi-part steps a half-finished step is planned in full, and its script
+stops at the first part that exists.
 
 Stop points the runner never passes on its own:
   - ``guided_retraining`` and ``guided_retraining_test`` are separate steps, and nothing runs the
@@ -31,6 +35,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -69,8 +74,49 @@ class StudyStep:
         return paths if paths and all(path.exists() for path in paths) else None
 
 
-def _staged(label: str, script: Path, config: str, stages: tuple[str, ...]) -> list[Step]:
-    return [Step(f"{label}: {stage}", script, ["--config", config, "--stage", stage]) for stage in stages]
+def _staged(label: str, script: Path, config: str, stages: tuple[str, ...],
+            done: dict[str, Path | None] | None = None) -> list[Step]:
+    return [Step(f"{label}: {stage}", script, ["--config", config, "--stage", stage], done=(done or {}).get(stage))
+            for stage in stages]
+
+
+def _marker(find: Callable[[], Path]) -> Path | None:
+    """A part's done file, or None when its settings cannot be loaded yet (then the part is planned)."""
+    try:
+        return find()
+    except Exception:  # noqa: BLE001 - a loader that cannot run only means "plan the part"
+        return None
+
+
+def _experiment(d: str, section: str) -> Any:
+    from src.v1_mnist.component.utils.retraining_settings import load_experiment_settings
+    return load_experiment_settings(section, f"{d}/retraining.yaml", REPO_ROOT)
+
+
+def _summary_file(d: str, section: str) -> Path:
+    return _experiment(d, section).tables_dir / "validation_summary.json"
+
+
+def _pools_file(d: str) -> Path:
+    from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings import load_pool_settings
+    return _first(load_pool_settings(f"{d}/retraining.yaml", REPO_ROOT)).results_path
+
+
+def _check_file(d: str) -> Path:
+    from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.transform_rule import check_path
+    return check_path(_experiment(d, "augmentation"))
+
+
+def _reanalysis_file(config: str) -> Path:
+    from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import load_reanalysis_settings
+    return load_reanalysis_settings(config, REPO_ROOT).output_dir / "tables" / "statements.json"
+
+
+def _novelty_file(config: str) -> Path:
+    from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.settings import (
+        load_novelty_settings,
+    )
+    return load_novelty_settings(config, REPO_ROOT).output_dir / "results.json"
 
 
 def _error_pattern_baselines(d: str) -> list[Step]:
@@ -122,26 +168,47 @@ def _held_out_class_novelty(d: str) -> list[Step]:
 
 def _guided_retraining(d: str) -> list[Step]:
     config = f"{d}/retraining.yaml"
+    augmented = _marker(lambda: _summary_file(d, "augmentation"))
+    curriculum = _marker(lambda: _summary_file(d, "curriculum"))
     return [
-        Step("hard_example_mining", P4 / "run_hard_example_mining.py", ["--config", config]),
-        *_staged("targeted_augmentation", P4 / "run_targeted_augmentation.py", config, ("check", "train", "summary")),
-        *_staged("curriculum_comparison", P4 / "run_curriculum_comparison.py", config, ("train", "summary")),
+        Step("hard_example_mining", P4 / "run_hard_example_mining.py", ["--config", config],
+             done=_marker(lambda: _pools_file(d))),
+        # train skips finished seeds by itself; with the summary written, every seed is done.
+        *_staged("targeted_augmentation", P4 / "run_targeted_augmentation.py", config, ("check", "train", "summary"),
+                 {"check": _marker(lambda: _check_file(d)), "train": augmented, "summary": augmented}),
+        *_staged("curriculum_comparison", P4 / "run_curriculum_comparison.py", config, ("train", "summary"),
+                 {"train": curriculum, "summary": curriculum}),
     ]
+
+
+def _test_pass_markers(d: str, section: str) -> dict[str, Path | None]:
+    folder = _marker(lambda: _experiment(d, section).output_dir)
+    return {"final_test": folder and folder / "test_results.json", "breakdown": folder and folder / "test_breakdown.json"}
+
+
+def _all_stages(stages: tuple[str, ...], done: Path | None) -> dict[str, Path | None]:
+    """Stages that continue by themselves, and the final one, are done once the final result exists."""
+    return {stage: done for stage in stages}
 
 
 def _guided_retraining_test(d: str) -> list[Step]:
     config = f"{d}/retraining.yaml"
+    reanalysis = ("embeddings", "train_som", "analyze")
     steps = [
-        *_staged("targeted_augmentation", P4 / "run_targeted_augmentation.py", config, ("final_test", "breakdown")),
-        *_staged("curriculum_comparison", P4 / "run_curriculum_comparison.py", config, ("final_test", "breakdown")),
-        *_staged("som_reanalysis", P4 / "run_som_reanalysis.py", f"{d}/som_reanalysis.yaml",
-                 ("embeddings", "train_som", "analyze")),
+        *_staged("targeted_augmentation", P4 / "run_targeted_augmentation.py", config, ("final_test", "breakdown"),
+                 _test_pass_markers(d, "augmentation")),
+        *_staged("curriculum_comparison", P4 / "run_curriculum_comparison.py", config, ("final_test", "breakdown"),
+                 _test_pass_markers(d, "curriculum")),
+        *_staged("som_reanalysis", P4 / "run_som_reanalysis.py", f"{d}/som_reanalysis.yaml", reanalysis,
+                 _all_stages(reanalysis, _marker(lambda: _reanalysis_file(f"{d}/som_reanalysis.yaml")))),
     ]
     if resolve(f"{d}/som_reanalysis_msp_arm.yaml").is_file():   # the secondary run on the max-softmax arm
-        steps += _staged("som_reanalysis (max-softmax arm)", P4 / "run_som_reanalysis.py",
-                         f"{d}/som_reanalysis_msp_arm.yaml", ("embeddings", "train_som", "analyze"))
-    steps += _staged("novelty_after_retraining", P4 / "run_novelty_after_retraining.py",
-                     f"{d}/novelty_after_retraining.yaml", ("score", "compare"))
+        msp = f"{d}/som_reanalysis_msp_arm.yaml"
+        steps += _staged("som_reanalysis (max-softmax arm)", P4 / "run_som_reanalysis.py", msp, reanalysis,
+                         _all_stages(reanalysis, _marker(lambda: _reanalysis_file(msp))))
+    novelty = f"{d}/novelty_after_retraining.yaml"
+    steps += _staged("novelty_after_retraining", P4 / "run_novelty_after_retraining.py", novelty, ("score", "compare"),
+                     _all_stages(("score", "compare"), _marker(lambda: _novelty_file(novelty))))
     return steps
 
 

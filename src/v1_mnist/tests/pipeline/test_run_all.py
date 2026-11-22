@@ -392,3 +392,53 @@ def test_missing_robustness_maps_are_trained_before_the_headline_map() -> None:
         assert [Path(c).name for c in todo] == ["som_20x20_robustness.yaml", "som_10x10_robustness.yaml"]
         assert robustness_maps(str(config_dir), exists=lambda path: True) == []
 
+
+
+# ---- a half-finished step continues where it stopped ---------------------------------------------
+
+from src.v1_mnist.component.pipeline.common import Step  # noqa: E402
+from src.v1_mnist.component.pipeline.study_steps import StudyStep  # noqa: E402
+
+
+def _three_part_step(tmp_path: Path) -> StudyStep:
+    marks = {part: tmp_path / f"{part}.json" for part in ("pools", "check", "summary")}
+    script = Path(__file__)
+
+    def commands(_d: str) -> list[Step]:
+        return [Step("pools", script, done=marks["pools"]), Step("check", script, done=marks["check"]),
+                Step("no marker", script), Step("summary", script, done=marks["summary"])]
+
+    return StudyStep("toy", (), commands, lambda _d: [tmp_path / "never_finished"])
+
+
+def test_a_half_finished_step_continues_at_its_first_missing_part(tmp_path: Path) -> None:
+    step = _three_part_step(tmp_path)
+    (tmp_path / "pools.json").write_text("{}")
+    (tmp_path / "check.json").write_text("{}")
+    planned = study_plan(step, str(tmp_path), dry_run=True)
+    assert [c.label for c in planned] == ["no marker", "summary"]      # finished parts skipped, order kept
+    assert all(c.listed_only for c in planned)
+
+
+def test_a_step_with_no_part_finished_is_planned_in_full(tmp_path: Path) -> None:
+    planned = study_plan(_three_part_step(tmp_path), str(tmp_path), dry_run=False)
+    assert [c.label for c in planned] == ["pools", "check", "no marker", "summary"]
+    assert not any(c.listed_only for c in planned)
+
+
+@pytest.mark.parametrize("config_dir", ["src/v1_mnist/component/configs", FASHION_DIR])
+def test_every_phase4_part_names_the_file_its_script_refuses_to_overwrite(config_dir: str) -> None:
+    """Both datasets have finished Phase 4, so every part's done file exists (needs the DVC data)."""
+    parts = [c for name in ("guided_retraining", "guided_retraining_test") for c in STUDY_STEPS[name].commands(config_dir)]
+    if all(c.done is None for c in parts):
+        pytest.skip("Phase 4 settings cannot be loaded here (Phase 1 embeddings not pulled with DVC)")
+    assert [c.label for c in parts if c.done is None] == []
+    assert [c.label for c in parts if not c.done.exists()] == []
+    names = {c.label: c.done.name for c in parts}
+    assert names["hard_example_mining"] == "results.json"
+    assert names["targeted_augmentation: check"] == "augmentation_check.json"
+    assert names["targeted_augmentation: summary"] == "validation_summary.json"
+    assert names["targeted_augmentation: final_test"] == "test_results.json"
+    assert names["curriculum_comparison: breakdown"] == "test_breakdown.json"
+    assert names["som_reanalysis: analyze"] == "statements.json"
+    assert names["novelty_after_retraining: compare"] == "results.json"

@@ -156,7 +156,9 @@ def phase3_steps(dry_run: bool, include_reproductions: bool = False, config_dir:
 def study_plan(step: StudyStep, config_dir: str, dry_run: bool) -> list[Step]:
     """The commands of one study step, or none (with a message) if its configs are not in the folder.
 
-    The study scripts have no --dry-run of their own, so in a dry run they are listed, not run.
+    A half-finished step continues: a part whose ``done`` file exists is skipped, so its script is not
+    asked to redo (and refuse) finished work. The study scripts have no --dry-run of their own, so in
+    a dry run they are listed, not run.
     """
     missing = step.missing(config_dir)
     if missing:
@@ -167,7 +169,13 @@ def study_plan(step: StudyStep, config_dir: str, dry_run: bool) -> list[Step]:
     if done:
         log.info(f"Skipping {step.name}: results already exist ({', '.join(show(path) for path in done)})")
         return []
-    return [replace(command, listed_only=dry_run) for command in step.commands(config_dir)]
+    commands = []
+    for command in step.commands(config_dir):
+        if command.done is not None and command.done.exists():
+            log.info(f"Skipping {command.label}: already finished ({show(command.done)}); the step continues after it")
+        else:
+            commands.append(replace(command, listed_only=dry_run))
+    return commands
 
 
 def robustness_maps(config_dir: str, exists: Callable[[Path], bool] = Path.exists) -> list[str]:
