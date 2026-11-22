@@ -42,7 +42,7 @@
 \pagenumbering{arabic}
 
 \section{Overview and Scope}
-Following the project's Phase 3 objective, we examine whether a frozen self-organizing map (SOM) and comparison detectors can recognize feature representations that differ from MNIST. A trained MNIST convolutional classifier provides 84-dimensional \texttt{fc2} embeddings, and a frozen $15\times15$ SOM supplies the reference prototypes. MNIST training embeddings ($n=49{,}000$) support fitting; MNIST validation ($n=10{,}500$) forms the in-distribution (ID) evaluation set. The proposal-specified SVHN test split ($n=26{,}032$) is the current external out-of-distribution (OOD) evaluation set, as specified in the project proposal. Because SVHN is very unlike MNIST, we add a second, harder test (Section~\ref{sec:heldout}): MNIST digits of classes the network never saw, with a new network and map trained on the remaining digits. Fashion-MNIST and KMNIST are deferred to later phases and are not part of the current Phase 3 results. These are development comparisons, not a final locked MNIST test result.
+Following the project's Phase 3 objective, we examine whether a frozen self-organizing map (SOM) and comparison detectors can recognize feature representations that differ from MNIST. A trained MNIST convolutional classifier provides 84-dimensional \texttt{fc2} embeddings, and a frozen $15\times15$ SOM supplies the reference prototypes. MNIST training embeddings ($n=49{,}000$) support fitting; MNIST validation ($n=10{,}500$) forms the in-distribution (ID) evaluation set. The proposal-specified SVHN \parencite{netzer2011reading} test split ($n=26{,}032$) is the current external out-of-distribution (OOD) evaluation set, as specified in the project proposal. Because SVHN is very unlike MNIST, we add a second, harder test (Section~\ref{sec:heldout}): MNIST digits of classes the network never saw, with a new network and map trained on the remaining digits. Fashion-MNIST and KMNIST are deferred to later phases and are not part of the current Phase 3 results. These are development comparisons, not a final locked MNIST test result.
 
 \section{Related Work and Project Contribution}
 Kohonen introduced self-organizing maps, a topology-preserving organization of inputs into neuron prototypes \parencite{kohonen1990som}. Unlike work developing the SOM itself, this study applies an already-trained map as a frozen novelty reference. Vesanto and Alhoniemi investigated clustering of SOM representations \parencite{vesanto2000clustering}; our use of the U-Matrix focuses instead on local prototype separation as a candidate novelty signal.
@@ -167,6 +167,24 @@ Isolation Forest & $0.280102 \pm 0.084964$ & Five fitted seeds \\\bottomrule
 Table~\ref{tab:svhn_new} is the headline comparison for the current additional frozen-CNN baseline evaluation; Table~\ref{tab:unified} is a separate post-hoc exploratory run in which Mahalanobis and $k$NN were freshly fitted using a common 10,000-row MNIST-training subset, so their AUROC values are not directly interchangeable with the separately recorded values in Table~\ref{tab:svhn_new}.
 
 The random-score null control from the same new run had AUROC $0.504640$ (near chance $0.5$), AUPR $0.714416$ (reflecting the higher OOD class prevalence), and FPR@95TPR $0.947905$. These are observed control values, not a confidence interval. The new standardized autoencoder has markedly higher average AUROC than the original unstandardized historical result (0.007719); this is a \emph{different} trained experiment and does not retroactively correct or replace the historical benchmark. Its AUROC varies appreciably across seeds (0.950747--0.992755). Isolation Forest remains below chance in the new five-seed run; its score convention and distributional behavior should not be reoriented using examined SVHN labels. Mean $\pm$ SD across fitting seeds does not constitute a 95\% bootstrap confidence interval. The full new run JSON stores AUROC, AUPR, FPR@95TPR and provenance for each evaluated method.
+
+\subsection{All six scores in one run: the RQ3 and RQ4 check}
+A later run, \path{mnist_svhn_novelty_statements_s42_v1}, scores all six main scores (QE, U-Matrix, MSP, energy, Mahalanobis and 5-nearest-neighbor distance) on the same 10,500 MNIST validation and 26,032 SVHN images, with paired bootstrap intervals for QE minus each other score (2,000 resamples, seed 42). It was added after the results above were known, to complete two checks: no earlier step gave a paired QE-against-Mahalanobis interval, and the group proposal defines RQ4 against the \emph{best} baseline, which is energy rather than MSP. RQ3, RQ4 and the 0.01 margin are applied exactly as fixed on 2026-11-10. It reproduces the AUROCs of Tables~\ref{tab:svhn_new} and~\ref{tab:svhn} to every printed digit.
+
+\begin{table}[H]\centering\small
+\caption{QE minus each other score on the same images (paired bootstrap 95\% intervals). Run \runcap{mnist_svhn_novelty_statements_s42_v1}.}
+\label{tab:statements}
+\begin{tabular}{@{}lccc@{}}\toprule
+Score & AUROC & QE minus score & 95\% paired interval\\\midrule
+Energy & 0.9998 & $-0.0187$ & [$-0.0207$, $-0.0167$]\\
+Max-softmax (MSP) & 0.9985 & $-0.0174$ & [$-0.0194$, $-0.0154$]\\
+$k$NN distance ($k=5$) & 0.9766 & $+0.0045$ & [$+0.0024$, $+0.0068$]\\
+U-Matrix & 0.9696 & $+0.0115$ & [$+0.0085$, $+0.0147$]\\
+Mahalanobis & 0.7764 & $+0.2047$ & [$+0.1981$, $+0.2119$]\\\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{RQ3 met:} the QE interval [0.979, 0.983] lies above 0.5 (label-shuffle control: mean 0.500, largest of 1,000 shuffles 0.511). \textbf{RQ4 not met:} against the best baseline, energy, the upper end of the paired interval ($-0.017$) is below $-0.01$. QE is slightly but clearly ahead of nearest-neighbor distance, the U-Matrix and Mahalanobis on SVHN. With one network and one map, no claim of ``better'' is made; the proposal requires at least five seeds for that.
 
 \subsection{Additional operating-point results}
 The separately measured SVHN FPR@95TPR values for the same additional benchmark are energy 0.000381, MSP 0.007810, $k$NN 0.059238 and Mahalanobis 0.313143. These are proportions rather than percentages. The historical QE threshold false-positive rate on MNIST validation was 5.13\%, which is a \emph{different} operating-point calculation; historical FPR definitions should not be mixed into a single directly comparable operating-point ranking.

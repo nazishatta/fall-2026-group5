@@ -1,9 +1,9 @@
-"""Shared SOM plotting helpers for every week.
+"""Shared SOM plotting helpers for every phase.
 
 Used by the SOM training (som_nnsom_training/visualize_som.py), cluster analysis
 (cluster_analysis/cluster_figures.py) and error pattern analysis
 (error_pattern_analysis/error_figures.py) figure scripts, and by the
-interactive report. Week-specific drawing functions live in each week's folder.
+interactive report. Step-specific drawing functions live in each step's folder.
 Label styling: som_text_style.py. Per-neuron class/error statistics and the simple
 grid map: som_neuron_maps.py (both split from this file on 2026-10-10).
 

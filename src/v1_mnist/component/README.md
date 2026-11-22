@@ -15,22 +15,22 @@ python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_cluster
 
 ## Folders in proposal order
 
-| Phase | Proposal week | Folder | What the code does |
-|---|---|---|---|
-| **1: Model Training Baseline** | 1 | [`p1_model_training_baseline/data_pipeline/`](p1_model_training_baseline/data_pipeline/README.md) | Load MNIST, stratified 70/15/15 split, class-distribution charts, sample images |
-| | 2 | [`p1_model_training_baseline/cnn_baseline_training/`](p1_model_training_baseline/cnn_baseline_training/README.md) | LeNet-5, training, test evaluation, 84-number fc2 embeddings |
-| **2: SOM Training & Visualization** | 3 | [`p2_som_training_visualization/som_nnsom_training/`](p2_som_training_visualization/som_nnsom_training/README.md) | NNSOM training with QE history, map quality, SOM figures, grid-size comparison, Optuna tuning |
-| | 4 | [`p2_som_training_visualization/cluster_analysis/`](p2_som_training_visualization/cluster_analysis/README.md) | Best-matching neurons, purity, entropy, class-neuron intersection, label-shuffle control |
-| | 5 | [`p2_som_training_visualization/error_pattern_analysis/`](p2_som_training_visualization/error_pattern_analysis/README.md) | Where the mistakes fall, hotspots, robustness on three grids, comparison with simpler error detectors |
-| | 3–5 | [`p2_som_training_visualization/interactive_report/`](p2_som_training_visualization/interactive_report/README.md) | One interactive HTML report of the SOM |
-| **3: Novelty Detection** | 6 | [`p3_novelty_detection/qe_novelty_detection/`](p3_novelty_detection/qe_novelty_detection/README.md) | Quantization error as a novelty score, MNIST against SVHN |
-| | 7 | [`p3_novelty_detection/u_matrix_analysis/`](p3_novelty_detection/u_matrix_analysis/README.md) | U-Matrix novelty score, where SVHN lands on the map |
-| | 8 | [`p3_novelty_detection/novelty_benchmark/`](p3_novelty_detection/novelty_benchmark/README.md) | QE and U-Matrix against seven other detectors, with paired intervals |
-| | – | [`p3_novelty_detection/held_out_class_novelty/`](p3_novelty_detection/held_out_class_novelty/README.md) | Harder test: train on 6 digits, detect the other 4 |
-| **4: Guided Retraining** | 9 | [`p4_guided_retraining/hard_example_mining/`](p4_guided_retraining/hard_example_mining/README.md) | Which training images are hard; equal-size SOM, max-softmax and random pools; curriculum comparison |
-| | 10 | [`p4_guided_retraining/targeted_augmentation/`](p4_guided_retraining/targeted_augmentation/README.md) | Altered copies of the hard images, retraining arms, hotspot and elsewhere error |
-| | 11 | [`p4_guided_retraining/som_reanalysis/`](p4_guided_retraining/som_reanalysis/README.md) | New SOMs on the retrained CNNs, old map against new map |
-| | – | [`p4_guided_retraining/novelty_after_retraining/`](p4_guided_retraining/novelty_after_retraining/README.md) | Does the SOM still detect SVHN after retraining? |
+| Phase | Folder | What the code does |
+|---|---|---|
+| **1: Model Training Baseline** | [`p1_model_training_baseline/data_pipeline/`](p1_model_training_baseline/data_pipeline/README.md) | Load MNIST, stratified 70/15/15 split, class-distribution charts, sample images |
+| | [`p1_model_training_baseline/cnn_baseline_training/`](p1_model_training_baseline/cnn_baseline_training/README.md) | LeNet-5, training, test evaluation, 84-number fc2 embeddings |
+| **2: SOM Training & Visualization** | [`p2_som_training_visualization/som_nnsom_training/`](p2_som_training_visualization/som_nnsom_training/README.md) | NNSOM training with QE history, map quality, SOM figures, grid-size comparison, Optuna tuning |
+| | [`p2_som_training_visualization/cluster_analysis/`](p2_som_training_visualization/cluster_analysis/README.md) | Best-matching neurons, purity, entropy, class-neuron intersection, label-shuffle control |
+| | [`p2_som_training_visualization/error_pattern_analysis/`](p2_som_training_visualization/error_pattern_analysis/README.md) | Where the mistakes fall, hotspots, robustness on three grids, comparison with simpler error detectors |
+| | [`p2_som_training_visualization/interactive_report/`](p2_som_training_visualization/interactive_report/README.md) | One interactive HTML report of the SOM |
+| **3: Novelty Detection** | [`p3_novelty_detection/qe_novelty_detection/`](p3_novelty_detection/qe_novelty_detection/README.md) | Quantization error as a novelty score, MNIST against SVHN |
+| | [`p3_novelty_detection/u_matrix_analysis/`](p3_novelty_detection/u_matrix_analysis/README.md) | U-Matrix novelty score, where SVHN lands on the map |
+| | [`p3_novelty_detection/novelty_benchmark/`](p3_novelty_detection/novelty_benchmark/README.md) | QE and U-Matrix against seven other detectors, with paired intervals |
+| | [`p3_novelty_detection/held_out_class_novelty/`](p3_novelty_detection/held_out_class_novelty/README.md) | Harder test: train on 6 digits, detect the other 4 |
+| **4: Guided Retraining** | [`p4_guided_retraining/hard_example_mining/`](p4_guided_retraining/hard_example_mining/README.md) | Which training images are hard; equal-size SOM, max-softmax and random pools; curriculum comparison |
+| | [`p4_guided_retraining/targeted_augmentation/`](p4_guided_retraining/targeted_augmentation/README.md) | Altered copies of the hard images, retraining arms, hotspot and elsewhere error |
+| | [`p4_guided_retraining/som_reanalysis/`](p4_guided_retraining/som_reanalysis/README.md) | New SOMs on the retrained CNNs, old map against new map |
+| | [`p4_guided_retraining/novelty_after_retraining/`](p4_guided_retraining/novelty_after_retraining/README.md) | Does the SOM still detect SVHN after retraining? |
 
 Shared by every step:
 

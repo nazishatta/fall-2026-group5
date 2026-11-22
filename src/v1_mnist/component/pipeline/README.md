@@ -6,33 +6,30 @@ Run every command from the code root: the folder that holds `src/` and `outputs/
 
 ## Step runners, in proposal order
 
-The proposal week is shown for orientation only; the code uses the step names.
-
-| Phase | Step (`run_all.py` name) | Proposal week | Runner | What it does | Run it? |
-|---|---|---|---|---|---|
-| 1 | `data_pipeline` | 1 | `p1_model_training_baseline/run_data_pipeline.py` | Environment check; MNIST split, class-distribution charts, sample images, `split_stats.json` | ❌ Already done (frozen) |
-| 1 | `cnn_baseline_training` | 2 | `p1_model_training_baseline/run_cnn_baseline_training.py` | Train LeNet-5 (metrics, curves, confusion matrix); extract the 84-D embeddings | ❌ Already done (frozen) |
-| 2 | `som_nnsom_training` | 3 | `p2_som_training_visualization/run_som_nnsom_training.py` | First the 10x10 and 20x20 robustness maps (`som_*_robustness.yaml`) if not trained yet; then train the SOM; SOM figures; 3 convergence charts; grid-size table | ✅ With `--skip-training` to redraw from the trained SOM |
-| 2 | `cluster_analysis` | 4 | `p2_som_training_visualization/run_cluster_analysis.py` | BMUs, purity, entropy, class–neuron intersection; class maps, purity map, class pie/stem; cluster heatmaps | ✅ Yes |
-| 2 | `error_pattern_analysis` | 5 | `p2_som_training_visualization/run_error_pattern_analysis.py` | Error geography and hotspots; hotspot images; error maps; error heatmaps; error-pattern robustness (15x15, 10x10, 20x20) and verdict | ✅ After `cluster_analysis` |
-| 2 | (report) | 3–5 | `p2_som_training_visualization/run_interactive_report.py` | Interactive HTML report | ✅ Yes |
-| 2 | `error_pattern_baselines` | – | `p2_som_training_visualization/run_error_pattern_baselines.py --stage all` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots | ✅ Skipped if its results exist |
-| 2 | `error_detector_budget` | – | `p2_som_training_visualization/run_error_detector_budget.py` | Same-budget comparison of the error detectors (exploratory) | ✅ Skipped if its results exist |
-| 2 | `grid_comparison` | – | `p2_som_training_visualization/run_grid_comparison.py --stage all` | Pre-registered grid comparison: 10x10, 15x15 and 20x20 maps on predicting held-out CNN mistakes (MNIST also checks the original run) | ✅ Skipped if its results exist |
-| 2 | `som_optuna` | – | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py`, `optuna_confirmation.py` | Optuna search for every grid in `som_optuna.yaml`, the 5-seed confirmation of each, the summary table | ✅ Skipped if the summary table exists |
-| 2 | `feature_layer_ablation` | – | `p2_som_training_visualization/run_feature_layer_ablation.py` | fc1 against fc2: `--stage extract`, `som`, `compare` | ✅ Skipped if its results exist |
-| 3 | `novelty_detection` | – | `p3_novelty_detection/run_*.py` (see below) | The three Phase 3 runners, in the order their results depend on each other | ✅ Finished steps are skipped |
-| 3 | `novelty_statements` | – | `component/p3_novelty_detection/novelty_benchmark/run_novelty_statements.py` | The six novelty scores in one run: the proposal's RQ3 and RQ4 (RQ4 against the best of max-softmax, energy, Mahalanobis and kNN), and statements O1 to O4 where the dataset's protocol states them | ✅ Skipped if its results exist |
-| 3 | `held_out_class_novelty` | – | `p3_novelty_detection/run_held_out_class_novelty.py` | Near novelty with held-out classes: `--stage run`, then `compare` | ✅ Skipped if its results exist |
-| 4 | `guided_retraining` | – | `p4_guided_retraining/run_hard_example_mining.py`, `run_targeted_augmentation.py`, `run_curriculum_comparison.py` | Hard-image pools; transform `check`; both experiments `train` and `summary` (validation only) | ✅ Skipped if its results exist |
-| 4 | (protocol, by hand) | – | `p4_guided_retraining/run_protocol_stamp.py --config CONFIG` | Fill in the macro-F1 guard, then freeze the retraining protocol. **`run_all.py` never does this** | ✅ Once, before the next row |
-| 4 | `guided_retraining_test` | – | the same two experiment runners, `run_som_reanalysis.py`, `run_novelty_after_retraining.py` | The single test pass and its breakdown; SOM re-analysis (and the max-softmax arm, if configured); novelty after retraining | ✅ Only when asked for by name; refuses without the stamp |
-| 4 | `hard_example_mining` | 9 | `p4_guided_retraining/run_hard_example_mining.py` | Decide which training images are hard; SOM, max-softmax and random pool tables (training images only, no CNN trained, test split never loaded) | ✅ Once per run ID; a new `run.revision` in `configs/retraining.yaml` for a new run |
-| 4 | `hard_example_mining` (curriculum) | 9 | `p4_guided_retraining/run_curriculum_comparison.py` | Train standard and curriculum arms (5 seeds, validation images only); validation summary; the single test pass after the protocol is frozen | ✅ `--stage train`, then `summary`, then `final_test` |
-| 5 | `som_reanalysis` | 11 | `p4_guided_retraining/run_som_reanalysis.py` | Embeddings of the retrained CNNs; new SOM per cell; tables and figures | ✅ `--stage embeddings`, `train_som`, `analyze` |
-| 4 | `targeted_augmentation` | 10 | `p4_guided_retraining/run_targeted_augmentation.py` | Check the altered images; train standard and augmented arms; summary; the single test pass | ✅ `--stage check`, `train`, `summary`, `final_test` |
-| 4 | (protocol) | 9–10 | `p4_guided_retraining/run_protocol_stamp.py` | Freeze the retraining protocol once every open item is filled | ✅ Once |
-| – | – | – | `run_all.py` | Runs the steps above in order (default: `som_nnsom_training` to `error_pattern_analysis`, then the report) | ✅ Yes |
+| Phase | Step (`run_all.py` name) | Runner | What it does | Run it? |
+|---|---|---|---|---|
+| 1 | `data_pipeline` | `p1_model_training_baseline/run_data_pipeline.py` | Environment check; MNIST split, class-distribution charts, sample images, `split_stats.json` | ❌ Already done (frozen) |
+| 1 | `cnn_baseline_training` | `p1_model_training_baseline/run_cnn_baseline_training.py` | Train LeNet-5 (metrics, curves, confusion matrix); extract the 84-D embeddings | ❌ Already done (frozen) |
+| 2 | `som_nnsom_training` | `p2_som_training_visualization/run_som_nnsom_training.py` | First the 10x10 and 20x20 robustness maps (`som_*_robustness.yaml`) if not trained yet; then train the SOM; SOM figures; 3 convergence charts; grid-size table | ✅ With `--skip-training` to redraw from the trained SOM |
+| 2 | `cluster_analysis` | `p2_som_training_visualization/run_cluster_analysis.py` | BMUs, purity, entropy, class–neuron intersection; class maps, purity map, class pie/stem; cluster heatmaps | ✅ Yes |
+| 2 | `error_pattern_analysis` | `p2_som_training_visualization/run_error_pattern_analysis.py` | Error geography and hotspots; hotspot images; error maps; error heatmaps; error-pattern robustness (15x15, 10x10, 20x20) and verdict | ✅ After `cluster_analysis` |
+| 2 | (report) | `p2_som_training_visualization/run_interactive_report.py` | Interactive HTML report | ✅ Yes |
+| 2 | `error_pattern_baselines` | `p2_som_training_visualization/run_error_pattern_baselines.py --stage all` | k-means cells, kNN impurity and max-softmax against the SOM's error hotspots | ✅ Skipped if its results exist |
+| 2 | `error_detector_budget` | `p2_som_training_visualization/run_error_detector_budget.py` | Same-budget comparison of the error detectors (exploratory) | ✅ Skipped if its results exist |
+| 2 | `grid_comparison` | `p2_som_training_visualization/run_grid_comparison.py --stage all` | Pre-registered grid comparison: 10x10, 15x15 and 20x20 maps on predicting held-out CNN mistakes (MNIST also checks the original run) | ✅ Skipped if its results exist |
+| 2 | `som_optuna` | `component/p2_som_training_visualization/som_nnsom_training/optuna_grid_tuning.py`, `optuna_confirmation.py` | Optuna search for every grid in `som_optuna.yaml`, the 5-seed confirmation of each, the summary table | ✅ Skipped if the summary table exists |
+| 2 | `feature_layer_ablation` | `p2_som_training_visualization/run_feature_layer_ablation.py` | fc1 against fc2: `--stage extract`, `som`, `compare` | ✅ Skipped if its results exist |
+| 3 | `novelty_detection` | `p3_novelty_detection/run_*.py` (see below) | The three Phase 3 runners, in the order their results depend on each other | ✅ Finished steps are skipped |
+| 3 | `novelty_statements` | `component/p3_novelty_detection/novelty_benchmark/run_novelty_statements.py` | The six novelty scores in one run: the proposal's RQ3 and RQ4 (RQ4 against the best of max-softmax, energy, Mahalanobis and kNN), and statements O1 to O4 where the dataset's protocol states them | ✅ Skipped if its results exist |
+| 3 | `held_out_class_novelty` | `p3_novelty_detection/run_held_out_class_novelty.py` | Near novelty with held-out classes: `--stage run`, then `compare` | ✅ Skipped if its results exist |
+| 4 | `guided_retraining` | `p4_guided_retraining/run_hard_example_mining.py`, `run_targeted_augmentation.py`, `run_curriculum_comparison.py` | Hard-image pools; transform `check`; both experiments `train` and `summary` (validation only) | ✅ Skipped if its results exist |
+| 4 | (protocol, by hand) | `p4_guided_retraining/run_protocol_stamp.py --config CONFIG` | Fill in the macro-F1 guard, then freeze the retraining protocol. **`run_all.py` never does this** | ✅ Once, before the next row |
+| 4 | `guided_retraining_test` | the same two experiment runners, `run_som_reanalysis.py`, `run_novelty_after_retraining.py` | The single test pass and its breakdown; SOM re-analysis (and the max-softmax arm, if configured); novelty after retraining | ✅ Only when asked for by name; refuses without the stamp |
+| 4 | `hard_example_mining` | `p4_guided_retraining/run_hard_example_mining.py` | Decide which training images are hard; SOM, max-softmax and random pool tables (training images only, no CNN trained, test split never loaded) | ✅ Once per run ID; a new `run.revision` in `configs/retraining.yaml` for a new run |
+| 4 | `hard_example_mining` (curriculum) | `p4_guided_retraining/run_curriculum_comparison.py` | Train standard and curriculum arms (5 seeds, validation images only); validation summary; the single test pass after the protocol is frozen | ✅ `--stage train`, then `summary`, then `final_test` |
+| 4 | `targeted_augmentation` | `p4_guided_retraining/run_targeted_augmentation.py` | Check the altered images; train standard and augmented arms; summary; the single test pass | ✅ `--stage check`, `train`, `summary`, `final_test` |
+| 4 | `som_reanalysis` | `p4_guided_retraining/run_som_reanalysis.py` | Embeddings of the retrained CNNs; new SOM per cell; tables and figures | ✅ `--stage embeddings`, `train_som`, `analyze` |
+| – | – | `run_all.py` | Runs the steps above in order (default: `som_nnsom_training` to `error_pattern_analysis`, then the report) | ✅ Yes |
 
 The Phase 1 and core Phase 2 runners are listed in `common.py` (`STEP_RUNNERS`); the later steps, from `error_pattern_baselines` on, are defined in `study_steps.py`; `run_all.py` puts them all in one list, `STEP_NAMES`, in proposal order. The default range is unchanged: it ends at `error_pattern_analysis` and the report. `--to STEP` runs on to a later step, and `--from STEP` alone, for a step after the report, runs just that step.
 
