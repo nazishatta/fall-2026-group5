@@ -61,3 +61,15 @@ def test_existing_folder_without_record_is_refused(tmp_path: Path) -> None:
     (s.output_dir / "metrics").mkdir(parents=True)
     with pytest.raises(RuntimeError, match="without a provenance record"):
         provenance.start_run(s)
+
+
+def test_the_comparison_never_overwrites_its_results(tmp_path: Path) -> None:
+    from types import SimpleNamespace
+
+    from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.layer_ablation.comparison import (
+        run_compare,
+    )
+
+    (tmp_path / "results.json").write_text("{}")
+    with pytest.raises(FileExistsError):
+        run_compare(SimpleNamespace(output_dir=tmp_path))  # type: ignore[arg-type]

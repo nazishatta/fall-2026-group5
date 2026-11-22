@@ -14,7 +14,9 @@
 Every step reads its configs from the dataset's config folder (``--config-dir``); a step whose
 config is not in that folder is not part of that dataset's study and is skipped with a message.
 A step whose results all exist already is skipped too, as in Phase 3 (each step's run folders are
-found by its own settings loader, so the run-ID rules live in one place). A half-finished Phase 4 step
+found by its own settings loader, so the run-ID rules live in one place). "Finished" means the step's
+final result file exists (the one its last part refuses to overwrite), never just its run folder: the
+folders are made when a step starts, so an interrupted step must not look finished. A half-finished Phase 4 step
 continues: each part names the file its script refuses to overwrite (``Step.done``), and a part whose
 file exists is skipped, so the step resumes at the first missing part. Parts that resume by themselves
 (training, embeddings, SOMs and scores skip what exists, cell by cell) are planned again; they only fill
@@ -223,14 +225,14 @@ def _baseline_results(d: str) -> list[Path]:
     from src.v1_mnist.component.p2_som_training_visualization.error_pattern_analysis.baselines.settings import (
         load_baseline_settings,
     )
-    return [_first(load_baseline_settings(f"{d}/error_pattern_baselines.yaml", REPO_ROOT)).output_dir]
+    return [_first(load_baseline_settings(f"{d}/error_pattern_baselines.yaml", REPO_ROOT)).results_path]
 
 
 def _budget_results(d: str) -> list[Path]:
     from src.v1_mnist.component.p2_som_training_visualization.error_pattern_analysis.baselines.budget_stage import (
         load_budget_settings,
     )
-    return [load_budget_settings(f"{d}/error_detector_budget.yaml", REPO_ROOT).output_dir]
+    return [load_budget_settings(f"{d}/error_detector_budget.yaml", REPO_ROOT).output_dir / "results.json"]
 
 
 def _grid_results(d: str) -> list[Path]:
@@ -249,19 +251,19 @@ def _ablation_results(d: str) -> list[Path]:
     from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.layer_ablation.settings import (
         load_ablation_settings,
     )
-    return [load_ablation_settings(f"{d}/feature_layer_ablation.yaml", REPO_ROOT).output_dir]
+    return [load_ablation_settings(f"{d}/feature_layer_ablation.yaml", REPO_ROOT).output_dir / "results.json"]
 
 
 def _statements_results(d: str) -> list[Path]:
     raw = yaml.safe_load(resolve(f"{d}/novelty_statements.yaml").read_text(encoding="utf-8")) or {}
-    return [resolve(raw["output_root"]) / str(raw["run_id"])]
+    return [resolve(raw["output_root"]) / str(raw["run_id"]) / "novelty_statements.json"]
 
 
 def _held_out_results(d: str) -> list[Path]:
     from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.settings import (
         load_held_out_settings,
     )
-    return [load_held_out_settings(f"{d}/held_out_class_novelty.yaml", REPO_ROOT).output_dir]
+    return [load_held_out_settings(f"{d}/held_out_class_novelty.yaml", REPO_ROOT).output_dir / "results.json"]
 
 
 def _experiments(d: str) -> list[object]:
@@ -273,11 +275,7 @@ def _experiments(d: str) -> list[object]:
 
 
 def _retraining_results(d: str) -> list[Path]:
-    from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings import (
-        load_pool_settings,
-    )
-    pools = _first(load_pool_settings(f"{d}/retraining.yaml", REPO_ROOT)).output_dir
-    return [pools, *(experiment.output_dir for experiment in _experiments(d))]
+    return [_pools_file(d), _summary_file(d, "augmentation"), _summary_file(d, "curriculum")]
 
 
 def _test_results(d: str) -> list[Path]:
@@ -291,9 +289,9 @@ def _test_results(d: str) -> list[Path]:
     if resolve(f"{d}/som_reanalysis_msp_arm.yaml").is_file():
         reanalysis.append(f"{d}/som_reanalysis_msp_arm.yaml")
     return [
-        *(experiment.output_dir / "test_results.json" for experiment in _experiments(d)),
-        *(load_reanalysis_settings(config, REPO_ROOT).output_dir for config in reanalysis),
-        load_novelty_settings(f"{d}/novelty_after_retraining.yaml", REPO_ROOT).output_dir,
+        *(experiment.output_dir / "test_breakdown.json" for experiment in _experiments(d)),
+        *(load_reanalysis_settings(config, REPO_ROOT).output_dir / "tables" / "statements.json" for config in reanalysis),
+        load_novelty_settings(f"{d}/novelty_after_retraining.yaml", REPO_ROOT).output_dir / "results.json",
     ]
 
 

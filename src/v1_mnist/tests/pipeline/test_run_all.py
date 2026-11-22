@@ -442,3 +442,34 @@ def test_every_phase4_part_names_the_file_its_script_refuses_to_overwrite(config
     assert names["curriculum_comparison: breakdown"] == "test_breakdown.json"
     assert names["som_reanalysis: analyze"] == "statements.json"
     assert names["novelty_after_retraining: compare"] == "results.json"
+
+
+# ---- an interrupted step is never taken for finished ---------------------------------------------
+
+
+def test_a_run_folder_without_its_final_file_is_not_finished(tmp_path: Path) -> None:
+    """Run folders are made when a step starts, so only the final result file means "finished"."""
+    folder = tmp_path / "run"
+    folder.mkdir()                                         # the step started, then was interrupted
+    step = StudyStep("toy", (), lambda _d: [Step("toy: all", Path(__file__))], lambda _d: [folder / "results.json"])
+    assert step.finished(str(tmp_path)) is None
+    assert [c.label for c in study_plan(step, str(tmp_path), dry_run=True)] == ["toy: all"]
+    (folder / "results.json").write_text("{}")
+    assert step.finished(str(tmp_path)) == [folder / "results.json"]
+
+
+@pytest.mark.parametrize("config_dir", ["src/v1_mnist/component/configs", FASHION_DIR])
+def test_every_study_step_is_finished_by_a_result_file_not_a_folder(config_dir: str) -> None:
+    checked = 0
+    for name, step in STUDY_STEPS.items():
+        if step.missing(config_dir):
+            continue
+        try:
+            paths = step.results(config_dir)
+        except Exception:  # noqa: BLE001 - settings that need the DVC data cannot load everywhere
+            continue
+        checked += 1
+        assert paths, name
+        assert all(path.suffix in (".json", ".csv") for path in paths), (name, paths)
+    if checked == 0:
+        pytest.skip("no study step's settings can be loaded here (DVC data not pulled)")
