@@ -1,0 +1,46 @@
+{
+  "run_id": "fashion_mnist_svhn_qe_energy_knn_paired_s42_v1",
+  "comparisons": {
+    "energy": {
+      "qe_auroc": 0.7893755670676385,
+      "baseline_auroc": 0.9821428168993472,
+      "qe_minus_baseline_auroc": -0.1927672498317088,
+      "paired_difference_ci_95": [
+        -0.198798262577926,
+        -0.18644236983053825
+      ]
+    },
+    "knn": {
+      "qe_auroc": 0.7893755670676385,
+      "baseline_auroc": 0.8636147891240086,
+      "qe_minus_baseline_auroc": -0.07423922205637012,
+      "paired_difference_ci_95": [
+        -0.07835996063453027,
+        -0.07015336700983409
+      ]
+    }
+  },
+  "seed": 42,
+  "bootstrap_iterations": 2000,
+  "sample_counts": {
+    "fashion_mnist_val": 10500,
+    "svhn_test": 26032
+  },
+  "input_sha256": {
+    "qe": {
+      "fashion_mnist_val": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+      "svhn_test": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae"
+    },
+    "energy": {
+      "fashion_mnist_val": "50cf5d2665a77b1b9cdd19dc02d610c711dd498099e3db1431e14a29ee531220",
+      "svhn_test": "22e89b5261c3deb1460851ef83b80707576dfcf2320f6d0b257774c9d0ee8ee2"
+    },
+    "knn": {
+      "fashion_mnist_val": "6e5fdb2c2080d023edbe8153d073f91f30d08d149f0df17dfeccb10f87cc1567",
+      "svhn_test": "5a852b9f4bac8716af4d2e1fb1c683c6796fa0fc11c4816ef045ecb03d4b305f"
+    }
+  },
+  "config_sha256": "869f32125d8fa2b637af5791407efadb4323fc09fe4c0482eba7c2d1b9c6ce51",
+  "leakage_control": "Frozen historical novelty scores; no fitting, tuning, or official Fashion-MNIST final-test access.",
+  "alignment_limitation": "Historical score arrays lack independent per-image identifiers. Paired analysis assumes the established identical sample order."
+}

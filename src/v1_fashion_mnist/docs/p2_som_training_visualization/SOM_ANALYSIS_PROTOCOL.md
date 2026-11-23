@@ -99,7 +99,136 @@ it fits the data a little more closely while keeping neighbours less well togeth
 15x15, neighbourhood 11, 250 epochs, as section 2 requires, and this is not a limitation of the headline
 map: no setting found improves both measures. No test data was used (`test_evaluated: false`).
 
-Everything else: [TBD]
+**Feature-layer ablation (recorded 2026-11-21).** SOMs on `fc1` and `fc2`, same recipe as the headline map,
+SOM seeds 1-5, paired by seed; fc1 minus fc2, mean and 95% t-interval over the 5 seeds. Source:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/feature_layer_ablation/feature_layer_ablation_som15x15_nb11_ep250_seeds5/tables/statements.csv`.
+
+| Statement | fc1 minus fc2 | Seeds where fc1 is larger | Verdict | MNIST |
+|---|---|---|---|---|
+| L1 (primary): error-cell AUROC | -0.055 [-0.066, -0.043] | 0 of 5 | **fc2 better** | fc2 better |
+| L2: weighted purity | -0.048 [-0.051, -0.045] | 0 of 5 | **fc2 better** | fc2 better |
+| L3: QE novelty AUROC on SVHN | +0.087 [+0.027, +0.148] | 5 of 5 | **fc1 better** | fc1 better (+0.005) |
+
+As on MNIST, `fc2`, the headline layer, gives maps that find the network's mistakes better and hold purer
+classes, while `fc1` separates SVHN better. On Fashion-MNIST the L3 gap is much larger than on MNIST (+0.087
+against +0.005), so the layer choice trades error finding against far-novelty detection. `fc2` stays the
+headline layer, as fixed in section 2. The `fc2` maps' QE AUROC on SVHN ranges from 0.766 to 0.884 over the
+5 seeds (Phase 3 protocol, section 7). No test data was used.
+
+**Error-pattern baselines and the same-budget comparison (recorded 2026-11-21; exploratory, as on MNIST).**
+Predicting which of the 876 validation images the network gets wrong, on the same validation embeddings.
+Sources: `outputs/v1_fashion_mnist/p2_som_training_visualization/error_pattern_analysis/error_pattern_baselines/error_pattern_baselines_som_15x15/summary.csv`
+and `.../error_detector_budget/error_detector_budget_som_15x15/summary.csv`.
+
+| Method | AUROC [95% interval] | Hotspot ratio | Mistakes caught at the SOM hotspots' share of images (3.5%) | MNIST AUROC |
+|---|---|---|---|---|
+| SOM cell error rate | 0.811 [0.796, 0.824] | 3.9 [3.2, 4.4] | 13.7% | 0.685 |
+| k-means cell error rate (10 seeds) | 0.812 [0.805, 0.821] | 4.0 [3.7, 4.5] | (15.8% at its own 4.0%) | 0.693 |
+| Nearest-neighbour impurity | 0.876 [0.864, 0.888] | | 21.1% [19.2, 22.9] | 0.874 |
+| Max-softmax | 0.906 [0.898, 0.914] | | 21.9% [19.8, 24.1] | 0.981 |
+
+As on MNIST, the SOM's cells find mistakes no better than k-means cells, and the network's own confidence
+finds them best. The gap is smaller on Fashion-MNIST (max-softmax minus SOM: 0.095 AUROC, against 0.296 on
+MNIST), because the mistakes lie in large mixed regions of the map rather than in a few small cells. The
+SOM's value in Phase 2 is the map of where classes mix and where the mistakes sit, not error detection. The
+SOM hotspot analysis reproduced the Phase 2 robustness result exactly.
+
+**SOM training (recorded 2026-11-21).** The three maps of section 1, seed 42, measured on the 10,500
+validation images. Source: `outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/tables/som_grid_ablation.csv`.
+
+| Grid | Neighbourhood | QE | TE1 (%) | TE1+2 (%) | Neurons used |
+|---|---|---|---|---|---|
+| 10x10 | 7 | 1.008 | 4.26 | 1.76 | 99 of 100 |
+| 15x15 (headline) | 11 | 0.899 | 5.37 | 3.55 | 222 of 225 |
+| 20x20 | 15 | 0.822 | 7.33 | 4.75 | 396 of 400 |
+
+As on MNIST, bigger maps fit the images more closely (lower QE) but keep neighbours together less well
+(higher topographic error), so no grid is best on every measure. The table's rank sum (10x10: 5, 15x15: 6,
+20x20: 7) is for reference only; the headline map stays 15x15 as fixed in section 1. Purity for each grid,
+from the grid comparison's 10 maps per grid (below): 87.9%, 89.0% and 89.5%.
+
+**RQ1: how well the map keeps classes apart (recorded 2026-11-21; descriptive, no pass/fail).** Source:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/cluster_summary.json`.
+
+| Measure | Fashion-MNIST | MNIST |
+|---|---|---|
+| Weighted purity on validation | 0.893 | 0.982 |
+| Label-shuffled baseline, mean [95% range] (1,000 shuffles, seed 20261010) | 0.173 [0.170, 0.177] | 0.174 [0.170, 0.177] |
+| p-value (smallest possible with 1,000 shuffles: 0.001) | 0.001 | 0.001 |
+
+The map keeps the classes far better than chance: the highest of the 1,000 shuffles was 0.180. Purity is lower than on
+MNIST, which fits the network's higher validation error rate (8.3% against 0.9%): more images sit in
+neurons where classes mix. Purity on the training images is 0.900, so the map is not much purer on the
+images it was trained on. The class maps are in `outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/figures/` and the interactive
+report is `outputs/v1_fashion_mnist/p2_som_training_visualization/interactive_report/interactive_report.html` (DVC).
+
+**RQ2: where the mistakes sit (recorded 2026-11-21).** The network gets 876 of the 10,500 validation images
+wrong (8.3%); its mean confidence is 0.686 on these and 0.942 on the rest. Hotspots are picked on one half
+of the mistakes and judged on the other half (section 2). The held-out ratio is the hotspots' error rate
+divided by the overall error rate (1 = no concentration). Sources:
+`outputs/v1_fashion_mnist/p2_som_training_visualization/error_pattern_analysis/robustness/*_error_pattern_robustness.json` and
+`error_pattern_robustness_verdict.json` in the same folder.
+
+| Map | Hotspots | Held-out ratio, median [2.5th, 97.5th percentile] | Chance median (95th percentile) | p | Error rate against purity (Spearman) | Verdict | MNIST median ratio |
+|---|---|---|---|---|---|---|---|
+| 15x15 (headline) | 11 | 3.90 [3.23, 4.44] | 1.00 (1.16) | 0.005 | -0.95 | **passes** | 11.1 |
+| 10x10 | 5 | 3.81 [3.07, 4.37] | 1.00 (1.22) | 0.005 | -0.93 | holds | 10.5 |
+| 20x20 | 20 | 3.81 [3.14, 4.35] | 1.00 (1.18) | 0.005 | -0.95 | holds | 13.4 |
+
+p = 0.005 is the smallest possible with 200 shuffles. On the headline map both pre-written criteria pass:
+the mistakes are concentrated in the hotspots (median ratio above chance with p < 0.05, 2.5th percentile
+above 1), and the neurons with more mistakes are the ones where classes mix (error rate falls as purity
+rises, and rises with class entropy, rho = 0.96). The result holds on the 10x10 and 20x20 maps.
+
+The ratios are much lower than on MNIST, but the two are not comparable in size: a ratio cannot exceed one
+divided by the overall error rate, which is about 12 on Fashion-MNIST and about 114 on MNIST. The
+Fashion-MNIST mistakes are spread over larger mixed regions of the map rather than packed into a few
+cells, which also explains the error-detection results above. On the images used to pick them, the 11
+hotspots hold 4.0% of the images and 19.7% of the mistakes; this overstates the concentration and is
+descriptive only. Mistakes also sit a little further from their neuron than correct images (mean distance
+0.994 against 0.840).
+
+No test data was used in any of these runs (`test_used: false`, `test_evaluated: false`).
+
+**Grid comparison (recorded 2026-11-21).** MNIST's pre-registered design, unchanged
+(`PREREGISTRATION_grid_comparison.md`): how well do a map's cells predict which validation images the
+network gets wrong, on images not used to work out the cells' error rates? Each grid tried three
+neighbourhoods and kept one by QE, TE1 and TE1+2 (labels not used): 7, 11 and 15, the settings of
+section 1. Each grid then trained 10 maps on resampled training data, scored over 200 repeated splits.
+876 mistakes; the 525 low-confidence images are the 5% the network is least sure about. Decision rule,
+fixed in advance: the whole 95% range inside ±0.02 means the grids are the same, the whole range on one
+side of 0 means one is better, otherwise inconclusive. Source: `outputs/v1_fashion_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_g10_15_20_b10_r200/results.json`.
+
+| Comparison | Measure | Difference | 95% range | Bigger grid better in | Verdict |
+|---|---|---|---|---|---|
+| **20x20 minus 15x15 (primary)** | **AUROC, mistakes** | **-0.042** | **-0.077 to -0.008** | **0% of repeats** | **15x15 better** |
+| 20x20 minus 15x15 | Average precision, mistakes | -0.023 | -0.064 to +0.016 | 11.5% | inconclusive |
+| 20x20 minus 15x15 | AUROC, low-confidence images | -0.046 | -0.096 to +0.003 | 4% | inconclusive |
+| 20x20 minus 15x15 | Average precision, low-confidence | -0.025 | -0.093 to +0.041 | 27% | inconclusive |
+| 15x15 minus 10x10 | AUROC, mistakes | -0.019 | -0.054 to +0.009 | 9% | inconclusive |
+| 15x15 minus 10x10 | AUROC, low-confidence images | -0.022 | -0.065 to +0.019 | 16% | inconclusive |
+| 20x20 minus 10x10 (exploratory) | AUROC, mistakes | -0.061 | -0.100 to -0.020 | 0% | 10x10 better |
+| 20x20 minus 10x10 (exploratory) | AUROC, low-confidence images | -0.068 | -0.112 to -0.030 | 0% | 10x10 better |
+
+The 20x20 minus 10x10 comparison was added after the MNIST result was known and before this run; it is
+not part of the decision.
+
+| Per grid (mean over 10 maps) | 10x10 | 15x15 | 20x20 |
+|---|---|---|---|
+| Held-out AUROC, mistakes [95% range] | 0.806 [0.780, 0.830] | 0.786 [0.757, 0.812] | 0.744 [0.714, 0.775] |
+| Held-out AUROC, low-confidence images | 0.864 [0.831, 0.889] | 0.843 [0.809, 0.874] | 0.796 [0.753, 0.834] |
+| QE (NNSOM definition) | 1.054 | 0.913 | 0.844 |
+| TE1 / TE1+2 (%) | 4.84 / 2.44 | 6.26 / 3.77 | 7.66 / 5.06 |
+| Purity (%) | 87.9 ± 0.3 | 89.0 ± 0.2 | 89.5 ± 0.2 |
+| Neighbours with a different main class (%) | 37.4 | 25.4 | 20.6 |
+
+The primary comparison is decided: the 20x20 map finds the network's mistakes less well than the headline
+15x15 map, which supports the headline choice. 15x15 and 10x10 cannot be told apart. As on MNIST, a
+bigger map is sharper (lower QE, purer cells) but no better at finding mistakes; here it is worse,
+probably because each of its cells holds fewer images, so its error rates are noisier. On MNIST the same
+comparison was inconclusive (difference +0.001, range -0.100 to +0.089): with 92 mistakes it could not
+see differences below about 0.1. With 876 mistakes the ranges here are about three times narrower. No
+test data was used (`test_split_read: false`).
 
 ## 6. References
 

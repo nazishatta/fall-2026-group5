@@ -1,0 +1,19 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_u_matrix_reproduction.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE against the U-Matrix on validation (summary statistics). The file keeps MNIST's name because the
+# runner looks for it by that name; for Fashion-MNIST this is a first run, not a reproduction.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_qe_u_matrix_validation_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis
+som_model: outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/som_models/som_15x15_nb11_ep250_s42
+validation_bmu: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu.npy
+validation_qe: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu_distance.npy
+qe_summary: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection/fashion_mnist_qe_training_calibrated_s42_v1/qe_summary.json
+grid_height: 15
+grid_width: 15
+feature_dim: 84
+validation_count: 10500
+expected_sha256:
+  som_model: 6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281
+  validation_qe: ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7

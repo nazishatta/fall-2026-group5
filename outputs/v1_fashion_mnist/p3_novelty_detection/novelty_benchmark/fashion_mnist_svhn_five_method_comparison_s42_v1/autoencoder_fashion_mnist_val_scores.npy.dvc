@@ -1,0 +1,5 @@
+outs:
+- md5: a0753c06d970fae8bcf27e08e760c336
+  size: 84128
+  hash: md5
+  path: autoencoder_fashion_mnist_val_scores.npy

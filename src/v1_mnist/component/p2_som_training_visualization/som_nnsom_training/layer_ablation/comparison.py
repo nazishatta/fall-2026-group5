@@ -18,7 +18,7 @@ from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.lay
     cell_name,
 )
 from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.comparison import paired_summary
-from src.v1_mnist.component.utils.run_provenance import write_json
+from src.v1_mnist.component.utils.run_provenance import ensure_not_done, write_json
 
 log = logging.getLogger("v1_mnist.feature_layer_ablation")
 STATEMENTS = {"L1_error_cell_auroc": "A1_error_cell_auroc", "L2_weighted_purity": "A2_weighted_purity",
@@ -80,7 +80,8 @@ def _write_tables(folder: Path, per_layer: dict[str, list[dict[str, Any]]], resu
 
 
 def run_compare(settings: AblationSettings) -> dict[str, Any]:
-    """Read every cell, write results.json and the tables."""
+    """Read every cell, write results.json and the tables (once; never overwritten)."""
+    ensure_not_done(settings.output_dir / "results.json")
     verify_run(settings)
     per_layer: dict[str, list[dict[str, Any]]] = {}
     for layer in settings.layers:

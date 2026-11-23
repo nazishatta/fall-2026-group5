@@ -1,0 +1,27 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_ood_evaluation.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE on SVHN test against Fashion-MNIST validation, with the frozen training-QE threshold.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+id_dataset: fashion_mnist
+id_split: val
+ood_datasets:
+  - name: svhn
+    split: test
+    run_id: fashion_mnist_svhn_qe_s42_v1
+som_config: src/v1_fashion_mnist/component/configs/som.yaml
+qe_config: src/v1_fashion_mnist/component/configs/qe_novelty.yaml
+cnn_checkpoint: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_fashion_mnist_s42.pth
+threshold_percentile: 95.0
+bootstrap:
+  iterations: 2000
+  seed: 42
+  confidence: 0.95
+target_tpr: 0.95
+output_dir: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection
+data_root: data/ood
+batch_size: 256
+cnn_sha256: 3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860
+training_distance_path: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/train_bmu_distance.npy
+validation_distance_path: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu_distance.npy
+max_missed_examples: 20

@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -106,6 +107,12 @@ def test_steps_come_after_the_steps_whose_results_they_read() -> None:
     assert first < benchmark
     for later in ("qe_threshold_sweep", "qe_umatrix_validation_figure", "proposal_gap_analysis", "svhn_som_overlay"):
         assert benchmark < names.index(later), later
+
+
+def test_qe_ood_comes_before_the_benchmark_that_reproduces_it() -> None:
+    """svhn_benchmark checks its QE AUROC against qe_ood's metrics (qe_reference_metrics)."""
+    names = flat(include_reproductions=True)
+    assert names.index("qe_ood") < names.index("svhn_benchmark")
 
 
 def test_planned_steps_keep_each_runners_own_order() -> None:
@@ -219,14 +226,41 @@ def test_results_folder_is_output_folder_plus_run_id(tmp_path: Path) -> None:
     assert results_folder(unnamed) is None
 
 
+def _phase3_run(tmp_path: Path, recorded: bool) -> tuple[P3Step, Path]:
+    """The first QE step's config in a dataset folder of its own, with its run folder already made."""
+    step = RUNNERS["run_qe_novelty_detection.py"][0]
+    (tmp_path / "configs").mkdir()
+    (tmp_path / "configs" / step.config).write_text(
+        yaml.safe_dump({"run_id": "run_a", "output_root": str(tmp_path / "out")}))
+    folder = tmp_path / "out" / "run_a"
+    folder.mkdir(parents=True)
+    if recorded:
+        (folder / "run_complete.json").write_text("{}")
+    return step, tmp_path / "configs"
+
+
 def test_existing_results_are_never_overwritten(tmp_path: Path) -> None:
-    (tmp_path / "out" / "run_a").mkdir(parents=True)
-    config = tmp_path / "config.yaml"
-    config.write_text(yaml.safe_dump({"run_id": "run_a", "output_root": str(tmp_path / "out")}))
-    first = RUNNERS["run_qe_novelty_detection.py"][0]
-    result = run_runner("run_qe_novelty_detection.py", "--only", first.name, "--config", str(config))
+    step, configs = _phase3_run(tmp_path, recorded=True)
+    result = run_runner("run_qe_novelty_detection.py", "--only", step.name, "--config", str(configs / step.config))
     assert result.returncode != 0
     assert "never overwritten" in result.stdout + result.stderr
+
+
+def test_a_recorded_phase3_run_is_skipped(tmp_path: Path) -> None:
+    step, configs = _phase3_run(tmp_path, recorded=True)
+    result = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs))
+    assert result.returncode == 0
+    assert "Skipping" in result.stdout + result.stderr
+
+
+def test_a_phase3_run_folder_without_its_record_stops_the_run(tmp_path: Path) -> None:
+    """The folder is made when the step starts: without a record the step may have been cut off."""
+    step, configs = _phase3_run(tmp_path, recorded=False)
+    result = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs))
+    assert result.returncode != 0
+    assert "has no run_complete.json" in result.stdout + result.stderr
+    dry = run_runner("run_qe_novelty_detection.py", "--steps", step.name, "--config-dir", str(configs), "--dry-run")
+    assert dry.returncode == 0 and "a real run would stop here" in dry.stdout + dry.stderr
 
 
 # Configs of the other phases (1, 2 and 4); only Phase 3 configs must belong to a Phase 3 runner.
@@ -235,16 +269,20 @@ OTHER_PHASE_CONFIGS = {
     "error_pattern_baselines.yaml", "som_optuna.yaml", "retraining.yaml", "som_reanalysis.yaml",
     "novelty_after_retraining.yaml", "held_out_class_novelty.yaml",
     "som_reanalysis_msp_arm.yaml", "error_detector_budget.yaml", "feature_layer_ablation.yaml",
+    "grid_comparison.yaml",
 }
 # Not a step: the shared input fingerprints.
 SUPPORTING_CONFIGS = {"phase3_shared_provenance.yaml"}
 
 
 def test_every_phase3_config_is_a_step_or_listed_as_supporting() -> None:
-    """A new Phase 3 config must be added to a runner (or listed here), so no analysis is left out."""
+    """A new Phase 3 config must belong to a runner or a run_all study step (or be listed here)."""
+    from src.v1_mnist.component.pipeline.study_steps import STUDY_STEPS
+
     step_configs = {step.config for steps in RUNNERS.values() for step in steps}
+    study_configs = {config for step in STUDY_STEPS.values() for config in step.configs}
     on_disk = {path.name for path in (REPO_ROOT / CONFIG_DIR).glob("*.yaml")}
-    missing = on_disk - OTHER_PHASE_CONFIGS - SUPPORTING_CONFIGS - step_configs
+    missing = on_disk - OTHER_PHASE_CONFIGS - SUPPORTING_CONFIGS - step_configs - study_configs
     assert not missing, f"Configs that no Phase 3 runner uses: {sorted(missing)}"
     assert not step_configs - on_disk, "A step names a config that does not exist"
 
@@ -294,8 +332,9 @@ def test_steps_follow_the_proposal_order() -> None:
     assert STEP_NAMES == [
         "data_pipeline", "cnn_baseline_training",                       # Phase 1
         "som_nnsom_training", "cluster_analysis", "error_pattern_analysis",
-        "error_pattern_baselines", "error_detector_budget", "som_optuna", "feature_layer_ablation",  # Phase 2
-        "novelty_detection", "held_out_class_novelty",                  # Phase 3
+        "error_pattern_baselines", "error_detector_budget", "grid_comparison", "som_optuna",
+        "feature_layer_ablation",                                       # Phase 2
+        "novelty_detection", "novelty_statements", "held_out_class_novelty",   # Phase 3
         "guided_retraining", "guided_retraining_test",                  # Phase 4
     ]
 
@@ -329,12 +368,37 @@ def test_optuna_grids_come_from_the_config() -> None:
 
 
 def test_every_study_step_passes_its_own_config() -> None:
+    mnist = "src/v1_mnist/component/configs"
+    assert [name for name, step in STUDY_STEPS.items() if step.missing(mnist)] == []
     for name, step in STUDY_STEPS.items():
-        for command in step.commands("src/v1_mnist/component/configs"):
+        if step.missing(mnist):
+            continue
+        for command in step.commands(mnist):
             config = command.args[command.args.index("--config") + 1]
             assert config.startswith("src/v1_mnist/component/configs/"), (name, command.label)
             assert (REPO_ROOT / config).is_file(), (name, config)
 
+
+
+def test_every_study_step_script_starts_without_pythonpath(tmp_path: Path) -> None:
+    """run_all.py starts these scripts directly, so each must put the code root on its own import path."""
+    mnist = "src/v1_mnist/component/configs"
+    scripts = sorted({command.script for step in STUDY_STEPS.values() for command in step.commands(mnist)})
+    env = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
+    for script in scripts:
+        result = subprocess.run([sys.executable, str(script), "--help"], cwd=tmp_path, env=env,
+                                capture_output=True, text=True, check=False)
+        assert result.returncode == 0, (script.name, result.stderr[-500:])
+
+
+def test_phase3_step_labels_name_the_configs_dataset() -> None:
+    """A Fashion-MNIST run prints Fashion-MNIST in its step names; MNIST's names are unchanged."""
+    steps = ("--steps", "qe_u_matrix", "qe_umatrix_validation_figure", "--dry-run")
+    fashion = run_runner("run_u_matrix_analysis.py", "--config-dir", FASHION_DIR, *steps)
+    mnist = run_runner("run_u_matrix_analysis.py", *steps)
+    assert fashion.returncode == 0 and mnist.returncode == 0, fashion.stderr + mnist.stderr
+    assert "on Fashion-MNIST validation" in fashion.stdout and " MNIST validation" not in fashion.stdout
+    assert "on MNIST validation" in mnist.stdout
 
 def test_reproductions_are_optional_only_for_mnist() -> None:
     assert optional_steps() == REPRODUCTION_STEPS
@@ -346,3 +410,93 @@ def test_phase3_runner_skips_steps_whose_config_is_not_in_the_folder(tmp_path: P
     result = run_runner("run_qe_novelty_detection.py", "--config-dir", str(tmp_path), "--dry-run")
     assert result.returncode == 0, result.stderr
     assert "not part of this dataset's study" in result.stdout + result.stderr
+
+
+def test_missing_robustness_maps_are_trained_before_the_headline_map() -> None:
+    from src.v1_mnist.component.pipeline.run_all import robustness_maps
+    for config_dir in (CONFIG_DIR, FASHION_DIR):
+        todo = robustness_maps(str(config_dir), exists=lambda path: False)
+        assert [Path(c).name for c in todo] == ["som_20x20_robustness.yaml", "som_10x10_robustness.yaml"]
+        assert robustness_maps(str(config_dir), exists=lambda path: True) == []
+
+
+
+# ---- a half-finished step continues where it stopped ---------------------------------------------
+
+from src.v1_mnist.component.pipeline.common import Step  # noqa: E402
+from src.v1_mnist.component.pipeline.study_steps import StudyStep  # noqa: E402
+
+
+def _three_part_step(tmp_path: Path) -> StudyStep:
+    marks = {part: tmp_path / f"{part}.json" for part in ("pools", "check", "summary")}
+    script = Path(__file__)
+
+    def commands(_d: str) -> list[Step]:
+        return [Step("pools", script, done=marks["pools"]), Step("check", script, done=marks["check"]),
+                Step("no marker", script), Step("summary", script, done=marks["summary"])]
+
+    return StudyStep("toy", (), commands, lambda _d: [tmp_path / "never_finished"])
+
+
+def test_a_half_finished_step_continues_at_its_first_missing_part(tmp_path: Path) -> None:
+    step = _three_part_step(tmp_path)
+    (tmp_path / "pools.json").write_text("{}")
+    (tmp_path / "check.json").write_text("{}")
+    planned = study_plan(step, str(tmp_path), dry_run=True)
+    assert [c.label for c in planned] == ["no marker", "summary"]      # finished parts skipped, order kept
+    assert all(c.listed_only for c in planned)
+
+
+def test_a_step_with_no_part_finished_is_planned_in_full(tmp_path: Path) -> None:
+    planned = study_plan(_three_part_step(tmp_path), str(tmp_path), dry_run=False)
+    assert [c.label for c in planned] == ["pools", "check", "no marker", "summary"]
+    assert not any(c.listed_only for c in planned)
+
+
+@pytest.mark.parametrize("config_dir", ["src/v1_mnist/component/configs", FASHION_DIR])
+def test_every_phase4_part_names_the_file_its_script_refuses_to_overwrite(config_dir: str) -> None:
+    """Both datasets have finished Phase 4, so every part's done file exists (needs the DVC data)."""
+    parts = [c for name in ("guided_retraining", "guided_retraining_test") for c in STUDY_STEPS[name].commands(config_dir)]
+    if all(c.done is None for c in parts):
+        pytest.skip("Phase 4 settings cannot be loaded here (Phase 1 embeddings not pulled with DVC)")
+    assert [c.label for c in parts if c.done is None] == []
+    assert [c.label for c in parts if not c.done.exists()] == []
+    names = {c.label: c.done.name for c in parts}
+    assert names["hard_example_mining"] == "results.json"
+    assert names["targeted_augmentation: check"] == "augmentation_check.json"
+    assert names["targeted_augmentation: summary"] == "validation_summary.json"
+    assert names["targeted_augmentation: final_test"] == "test_results.json"
+    assert names["curriculum_comparison: breakdown"] == "test_breakdown.json"
+    assert names["som_reanalysis: analyze"] == "statements.json"
+    assert names["novelty_after_retraining: compare"] == "results.json"
+
+
+# ---- an interrupted step is never taken for finished ---------------------------------------------
+
+
+def test_a_run_folder_without_its_final_file_is_not_finished(tmp_path: Path) -> None:
+    """Run folders are made when a step starts, so only the final result file means "finished"."""
+    folder = tmp_path / "run"
+    folder.mkdir()                                         # the step started, then was interrupted
+    step = StudyStep("toy", (), lambda _d: [Step("toy: all", Path(__file__))], lambda _d: [folder / "results.json"])
+    assert step.finished(str(tmp_path)) is None
+    assert [c.label for c in study_plan(step, str(tmp_path), dry_run=True)] == ["toy: all"]
+    (folder / "results.json").write_text("{}")
+    assert step.finished(str(tmp_path)) == [folder / "results.json"]
+
+
+@pytest.mark.parametrize("config_dir", ["src/v1_mnist/component/configs", FASHION_DIR])
+def test_every_study_step_is_finished_by_a_result_file_not_a_folder(config_dir: str) -> None:
+    checked = 0
+    for name, step in STUDY_STEPS.items():
+        if step.missing(config_dir):
+            continue
+        try:
+            paths = step.results(config_dir)
+        except Exception:  # noqa: BLE001 - settings that need the DVC data cannot load everywhere
+            continue
+        checked += 1
+        assert paths, name
+        assert all(path.suffix in (".json", ".csv") for path in paths), (name, paths)
+    if checked == 0:
+        pytest.skip("no study step's settings can be loaded here (DVC data not pulled)")

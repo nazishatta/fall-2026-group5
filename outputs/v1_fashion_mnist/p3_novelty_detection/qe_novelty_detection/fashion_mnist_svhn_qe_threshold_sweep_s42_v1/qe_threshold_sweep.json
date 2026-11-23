@@ -1,0 +1,103 @@
+{
+  "run_id": "fashion_mnist_svhn_qe_threshold_sweep_s42_v1",
+  "analysis": "qe_threshold_sweep",
+  "headline_percentile": 95.0,
+  "threshold_sweep": [
+    {
+      "percentile": 90.0,
+      "threshold": 1.245046782963057,
+      "training_flag_rate": 0.1,
+      "id_false_alarm_rate": 0.10123809523809524,
+      "id_false_alarm_low": 0.0956135150146899,
+      "id_false_alarm_high": 0.10715434540766453,
+      "ood_detection_rate": 0.13118469575906577,
+      "ood_detection_low": 0.12713796092940277,
+      "ood_detection_high": 0.13534026431364787,
+      "ood_missed": 22617,
+      "detection_minus_false_alarm": 0.029946600520970534
+    },
+    {
+      "percentile": 95.0,
+      "threshold": 1.4214525859373504,
+      "training_flag_rate": 0.05,
+      "id_false_alarm_rate": 0.05104761904761905,
+      "id_false_alarm_low": 0.0469995595579005,
+      "id_false_alarm_high": 0.05542405974732491,
+      "ood_detection_rate": 0.030424093423478796,
+      "ood_detection_low": 0.028405997711178438,
+      "ood_detection_high": 0.032580756311428684,
+      "ood_missed": 25240,
+      "detection_minus_false_alarm": -0.020623525624140254
+    },
+    {
+      "percentile": 97.5,
+      "threshold": 1.5991250934169943,
+      "training_flag_rate": 0.025,
+      "id_false_alarm_rate": 0.026571428571428572,
+      "id_false_alarm_low": 0.023664075049435542,
+      "id_false_alarm_high": 0.029825066139846482,
+      "ood_detection_rate": 0.010448678549477565,
+      "ood_detection_low": 0.009283670710244229,
+      "ood_detection_high": 0.011758148110444996,
+      "ood_missed": 25760,
+      "detection_minus_false_alarm": -0.01612275002195101
+    },
+    {
+      "percentile": 99.0,
+      "threshold": 1.845549670208381,
+      "training_flag_rate": 0.01,
+      "id_false_alarm_rate": 0.010571428571428572,
+      "id_false_alarm_low": 0.008786409779975815,
+      "id_false_alarm_high": 0.012714434430790691,
+      "ood_detection_rate": 0.0025737553779963123,
+      "ood_detection_low": 0.0020273466248925667,
+      "ood_detection_high": 0.0032669496642713375,
+      "ood_missed": 25965,
+      "detection_minus_false_alarm": -0.00799767319343226
+    },
+    {
+      "percentile": 99.5,
+      "threshold": 2.023235275192946,
+      "training_flag_rate": 0.005,
+      "id_false_alarm_rate": 0.006095238095238095,
+      "id_false_alarm_low": 0.00477647305789013,
+      "id_false_alarm_high": 0.007775264260077392,
+      "ood_detection_rate": 0.0008835279655808236,
+      "ood_detection_low": 0.0005888385496176257,
+      "ood_detection_high": 0.00132550168399938,
+      "ood_missed": 26009,
+      "detection_minus_false_alarm": -0.0052117101296572715
+    }
+  ],
+  "threshold_free_metrics": {
+    "auroc": 0.7893755670676385,
+    "auroc_bootstrap_interval": [
+      0.7831694956939443,
+      0.795990636890128
+    ],
+    "bootstrap_confidence": 0.95,
+    "aupr_ood": 0.8252907439139893,
+    "fpr_at_target_tpr": 0.4196190476190476,
+    "target_tpr": 0.95
+  },
+  "label_permutation_null": {
+    "observed_auroc": 0.7893755670676385,
+    "shuffled_mean": 0.49984424721222226,
+    "shuffled_low": 0.4937524165313022,
+    "shuffled_high": 0.5062236729702638,
+    "shuffled_max": 0.510410553311675,
+    "iterations": 1000,
+    "p_value": 0.000999000999000999
+  },
+  "note": "AUROC and AUPR do not depend on the percentile cutoff; only the rates in threshold_sweep do. The 95th percentile remains the headline cutoff, and no percentile is chosen from SVHN results.",
+  "provenance": {
+    "config_sha256": "adddc3273d200aed15c6c8c58037c375d290675810a2262b45db72f29cb11fe4",
+    "input_sha256": {
+      "train_qe": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+      "validation_qe": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+      "svhn_qe": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae",
+      "qe_summary": "c0bd916ba16d9b698eaab88cef0f9eb5aa88a96f90bc0e7172c89cddff9391c9"
+    }
+  },
+  "leakage_control": "Cutoffs come from Fashion-MNIST training QE only. Fashion-MNIST validation is the in-distribution set and SVHN test is the novel set, both used for evaluation only. The sweep was fixed in the protocol before any run. The final Fashion-MNIST test split is never opened."
+}

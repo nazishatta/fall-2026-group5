@@ -214,7 +214,7 @@ def write_manifest(
     repo_root: Path,
     extra: Optional[dict[str, Any]] = None,
 ) -> Path:
-    """Write visualization_manifest.json for one week's figures."""
+    """Write visualization_manifest.json for one step's figures."""
     data = inputs.data
     manifest: dict[str, Any] = {
         "model_name": model_name,

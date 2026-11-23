@@ -1,0 +1,27 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_threshold_sweep.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# QE at several training-QE percentiles. The percentile list is fixed before the run; the 95th
+# stays the headline cutoff and nothing is chosen from SVHN. Includes the label-shuffle control.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_qe_threshold_sweep_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection
+percentiles: [90.0, 95.0, 97.5, 99.0, 99.5]
+target_tpr: 0.95
+bootstrap:
+  iterations: 2000
+  seed: 42
+  confidence: 0.95
+permutation_null:
+  iterations: 1000
+  seed: 42
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  frozen_percentile_95_threshold: 1.4214525859373504
+inputs:
+  train_qe: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/train_bmu_distance.npy
+  validation_qe: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu_distance.npy
+  svhn_qe: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1/qe_svhn_test_scores.npy
+  qe_summary: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection/fashion_mnist_qe_training_calibrated_s42_v1/qe_summary.json

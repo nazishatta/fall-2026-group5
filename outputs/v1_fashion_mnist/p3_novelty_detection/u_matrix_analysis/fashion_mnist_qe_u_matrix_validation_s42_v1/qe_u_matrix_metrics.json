@@ -1,0 +1,25 @@
+{
+  "analysis": "qe_u_matrix_validation_comparison",
+  "dataset": "Fashion-MNIST",
+  "split": "validation",
+  "validation_samples": 10500,
+  "som_neurons": 225,
+  "qe_mean": 0.8528676812283084,
+  "u_matrix_mean": 0.6977572375947183,
+  "spearman_correlation": 0.38318296997269147,
+  "ood_evaluation": "not_performed",
+  "qe_reconstruction_difference": "not_measured",
+  "leakage_control": "Fashion-MNIST validation assignments and distances only; no final test or external OOD inputs.",
+  "run_id": "fashion_mnist_qe_u_matrix_validation_s42_v1",
+  "som_run": "som_15x15_nb11_ep250_s42",
+  "qe_threshold": 1.4214525859373504,
+  "source_summary_run_id": "fashion_mnist_qe_training_calibrated_s42_v1",
+  "input_sha256": {
+    "som_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+    "validation_bmu": "d3433eb4b1ebf6be975ffe96a34ef80a1479cfbfad33b8bd9804da877cd8ed33",
+    "validation_qe": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+    "qe_summary": "c0bd916ba16d9b698eaab88cef0f9eb5aa88a96f90bc0e7172c89cddff9391c9"
+  },
+  "config_sha256": "f8a72a12b23a261c40359037c9e7a1705a18af806c268ff8c7a5a04a5c96e31b",
+  "historical_result_overwritten": false
+}

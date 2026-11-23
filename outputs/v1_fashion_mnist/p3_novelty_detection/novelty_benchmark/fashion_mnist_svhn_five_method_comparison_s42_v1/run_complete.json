@@ -1,0 +1,7 @@
+{
+  "config": "novelty_benchmark.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/run_svhn_benchmark.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "svhn_benchmark"
+}

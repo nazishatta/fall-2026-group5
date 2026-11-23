@@ -4,10 +4,16 @@ Two checks, both written down before the arms are compared:
 1. a contact sheet: original image next to its altered copies, for a few pool images;
 2. the Phase 1 CNN's accuracy on altered validation images against its accuracy on the originals.
    If the altered images are much harder than the originals, the ranges are too strong.
+
+When the config sets ``augmentation.transform_check.max_accuracy_drop`` (Fashion-MNIST), the check
+records whether it passed and the train stage refuses to start until it has. With ``max_halvings`` as
+well, a failed check halves the ranges and checks again by itself (``transform_rule.py``). Without these
+settings (MNIST, whose check was judged by hand before this existed) nothing is enforced.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -18,6 +24,12 @@ import torch
 
 from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.augmentation_arms import (
     ranges_from_options,
+)
+from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.transform_rule import (
+    accuracy_drop_limit,
+    attempts_until_pass,
+    check_path,
+    max_halvings,
 )
 from src.v1_mnist.component.utils.cnn_retraining import (
     load_model,
@@ -35,12 +47,15 @@ LOGGER = logging.getLogger("v1_mnist.augmentation_check")
 SHEET_IMAGES = 10
 
 
-def contact_sheet(data: RetrainingData, settings: ExperimentSettings, path: Path) -> Path:
+def contact_sheet(
+    data: RetrainingData, settings: ExperimentSettings, path: Path, transforms: dict[str, Any] | None = None,
+) -> Path:
     """Original (left) and its altered copies (right) for the first pool images by sample ID."""
     copies = int(settings.options["copies_per_image"])
     rows = np.flatnonzero(data.som_pool)
     rows = rows[np.argsort(data.train.sample_ids[rows])][:SHEET_IMAGES]
-    altered = make_copies(data.train.images[rows], copies, settings.seeds[0], ranges_from_options(settings.options))
+    ranges = ranges_from_options({"transforms": transforms or settings.options["transforms"]})
+    altered = make_copies(data.train.images[rows], copies, settings.seeds[0], ranges)
     fig, axes = plt.subplots(SHEET_IMAGES, copies + 1, figsize=(1.1 * (copies + 1), 1.1 * SHEET_IMAGES))
     for i, row in enumerate(rows):
         axes[i, 0].imshow(data.train.images[row], cmap="gray_r")
@@ -54,35 +69,76 @@ def contact_sheet(data: RetrainingData, settings: ExperimentSettings, path: Path
     return save_pdf(fig, path)
 
 
+def require_passed_check(settings: ExperimentSettings) -> None:
+    """Stop the train stage unless the transform check ran and passed (only when a limit is set)."""
+    if accuracy_drop_limit(settings) is None:
+        return
+    path = check_path(settings)
+    if not path.is_file():
+        raise RuntimeError(f"{path} is missing: run --stage check before --stage train.")
+    result = json.loads(path.read_text(encoding="utf-8"))
+    if not result.get("passed"):
+        raise RuntimeError(
+            f"The transform check failed (accuracy drop {result.get('accuracy_drop')}, allowed "
+            f"{result.get('max_accuracy_drop')}): make the ranges smaller under a new revision "
+            "and record it in DEVIATIONS.md before any arm runs (or set transform_check.max_halvings).")
+
+
 def run_check(settings: ExperimentSettings, data: RetrainingData) -> dict[str, Any]:
-    """Write the contact sheet and augmentation_check.json (once)."""
-    out = settings.output_dir / "check"
-    result_path = out / "augmentation_check.json"
+    """Write the contact sheet and augmentation_check.json (once).
+
+    With ``max_halvings`` set, failed ranges are halved and checked again (transform_rule.py); the
+    result holds every attempt, and its ``transforms`` are the ones training will use.
+    """
+    result_path = check_path(settings)
     ensure_not_done(result_path)
-    sheet = contact_sheet(data, settings, settings.output_dir / "figures" / "augmentation_contact_sheet")
 
     device = resolve_device(settings.device)
     state = torch.load(settings.cnn_checkpoint, map_location="cpu")
     model = load_model(state, settings.train.num_classes, device,
                        settings.train.in_channels, settings.train.image_size)
-    ranges = ranges_from_options(settings.options)
-    altered = make_copies(data.val.images, 1, settings.seeds[0], ranges)
     original_pred, _ = predict(model, data.val.images, device)
-    altered_pred, _ = predict(model, altered, device)
+    original_ok = original_pred == data.val.labels
+    altered_ok: dict[int, np.ndarray] = {}
+
+    def drop_of(transforms: dict[str, float]) -> float:
+        ranges = ranges_from_options({"transforms": transforms})
+        altered_pred, _ = predict(model, make_copies(data.val.images, 1, settings.seeds[0], ranges), device)
+        altered_ok[len(altered_ok)] = altered_pred == data.val.labels
+        return float(original_ok.mean() - altered_ok[len(altered_ok) - 1].mean())
+
+    limit = accuracy_drop_limit(settings)
+    attempts = attempts_until_pass(settings.options["transforms"], limit, max_halvings(settings), drop_of)
+    final, ok = attempts[-1], altered_ok[len(attempts) - 1]
+    sheet = contact_sheet(data, settings, settings.output_dir / "figures" / "augmentation_contact_sheet",
+                          final["transforms"])
     hot = data.val_in_hotspot
     result = {
         "run_id": settings.run_id,
         "checkpoint": settings.cnn_checkpoint.name,
         "checkpoint_sha256": sha256_file(settings.cnn_checkpoint),
         "validation_images": len(data.val.labels),
-        "accuracy_original": float((original_pred == data.val.labels).mean()),
-        "accuracy_altered": float((altered_pred == data.val.labels).mean()),
-        "accuracy_original_hotspot": float((original_pred == data.val.labels)[hot].mean()),
-        "accuracy_altered_hotspot": float((altered_pred == data.val.labels)[hot].mean()),
-        "transforms": settings.options["transforms"],
+        "accuracy_original": float(original_ok.mean()),
+        "accuracy_altered": float(ok.mean()),
+        "accuracy_original_hotspot": float(original_ok[hot].mean()),
+        "accuracy_altered_hotspot": float(ok[hot].mean()),
+        "transforms": final["transforms"],
         "contact_sheet": sheet.name,
     }
+    if limit is not None:
+        result["accuracy_drop"] = result["accuracy_original"] - result["accuracy_altered"]
+        result["max_accuracy_drop"] = limit
+        result["passed"] = bool(final["passed"])
+    if max_halvings(settings) > 0:
+        result["halvings"] = final["halvings"]
+        result["attempts"] = attempts
     write_json(result_path, result)
+    for attempt in attempts:
+        LOGGER.info("Ranges halved %d time(s): accuracy drop %.4f%s", attempt["halvings"], attempt["accuracy_drop"],
+                    "" if limit is None else f" (allowed {limit:.4f})")
     LOGGER.info("Accuracy on validation images: original %.4f, altered %.4f",
                 result["accuracy_original"], result["accuracy_altered"])
+    if limit is not None:
+        LOGGER.info("Transform check %s: accuracy drop %.4f, allowed %.4f. Look at the contact sheet too.",
+                    "PASSED" if result["passed"] else "FAILED", result["accuracy_drop"], limit)
     return result

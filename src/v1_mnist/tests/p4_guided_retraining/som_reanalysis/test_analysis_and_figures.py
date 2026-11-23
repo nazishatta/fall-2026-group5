@@ -77,3 +77,12 @@ def test_analysis_writes_tables_and_figures_are_pdf(tmp_path: Path) -> None:
     paths = make_figures(settings, results)
     assert all(p.suffix == ".pdf" and p.is_file() for p in paths)
     assert not list(settings.folder("figures").glob("*.png"))
+
+
+def test_the_analysis_never_overwrites_its_tables(tmp_path: Path) -> None:
+    import pytest
+
+    (tmp_path / "tables").mkdir()
+    (tmp_path / "tables" / "statements.json").write_text("{}")
+    with pytest.raises(FileExistsError):
+        run_analysis(SimpleNamespace(folder=lambda name: tmp_path / name))  # type: ignore[arg-type]

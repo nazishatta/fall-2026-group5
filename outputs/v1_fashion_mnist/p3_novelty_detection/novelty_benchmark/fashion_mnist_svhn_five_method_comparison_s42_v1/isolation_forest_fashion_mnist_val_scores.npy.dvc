@@ -1,0 +1,5 @@
+outs:
+- md5: 02e019624892d0ed25b3ad24e3b85558
+  size: 84128
+  hash: md5
+  path: isolation_forest_fashion_mnist_val_scores.npy

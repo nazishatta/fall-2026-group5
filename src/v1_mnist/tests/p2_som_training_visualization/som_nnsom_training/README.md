@@ -6,6 +6,7 @@ Tests for the code in `component/p2_som_training_visualization/som_nnsom_trainin
 
 | Folder | What is inside |
 |---|---|
+| [`grid_comparison/`](grid_comparison/README.md) | Tests for the code in `component/p2_som_training_visualization/som_nnsom_training/grid_comparison/`. |
 | [`layer_ablation/`](layer_ablation/README.md) | Tests for the code in `component/p2_som_training_visualization/som_nnsom_training/layer_ablation/`. |
 
 ## Files

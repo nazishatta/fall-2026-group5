@@ -1,0 +1,5 @@
+outs:
+- md5: e069d87428666dc2101cdf49fdfb0f70
+  size: 208384
+  hash: md5
+  path: one_class_svm_svhn_test_scores.npy

@@ -3,12 +3,13 @@
   Phase 1  data_pipeline            p1_model_training_baseline/run_data_pipeline.py
            cnn_baseline_training    p1_model_training_baseline/run_cnn_baseline_training.py
   Phase 2  som_nnsom_training       p2_som_training_visualization/run_som_nnsom_training.py
+                                    (first the 10x10 and 20x20 robustness maps, if not trained yet)
            cluster_analysis         p2_som_training_visualization/run_cluster_analysis.py
            error_pattern_analysis   p2_som_training_visualization/run_error_pattern_analysis.py
            (report)                 p2_som_training_visualization/run_interactive_report.py,
                                     after error_pattern_analysis
-           error_pattern_baselines, error_detector_budget, som_optuna, feature_layer_ablation
-                                    (study_steps.py)
+           error_pattern_baselines, error_detector_budget, grid_comparison, som_optuna,
+           feature_layer_ablation   (study_steps.py)
   Phase 3  novelty_detection        p3_novelty_detection/run_*.py (three runners, run in the
                                     order their results depend on each other; see
                                     ORDER below)
@@ -50,7 +51,7 @@ import argparse
 import sys
 from dataclasses import replace
 from pathlib import Path
-from typing import Sequence
+from typing import Callable, Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -63,7 +64,9 @@ from src.v1_mnist.component.pipeline.common import (  # noqa: E402
     STEP_RUNNERS,
     P3Step,
     Step,
+    load,
     log,
+    resolve,
     run_steps,
     show,
 )
@@ -86,7 +89,8 @@ from src.v1_mnist.component.utils.in_distribution import in_distribution  # noqa
 #Phase 3 has three runners, but their steps depend on each other across runners, so
 #they cannot simply run one runner after another:
 #
-#  1. qe_novelty               writes the QE summary that nearly everything reads.
+#  1. qe_novelty               writes the QE summary that nearly everything reads; then
+#     qe_ood (QE on SVHN), whose metrics svhn_benchmark must reproduce.
 #  2. the whole novelty_benchmark runner
 #                              svhn_benchmark writes the SVHN score arrays that the
 #                              threshold sweep, the figures and the gap analysis read.
@@ -115,9 +119,9 @@ RUNNER_STEPS: dict[str, list[P3Step]] = {
 }
 # (runner, steps to run from it; None means all of its steps), in dependency order.
 ORDER: tuple[tuple[str, tuple[str, ...] | None], ...] = (
-    ("run_qe_novelty_detection.py", ("qe_novelty", "qe_score_distribution_figure")),
+    ("run_qe_novelty_detection.py", ("qe_novelty", "qe_score_distribution_figure", "qe_ood")),
     ("run_novelty_benchmark.py", None),
-    ("run_qe_novelty_detection.py", ("qe_ood", "qe_random_control", "qe_threshold_sweep")),
+    ("run_qe_novelty_detection.py", ("qe_random_control", "qe_threshold_sweep")),
     ("run_u_matrix_analysis.py", None),
 )
 
@@ -152,7 +156,9 @@ def phase3_steps(dry_run: bool, include_reproductions: bool = False, config_dir:
 def study_plan(step: StudyStep, config_dir: str, dry_run: bool) -> list[Step]:
     """The commands of one study step, or none (with a message) if its configs are not in the folder.
 
-    The study scripts have no --dry-run of their own, so in a dry run they are listed, not run.
+    A half-finished step continues: a part whose ``done`` file exists is skipped, so its script is not
+    asked to redo (and refuse) finished work. The study scripts have no --dry-run of their own, so in
+    a dry run they are listed, not run.
     """
     missing = step.missing(config_dir)
     if missing:
@@ -163,7 +169,30 @@ def study_plan(step: StudyStep, config_dir: str, dry_run: bool) -> list[Step]:
     if done:
         log.info(f"Skipping {step.name}: results already exist ({', '.join(show(path) for path in done)})")
         return []
-    return [replace(command, listed_only=dry_run) for command in step.commands(config_dir)]
+    commands = []
+    for command in step.commands(config_dir):
+        if command.done is not None and command.done.exists():
+            log.info(f"Skipping {command.label}: already finished ({show(command.done)}); the step continues after it")
+        else:
+            commands.append(replace(command, listed_only=dry_run))
+    return commands
+
+
+def robustness_maps(config_dir: str, exists: Callable[[Path], bool] = Path.exists) -> list[str]:
+    """The dataset's robustness-map configs (som_<grid>_robustness.yaml) whose map is not trained yet.
+
+    The error-pattern robustness check and the grid-size table need these maps, so som_nnsom_training
+    trains them before the headline map. A map that exists is never retrained.
+    """
+    todo = []
+    for config in sorted(resolve(config_dir).glob("som_*_robustness.yaml"), reverse=True):
+        cfg = load(config)
+        model = resolve(cfg.paths.som_models_dir) / str(cfg.visualization.selected_model)
+        if exists(model):
+            log.info(f"Robustness map {model.name} already trained; kept.")
+        else:
+            todo.append(f"{config_dir}/{config.name}")
+    return todo
 
 
 PHASE2_NAMES = list(STEP_RUNNERS)
@@ -210,6 +239,10 @@ def main(argv: Sequence[str] | None = None) -> None:
             plan.extend(study_plan(STUDY_STEPS[name], config_dir, args.dry_run))
         else:
             extra = ["--config", cnn_config if name in CNN_STEPS else som_config]
+            if name == "som_nnsom_training":
+                # The 10x10 and 20x20 maps first: the headline run's grid table and the robustness check need them.
+                plan.extend(Step(f"som_nnsom_training ({Path(cfg).stem}, robustness map)", STEP_RUNNERS[name],
+                                 ["--config", cfg, *common]) for cfg in robustness_maps(config_dir))
             if name == "som_nnsom_training" and args.skip_training:
                 extra.append("--skip-training")
             plan.append(Step(name, STEP_RUNNERS[name], [*extra, *common]))

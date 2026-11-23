@@ -1,0 +1,14 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/svhn_inverted_norm_diagnostic.yaml with only
+# the dataset-specific values changed (output folder, run ID); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Triggered diagnostic (protocol section 3; docs/DEVIATIONS.md, 2026-11-21): Isolation Forest scored SVHN
+# below chance, as on MNIST. Do SVHN's embeddings get longer when the image intensities are inverted?
+# Exploratory: written after the main Phase 3 results were known. The network and the SVHN file come from
+# phase3_shared_provenance.yaml in this folder.
+run_id: fashion_mnist_svhn_inverted_embedding_norm_s42_v1
+seed: 42
+batch_size: 256
+image_size: 28
+feature_dim: 84
+classes: 10
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark

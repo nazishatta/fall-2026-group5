@@ -1,0 +1,3 @@
+subset,fashion_mnist_validation_images,svhn_images,qe_auroc,auroc_ci_low,auroc_ci_high
+all images,10500,26032,0.7893755670676385,0.7831694956939443,0.795990636890128
+norm inside training p5-p95,9478,532,0.9576133570897065,0.9528584795497924,0.9619790071824423

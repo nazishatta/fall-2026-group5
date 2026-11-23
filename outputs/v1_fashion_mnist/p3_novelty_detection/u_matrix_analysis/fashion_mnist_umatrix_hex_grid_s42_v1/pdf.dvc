@@ -1,0 +1,6 @@
+outs:
+- md5: b084e749e09914d9b636b9144ab44e66.dir
+  size: 21775
+  nfiles: 1
+  hash: md5
+  path: pdf

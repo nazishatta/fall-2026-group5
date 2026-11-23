@@ -2,13 +2,13 @@
 
 Helpers used by more than one step of the project. Nothing here runs on its own: every file is imported by the step scripts in `p1_model_training_baseline/`, `p2_som_training_visualization/` and `pipeline/`, or by another file in this folder.
 
-The trees below follow the code's own layout: each **phase folder**, then its **step folders** (one per proposal week), then each script, and under the script the **utils files it calls** with the functions it imports. Paths are relative to `src/v1_mnist/component/`.
+The trees below follow the code's own layout: each **phase folder**, then its **step folders** (one per proposal step), then each script, and under the script the **utils files it calls** with the functions it imports. Paths are relative to `src/v1_mnist/component/`.
 
 ## The files
 
 | File                  | What it does                                                                                                                                                                             |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config.py`           | Loads a YAML config with `base.yaml` merged in (`load_config`); sets seeds (`set_seed`, `require_seed`); picks the device (`get_device`). Refuses the old run names `week_2` / `week_3`. |
+| `config.py`           | Loads a YAML config with `base.yaml` merged in (`load_config`); sets seeds (`set_seed`, `require_seed`); picks the device (`get_device`). Refuses old run names that carry a week number. |
 | `dataset_info.py`     | What the SOM code needs to know about the dataset and the CNN (classes, feature size, display names), read from the config.                                                              |
 | `file_hash.py`        | SHA-256 fingerprint of a file (`sha256_file`), used for every provenance check; `som_io.py` re-exports it.                                                                                 |
 | `figures.py`          | Saves every results figure the same way: one PDF with embedded fonts (`save_pdf`).                                                                                                       |
@@ -128,7 +128,7 @@ One line per file, taken from the file's own description. The trees above show w
 | `som_figure_setup.py` | Shared setup for the SOM figure scripts of SOM training, cluster analysis and error pattern analysis. |
 | `som_io.py` | Loads the embedding splits and the chosen SOM, rebuilds the neuron of every image and writes the assignment tables. |
 | `som_neuron_maps.py` | Per-neuron class and error statistics, and the simple grid map used by the cluster analysis and error pattern analysis figure scripts (cluster_figures.py, error_figures.py). |
-| `som_plotting.py` | Shared SOM plotting helpers for every week. |
+| `som_plotting.py` | Shared SOM plotting helpers for every phase. |
 | `som_text_style.py` | Text styling for NNSOM's dense SOM plots (neuron labels on hexagons). |
 | `som_types.py` | Type names for annotations of NNSOM objects. |
 | `stats.py` | Entropy, the Wilson bound and Spearman correlation. |

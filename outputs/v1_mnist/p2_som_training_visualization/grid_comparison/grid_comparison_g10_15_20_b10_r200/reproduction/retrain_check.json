@@ -1,0 +1,36 @@
+{
+  "auroc_err_mean_difference_per_grid": {
+    "10": 0.009909965779981822,
+    "15": 0.006225681437596053,
+    "20": 0.007333672144133607
+  },
+  "choice_same": true,
+  "passed": true,
+  "tolerance": 0.01,
+  "verdicts_new_vs_original": {
+    "primary": [
+      "inconclusive",
+      "inconclusive"
+    ],
+    "secondary_0": [
+      "inconclusive",
+      "inconclusive"
+    ],
+    "secondary_1": [
+      "inconclusive",
+      "inconclusive"
+    ],
+    "secondary_2": [
+      "inconclusive",
+      "inconclusive"
+    ],
+    "secondary_3": [
+      "inconclusive",
+      "inconclusive"
+    ],
+    "secondary_4": [
+      "inconclusive",
+      "inconclusive"
+    ]
+  }
+}

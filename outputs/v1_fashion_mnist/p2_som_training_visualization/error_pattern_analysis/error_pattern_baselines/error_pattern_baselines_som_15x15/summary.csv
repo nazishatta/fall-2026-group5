@@ -1,0 +1,5 @@
+method,auroc,average_precision,hotspot_ratio,image_share,error_share
+som_cell,0.811 (0.796--0.824),0.253,3.9 (3.2--4.4),3.5\%,13.7\%
+kmeans_cell,0.812 (0.805--0.821),0.260,4.0 (3.7--4.5),4.0\%,15.8\%
+knn_impurity,0.876 (0.864--0.888),0.383,--,--,--
+max_softmax,0.906 (0.898--0.914),0.428,--,--,--

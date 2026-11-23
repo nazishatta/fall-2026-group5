@@ -17,6 +17,7 @@ Runner: `pipeline/p3_novelty_detection/run_novelty_benchmark.py`. Results: `outp
 | `knn_baseline.py` | k-nearest-neighbor distance baseline for novelty detection. |
 | `ood_comparison.py` | Held-out OOD comparison; never fit detectors or calibrate on evaluation samples. |
 | `paired_bootstrap.py` | Paired stratified bootstrap for comparing two OOD AUROCs. |
+| `novelty_statements.py` | The Phase 3 criteria (RQ3, RQ4 and, where stated, O1 to O4) judged from six aligned novelty scores (verdict rules, no data loading). |
 | `paired_ood_comparison.py` | Frozen-score paired OOD comparison for Phase 3. |
 | `qe_norm_dependence.py` | How much of the QE novelty signal is an embedding-norm effect? |
 | `required_baselines.py` | Required novelty baselines on frozen CNN outputs and embeddings. |
@@ -24,6 +25,7 @@ Runner: `pipeline/p3_novelty_detection/run_novelty_benchmark.py`. Results: `outp
 | `run_fair_budget_baselines.py` ▶ | Post-hoc equal-training-pool novelty baseline diagnostic. |
 | `run_historical_baseline_verification.py` ▶ | Recompute historical MNIST-only validation summaries in a NEW run folder. |
 | `run_missed_svhn_figure.py` ▶ | Reconstruct frozen QE missed-SVHN examples from historical IDs. |
+| `run_novelty_statements.py` ▶ | All six novelty scores on the same images in one run; the proposal's RQ3 and RQ4, and statements O1 to O4 where a dataset's protocol states them. |
 | `run_qe_energy_knn_paired.py` ▶ | Paired AUROC comparisons of SOM QE against energy and kNN. |
 | `run_qe_norm_dependence.py` ▶ | Is part of the QE novelty result an embedding-norm effect? |
 | `run_qe_umatrix_random_ood.py` ▶ | Reproduce Phase 3 QE/U-Matrix paired and random-score OOD analyses. |

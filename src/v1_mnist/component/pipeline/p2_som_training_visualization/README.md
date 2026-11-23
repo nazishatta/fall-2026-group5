@@ -11,6 +11,7 @@ One runner per Phase 2 step, named after the step folder it runs (`run_<step>.py
 | `run_error_pattern_analysis.py` ▶ | Error pattern analysis and its robustness check. |
 | `run_error_pattern_baselines.py` ▶ | Error pattern baselines: is the SOM's error-geography result special, or do simple alternatives find it too? |
 | `run_feature_layer_ablation.py` ▶ | Feature-layer ablation (Phase 2): SOMs on fc1 and fc2 of the Phase 1 LeNet-5, compared on A1 to A3. |
+| `run_grid_comparison.py` ▶ | Pre-registered grid comparison (Phase 2): do the 10x10, 15x15 and 20x20 maps differ in how well their cells predict held-out CNN mistakes? |
 | `run_interactive_report.py` ▶ | Interactive HTML report for the trained SOM. |
 | `run_som_nnsom_training.py` ▶ | SOM training and visualization with NNSOM. |
 

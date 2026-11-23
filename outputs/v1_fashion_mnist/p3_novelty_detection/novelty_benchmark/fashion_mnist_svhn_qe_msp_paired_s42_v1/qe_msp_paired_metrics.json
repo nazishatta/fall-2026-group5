@@ -1,0 +1,25 @@
+{
+  "qe_auroc": 0.7893755670676385,
+  "msp_auroc": 0.8837241526911932,
+  "qe_minus_msp_auroc": -0.09434858562355475,
+  "difference_ci_95": [
+    -0.10113599635613311,
+    -0.08771821970029568
+  ],
+  "bootstrap_iterations": 2000,
+  "seed": 42,
+  "n_id": 10500,
+  "n_ood": 26032,
+  "positive_class": "OOD",
+  "limitation": "Paired validity requires identically ordered QE and MSP scores for each evaluation split.",
+  "run_id": "fashion_mnist_svhn_qe_msp_paired_s42_v1",
+  "id_dataset": "fashion_mnist_validation",
+  "ood_dataset": "svhn_test",
+  "qe_id_sha256": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+  "qe_ood_sha256": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae",
+  "checkpoint_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+  "svhn_sha256": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+  "source_config_sha256": "5a2a51d3a82725c6b19727df8af78dd2baaac901c54f3a8e87249991f55b0b6a",
+  "leakage_control": "Frozen CNN and historical QE; no OOD fitting, tuning or final Fashion-MNIST test-set use.",
+  "alignment_evidence": "Same frozen checkpoint, torchvision SVHN test ordering, SVHN preprocessing and unshuffled inference. Historical QE arrays lack per-image identifiers; alignment is supported but cannot be independently ID-verified."
+}

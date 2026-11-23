@@ -1,0 +1,24 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_norm_dependence.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# How much QE follows the embedding length, and whether QE still separates SVHN among images whose
+# length is ordinary. Fixed in the protocol before any run.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_svhn_qe_norm_dependence_s42_v1
+analysis_status: preregistered_exploratory
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+qe_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
+seed: 42
+batch_size: 256
+target_tpr: 0.95
+bootstrap_iterations: 2000
+confidence: 0.95
+norm_matched_band: [5, 95]
+expected:
+  train_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  frozen_training_qe_threshold: 1.4214525859373504
+  qe_reference_auroc: 0.7893755670676385
+  qe_auroc_tolerance: 1.0e-6

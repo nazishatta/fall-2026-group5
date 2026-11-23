@@ -1,0 +1,5 @@
+outs:
+- md5: 61b3e8d766436ed85d8e28e3e7d2ce8e
+  size: 84128
+  hash: md5
+  path: qe_fashion_mnist_val_scores.npy

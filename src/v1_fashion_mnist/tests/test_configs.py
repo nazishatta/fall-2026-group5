@@ -32,6 +32,12 @@ def test_there_are_configs() -> None:
 
 @pytest.mark.parametrize("path", CONFIGS, ids=lambda p: p.name)
 def test_every_config_loads_with_the_fashion_mnist_dataset(path: Path) -> None:
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if isinstance(raw.get("dataset"), str):
+        # Two Phase 3 configs name their dataset as a plain string, as their MNIST originals do;
+        # the code reads that string (it replaces base.yaml's dataset section when merged).
+        assert raw["dataset"] == "fashion_mnist"
+        return
     config = load_config(str(path))
     assert dataset_spec(config) == DatasetSpec("fashion_mnist", 1, 28)
 

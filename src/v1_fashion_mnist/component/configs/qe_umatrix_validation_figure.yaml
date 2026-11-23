@@ -1,0 +1,15 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_umatrix_validation_figure.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Figure of QE against the U-Matrix on validation; its numbers must match the qe_u_matrix summary.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_qe_umatrix_validation_figure_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis
+scores_directory: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark/fashion_mnist_svhn_five_method_comparison_s42_v1
+source_summary: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis/fashion_mnist_qe_u_matrix_validation_s42_v1/qe_u_matrix_metrics.json
+figure_name: qe_u_matrix_validation.pdf
+score_sha256:
+  qe: ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7
+  u_matrix: 001344c81d39d0d117aa459a09150e9d8859569c7d6eb0c528a9d4a19f9256a9
+correlation_tolerance: 1.0e-10
+mean_tolerance: 1.0e-10

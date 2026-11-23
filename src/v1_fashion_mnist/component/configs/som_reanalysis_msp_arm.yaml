@@ -1,0 +1,59 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/som_reanalysis_msp_arm.yaml with only the
+# dataset-specific values changed (paths); protocol:
+# src/v1_fashion_mnist/docs/p4_guided_retraining/RETRAINING_PROTOCOL.md
+# protocol.document below is the MNIST protocol, which the Fashion-MNIST protocol follows unchanged.
+# ==============================================================================
+# SOM re-analysis, secondary run: adds the least-confident (max-softmax) augmentation arm.
+# Addendum: src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/MSP_ARM_ADDENDUM.md
+# Primary protocol: src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/SOM_REANALYSIS_PROTOCOL.md
+#
+# Same code, recipe and measures as configs/som_reanalysis.yaml; only the run name, the arms and the
+# pairs differ. Training and validation images only; the Fashion-MNIST test split is never read.
+# ==============================================================================
+
+run:
+  name: som_reanalysis_msp_arm
+  # Run folder: <name>_<selected SOM run ID>[_<revision>]. Leave empty for the first run; set a new
+  # one (r2, r3, ...) for every new or changed run. Results are never overwritten.
+  revision: ""
+
+inputs:
+  retraining_config: src/v1_fashion_mnist/component/configs/retraining.yaml
+  retraining_section: augmentation    # the retraining run whose checkpoints are re-analysed
+  som_config: src/v1_fashion_mnist/component/configs/som.yaml
+
+paths:
+  output_root: ./outputs/v1_fashion_mnist/p4_guided_retraining/som_reanalysis
+
+protocol:
+  document: src/v1_mnist/docs/p4_guided_retraining/som_reanalysis/MSP_ARM_ADDENDUM.md
+
+cells:
+  arms: [standard, augmented_som, augmented_msp]   # addendum section 2
+  seeds: [1, 2, 3, 4, 5]
+  reference: baseline        # the Phase 2 SOM on the Phase 1 embeddings (loaded, not retrained)
+
+extraction:
+  layer: fc2                 # the layer Phase 1 used for the embeddings
+  batch_size: 1000
+  device: auto               # "auto", "cuda" or "cpu"
+  # The predictions found during the extraction must match the saved validation predictions of the
+  # retraining run for at least this share of images; otherwise the cell stops.
+  min_prediction_agreement: 0.999
+
+measures:
+  adjacency_distance: 1.1    # neurons closer than this on the map are neighbours (same as topographic error)
+
+comparison:
+  # [first arm, second arm]; the difference is taken per seed.
+  pairs:
+    # The first pair decides R1, R2 and R5, the second R3 and R4 (here: SOM guidance against
+    # max-softmax guidance); the third is the addendum's statement S1.
+    - [augmented_som, standard]
+    - [augmented_som, augmented_msp]
+    - [augmented_msp, standard]
+  confidence: 0.95
+  organisation_tolerance_pct: 1.0    # statement R5: upper end of the topographic-error interval
+
+figures:
+  example_seed: 1
