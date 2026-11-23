@@ -1,0 +1,56 @@
+{
+  "run_id": "fashion_mnist_svhn_ae_train_standardized_s42_v1",
+  "method": "autoencoder_train_standardized_diagnostic",
+  "id_dataset": "fashion_mnist",
+  "id_split": "validation",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "metrics": {
+    "n_id": 10500,
+    "n_ood": 26032,
+    "seed": 42,
+    "bootstrap_repeats": 2000,
+    "target_tpr": 0.95,
+    "auroc": 0.6762734436737203,
+    "aupr": 0.7675986114173818,
+    "fpr_at_95_tpr": 0.6526666666666666,
+    "confidence_intervals_95": {
+      "auroc": [
+        0.6694278043323968,
+        0.6828915381618228
+      ],
+      "aupr": [
+        0.7628504797437248,
+        0.7727061749729909
+      ],
+      "fpr_at_95_tpr": [
+        0.6416190476190476,
+        0.6634285714285715
+      ]
+    },
+    "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+  },
+  "losses": {
+    "initial": 0.4025786397895034,
+    "final": 0.014967034250953975
+  },
+  "preprocessing": "StandardScaler fitted on Fashion-MNIST training embeddings ONLY",
+  "config_sha256": "b8f6537026332c48e847a7dab17a37a66371573b97ecd173e523abed2897b82e",
+  "input_sha256": {
+    "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+    "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+    "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "frozen_provenance": {
+    "qe_threshold": 1.4214525859373504,
+    "som_model": "som_15x15_nb11_ep250_s42",
+    "som_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+    "cnn_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+    "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "train_qe_sha256": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+    "val_qe_sha256": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7"
+  },
+  "leakage_control": "Frozen CNN and SOM. Train-fitted scaler and autoencoder see Fashion-MNIST training features only. Fashion-MNIST validation and SVHN test used only for evaluation. No threshold tuning or Fashion-MNIST final test access.",
+  "limitation": "Fixed before the run by the dataset's Phase 3 protocol: the autoencoder with standardised inputs, as in MNIST's final setup. Not a follow-up to an observed result."
+}

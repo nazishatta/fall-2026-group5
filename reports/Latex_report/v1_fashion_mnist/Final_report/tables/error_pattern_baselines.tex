@@ -1,0 +1,15 @@
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.11\textwidth}|>{\raggedright\arraybackslash}p{0.14\textwidth}|}
+\hline
+\textbf{Score} & \textbf{AUROC (95\% range)} & \textbf{Hotspot ratio} & \textbf{Images flagged} & \textbf{Mistakes caught} \\ \hline
+SOM 15$\times$15 cell error rate & 0.811 (0.796--0.824) & 3.9 (3.2--4.4) & 3.5\% & 13.7\% \\ \hline
+k-means, 225 clusters, cell error rate & 0.812 (0.805--0.821) & 4.0 (3.7--4.5) & 4.0\% & 15.8\% \\ \hline
+kNN impurity ($k=15$) & 0.876 (0.864--0.888) & --$^\dagger$ & 3.5\%$^\dagger$ & 21.1\% (19.2--22.9)$^\dagger$ \\ \hline
+CNN max-softmax probability & 0.906 (0.898--0.914) & --$^\dagger$ & 3.5\%$^\dagger$ & 21.9\% (19.8--24.1)$^\dagger$ \\ \hline
+\end{tabular}
+\caption{How well each score finds the 876 validation images that the CNN gets wrong (10,500 images in total). Hotspot ratio: share of mistakes divided by share of images in the hotspot cells, chosen on one half and measured on the other; chance is about 1 ($p=0.005$). $^\dagger$kNN impurity and max-softmax score each image and form no cells, so instead they flag the same share of images as the SOM's hotspots (3.5\%, the images with the highest scores); the share of mistakes caught has a bootstrap interval. This same-budget comparison is exploratory, as on MNIST.}
+\label{tab:error-pattern-baselines}
+\end{table}

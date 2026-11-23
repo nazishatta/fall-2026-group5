@@ -10,12 +10,14 @@ import numpy as np
 from src.v1_mnist.component.utils.figures import save_pdf
 
 
-def _heat(ax: plt.Axes, matrix: np.ndarray, title: str, cmap: str, centre_zero: bool) -> None:
+def _heat(
+    ax: plt.Axes, matrix: np.ndarray, title: str, cmap: str, centre_zero: bool, class_label: str = "digit"
+) -> None:
     limit = float(np.abs(matrix).max()) or 1.0
     image = ax.imshow(matrix, cmap=cmap, vmin=-limit if centre_zero else 0.0, vmax=limit)
     ax.set_title(title, fontsize=10)
-    ax.set_xlabel("Predicted digit")
-    ax.set_ylabel("True digit")
+    ax.set_xlabel(f"Predicted {class_label}")
+    ax.set_ylabel(f"True {class_label}")
     ax.set_xticks(range(matrix.shape[0]))
     ax.set_yticks(range(matrix.shape[0]))
     for (row, col), value in np.ndenumerate(matrix):
@@ -26,12 +28,14 @@ def _heat(ax: plt.Axes, matrix: np.ndarray, title: str, cmap: str, centre_zero: 
 
 
 def plot_confusion_comparison(
-    before: np.ndarray, after: np.ndarray, before_name: str, after_name: str, output_path: Path
+    before: np.ndarray, after: np.ndarray, before_name: str, after_name: str, output_path: Path,
+    class_label: str = "digit",
 ) -> Path:
-    """CF1, CF2 and CF2 - CF1 (test images, averaged over seeds) in one PDF."""
+    """CF1, CF2 and CF2 - CF1 (test images, averaged over seeds) in one PDF; axes name ``class_label``."""
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.6))
-    _heat(axes[0], before, f"CF1: {before_name}", "Blues", centre_zero=False)
-    _heat(axes[1], after, f"CF2: {after_name}", "Blues", centre_zero=False)
-    _heat(axes[2], after - before, "CF2 minus CF1 (blue: fewer, red: more)", "RdBu_r", centre_zero=True)
+    _heat(axes[0], before, f"CF1: {before_name}", "Blues", centre_zero=False, class_label=class_label)
+    _heat(axes[1], after, f"CF2: {after_name}", "Blues", centre_zero=False, class_label=class_label)
+    _heat(axes[2], after - before, "CF2 minus CF1 (blue: fewer, red: more)", "RdBu_r", centre_zero=True,
+          class_label=class_label)
     fig.tight_layout()
     return save_pdf(fig, output_path)

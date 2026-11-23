@@ -57,7 +57,8 @@ def _evaluate_arm(
         checkpoint = settings.checkpoint_path(arm, seed)
         if sha256_file(checkpoint) != record["checkpoint_sha256"]:
             raise RuntimeError(f"{checkpoint.name}: checkpoint differs from the one recorded after training.")
-        model = load_model(torch.load(checkpoint, map_location="cpu"), settings.train.num_classes, device)
+        model = load_model(torch.load(checkpoint, map_location="cpu"), settings.train.num_classes, device,
+                           settings.train.in_channels, settings.train.image_size)
         pred, conf = predict(model, test_x, device)
         np.savez_compressed(settings.prediction_path(arm, seed, "test"), pred=pred, confidence=conf)
         wrong.append(pred != test_y)
@@ -111,7 +112,7 @@ def run_final_test(settings: ExperimentSettings, repo_root: Path) -> dict[str, A
         for seed in settings.seeds:
             load_run_record(settings, arm.name, seed)  # stops if any run is unfinished
 
-    test = load_test_images(settings.data_root, settings.embeddings_dir)
+    test = load_test_images(settings.data_root, settings.embeddings_dir, settings.dataset)
     features = np.load(settings.embeddings_dir / "test_features.npy")
     if not np.array_equal(np.load(settings.embeddings_dir / "test_sample_ids.npy"), test.sample_ids):
         raise ValueError("Test sample IDs differ between the images and the embeddings.")
@@ -134,6 +135,7 @@ def run_final_test(settings: ExperimentSettings, repo_root: Path) -> dict[str, A
             plot_confusion_comparison(
                 evaluated[control]["confusion_mean"], evaluated[guided]["confusion_mean"],
                 control, guided, settings.output_dir / "figures" / f"confusion_{control}_vs_{guided}",
+                settings.dataset.class_label,
             )
     results = {
         "run_id": settings.run_id, "split": "test", "test_images": len(test.labels),

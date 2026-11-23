@@ -1,0 +1,44 @@
+# The six novelty scores in one run, the group proposal's RQ3 and RQ4, and statements O1 to O4, judged by
+# the rules fixed in the protocol before any run (src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 3).
+# Every number below is the protocol's.
+run_id: fashion_mnist_svhn_novelty_statements_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+qe_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
+inputs:
+  checkpoint: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_fashion_mnist_s42.pth
+  train_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  train_labels: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_labels.npy
+  validation_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+  validation_predictions: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_preds.npy
+  validation_confidence: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_confidence.npy
+  svhn_file: data/ood_svhn/test_32x32.mat
+expected_sha256:
+  checkpoint: 3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860
+  train_features: e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527
+  validation_features: ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d
+expected:
+  training_samples: 49000
+  validation_samples: 10500
+  svhn_samples: 26032
+  feature_dim: 84
+  classes: 10
+inference:
+  feature_layer: fc2
+  image_size: [28, 28]
+  batch_size: 256
+  thread_count: 1
+  confidence_tolerance: 1.0e-05
+tolerances:
+  qe_reconstruction: 1.0e-4
+evaluation:
+  energy_temperature: 1.0          # S4: temperature 1
+  knn_neighbors: 5                 # S6: mean distance to the 5 nearest training embeddings
+  target_tpr: 0.95                 # FPR at 95% TPR
+  bootstrap_iterations: 2000       # stratified bootstrap for every AUROC interval
+  bootstrap_seed: 42
+  paired_iterations: 2000          # paired bootstrap for S1 minus each other score
+  paired_seed: 42
+  shuffle_iterations: 1000         # label-shuffle control for the S1 AUROC
+  shuffle_seed: 42
+  competitive_margin: 0.01         # O2, O3: lower end of S1 minus other above -0.01
+  protocol_statements: true        # judge O1 to O4 too (the proposal's RQ3 and RQ4 are always judged)

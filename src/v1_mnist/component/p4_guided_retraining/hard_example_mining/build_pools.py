@@ -51,7 +51,7 @@ def build_pools(settings: PoolSettings, analysis: AnalysisSettings, repo_root: P
         settings.output_dir / "difficulty" / "train_difficulty.csv",
         data, data.purity_by_neuron[data.bmu], flags, msp,
     )
-    write_pool_tables(settings.output_dir, data, flags, msp, analysis.num_classes)
+    write_pool_tables(settings.output_dir, data, flags, msp, analysis.num_classes, analysis.class_label)
 
     results: dict[str, Any] = {
         "run_id": settings.run_id,

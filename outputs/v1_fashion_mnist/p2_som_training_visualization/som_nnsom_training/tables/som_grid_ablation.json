@@ -1,0 +1,55 @@
+{
+  "purpose": "descriptive ablation; not used to select a grid",
+  "grid_decision": "docs/p2_som_training_visualization/som_nnsom_training/SOM_GRID_SELECTION_PROTOCOL.md (Recorded outcome)",
+  "test_evaluated": false,
+  "rows": [
+    {
+      "run_id": "som_10x10_nb7_ep250_s42",
+      "grid": "10x10",
+      "init_neighborhood": 7,
+      "epochs": 250,
+      "model_sha256": "26848c9d5e86847ad505b1addf6c12c08b77049e7c973995c2ac4d8fc3172912",
+      "validation_qe": 1.0076845152798182,
+      "validation_te1_percent": 4.257142857142857,
+      "validation_te1_plus_2_percent": 1.7619047619047619,
+      "validation_occupancy": 0.99,
+      "train_occupancy": 1.0,
+      "qe_rank": 3,
+      "te1_rank": 1,
+      "te1_plus_2_rank": 1,
+      "reference_rank_sum": 5
+    },
+    {
+      "run_id": "som_15x15_nb11_ep250_s42",
+      "grid": "15x15",
+      "init_neighborhood": 11,
+      "epochs": 250,
+      "model_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+      "validation_qe": 0.8985395856170484,
+      "validation_te1_percent": 5.371428571428572,
+      "validation_te1_plus_2_percent": 3.5523809523809526,
+      "validation_occupancy": 0.9866666666666667,
+      "train_occupancy": 1.0,
+      "qe_rank": 2,
+      "te1_rank": 2,
+      "te1_plus_2_rank": 2,
+      "reference_rank_sum": 6
+    },
+    {
+      "run_id": "som_20x20_nb15_ep250_s42",
+      "grid": "20x20",
+      "init_neighborhood": 15,
+      "epochs": 250,
+      "model_sha256": "fef0bb769f9cdd8a58c9eb95e8e41f13e88f425f281bd937c2a6496145358711",
+      "validation_qe": 0.822215373179105,
+      "validation_te1_percent": 7.333333333333333,
+      "validation_te1_plus_2_percent": 4.752380952380952,
+      "validation_occupancy": 0.99,
+      "train_occupancy": 0.9975,
+      "qe_rank": 1,
+      "te1_rank": 3,
+      "te1_plus_2_rank": 3,
+      "reference_rank_sum": 7
+    }
+  ]
+}

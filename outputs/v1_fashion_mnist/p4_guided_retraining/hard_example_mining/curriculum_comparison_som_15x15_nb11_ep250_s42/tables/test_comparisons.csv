@@ -1,0 +1,16 @@
+comparison,subset,mean_difference,ci_low,ci_high,excludes_zero
+curriculum_som minus standard,overall,0.032895,0.029333,0.036438,True
+curriculum_som minus standard,hotspot,0.158768,0.120367,0.196209,True
+curriculum_som minus standard,non_hotspot,0.027625,0.024369,0.03082,True
+curriculum_random minus standard,overall,0.015086,0.012495,0.017714,True
+curriculum_random minus standard,hotspot,0.061137,0.035545,0.086256,True
+curriculum_random minus standard,non_hotspot,0.013157,0.010775,0.015539,True
+curriculum_msp minus standard,overall,0.035886,0.032419,0.039639,True
+curriculum_msp minus standard,hotspot,0.140284,0.103318,0.175841,True
+curriculum_msp minus standard,non_hotspot,0.031514,0.027863,0.034948,True
+curriculum_som minus curriculum_random,overall,0.01781,0.014819,0.020648,True
+curriculum_som minus curriculum_random,hotspot,0.09763,0.066351,0.128436,True
+curriculum_som minus curriculum_random,non_hotspot,0.014467,0.011907,0.017027,True
+curriculum_som minus curriculum_msp,overall,-0.00299,-0.005981,-0.000114,True
+curriculum_som minus curriculum_msp,hotspot,0.018483,-0.009953,0.046445,False
+curriculum_som minus curriculum_msp,non_hotspot,-0.00389,-0.006689,-0.00123,True

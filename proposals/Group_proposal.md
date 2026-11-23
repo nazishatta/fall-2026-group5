@@ -9,7 +9,7 @@
 | **Team**       | Fyrooz Anika Khan, Nazish Atta                                  |
 | **Advisor**    | Dr. Amir Jafari                                                 |
 | **Repository** | https://github.com/nazishatta/fall-2026-group5                  |
-| **Version**    | Group proposal, revised 2026-11-15                              |
+| **Version**    | Group proposal, revised 2026-11-22                              |
 
 The advisor's original topic description is kept in [`Project_proposal.md`](Project_proposal.md).
 This document is the group's own proposal: what we will do, with which data, how we will judge
@@ -39,10 +39,14 @@ retraining that measurably improves the model or its representation. We treat th
 hypothesis to test, not a result to defend. Parts that the evidence does not support will be
 reported as unsupported.
 
-### Where we are today (2026-11-15): MNIST results
+### Where we are today (2026-11-22): results on MNIST and Fashion-MNIST
 
-All numbers below are on MNIST. Fashion-MNIST has not been run yet. Details are in the phase
-reports in `reports/Latex_report/v1_mnist/`.
+Both datasets have been through all four phases with the same code, SOM settings and
+statistics, and a protocol written before each run. Details are in the phase reports in
+`reports/Latex_report/v1_mnist/` and `reports/Latex_report/v1_fashion_mnist/`. The first part is
+MNIST, the second part is Fashion-MNIST.
+
+**MNIST**
 
 - **Phase 1, CNN baseline.** LeNet-5 gets **99.18%** of the test images right (10,414 of 10,500;
   95% Wilson interval 98.99–99.34%), macro-F1 0.9918. It makes 92 mistakes on the 10,500
@@ -71,10 +75,52 @@ reports in `reports/Latex_report/v1_mnist/`.
 - **Phase 4, the map after retraining (RQ6): not supported.** Purity and topographic error do not
   change beyond seed-to-seed noise. The hotspot error rate and the overall validation error do
   drop after SOM-guided augmentation.
-- **In short:** the SOM does not beat the classifier's own confidence at detecting mistakes or
-  novel inputs. What it adds is a map of **where** mistakes and novel inputs land, and choosing
-  retraining images from that map works as well as choosing them by confidence.
-- **Still to do:** run the same pipeline on Fashion-MNIST.
+- **In short (MNIST):** the SOM does not beat the classifier's own confidence at detecting
+  mistakes or novel inputs. What it adds is a map of **where** mistakes and novel inputs land, and
+  choosing retraining images from that map works as well as choosing them by confidence.
+
+**Fashion-MNIST**
+
+- **Phase 1, CNN baseline.** The same LeNet-5 recipe, trained once and not tuned, gets **90.90%**
+  of the test images right (9,544 of 10,500; 95% Wilson interval 90.33–91.43%), macro-F1 0.909.
+  It makes 876 mistakes on the validation images and 956 on the test images (MNIST: 92 and 86),
+  mostly between upper-body garments; Shirt is the weakest class (F1 0.746).
+- **Phase 2, the map (RQ1) and where mistakes gather (RQ2): supported.** The 15x15 map's weighted
+  purity is 0.893, against 0.173 with shuffled labels (p = 0.001). The 11 hotspot cells hold
+  **3.9 times** their fair share of the validation mistakes (95% range 3.2–4.4; p = 0.005), and
+  the result holds on the 10x10 and 20x20 maps. The ratio is smaller than on MNIST because a
+  ratio cannot exceed one divided by the overall error rate (about 12 here, about 114 on MNIST).
+  As on MNIST, a SOM cell is no better than a k-means cell at finding mistakes (AUROC 0.811 vs
+  0.812) and the CNN's own confidence is better (0.906). The pre-registered grid comparison finds
+  15x15 better than 20x20 at locating mistakes (−0.042, 95% range −0.077 to −0.008).
+- **Phase 3, novelty detection (RQ3, RQ4).** With SVHN as novel data, the SOM's quantization
+  error gives an AUROC of **0.789** (0.783–0.796), so **RQ3 is supported**. Energy (0.982) and
+  max-softmax (0.884) rank better, and the paired difference to max-softmax is −0.094
+  (−0.101 to −0.088), so **RQ4 ("competitive") is not supported**. The 95th-percentile threshold
+  fitted on training data flags only 3.0% of SVHN. SVHN's embeddings are much shorter than
+  Fashion-MNIST's, which a rule on embedding length alone already uses. For near novelty (4 of
+  the 10 classes held out, 5 splits) the SOM does better than max-softmax in every split
+  (+0.046, 0.034 to 0.057), which it did not show on MNIST; nearest-neighbour distance is still
+  better than the SOM.
+- **Phase 4, guided retraining (RQ5): not supported for the primary statement.** MNIST's
+  augmentation ranges failed the transform check on Fashion-MNIST (accuracy on altered images
+  dropped by 0.081; limit 0.02). The rule to halve the ranges was written before re-checking; the
+  second attempt also failed (0.029) and the third passed (0.012), so the ranges are four times
+  weaker than on MNIST. The SOM pool holds 19,997 images (41% of the training set; MNIST 8.6%).
+  Over 5 seeds, SOM-chosen augmentation lowers the hotspot test error from 36.0% to 34.0%, but
+  its advantage over random augmentation (−1.0 point, 95% interval −3.2 to +1.1) is not
+  distinguishable from zero (MNIST: −2.5 points, met). Ordering training by SOM difficulty
+  (curriculum) makes things worse on both datasets, more so here (+3.3 points overall).
+- **Phase 4, the map after retraining (RQ6): not supported.** Purity does not improve and
+  topographic error is not shown to stay equal. SOM guidance does shrink the hotspot error rate
+  more than random guidance does (−3.2 points, −5.2 to −1.2). Novelty detection gets worse after
+  retraining (the SOM's AUROC on SVHN falls from 0.838 to 0.715), which it did not on MNIST.
+- **In short (both datasets):** the SOM does not beat the classifier's own confidence or energy at
+  detecting mistakes or far novel inputs. What it adds is a map of **where** mistakes and novel
+  inputs land. Retraining on SOM-chosen images helped on MNIST but not clearly on Fashion-MNIST,
+  where the augmentation had to be much weaker and the SOM pool was large.
+- **Still to do:** documents only (paper, poster, deck, videos) and repository clean-up; the
+  technical freeze was on 2026-11-22, so no new experiments.
 
 ---
 
@@ -102,10 +148,10 @@ All datasets are public. None contains personal data. All download automatically
 | -------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **MNIST**                  | Main development dataset                                       | 70,000 grayscale 28x28 digit images, 10 classes                    | `torchvision.datasets.MNIST`. Originally distributed from Yann LeCun's site and widely used for research. **We have not re-checked its exact terms; confirm them on that page.** Cite LeCun et al. (1998). |
 | **Fashion-MNIST**          | Second dataset: the same pipeline is repeated on it              | 70,000 grayscale 28x28 images, 10 clothing classes                 | `torchvision.datasets.FashionMNIST`. **MIT licence.** Cite Xiao et al. (2017). |
-| **SVHN**                   | Novelty (OOD) test set for the MNIST model only; never trained on | 26,032 test digit crops (street-view house numbers)                | `torchvision.datasets.SVHN`. **For non-commercial use only**, which fits this academic project. Cite Netzer et al. (2011). |
+| **SVHN**                   | Novelty (OOD) test set for the MNIST and Fashion-MNIST models; never trained on | 26,032 test digit crops (street-view house numbers)                | `torchvision.datasets.SVHN`. **For non-commercial use only**, which fits this academic project. Cite Netzer et al. (2011). |
 
 We train and analyse on two datasets only: **MNIST and Fashion-MNIST**. SVHN is used only to
-test novelty detection on the MNIST model. Licence and terms for Fashion-MNIST and SVHN were
+test novelty detection, for the models of both datasets. Licence and terms for Fashion-MNIST and SVHN were
 checked against each dataset's own page on 2026-09-30. MNIST's terms still need checking (see the table). Please
 re-check all of them before any public release of code or results.
 
@@ -129,8 +175,9 @@ committed, because those are what a reader needs to check our numbers.
 ### 3.4 Second dataset
 
 MNIST is good for building the method, but it is near the accuracy ceiling and gives few
-mistakes (92 on validation). We therefore repeat the whole pipeline on **Fashion-MNIST**, which
-has the same image size and more mistakes, for the final results.
+mistakes (92 on validation). We therefore repeated the whole pipeline on **Fashion-MNIST**, which
+has the same image size and about ten times more mistakes (876 on validation), and report both
+datasets in the final results.
 
 ---
 
@@ -160,7 +207,7 @@ The diagram is in the README (`demo/project_pipeline/nnsom_project_pipeline.draw
 
 **Reproducibility rules.** Every run has a name that encodes its setup (for example
 `fashion_mnist_lenet5_penultimate_som15x15_seed42`). Every reported number can be traced from
-config to raw result to table or figure. Unmeasured values are written as `[TBD]`, never guessed.
+config to raw result to table or figure. Unmeasured values are marked as still to be determined, never guessed.
 
 ---
 
@@ -238,10 +285,10 @@ A weaker result against strong baselines will be reported as such.
 ## 6. Success criteria
 
 The rules below are fixed **before** the test set is examined for each question. This proposal
-said the thresholds marked `[TBD]` would be filled in here by the **2026-10-06** working session.
+said the thresholds still open at that time would be filled in here by the **2026-10-06** working session.
 Instead they were fixed in the phase protocols, before any test-set use (RQ2:
 `ERROR_PATTERN_ROBUSTNESS_CRITERIA.md`, written 2026-10-06; RQ5: `RETRAINING_PROTOCOL.md`, stamped
-2026-11-03). They were copied into this table unchanged on 2026-11-15 (see
+2026-11-03 for MNIST and 2026-11-22 for Fashion-MNIST). They were copied into this table unchanged on 2026-11-15 (see
 `src/v1_mnist/docs/DEVIATIONS.md`). Changing them afterwards would need a written reason.
 
 |         | Counts as supported if                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Counts as not supported if                                                            |
@@ -250,7 +297,7 @@ Instead they were fixed in the phase protocols, before any test-set use (RQ2:
 | **RQ2** | Some cells have an error rate whose Wilson lower bound is above the overall error rate, **and** the top 5% of cells (k = max(5, 5% of neurons), picked by Wilson lower bound on one half of validation) hold more than their share of errors on the other half: the median held-out ratio beats the label-shuffled baseline (p < 0.05) and its 2.5th percentile is above 1 (`ERROR_PATTERN_ROBUSTNESS_CRITERIA.md` §3). No fixed percentage is used, so the rule means the same on every dataset and grid. | Errors are spread across cells about as expected by chance.                           |
 | **RQ3** | AUROC for the SOM score is above 0.5 with a bootstrap 95% interval that excludes 0.5, on every ID/OOD pair.                                                                                                                                                                                                                                                                                                                                                                                                | The interval includes 0.5.                                                            |
 | **RQ4** | Reported honestly against all baselines. "Competitive" means within 0.01 AUROC of the best baseline: the lower end of the 95% paired bootstrap interval for (SOM AUROC minus best-baseline AUROC) must be above -0.01. Margin fixed on 2026-11-10, after the development results were seen (see `src/v1_mnist/docs/DEVIATIONS.md`). "Better" needs non-overlapping intervals over at least 5 seeds.                                                                                                        | SOM score is clearly worse than simple baselines such as maximum softmax probability. |
-| **RQ5** | SOM-guided selection beats the random control on hotspot error rate, as a paired difference over at least 5 seeds with an interval excluding 0, **and** macro-F1 drops by no more than **0.00157** (2 × the seed-to-seed standard deviation of the `standard` arm's validation macro-F1, measured before any arms were compared; `RETRAINING_PROTOCOL.md`, stamped 2026-11-03).                                                                                                                            | Guided and random selection are indistinguishable.                                    |
+| **RQ5** | SOM-guided selection beats the random control on hotspot error rate, as a paired difference over at least 5 seeds with an interval excluding 0, **and** macro-F1 drops by no more than **0.00157** on MNIST and **0.0033** on Fashion-MNIST (2 × the seed-to-seed standard deviation of the `standard` arm's validation macro-F1, measured by the same rule on each dataset before any arms were compared; `RETRAINING_PROTOCOL.md`, stamped 2026-11-03 and 2026-11-22).                                                                                                                            | Guided and random selection are indistinguishable.                                    |
 | **RQ6** | Before/after quantization error, topographic error and purity improve in the direction predicted, beyond seed-to-seed variation.                                                                                                                                                                                                                                                                                                                                                                           | No change beyond noise.                                                               |
 
 **A known limit on RQ2.** The MNIST baseline makes 92 mistakes on the 10,500 validation images
@@ -299,16 +346,19 @@ in working sessions**.
 | Date           | Session                                       | Plan                                                                                                                                                                                                    | Done?     |
 | -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | 2026-09-22     | Solutions and first results                   | MNIST baseline, embeddings, 15x15 SOM, first figures                                                                                                                                                    | Yes       |
-| 2026-09-29     | Working session                               | Cluster analysis, error-pattern and hotspot analysis (in review), LaTeX report skeleton                                                                                                                 | In review |
-| **2026-10-06** | Working session                               | **Proposal in repo. Literature review draft committed. Success-criteria thresholds fixed. Owners set for RQ3 to RQ6. GitHub tickets and milestones created.**                                           | Planned   |
+| 2026-09-29     | Working session                               | Cluster analysis, error-pattern and hotspot analysis (in review), LaTeX report skeleton                                                                                                                 | Yes       |
+| **2026-10-06** | Working session                               | **Proposal in repo. Literature review draft committed. Success-criteria thresholds fixed. Owners set for RQ3 to RQ6. GitHub tickets and milestones created.**                                           | Partly    |
 | 2026-10-13     | No class (Fall Break)                         | (Optional buffer for RQ2 write-up)                                                                                                                                                                      | n/a       |
-| **2026-10-20** | **Preliminary presentation**                  | RQ1 and RQ2 complete on MNIST. First RQ3 results (SOM novelty score vs. maximum softmax probability). Literature review complete. Slides in `presentation/`. Paper skeleton started. | Planned   |
-| 2026-10-27     | Working session                               | RQ4: reproduce the OOD baselines (Isolation Forest, One-Class SVM, autoencoder, MSP, energy, Mahalanobis, nearest-neighbour)                                                                            | Planned   |
-| 2026-11-03     | Working session                               | RQ4 complete. Repeat pipeline on Fashion-MNIST.                                                                                                                                                         | Planned   |
-| 2026-11-10     | Working session                               | RQ5: SOM-guided retraining with a random-selection control, at least 5 seeds                                                                                                                            | Planned   |
-| 2026-11-17     | Working session                               | RQ6: before/after map metrics. Run the pipeline on Fashion-MNIST.                                                                                                                                       | Planned   |
+| **2026-10-20** | **Preliminary presentation**                  | RQ1 and RQ2 complete on MNIST. First RQ3 results (SOM novelty score vs. maximum softmax probability). Literature review complete. Slides in `presentation/`. Paper skeleton started. | Yes       |
+| 2026-10-27     | Working session                               | RQ4: reproduce the OOD baselines (Isolation Forest, One-Class SVM, autoencoder, MSP, energy, Mahalanobis, nearest-neighbour)                                                                            | Yes       |
+| 2026-11-03     | Working session                               | RQ4 complete. Repeat pipeline on Fashion-MNIST.                                                                                                                                                         | Yes, late |
+| 2026-11-10     | Working session                               | RQ5: SOM-guided retraining with a random-selection control, at least 5 seeds                                                                                                                            | Yes       |
+| 2026-11-17     | Working session                               | RQ6: before/after map metrics. Run the pipeline on Fashion-MNIST.                                                                                                                                       | Yes, late |
+| **2026-11-22** | Technical freeze                              | No new experiments. Fashion-MNIST Phases 1 to 4 done. Pull requests opened: Fashion-MNIST into `develop`, then `develop` into `main`. Proposal, progress report and reports updated. | Partly    |
 | 2026-11-24     | No class (Thanksgiving)                       | (Buffer)                                                                                                                                                                                                | n/a       |
-| 2026-12-01     | Working session                               | Freeze results. Full paper draft. Poster. Videos recorded. Code cleaned for release.                                                                                                                    | Planned   |
+| 2026-11-26     | Deadline                                      | Every pull request merged or closed; merged branches deleted; paper complete in the journal template on `main`; no open placeholders in this proposal | Planned   |
+| 2026-11-29     | Deadline                                      | Paper proof-read by both members; poster draft; progress report up to date; paper and reports build from a clean clone | Planned   |
+| 2026-12-01     | Working session                               | Final presentation deck, poster and the script for the 1-minute video; dry run of the talk. (Results were frozen on 2026-11-22.)                                                                                                                    | Planned   |
 | **2026-12-08** | **Final presentation and journal submission** | Presentation, journal-style paper submitted, poster, recorded video, and a 1-minute project video                                                                                                       | Planned   |
 
 **Every week:** a short progress report in `reports/Progress_Report/`, and reviewed pull
@@ -329,6 +379,9 @@ requests from both team members.
 | Paper skeleton started                                                                          | 2026-10-20                            |
 | Reusable analysis pipeline: data, CNN, embeddings, SOM, analysis, novelty detection, retraining | Final                                 |
 | Results tables and vector figures (SVG or PDF), diagrams as draw.io/SVG                         | Final                                 |
+| Fashion-MNIST study and the paper merged to `main`; merged branches deleted                     | 2026-11-26                            |
+| Target journal and its template named (ticket #40)                                              | 2026-11-26                            |
+| Poster draft                                                                                    | 2026-11-29                            |
 | Journal-style paper (LaTeX) with bibliography                                                   | 2026-12-08                            |
 | Poster, recorded video, 1-minute project video                                                  | 2026-12-08                            |
 | Code release: pinned `requirements.txt`, README with install and run steps, tests               | 2026-12-08                            |
@@ -338,8 +391,8 @@ requests from both team members.
 | Risk                                 | Why it matters                                      | What we do                                                                                       |
 | ------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Few errors on MNIST                  | 92 validation and 86 test mistakes give weak per-cell statistics | Wilson bounds, label-shuffled baseline, held-out hotspots, and replication on Fashion-MNIST |
-| Result only on MNIST                 | Reads as a class project                            | Repeat the whole pipeline on Fashion-MNIST for the final results                                 |
-| SOM does not beat strong OOD methods | Possible honest negative result                     | Compare to recent methods; report as-is; the error-geography and retraining findings still stand |
+| Result only on MNIST                 | Reads as a class project                            | Done: the whole pipeline was repeated on Fashion-MNIST (2026-11-22)                              |
+| SOM does not beat strong OOD methods | Possible honest negative result                     | Compare to recent methods; report as-is (it happened on both datasets); the error-geography and retraining findings still stand |
 | SOM grid size and training time      | Too small loses detail, too large gives empty cells | Written grid-selection protocol; tune on validation data; use PCA if embeddings are too large    |
 | Novelty threshold choice             | A poor threshold distorts results                   | Fit on training-set quantization error only; report AUROC across thresholds                      |
 | Retraining is unstable               | Too many hard samples too early can hurt training   | Gradual schedule; monitor validation accuracy; keep the random control                           |

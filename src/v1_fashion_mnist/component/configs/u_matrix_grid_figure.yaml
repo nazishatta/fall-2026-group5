@@ -1,0 +1,14 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/u_matrix_grid_figure.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# The U-Matrix of the headline SOM on its hexagonal grid.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_umatrix_hex_grid_s42_v1
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/u_matrix_analysis
+model_path: outputs/v1_fashion_mnist/p2_som_training_visualization/som_nnsom_training/som_models/som_15x15_nb11_ep250_s42
+model_sha256: 6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281
+grid_height: 15
+grid_width: 15
+feature_dim: 84
+hex_radius: 0.56
+figure_name: u_matrix_novelty_som_grid.pdf

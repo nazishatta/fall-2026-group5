@@ -1,0 +1,14 @@
+# Fashion-MNIST Phase 3 inputs and their SHA-256. Every Phase 3 script in this folder checks its inputs
+# against this file (src/v1_mnist/component/utils/shared_provenance.py), never against MNIST's.
+# Checkpoint and embeddings: Phase 1 run lenet5_fashion_mnist_s42 (hashes as in its embedding_manifest.json).
+# SVHN: the same test file as for MNIST (src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md, section 2).
+inputs:
+  checkpoint: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/checkpoints/lenet5_fashion_mnist_s42.pth
+  train_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation_features: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+expected_sha256:
+  checkpoint: 3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860
+  train_features: e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527
+  validation_features: ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d
+  svhn_file: cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b
+svhn_file: data/ood_svhn/test_32x32.mat

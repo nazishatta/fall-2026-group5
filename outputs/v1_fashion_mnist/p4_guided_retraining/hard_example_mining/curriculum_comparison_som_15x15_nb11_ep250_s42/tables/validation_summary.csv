@@ -1,0 +1,5 @@
+arm,overall_error_mean,overall_error_std,hotspot_error_mean,hotspot_error_std,non_hotspot_error_mean,non_hotspot_error_std,macro_f1_mean,macro_f1_std
+standard,0.086514,0.001529,0.375887,0.019779,0.074367,0.001389,0.913253,0.001659
+curriculum_som,0.119505,0.002707,0.516785,0.015911,0.102828,0.002235,0.878803,0.002521
+curriculum_random,0.106705,0.002553,0.446336,0.016242,0.092448,0.002549,0.892109,0.002318
+curriculum_msp,0.121067,0.002078,0.499291,0.014322,0.10519,0.002148,0.876313,0.002877

@@ -1,0 +1,499 @@
+{
+  "run_id": "fashion_mnist_svhn_unified_nine_methods_s42_46_v1",
+  "study_type": "preregistered_exploratory",
+  "data": {
+    "id_split": "fashion_mnist_validation",
+    "ood_split": "svhn_official_test",
+    "fashion_mnist_training_samples": 49000,
+    "fashion_mnist_validation_samples": 10500,
+    "svhn_test_samples": 26032
+  },
+  "methods": [
+    "qe",
+    "u_matrix",
+    "isolation_forest",
+    "one_class_svm",
+    "autoencoder",
+    "max_softmax",
+    "energy",
+    "mahalanobis",
+    "knn"
+  ],
+  "random_score_null_control": {
+    "auroc": 0.5046400035121609,
+    "aupr": 0.714415547972963,
+    "fpr_at_target_tpr": 0.9479047619047619
+  },
+  "reference_frozen_metrics": {
+    "qe": {
+      "auroc": 0.7893755670676385,
+      "aupr": 0.8252907439139893,
+      "fpr_at_target_tpr": 0.4196190476190476,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.7830097960019903,
+          0.7954011914822783
+        ],
+        "aupr": [
+          0.8202465024757234,
+          0.8300087234382103
+        ],
+        "fpr_at_target_tpr": [
+          0.4079547619047619,
+          0.43106428571428573
+        ]
+      }
+    },
+    "u_matrix": {
+      "auroc": 0.8116903938742062,
+      "aupr": 0.891912221886052,
+      "fpr_at_target_tpr": 0.25257142857142856,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8060274541223988,
+          0.8176098259559663
+        ],
+        "aupr": [
+          0.8886929661278964,
+          0.8951252229198895
+        ],
+        "fpr_at_target_tpr": [
+          0.24418809523809523,
+          0.2598119047619048
+        ]
+      }
+    },
+    "max_softmax": {
+      "auroc": 0.8837241526911932,
+      "aupr": 0.9355365706353104,
+      "fpr_at_target_tpr": 0.30733333333333335,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8798636372450024,
+          0.888330737444025
+        ],
+        "aupr": [
+          0.9333272925178125,
+          0.938148933219674
+        ],
+        "fpr_at_target_tpr": [
+          0.29628571428571426,
+          0.316002380952381
+        ]
+      }
+    },
+    "energy": {
+      "auroc": 0.9821428168993472,
+      "aupr": 0.9879640425517824,
+      "fpr_at_target_tpr": 0.06342857142857143,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9806988929376299,
+          0.9837519577552902
+        ],
+        "aupr": [
+          0.9864268659250891,
+          0.9895042282997598
+        ],
+        "fpr_at_target_tpr": [
+          0.05847380952380952,
+          0.06838809523809523
+        ]
+      }
+    }
+  },
+  "fitted_methods_per_seed": [
+    {
+      "seed": 42,
+      "training_subset_sha256": "f2235a78bdaed08763974df7cf9996dac636938bcbf7e66d0a8c0d459f6aef2f",
+      "metrics": {
+        "isolation_forest": {
+          "auroc": 0.322123942693242,
+          "aupr": 0.581196213770667,
+          "fpr_at_target_tpr": 0.8792380952380953
+        },
+        "one_class_svm": {
+          "auroc": 0.7344923537331344,
+          "aupr": 0.8113301786152114,
+          "fpr_at_target_tpr": 0.6339047619047619
+        },
+        "autoencoder": {
+          "auroc": 0.591421102598999,
+          "aupr": 0.6973097171854641,
+          "fpr_at_target_tpr": 0.6506666666666666
+        },
+        "mahalanobis": {
+          "auroc": 0.7351172220271022,
+          "aupr": 0.7795098897589602,
+          "fpr_at_target_tpr": 0.4188571428571429
+        },
+        "knn": {
+          "auroc": 0.8690800882430415,
+          "aupr": 0.8981471316908325,
+          "fpr_at_target_tpr": 0.30304761904761907
+        }
+      },
+      "autoencoder_initial_training_loss": 0.9075185735702515,
+      "autoencoder_final_training_loss": 0.037065273648500444
+    },
+    {
+      "seed": 43,
+      "training_subset_sha256": "cdf0be5215ff7efdb6d3d12c429432df7f8488d2ce50c833c14e5441046774a4",
+      "metrics": {
+        "isolation_forest": {
+          "auroc": 0.2922824728539234,
+          "aupr": 0.5715190029943131,
+          "fpr_at_target_tpr": 0.898952380952381
+        },
+        "one_class_svm": {
+          "auroc": 0.7351489375713407,
+          "aupr": 0.8120117505565863,
+          "fpr_at_target_tpr": 0.6291428571428571
+        },
+        "autoencoder": {
+          "auroc": 0.8184667460561361,
+          "aupr": 0.8474919995487015,
+          "fpr_at_target_tpr": 0.4123809523809524
+        },
+        "mahalanobis": {
+          "auroc": 0.7371134171861737,
+          "aupr": 0.7810213799140346,
+          "fpr_at_target_tpr": 0.4184761904761905
+        },
+        "knn": {
+          "auroc": 0.8583645440044488,
+          "aupr": 0.8870296723908191,
+          "fpr_at_target_tpr": 0.3020952380952381
+        }
+      },
+      "autoencoder_initial_training_loss": 0.9235621062278747,
+      "autoencoder_final_training_loss": 0.040198073530197144
+    },
+    {
+      "seed": 44,
+      "training_subset_sha256": "c979751a43b040118290b2f4f8e8bfaa2643e9e4e88dc13f34fb3561696d2035",
+      "metrics": {
+        "isolation_forest": {
+          "auroc": 0.23031208841864956,
+          "aupr": 0.5525743840978108,
+          "fpr_at_target_tpr": 0.9380952380952381
+        },
+        "one_class_svm": {
+          "auroc": 0.7454128837767436,
+          "aupr": 0.8202340488134233,
+          "fpr_at_target_tpr": 0.6210476190476191
+        },
+        "autoencoder": {
+          "auroc": 0.7433704908976497,
+          "aupr": 0.7892201466206346,
+          "fpr_at_target_tpr": 0.4961904761904762
+        },
+        "mahalanobis": {
+          "auroc": 0.7401784470395413,
+          "aupr": 0.7826223883453217,
+          "fpr_at_target_tpr": 0.4121904761904762
+        },
+        "knn": {
+          "auroc": 0.8695495617115931,
+          "aupr": 0.8924570632548855,
+          "fpr_at_target_tpr": 0.2562857142857143
+        }
+      },
+      "autoencoder_initial_training_loss": 0.9012977088928222,
+      "autoencoder_final_training_loss": 0.03661211150884628
+    },
+    {
+      "seed": 45,
+      "training_subset_sha256": "62b6d76e792d755f97c2953a134c0907f5e7948af320ef689631b15a5fa8c42c",
+      "metrics": {
+        "isolation_forest": {
+          "auroc": 0.24726849372201248,
+          "aupr": 0.557735479488052,
+          "fpr_at_target_tpr": 0.9297142857142857
+        },
+        "one_class_svm": {
+          "auroc": 0.7414151118037874,
+          "aupr": 0.8171615445095098,
+          "fpr_at_target_tpr": 0.6273333333333333
+        },
+        "autoencoder": {
+          "auroc": 0.7931796488570844,
+          "aupr": 0.8282354777526051,
+          "fpr_at_target_tpr": 0.44742857142857145
+        },
+        "mahalanobis": {
+          "auroc": 0.7385026487546463,
+          "aupr": 0.7805405846368987,
+          "fpr_at_target_tpr": 0.4086666666666667
+        },
+        "knn": {
+          "auroc": 0.8452576609008693,
+          "aupr": 0.8805142289208626,
+          "fpr_at_target_tpr": 0.34895238095238096
+        }
+      },
+      "autoencoder_initial_training_loss": 0.9220608822822571,
+      "autoencoder_final_training_loss": 0.0382459411919117
+    },
+    {
+      "seed": 46,
+      "training_subset_sha256": "4db05ed306a054fd5ef582b659c27d127e8ab48955cc5d28de28ca41e1e6199f",
+      "metrics": {
+        "isolation_forest": {
+          "auroc": 0.2677493561038429,
+          "aupr": 0.5638773180045785,
+          "fpr_at_target_tpr": 0.9111428571428571
+        },
+        "one_class_svm": {
+          "auroc": 0.7324370445166388,
+          "aupr": 0.8143864848257554,
+          "fpr_at_target_tpr": 0.6536190476190477
+        },
+        "autoencoder": {
+          "auroc": 0.7632976556326281,
+          "aupr": 0.8152596919104298,
+          "fpr_at_target_tpr": 0.49933333333333335
+        },
+        "mahalanobis": {
+          "auroc": 0.73804176178769,
+          "aupr": 0.780727134508119,
+          "fpr_at_target_tpr": 0.4057142857142857
+        },
+        "knn": {
+          "auroc": 0.8517654535077707,
+          "aupr": 0.8892775618997515,
+          "fpr_at_target_tpr": 0.3517142857142857
+        }
+      },
+      "autoencoder_initial_training_loss": 0.9112447761535645,
+      "autoencoder_final_training_loss": 0.0371441210269928
+    }
+  ],
+  "fitted_methods_seed_summary": {
+    "isolation_forest": {
+      "auroc": {
+        "mean": 0.271947270758334,
+        "sample_sd": 0.03637090795761594,
+        "per_seed": [
+          0.322123942693242,
+          0.2922824728539234,
+          0.23031208841864956,
+          0.24726849372201248,
+          0.2677493561038429
+        ]
+      },
+      "aupr": {
+        "mean": 0.5653804796710843,
+        "sample_sd": 0.011319458029479134,
+        "per_seed": [
+          0.581196213770667,
+          0.5715190029943131,
+          0.5525743840978108,
+          0.557735479488052,
+          0.5638773180045785
+        ]
+      },
+      "fpr_at_target_tpr": {
+        "mean": 0.9114285714285714,
+        "sample_sd": 0.02365080430382203,
+        "per_seed": [
+          0.8792380952380953,
+          0.898952380952381,
+          0.9380952380952381,
+          0.9297142857142857,
+          0.9111428571428571
+        ]
+      }
+    },
+    "one_class_svm": {
+      "auroc": {
+        "mean": 0.737781266280329,
+        "sample_sd": 0.0054257079108328944,
+        "per_seed": [
+          0.7344923537331344,
+          0.7351489375713407,
+          0.7454128837767436,
+          0.7414151118037874,
+          0.7324370445166388
+        ]
+      },
+      "aupr": {
+        "mean": 0.8150248014640973,
+        "sample_sd": 0.0037026372589725196,
+        "per_seed": [
+          0.8113301786152114,
+          0.8120117505565863,
+          0.8202340488134233,
+          0.8171615445095098,
+          0.8143864848257554
+        ]
+      },
+      "fpr_at_target_tpr": {
+        "mean": 0.6330095238095239,
+        "sample_sd": 0.012407773146988163,
+        "per_seed": [
+          0.6339047619047619,
+          0.6291428571428571,
+          0.6210476190476191,
+          0.6273333333333333,
+          0.6536190476190477
+        ]
+      }
+    },
+    "autoencoder": {
+      "auroc": {
+        "mean": 0.7419471288084996,
+        "sample_sd": 0.08887628825505335,
+        "per_seed": [
+          0.591421102598999,
+          0.8184667460561361,
+          0.7433704908976497,
+          0.7931796488570844,
+          0.7632976556326281
+        ]
+      },
+      "aupr": {
+        "mean": 0.7955034066035669,
+        "sample_sd": 0.05883449898826095,
+        "per_seed": [
+          0.6973097171854641,
+          0.8474919995487015,
+          0.7892201466206346,
+          0.8282354777526051,
+          0.8152596919104298
+        ]
+      },
+      "fpr_at_target_tpr": {
+        "mean": 0.5012000000000001,
+        "sample_sd": 0.09103440828644677,
+        "per_seed": [
+          0.6506666666666666,
+          0.4123809523809524,
+          0.4961904761904762,
+          0.44742857142857145,
+          0.49933333333333335
+        ]
+      }
+    },
+    "mahalanobis": {
+      "auroc": {
+        "mean": 0.7377906993590306,
+        "sample_sd": 0.0018626215032039486,
+        "per_seed": [
+          0.7351172220271022,
+          0.7371134171861737,
+          0.7401784470395413,
+          0.7385026487546463,
+          0.73804176178769
+        ]
+      },
+      "aupr": {
+        "mean": 0.7808842754326668,
+        "sample_sd": 0.0011260091861639433,
+        "per_seed": [
+          0.7795098897589602,
+          0.7810213799140346,
+          0.7826223883453217,
+          0.7805405846368987,
+          0.780727134508119
+        ]
+      },
+      "fpr_at_target_tpr": {
+        "mean": 0.41278095238095247,
+        "sample_sd": 0.005843150145950219,
+        "per_seed": [
+          0.4188571428571429,
+          0.4184761904761905,
+          0.4121904761904762,
+          0.4086666666666667,
+          0.4057142857142857
+        ]
+      }
+    },
+    "knn": {
+      "auroc": {
+        "mean": 0.8588034616735447,
+        "sample_sd": 0.010657188253842952,
+        "per_seed": [
+          0.8690800882430415,
+          0.8583645440044488,
+          0.8695495617115931,
+          0.8452576609008693,
+          0.8517654535077707
+        ]
+      },
+      "aupr": {
+        "mean": 0.8894851316314302,
+        "sample_sd": 0.006527098959757301,
+        "per_seed": [
+          0.8981471316908325,
+          0.8870296723908191,
+          0.8924570632548855,
+          0.8805142289208626,
+          0.8892775618997515
+        ]
+      },
+      "fpr_at_target_tpr": {
+        "mean": 0.3124190476190476,
+        "sample_sd": 0.03944666021690016,
+        "per_seed": [
+          0.30304761904761907,
+          0.3020952380952381,
+          0.2562857142857143,
+          0.34895238095238096,
+          0.3517142857142857
+        ]
+      }
+    }
+  },
+  "fitting": {
+    "common_training_rows_per_seed": 10000,
+    "same_training_row_indices_within_seed": true,
+    "frozen_reference_methods": [
+      "qe",
+      "u_matrix",
+      "max_softmax",
+      "energy"
+    ],
+    "freshly_fitted_methods": [
+      "isolation_forest",
+      "one_class_svm",
+      "autoencoder",
+      "mahalanobis",
+      "knn"
+    ],
+    "autoencoder_input_standardization": "StandardScaler fitted on selected Fashion-MNIST train subset only",
+    "methods_have_equal_compute_cost": false,
+    "isolation_forest_internal_max_samples_per_tree": 256
+  },
+  "provenance": {
+    "input_sha256": {
+      "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+      "train_labels": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+      "som_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281"
+    },
+    "config_sha256": "e7518f3b2983c63f7a64088ca725574114291d11710dc7b6a1886205a1445597",
+    "frozen_som": {
+      "qe_threshold": 1.4214525859373504,
+      "som_model": "som_15x15_nb11_ep250_s42",
+      "som_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+      "cnn_sha256": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features_sha256": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "train_qe_sha256": "dd61c7b63add449fae66577137e456f7c90a12a6d57a8d5a3d9fc6d699096889",
+      "val_qe_sha256": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7"
+    }
+  },
+  "metrics_protocol": "OOD positive; higher novelty; empirical FPR at target TPR on labeled evaluation, not a training-frozen deployment threshold",
+  "leakage_control": "All freshly fitted methods use Fashion-MNIST training subsets only; scalers fit on training only. Validation and SVHN are evaluation-only. Method set fixed in the protocol before any run; exploratory. Fashion-MNIST final test never accessed.",
+  "limitations": [
+    "Frozen CNN and SOM were trained on historical complete training data, not retrained for each 10k subset.",
+    "Five fitted methods share exact selected Fashion-MNIST training rows, but not computational budgets or model families.",
+    "Isolation Forest uses 256 samples per tree; total training pool has 10k rows.",
+    "Bootstrap intervals of frozen methods condition on one frozen CNN/SOM; seed spread of fitted methods is not a bootstrap confidence interval.",
+    "All methods use SVHN as external OOD; the method set was chosen after MNIST's SVHN results, before any result on this dataset.",
+    "Frozen SOM preprocessing and model selection follow historical settings; no new selection or tuning performed."
+  ]
+}

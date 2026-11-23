@@ -1,0 +1,195 @@
+{
+  "run_id": "fashion_mnist_svhn_som_overlay_s42_v1",
+  "analysis": "svhn_som_overlay_and_miss_profile",
+  "qe_threshold": 1.4214525859373504,
+  "svhn_samples": 26032,
+  "detected": 792,
+  "missed": 25240,
+  "miss_rate": 0.9695759065765212,
+  "svhn_occupied_neurons": 42,
+  "neurons_holding_misses": 31,
+  "class_landing_profile": [
+    {
+      "dominant_fashion_mnist_class": 0,
+      "svhn_images": 29,
+      "missed": 9,
+      "miss_rate": 0.3103448275862069,
+      "share_of_all_missed": 0.0003565768621236133
+    },
+    {
+      "dominant_fashion_mnist_class": 1,
+      "svhn_images": 12,
+      "missed": 2,
+      "miss_rate": 0.16666666666666666,
+      "share_of_all_missed": 7.92393026941363e-05
+    },
+    {
+      "dominant_fashion_mnist_class": 2,
+      "svhn_images": 1848,
+      "missed": 1699,
+      "miss_rate": 0.9193722943722944,
+      "share_of_all_missed": 0.06731378763866878
+    },
+    {
+      "dominant_fashion_mnist_class": 3,
+      "svhn_images": 402,
+      "missed": 289,
+      "miss_rate": 0.7189054726368159,
+      "share_of_all_missed": 0.011450079239302694
+    },
+    {
+      "dominant_fashion_mnist_class": 4,
+      "svhn_images": 5,
+      "missed": 5,
+      "miss_rate": 1.0,
+      "share_of_all_missed": 0.00019809825673534074
+    },
+    {
+      "dominant_fashion_mnist_class": 5,
+      "svhn_images": 21,
+      "missed": 0,
+      "miss_rate": 0.0,
+      "share_of_all_missed": 0.0
+    },
+    {
+      "dominant_fashion_mnist_class": 6,
+      "svhn_images": 6,
+      "missed": 3,
+      "miss_rate": 0.5,
+      "share_of_all_missed": 0.00011885895404120444
+    },
+    {
+      "dominant_fashion_mnist_class": 7,
+      "svhn_images": 3,
+      "missed": 3,
+      "miss_rate": 1.0,
+      "share_of_all_missed": 0.00011885895404120444
+    },
+    {
+      "dominant_fashion_mnist_class": 8,
+      "svhn_images": 23658,
+      "missed": 23201,
+      "miss_rate": 0.9806830670386338,
+      "share_of_all_missed": 0.9192155309033281
+    },
+    {
+      "dominant_fashion_mnist_class": 9,
+      "svhn_images": 48,
+      "missed": 29,
+      "miss_rate": 0.6041666666666666,
+      "share_of_all_missed": 0.0011489698890649763
+    }
+  ],
+  "missed_typicality": {
+    "missed_images": 25240,
+    "compared_images": 25119,
+    "median_qe_ratio": 1.0364683362723504,
+    "share_at_or_below_cell_median": 0.4361240495242645,
+    "interpretation": "Ratio = missed image QE / median Fashion-MNIST-validation QE in the same neuron. Values near or below 1 mean the SOM represents the image about as well as a typical Fashion-MNIST class in that cell. This describes the score; it is not proof of a visual or causal reason."
+  },
+  "top_missed_neurons": [
+    {
+      "neuron": 109,
+      "missed": 11675,
+      "svhn_images": 11977,
+      "miss_rate": 0.9747850045921349,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 0.8600682593856656
+    },
+    {
+      "neuron": 94,
+      "missed": 11229,
+      "svhn_images": 11298,
+      "miss_rate": 0.9938927243759957,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 0.3333333333333333
+    },
+    {
+      "neuron": 95,
+      "missed": 1688,
+      "svhn_images": 1824,
+      "miss_rate": 0.9254385964912281,
+      "dominant_fashion_mnist_class": 2,
+      "class_purity": 0.24867724867724866
+    },
+    {
+      "neuron": 79,
+      "missed": 278,
+      "svhn_images": 381,
+      "miss_rate": 0.7296587926509186,
+      "dominant_fashion_mnist_class": 3,
+      "class_purity": 0.3333333333333333
+    },
+    {
+      "neuron": 108,
+      "missed": 120,
+      "svhn_images": 125,
+      "miss_rate": 0.96,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 0.7368421052631579
+    },
+    {
+      "neuron": 110,
+      "missed": 84,
+      "svhn_images": 103,
+      "miss_rate": 0.8155339805825242,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 0.25384615384615383
+    },
+    {
+      "neuron": 125,
+      "missed": 51,
+      "svhn_images": 95,
+      "miss_rate": 0.5368421052631579,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 0.7769230769230769
+    },
+    {
+      "neuron": 124,
+      "missed": 31,
+      "svhn_images": 36,
+      "miss_rate": 0.8611111111111112,
+      "dominant_fashion_mnist_class": 8,
+      "class_purity": 1.0
+    },
+    {
+      "neuron": 64,
+      "missed": 29,
+      "svhn_images": 47,
+      "miss_rate": 0.6170212765957447,
+      "dominant_fashion_mnist_class": 9,
+      "class_purity": 0.7413793103448276
+    },
+    {
+      "neuron": 132,
+      "missed": 8,
+      "svhn_images": 12,
+      "miss_rate": 0.6666666666666666,
+      "dominant_fashion_mnist_class": 0,
+      "class_purity": 0.5614035087719298
+    }
+  ],
+  "figure": "pdf/svhn_som_overlay.pdf",
+  "history_check": {
+    "max_abs_qe_difference": 0.0,
+    "limit": 0.0001
+  },
+  "provenance": {
+    "config_sha256": "a22c833c9b791680da97e0b7e48cd6e492d7239a0c33ca0da139d4802dc6fb27",
+    "input_sha256": {
+      "train_class_neuron": "3686a71da06ad932b98ec5250d8c36b3d9a15b7e6a48abef6c1cfd5abc3d675f",
+      "validation_bmu": "d3433eb4b1ebf6be975ffe96a34ef80a1479cfbfad33b8bd9804da877cd8ed33",
+      "validation_qe": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+      "historical_svhn_qe": "add731f9d73383711e81865a37e5c6442d19784a26d8ae64dc1baed84c6da9ae"
+    },
+    "frozen_input_sha256": {
+      "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+      "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+      "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+      "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b",
+      "som_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281"
+    }
+  },
+  "leakage_control": "SVHN test is the novel set and is used only for description. Fashion-MNIST validation and the training class table are references. The QE cutoff comes from Fashion-MNIST training and is not changed. Nothing is tuned and the final Fashion-MNIST test split is never opened.",
+  "limitation": "Descriptive only. Where a missed image lands and how typical its QE is does not prove why the SOM missed it."
+}

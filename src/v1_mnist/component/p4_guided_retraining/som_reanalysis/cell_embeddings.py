@@ -22,7 +22,11 @@ from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import 
     cell_name,
     embeddings_folder,
 )
-from src.v1_mnist.component.utils.cnn_retraining import load_model, resolve_device
+from src.v1_mnist.component.utils.cnn_retraining import (
+    load_model,
+    network_input,
+    resolve_device,
+)
 from src.v1_mnist.component.utils.frozen_split import SplitImages, load_train_val_images
 from src.v1_mnist.component.utils.run_provenance import write_json
 from src.v1_mnist.component.utils.som_io import sha256_file
@@ -32,7 +36,7 @@ log = logging.getLogger("v1_mnist.som_reanalysis")
 
 def _extract(model: torch.nn.Module, split: SplitImages, settings: ReanalysisSettings,
              device: torch.device) -> tuple[np.ndarray, np.ndarray]:
-    data = TensorDataset(torch.as_tensor(split.images).unsqueeze(1), torch.as_tensor(split.labels))
+    data = TensorDataset(network_input(split.images), torch.as_tensor(split.labels))
     loader = DataLoader(data, batch_size=settings.batch_size, shuffle=False)
     features, _labels, predictions = FeatureExtractor(model, settings.layer).extract(loader, device)
     return features.astype(np.float32), predictions
@@ -51,7 +55,7 @@ def extract_cell(settings: ReanalysisSettings, arm: str, seed: int, train: Split
 
     checkpoint = retr.checkpoint_path(arm, seed)
     state = torch.load(checkpoint, map_location="cpu")
-    model = load_model(state, retr.train.num_classes, device)
+    model = load_model(state, retr.train.num_classes, device, retr.train.in_channels, retr.train.image_size)
     train_x, _ = _extract(model, train, settings, device)
     val_x, val_pred = _extract(model, val, settings, device)
 
@@ -78,7 +82,7 @@ def extract_cell(settings: ReanalysisSettings, arm: str, seed: int, train: Split
 def run_embeddings(settings: ReanalysisSettings, repo_root: Path) -> None:
     """Extract the embeddings of every cell. The test split is not loaded."""
     retr = settings.retraining
-    train, val = load_train_val_images(retr.data_root, retr.embeddings_dir)
+    train, val = load_train_val_images(retr.data_root, retr.embeddings_dir, retr.dataset)
     device = resolve_device(settings.device)
     for arm in settings.arms:
         for seed in settings.seeds:

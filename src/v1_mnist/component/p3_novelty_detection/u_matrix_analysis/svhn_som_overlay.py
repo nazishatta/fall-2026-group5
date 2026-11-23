@@ -24,6 +24,7 @@ from src.v1_mnist.component.p3_novelty_detection.u_matrix_analysis.run_u_matrix_
     hexagon_vertices,
 )
 from src.v1_mnist.component.utils.figures import pdf_figure_path, save_pdf
+from src.v1_mnist.component.utils.in_distribution import InDistribution
 
 NO_CLASS = -1
 
@@ -106,12 +107,16 @@ def class_landing_profile(
     threshold: float,
     dominant_class: NDArray[np.integer],
     class_count: int,
+    dataset: InDistribution | None = None,
 ) -> list[dict[str, float | int | str | None]]:
-    """Group SVHN images by the MNIST class that dominates the neuron they land in.
+    """Group SVHN images by the training class that dominates the neuron they land in.
+
+    The class column is ``dominant_<dataset>_class`` (``dominant_mnist_class`` for MNIST).
 
     One row per class (plus a row for neurons no training sample reached, if any
     SVHN image lands there). The rows add up to all SVHN images and all misses.
     """
+    dataset = dataset or InDistribution()
     classes = np.asarray(dominant_class)
     index, values = check_assignments(bmu, qe, len(classes))
     cutoff = check_threshold(threshold)
@@ -127,7 +132,7 @@ def class_landing_profile(
         misses = int((here & missed).sum())
         rows.append(
             {
-                "dominant_mnist_class": "none" if label == NO_CLASS else int(label),
+                f"dominant_{dataset.name}_class": "none" if label == NO_CLASS else int(label),
                 "svhn_images": images,
                 "missed": misses,
                 "miss_rate": misses / images if images else None,
@@ -145,6 +150,7 @@ def miss_typicality(
     validation_qe: NDArray[np.floating],
     neuron_count: int,
     min_validation_hits: int,
+    dataset: InDistribution | None = None,
 ) -> dict[str, float | int | str | None]:
     """How ordinary the missed SVHN images look to the SOM.
 
@@ -154,6 +160,7 @@ def miss_typicality(
     QE cutoff cannot separate it. Neurons with fewer than ``min_validation_hits``
     validation digits are left out of the comparison.
     """
+    dataset = dataset or InDistribution()
     index, values = check_assignments(bmu, qe, neuron_count)
     ref_index, ref_values = check_assignments(validation_bmu, validation_qe, neuron_count)
     cutoff = check_threshold(threshold)
@@ -173,7 +180,7 @@ def miss_typicality(
         "compared_images": int(usable.sum()),
         "median_qe_ratio": float(np.median(ratio)) if ratio.size else None,
         "share_at_or_below_cell_median": float(np.mean(ratio <= 1.0)) if ratio.size else None,
-        "interpretation": (
+        "interpretation": dataset.wording(
             "Ratio = missed image QE / median MNIST-validation QE in the same neuron. "
             "Values near or below 1 mean the SOM represents the image about as well "
             "as a typical MNIST digit in that cell. This describes the score; it is "
@@ -187,10 +194,12 @@ def top_missed_neurons(
     dominant_class: NDArray[np.integer],
     purity: NDArray[np.floating],
     count: int,
+    dataset: InDistribution | None = None,
 ) -> list[dict[str, float | int | None]]:
     """The neurons that hold the most missed SVHN images (ties keep neuron order)."""
     if count < 1:
         raise ValueError("count must be positive")
+    dataset = dataset or InDistribution()
     missed = np.asarray(summary["missed"])
     rows: list[dict[str, float | int | None]] = []
     for neuron in np.argsort(-missed, kind="stable")[:count]:
@@ -204,7 +213,7 @@ def top_missed_neurons(
                 "missed": int(missed[neuron]),
                 "svhn_images": int(summary["hits"][neuron]),
                 "miss_rate": None if np.isnan(share) else share,
-                "dominant_mnist_class": (
+                f"dominant_{dataset.name}_class": (
                     None if dominant_class[neuron] == NO_CLASS else int(dominant_class[neuron])
                 ),
                 "class_purity": None if np.isnan(quality) else quality,
@@ -221,6 +230,7 @@ def save_svhn_overlay(
     threshold: float,
     radius: float,
     destination: Path,
+    dataset: InDistribution | None = None,
 ) -> Path:
     """Draw three hexagonal SOM maps and save them as one PDF (never overwrites).
 
@@ -232,6 +242,7 @@ def save_svhn_overlay(
     output = pdf_figure_path(destination)
     if output.exists():
         raise FileExistsError(f"Refusing to overwrite {output}")
+    dataset = dataset or InDistribution()
     neuron_count = len(dominant_class)
     if np.asarray(centers).shape != (neuron_count, 2):
         raise ValueError("Expected one (x, y) position per neuron")
@@ -246,7 +257,8 @@ def save_svhn_overlay(
     panels = (
         ("SVHN images per neuron", hits, "viridis", "SVHN images (BMU hits)", None),
         ("Share of SVHN images missed", summary["miss_rate"], "magma", "Missed share (QE at or below cutoff)", None),
-        ("Dominant MNIST class per neuron", classes, plt.get_cmap(class_map, class_count), "MNIST class", (-0.5, class_count - 0.5)),
+        (dataset.wording("Dominant MNIST class per neuron"), classes, plt.get_cmap(class_map, class_count),
+         dataset.wording("MNIST class"), (-0.5, class_count - 0.5)),
     )
     fig, axes = plt.subplots(1, 3, figsize=(18, 5.8))
     for ax, (title, values, cmap, label, limits) in zip(axes, panels, strict=True):

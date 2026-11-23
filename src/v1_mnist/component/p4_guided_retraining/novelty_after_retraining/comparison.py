@@ -13,15 +13,23 @@ from typing import Any
 
 import numpy as np
 
-from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.provenance import verify_run
+from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.provenance import (
+    verify_run,
+)
 from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.scoring import (
     DETECTORS,
     DIAGNOSTIC,
     competitive,
 )
-from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.settings import NoveltySettings
-from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.comparison import paired_summary
-from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import cell_name
+from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.settings import (
+    NoveltySettings,
+)
+from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.comparison import (
+    paired_summary,
+)
+from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import (
+    cell_name,
+)
 from src.v1_mnist.component.utils.run_provenance import ensure_not_done, write_json
 
 SHOWN, OPPOSITE, INCONCLUSIVE = "shown", "opposite shown", "inconclusive"
@@ -112,7 +120,7 @@ def run_compare(settings: NoveltySettings) -> dict[str, Any]:
     metrics = {c: json.loads((settings.folder("metrics") / f"{c}.json").read_text(encoding="utf-8")) for c in names}
     results = {"run_id": settings.run_id, "statements": statements(metrics, settings),
                "arms": arm_summary(metrics, settings), "reference": metrics[settings.reference]["scores"],
-               "mnist_test_read": False}
+               f"{settings.reanalysis.retraining.dataset.name}_test_read": False}
     write_json(results_path, results)
     _write_tables(settings, metrics)
     return results

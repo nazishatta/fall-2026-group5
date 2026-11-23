@@ -1,0 +1,17 @@
+{
+  "embedding_manifest": "fce7b78826b3d68d1c44d49412d40e11204a485bac8dcb063c57605771ce5af5",
+  "selected_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+  "som_training_metrics": "7ce662b7e1ec983635c82ac6a7ad46e8443ad0841ff9b6f5dcb877e33d42d198",
+  "train_confidence": "d1b4941c3fbe7f08be94fc2187080c6fec6bf2ae4627d78628756f7a45667bf9",
+  "train_correct": "6b8c8ca8a25af0493cf3a5a471311d13e144a6e211844e3e77b3e588f356e43a",
+  "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+  "train_labels": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+  "train_preds": "9d7e1da08f719127f6acde2210541db4d2d6dbb982633e74f5d1bb6f29067c1b",
+  "train_sample_ids": "a3bea004755d426a5b0f36009a66c706491a014d19c258c7761db2c9557c5b72",
+  "val_confidence": "da790c1a27cd0133193ebb967b1f82ea516b53d388a8030b910a5bf847179ea7",
+  "val_correct": "8eab235e19b1e03c21626c9b4f73e75962fbe22f0de0db57139ae2c7cf771828",
+  "val_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+  "val_labels": "ca683bf329bb6354160efb86806f2b86549f720039caa31c0ba6231877128d8a",
+  "val_preds": "81ec1b60cfc36f65b6100f4a8cdcc3904dd3c62b2e9f2af034ab2af8ed9b9d1d",
+  "val_sample_ids": "89b13768297dbaf718d760ec3ea3f4c1e4c105370badca5c4f572542cbba9b26"
+}

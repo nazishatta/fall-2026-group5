@@ -1,0 +1,5 @@
+outs:
+- md5: f4e838680942c93f823011fe441221a3
+  size: 84128
+  hash: md5
+  path: energy_fashion_mnist_val_scores.npy

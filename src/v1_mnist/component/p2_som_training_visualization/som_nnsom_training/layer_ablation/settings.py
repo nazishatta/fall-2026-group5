@@ -13,6 +13,7 @@ import yaml
 
 from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.settings import resolve_path
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.image_datasets import DatasetSpec, dataset_spec
 
 DEFAULT_CONFIG = "src/v1_mnist/component/configs/feature_layer_ablation.yaml"
 LAYER_DIMS = {"fc1": 120, "fc2": 84}   # LeNet-5 (lenet5.py)
@@ -62,6 +63,7 @@ class AblationSettings:
     image_size: tuple[int, int]
     fc2_tolerance: float
     confidence: float
+    dataset: DatasetSpec = DatasetSpec()   # dataset and network input size (Phase 1 config)
 
     def folder(self, kind: str) -> Path:
         return self.output_dir / kind
@@ -125,6 +127,7 @@ def load_ablation_settings(config_path: str | Path | None, repo_root: Path) -> A
         protocol_path=resolve_path(repo_root, raw["protocol"]["document"]),
         input_configs=paths,
         data_root=resolve_path(repo_root, cnn.paths.data_root),
+        dataset=dataset_spec(cnn),
         embeddings_dir=resolve_path(repo_root, som_raw["paths"]["embeddings_dir"]),
         checkpoint=resolve_path(repo_root, prov["inputs"]["checkpoint"]),
         checkpoint_sha256=str(prov["expected_sha256"]["checkpoint"]),

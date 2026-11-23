@@ -1,0 +1,5 @@
+outs:
+- md5: 843accf961205651c770f75f1b48463c
+  size: 208384
+  hash: md5
+  path: qe_svhn_test_scores.npy

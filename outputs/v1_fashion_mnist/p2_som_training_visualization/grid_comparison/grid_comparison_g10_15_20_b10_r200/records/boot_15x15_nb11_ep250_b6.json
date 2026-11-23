@@ -1,0 +1,22 @@
+{
+  "bootstrap": 6,
+  "epochs": 250,
+  "grid": 15,
+  "init_neighborhood": 11,
+  "map_id": "boot_15x15_nb11_ep250_b6",
+  "model_file": "models/boot_15x15_nb11_ep250_b6.npz",
+  "model_sha256": "3a1f0395e22a090546b5162d63cd72381f014202f37ab0968b9a2a3087cf960c",
+  "neighbour_disagreement": 24.958402662229616,
+  "occupancy": 0.9866666666666667,
+  "purity": 89.02857142857142,
+  "qe_nnsom": 0.8965460755841272,
+  "qe_per_image": 0.8622890446849567,
+  "resample_sha256": "2c1e7d8f72c73966",
+  "rng_mode": "fast",
+  "seed": 6,
+  "stage": "boot",
+  "te1": 6.9714285714285715,
+  "te12": 3.933333333333333,
+  "train_seconds": 20.2,
+  "utc": "2026-11-22T03:06:54Z"
+}

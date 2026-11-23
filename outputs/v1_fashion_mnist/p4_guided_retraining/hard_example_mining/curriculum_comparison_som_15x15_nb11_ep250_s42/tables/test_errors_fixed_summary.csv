@@ -1,0 +1,7 @@
+arm,subset,fixed_mean,new_mean,net_fixed_mean,net_fixed_std
+curriculum_som,overall,221.0,566.4,-345.4,22.43
+curriculum_som,hotspot,33.6,100.6,-67.0,15.3
+curriculum_random,overall,216.8,375.2,-158.4,42.93
+curriculum_random,hotspot,30.8,56.6,-25.8,8.53
+curriculum_msp,overall,211.4,588.2,-376.8,24.23
+curriculum_msp,hotspot,34.0,93.2,-59.2,7.46

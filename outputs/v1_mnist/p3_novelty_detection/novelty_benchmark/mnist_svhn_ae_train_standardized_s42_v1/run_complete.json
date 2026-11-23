@@ -1,0 +1,7 @@
+{
+  "config": "autoencoder_standardized_diagnostic.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/run_standardized_autoencoder.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "standardized_autoencoder"
+}

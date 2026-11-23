@@ -1,29 +1,29 @@
 # MNIST results (`outputs/v1_mnist/`)
 
-Results are grouped by **project phase** and, inside each phase, by **step**, in the order of the project proposal. The folder names match `src/v1_mnist/component/`, `tests/` and `docs/`, so each step's code, tests, documents and results share one name. The paper-writing weeks (12–14) produce documents, not results, so they have no folder here.
+Results are grouped by **project phase** and, inside each phase, by **step**, in the order of the project proposal. The folder names match `src/v1_mnist/component/`, `tests/` and `docs/`, so each step's code, tests, documents and results share one name. The paper-writing part of the proposal produces documents, not results, so it has no folder here.
 
 > **Naming:** the `p` in `p1_…`, `p2_…`, `p3_…`, `p4_…` means **phase**. Inside a step folder, each run has its own folder named by its **run ID** (for example `som_15x15_nb11_ep250_s42_v2`: 15x15 grid, neighbourhood 11, 250 epochs, seed 42, version 2). A run folder is never overwritten; a new run gets a new ID.
 
 ## Folders in proposal order
 
-| Phase | Proposal week | Folder | What is inside |
-|---|---|---|---|
-| **1: Model Training Baseline** | 1 | [`p1_model_training_baseline/data_pipeline/`](p1_model_training_baseline/data_pipeline/README.md) | Split sizes, class-distribution charts, sample images |
-| | 2 | [`p1_model_training_baseline/cnn_baseline_training/`](p1_model_training_baseline/cnn_baseline_training/README.md) | LeNet-5 checkpoint, 84-number embeddings of every split, training curves, test metrics, logs |
-| **2: SOM Training & Visualization** | 3 | [`p2_som_training_visualization/som_nnsom_training/`](p2_som_training_visualization/som_nnsom_training/README.md) | Trained SOMs, run logs, `run_manifest.csv`, QE histories and curves, SOM figures |
-| | 3 | [`p2_som_training_visualization/som_optuna_tuning/`](p2_som_training_visualization/som_optuna_tuning/README.md) | Optuna tuning of the three grid sizes and its 5-seed check |
-| | 3 | [`p2_som_training_visualization/feature_layer_ablation/`](p2_som_training_visualization/feature_layer_ablation/README.md) | SOMs on fc1 and fc2 of the Phase 1 network, 5 SOM seeds each |
-| | 4 | [`p2_som_training_visualization/cluster_analysis/`](p2_som_training_visualization/cluster_analysis/README.md) | Neuron assignments, purity and entropy tables, class maps |
-| | 5 | [`p2_som_training_visualization/error_pattern_analysis/`](p2_som_training_visualization/error_pattern_analysis/README.md) | Error geography, hotspots, robustness on three grids, comparison with simpler error detectors |
-| | 3–5 | `p2_som_training_visualization/interactive_report/` (+ `.dvc`) | `interactive_report.html` (DVC) |
-| **3: Novelty Detection** | 6 | [`p3_novelty_detection/qe_novelty_detection/`](p3_novelty_detection/qe_novelty_detection/README.md) | QE scores with the frozen training cut-off, QE against SVHN, cut-off sweep, random control |
-| | 7 | [`p3_novelty_detection/u_matrix_analysis/`](p3_novelty_detection/u_matrix_analysis/README.md) | U-Matrix statistics and figures, SVHN on the SOM grid |
-| | 8 | [`p3_novelty_detection/novelty_benchmark/`](p3_novelty_detection/novelty_benchmark/README.md) | QE and U-Matrix against Isolation Forest, One-Class SVM, autoencoder, max-softmax, energy, Mahalanobis and kNN; paired comparisons; diagnostics |
-| | – | [`p3_novelty_detection/held_out_class_novelty/`](p3_novelty_detection/held_out_class_novelty/README.md) | Train on 6 digits, detect the other 4 (5 class splits) |
-| **4: Guided Retraining** | 9 | [`p4_guided_retraining/hard_example_mining/`](p4_guided_retraining/hard_example_mining/README.md) | Hard-image pools, curriculum comparison |
-| | 10 | [`p4_guided_retraining/targeted_augmentation/`](p4_guided_retraining/targeted_augmentation/README.md) | Retraining with altered copies of the hard images |
-| | 11 | [`p4_guided_retraining/som_reanalysis/`](p4_guided_retraining/som_reanalysis/README.md) | New SOMs on the retrained CNNs |
-| | – | [`p4_guided_retraining/novelty_after_retraining/`](p4_guided_retraining/novelty_after_retraining/README.md) | SVHN novelty on the retrained networks |
+| Phase | Folder | What is inside |
+|---|---|---|
+| **1: Model Training Baseline** | [`p1_model_training_baseline/data_pipeline/`](p1_model_training_baseline/data_pipeline/README.md) | Split sizes, class-distribution charts, sample images |
+| | [`p1_model_training_baseline/cnn_baseline_training/`](p1_model_training_baseline/cnn_baseline_training/README.md) | LeNet-5 checkpoint, 84-number embeddings of every split, training curves, test metrics, logs |
+| **2: SOM Training & Visualization** | [`p2_som_training_visualization/som_nnsom_training/`](p2_som_training_visualization/som_nnsom_training/README.md) | Trained SOMs, run logs, `run_manifest.csv`, QE histories and curves, SOM figures |
+| | [`p2_som_training_visualization/som_optuna_tuning/`](p2_som_training_visualization/som_optuna_tuning/README.md) | Optuna tuning of the three grid sizes and its 5-seed check |
+| | [`p2_som_training_visualization/feature_layer_ablation/`](p2_som_training_visualization/feature_layer_ablation/README.md) | SOMs on fc1 and fc2 of the Phase 1 network, 5 SOM seeds each |
+| | [`p2_som_training_visualization/cluster_analysis/`](p2_som_training_visualization/cluster_analysis/README.md) | Neuron assignments, purity and entropy tables, class maps |
+| | [`p2_som_training_visualization/error_pattern_analysis/`](p2_som_training_visualization/error_pattern_analysis/README.md) | Error geography, hotspots, robustness on three grids, comparison with simpler error detectors |
+| | `p2_som_training_visualization/interactive_report/` (+ `.dvc`) | `interactive_report.html` (DVC) |
+| **3: Novelty Detection** | [`p3_novelty_detection/qe_novelty_detection/`](p3_novelty_detection/qe_novelty_detection/README.md) | QE scores with the frozen training cut-off, QE against SVHN, cut-off sweep, random control |
+| | [`p3_novelty_detection/u_matrix_analysis/`](p3_novelty_detection/u_matrix_analysis/README.md) | U-Matrix statistics and figures, SVHN on the SOM grid |
+| | [`p3_novelty_detection/novelty_benchmark/`](p3_novelty_detection/novelty_benchmark/README.md) | QE and U-Matrix against Isolation Forest, One-Class SVM, autoencoder, max-softmax, energy, Mahalanobis and kNN; paired comparisons; diagnostics |
+| | [`p3_novelty_detection/held_out_class_novelty/`](p3_novelty_detection/held_out_class_novelty/README.md) | Train on 6 digits, detect the other 4 (5 class splits) |
+| **4: Guided Retraining** | [`p4_guided_retraining/hard_example_mining/`](p4_guided_retraining/hard_example_mining/README.md) | Hard-image pools, curriculum comparison |
+| | [`p4_guided_retraining/targeted_augmentation/`](p4_guided_retraining/targeted_augmentation/README.md) | Retraining with altered copies of the hard images |
+| | [`p4_guided_retraining/som_reanalysis/`](p4_guided_retraining/som_reanalysis/README.md) | New SOMs on the retrained CNNs |
+| | [`p4_guided_retraining/novelty_after_retraining/`](p4_guided_retraining/novelty_after_retraining/README.md) | SVHN novelty on the retrained networks |
 
 Every Phase 3 run folder, the script and config that wrote it, and how that was checked, are listed in `p3_novelty_detection/run_manifest.csv`.
 

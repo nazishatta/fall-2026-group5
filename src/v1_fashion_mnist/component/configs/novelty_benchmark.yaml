@@ -1,0 +1,46 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/novelty_benchmark.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Five-method comparison (QE, U-Matrix, Isolation Forest, One-Class SVM, autoencoder) on SVHN test;
+# writes the score arrays later steps read. Baselines are fitted on Fashion-MNIST training embeddings only.
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+dataset: fashion_mnist
+seed: 42
+embeddings:
+  train: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/train_features.npy
+  validation: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_features.npy
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/novelty_benchmark
+# The QE-on-SVHN run whose AUROC and AUPR this run must reproduce.
+qe_reference_metrics: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection/fashion_mnist_svhn_qe_s42_v1/qe_ood_metrics.json
+isolation_forest:
+  n_estimators: 200
+  max_samples: 256
+  contamination: 0.05
+one_class_svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: scale
+  max_training_samples: 10000
+autoencoder:
+  input_dim: 84
+  hidden_dim: 32
+  latent_dim: 16
+  epochs: 20
+  batch_size: 256
+  learning_rate: 0.001
+run_id: fashion_mnist_svhn_five_method_comparison_s42_v1
+svhn_file: data/ood_svhn/test_32x32.mat
+qe_evaluation_config: src/v1_fashion_mnist/component/configs/qe_ood_evaluation.yaml
+expected_sha256:
+  train: e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527
+  validation: ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d
+expected:
+  svhn_count: 26032
+  fashion_mnist_train_count: 49000
+  fashion_mnist_validation_count: 10500
+  som_neurons: 225
+  feature_dim: 84
+  qe_threshold: 1.4214525859373504
+tolerances:
+  qe_reconstruction: 0.0001
+  metric_agreement: 0.0000000001

@@ -117,7 +117,7 @@ def reference_file(root: Path, rows: list[dict[str, Any]]) -> None:
 def patch_heavy(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
     train, validation, svhn = make_data()
     monkeypatch.setattr(runner, "ROOT", root)
-    monkeypatch.setattr(runner, "load_embeddings", lambda config: {
+    monkeypatch.setattr(runner, "load_embeddings", lambda config, config_path=None: {
         "train": train, "validation": validation, "svhn": svhn, "hashes": {"train": "abc"}, "provenance": {"qe_threshold": 1.0},
     })
     monkeypatch.setattr(runner, "get_autoencoder_fitter", lambda: fake_fitter)

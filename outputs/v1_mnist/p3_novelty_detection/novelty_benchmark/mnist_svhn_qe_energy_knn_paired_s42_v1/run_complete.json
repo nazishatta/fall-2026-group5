@@ -1,0 +1,7 @@
+{
+  "config": "qe_energy_knn_paired.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/novelty_benchmark/run_qe_energy_knn_paired.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "qe_energy_knn_paired"
+}

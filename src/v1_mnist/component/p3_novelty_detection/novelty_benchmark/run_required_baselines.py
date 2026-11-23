@@ -28,6 +28,7 @@ from src.v1_mnist.component.p3_novelty_detection.novelty_benchmark.required_base
     max_softmax_novelty,
 )
 from src.v1_mnist.component.utils.config import load_config
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import get_logger
 from src.v1_mnist.component.utils.shared_provenance import (
     verify_shared_inputs,
@@ -69,12 +70,15 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
     )
 
     config = load_config(config_path)
+    dataset = in_distribution(config_path)
+    channels = int(getattr(getattr(config, "dataset", None), "channels", 1))
     verify_shared_inputs(
         vars(config.inputs),
         required_keys=(
             "checkpoint", "train_features",
             "validation_features", "svhn_file",
         ),
+        config_path=config_path,
     )
     run_id = str(config.run_id)
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
@@ -125,7 +129,8 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         raise RuntimeError("Training labels are not aligned")
 
     torch.set_num_threads(int(config.inference.thread_count))
-    model = LeNet5(num_classes=int(expected.classes))
+    image_size = tuple(int(x) for x in config.inference.image_size)
+    model = LeNet5(num_classes=int(expected.classes), in_channels=channels, image_size=image_size[0])
     state = torch.load(
         inputs["checkpoint"], map_location="cpu", weights_only=True
     )
@@ -137,10 +142,10 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         val_logits, val_preds, val_confidence,
         float(config.inference.confidence_tolerance),
     )
-    LOGGER.info("Frozen MNIST validation predictions verified")
+    LOGGER.info(dataset.wording("Frozen MNIST validation predictions verified"))
 
-    image_size = tuple(int(x) for x in config.inference.image_size)
-    loader = svhn_test_loader(inputs['svhn_file'], image_size, int(config.inference.batch_size))
+    loader = svhn_test_loader(inputs['svhn_file'], image_size, int(config.inference.batch_size),
+                              channels=channels)
     extracted = FeatureExtractor(
         model, str(config.inference.feature_layer)
     ).extract(loader, torch.device("cpu"), return_metadata=True)
@@ -209,7 +214,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         destination.mkdir(parents=True, exist_ok=False)
         for name in ("energy", "knn"):
             for split, values in zip(
-                ("mnist_val", "svhn_test"), scores[name], strict=True
+                (dataset.val_tag, "svhn_test"), scores[name], strict=True
             ):
                 output_path = destination / f"{name}_{split}_scores.npy"
                 with output_path.open("xb") as stream:
@@ -226,7 +231,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
             "energy_temperature": temperature,
             "input_sha256": hashes,
             "config_sha256": sha256_file(config_path),
-            "leakage_control": (
+            "leakage_control": dataset.wording(
                 "Frozen CNN, original MNIST train/validation and SVHN test. "
                 "No model retraining, threshold selection, or MNIST final test."
             ),
@@ -289,7 +294,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
 
     result: dict[str, Any] = {
         "run_id": run_id,
-        "id_dataset": "mnist",
+        "id_dataset": dataset.name,
         "id_split": "validation",
         "ood_dataset": "svhn",
         "ood_split": "test",
@@ -300,7 +305,7 @@ def run(config_path: Path, *, save: bool = False) -> dict[str, Any]:
         "energy_temperature": temperature,
         "input_sha256": hashes,
         "config_sha256": sha256_file(config_path),
-        "leakage_control": (
+        "leakage_control": dataset.wording(
             "Frozen CNN. Mahalanobis fitted on MNIST training embeddings "
             "only. MNIST validation and SVHN used for evaluation, not tuning. "
             "No MNIST final-test samples accessed."

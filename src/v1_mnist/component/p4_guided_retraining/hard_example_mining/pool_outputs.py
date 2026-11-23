@@ -68,9 +68,10 @@ def pool_summary_rows(data: TrainInputs, flags: DifficultyFlags, msp: np.ndarray
 
 
 def write_pool_tables(
-    output_dir: Path, data: TrainInputs, flags: DifficultyFlags, msp: np.ndarray, num_classes: int
+    output_dir: Path, data: TrainInputs, flags: DifficultyFlags, msp: np.ndarray, num_classes: int,
+    class_label: str = "digit",
 ) -> None:
-    """pool_summary.csv and pool_by_class.csv (small, kept in git)."""
+    """pool_summary.csv and pool_by_class.csv (small, kept in git); the class column is ``class_label``."""
     tables = output_dir / "tables"
     _write_csv(
         tables / "pool_summary.csv",
@@ -84,4 +85,4 @@ def write_pool_tables(
         "msp_pool": class_counts(data.label, msp, num_classes),
     }
     rows = [[digit] + [int(col[digit]) for col in columns.values()] for digit in range(num_classes)]
-    _write_csv(tables / "pool_by_class.csv", ["digit", *columns.keys()], rows)
+    _write_csv(tables / "pool_by_class.csv", [class_label, *columns.keys()], rows)

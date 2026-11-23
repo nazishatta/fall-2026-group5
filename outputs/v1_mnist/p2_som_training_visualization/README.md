@@ -7,6 +7,7 @@ The trained SOMs and what the map shows about the CNN's classes and mistakes. Th
 ```
 p2_som_training_visualization/
 ├── som_nnsom_training/        SOM models, logs, run_manifest.csv, QE curves, SOM figures
+├── grid_comparison/           pre-registered comparison of the three grids: the original run and its reproduction
 ├── som_optuna_tuning/         Optuna tuning of the three grid sizes and the 5-seed check
 ├── feature_layer_ablation/    SOMs on fc1 and fc2, 5 SOM seeds each (DVC for the embeddings)
 ├── cluster_analysis/          neuron assignments, purity tables, class maps

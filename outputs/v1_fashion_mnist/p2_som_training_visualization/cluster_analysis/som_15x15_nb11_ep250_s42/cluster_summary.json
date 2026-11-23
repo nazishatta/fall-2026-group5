@@ -1,0 +1,81 @@
+{
+  "analysis": "cluster_analysis",
+  "som": "som_15x15_nb11_ep250_s42",
+  "model_sha256": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+  "som_grid": [
+    15,
+    15
+  ],
+  "config": "som.yaml",
+  "development_only": true,
+  "test_used": false,
+  "nnsom_version": "1.8.3",
+  "library_versions": {
+    "NNSOM": "1.8.3",
+    "numpy": "2.4.4",
+    "scikit-learn": "1.9.0"
+  },
+  "git_commit": "31a023471bbaa6e4e6cdb94e2af0fe01219a2aa0",
+  "class_counts_from": "NNSOM.utils.cal_class_cluster_intersect",
+  "model_check": {
+    "embeddings_match_config": "PASS",
+    "quantization_error_matches_training_run": "PASS (relative tolerance 1e-06; values per split)",
+    "occupied_neurons_match_training_run": "PASS"
+  },
+  "splits": {
+    "train": {
+      "samples": 49000,
+      "occupied_neurons": 225,
+      "total_neurons": 225,
+      "occupancy_rate": 1.0,
+      "sample_weighted_purity": 0.9003469387755102,
+      "sample_weighted_mean_normalized_entropy": 0.11928521858643697,
+      "model_check": {
+        "quantization_error": {
+          "training_run": 0.9154924196215759,
+          "recomputed": 0.9154924196215759,
+          "relative_difference": 0.0,
+          "relative_tolerance": 1e-06
+        },
+        "occupied_neurons": {
+          "training_run": 225,
+          "recomputed": 225
+        }
+      }
+    },
+    "val": {
+      "samples": 10500,
+      "occupied_neurons": 222,
+      "total_neurons": 225,
+      "occupancy_rate": 0.9866666666666667,
+      "sample_weighted_purity": 0.8933333333333333,
+      "sample_weighted_mean_normalized_entropy": 0.12636376948232309,
+      "model_check": {
+        "quantization_error": {
+          "training_run": 0.8985395856170484,
+          "recomputed": 0.8985395856170484,
+          "relative_difference": 0.0,
+          "relative_tolerance": 1e-06
+        },
+        "occupied_neurons": {
+          "training_run": 222,
+          "recomputed": 222
+        }
+      },
+      "purity_label_shuffle": {
+        "method": "class labels shuffled across images; each image keeps its BMU",
+        "shuffles": 1000,
+        "seed": 20261010,
+        "observed_purity": 0.8933333333333333,
+        "null_mean": 0.17317047619047624,
+        "null_sd": 0.0019000272439004251,
+        "null_95_range": [
+          0.16952380952380952,
+          0.1768595238095238
+        ],
+        "null_max": 0.18019047619047618,
+        "p_value": 0.000999000999000999
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "config": "qe_random_control.yaml",
+  "role": "result",
+  "script": "p3_novelty_detection/qe_novelty_detection/run_qe_random_control.py",
+  "source": "backfilled from run_manifest.csv (the run finished before completion records existed)",
+  "step": "qe_random_control"
+}

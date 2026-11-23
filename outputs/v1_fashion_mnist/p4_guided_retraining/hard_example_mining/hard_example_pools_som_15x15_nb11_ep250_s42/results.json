@@ -1,0 +1,40 @@
+{
+  "hotspot_neurons": [
+    71,
+    79,
+    82,
+    95,
+    96,
+    110,
+    113,
+    126,
+    131,
+    145,
+    208
+  ],
+  "pool_sizes": {
+    "in_hotspot": 1909,
+    "low_purity": 18537,
+    "msp_pool": 19997,
+    "qe_flag": 2450,
+    "som_pool": 19997
+  },
+  "purity_cutoff": 0.95,
+  "qe_percentile": 95.0,
+  "qe_threshold": 1.4214525859373504,
+  "run_id": "hard_example_pools_som_15x15_nb11_ep250_s42",
+  "selected_som": "som_15x15_nb11_ep250_s42",
+  "sha256": {
+    "som_model": "6039cd5a95ba0ac6b8cf3f7f1664d58a0873a617c522817b6d7f3bb3deae1281",
+    "train_bmu_assignments": "eec29f1dec3b2e36fd281afbc0b144499e0d3e0eef99cfdcd0880b00d0449d0d",
+    "train_cluster_metrics": "3558acd718930e5d87930f7c4fa45054df04ec745fd17f1eb2e5513e868dec08",
+    "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "train_labels": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+    "train_sample_ids": "a3bea004755d426a5b0f36009a66c706491a014d19c258c7761db2c9557c5b72",
+    "val_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+    "val_hotspots": "c9a231a0acfe1c709409c07bccea485d981d2c2bf93f283f00f3331dea7735e6"
+  },
+  "split": "train",
+  "training_errors": 3311,
+  "training_images": 49000
+}

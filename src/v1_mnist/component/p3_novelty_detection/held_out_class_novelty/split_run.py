@@ -16,7 +16,9 @@ import torch
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, TensorDataset
 
-from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import FeatureExtractor
+from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
+    FeatureExtractor,
+)
 from src.v1_mnist.component.p2_som_training_visualization.som_nnsom_training.trainer_history import (
     train_som_with_history,
 )
@@ -25,16 +27,28 @@ from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.class_sp
     cells_covering,
     make_split,
 )
-from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.provenance import start_run, verify_run
-from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.settings import HeldOutSettings
+from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.provenance import (
+    start_run,
+    verify_run,
+)
+from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.settings import (
+    HeldOutSettings,
+)
 from src.v1_mnist.component.p3_novelty_detection.held_out_class_novelty.split_metrics import (
     SCORES,
     all_scores,
     per_digit_qe_auroc,
     split_metrics,
 )
-from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.scoring import relu_logits
-from src.v1_mnist.component.utils.cnn_retraining import load_model, resolve_device, train_cnn
+from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.scoring import (
+    relu_logits,
+)
+from src.v1_mnist.component.utils.cnn_retraining import (
+    load_model,
+    network_input,
+    resolve_device,
+    train_cnn,
+)
 from src.v1_mnist.component.utils.frozen_split import SplitImages, load_train_val_images
 from src.v1_mnist.component.utils.run_provenance import write_json
 from src.v1_mnist.component.utils.som_io import reconstruct_assignments, sha256_file
@@ -45,7 +59,7 @@ PARTS = ("train", "normal", "novel")
 
 def _embed(model: torch.nn.Module, images: np.ndarray, layer: str, batch_size: int,
            device: torch.device) -> tuple[np.ndarray, np.ndarray]:
-    data = TensorDataset(torch.as_tensor(images).unsqueeze(1), torch.zeros(len(images), dtype=torch.long))
+    data = TensorDataset(network_input(images), torch.zeros(len(images), dtype=torch.long))
     loader = DataLoader(data, batch_size=batch_size, shuffle=False)
     features, _labels, predictions = FeatureExtractor(model, layer).extract(loader, device)
     return features.astype(np.float32), np.asarray(predictions, dtype=np.int64)
@@ -61,7 +75,8 @@ def _train_network(settings: HeldOutSettings, cs: ClassSplit, device: torch.devi
     rows = np.arange(len(cs.train_y))
     result = train_cnn(cs.train_x, cs.train_y, cs.normal_x, cs.normal_y, None, lambda _epoch: rows,
                        settings.train, settings.training_seed, device)
-    model = load_model(result.best_state, settings.train.num_classes, device)
+    model = load_model(result.best_state, settings.train.num_classes, device,
+                       settings.train.in_channels, settings.train.image_size)
     return model, {"best_epoch": result.best_epoch, "best_val_accuracy_known": result.best_val_accuracy,
                    "history": result.history, "state": result.best_state}
 
@@ -139,7 +154,7 @@ def run_split(settings: HeldOutSettings, split: int, train: SplitImages, val: Sp
 def run_splits(settings: HeldOutSettings, only: list[int] | None = None) -> None:
     """Run every split (or only the named ones). The MNIST test split is not loaded."""
     start_run(settings)
-    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir)
+    train, val = load_train_val_images(settings.data_root, settings.embeddings_dir, settings.dataset)
     device = resolve_device(settings.device)
     for split in settings.split_ids:
         if only and split not in only:

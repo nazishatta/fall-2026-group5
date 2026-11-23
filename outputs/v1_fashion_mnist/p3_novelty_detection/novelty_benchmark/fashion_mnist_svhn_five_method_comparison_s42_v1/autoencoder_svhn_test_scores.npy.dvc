@@ -1,0 +1,5 @@
+outs:
+- md5: 075ef2e8ee7323fca46a20bb21efb697
+  size: 208384
+  hash: md5
+  path: autoencoder_svhn_test_scores.npy

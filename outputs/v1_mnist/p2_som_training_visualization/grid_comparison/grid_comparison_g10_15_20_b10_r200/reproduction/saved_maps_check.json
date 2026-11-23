@@ -1,0 +1,29 @@
+{
+  "exploratory_on_saved_maps": [
+    {
+      "ci_high": 0.04963405676106565,
+      "ci_low": -0.18796393924762778,
+      "contrast": "20x20 minus 10x10",
+      "mean_delta": -0.0638224434719299,
+      "metric": "auroc_err",
+      "share_reps_big_better": 0.145,
+      "verdict": "inconclusive"
+    },
+    {
+      "ci_high": -0.009929001278961942,
+      "ci_low": -0.10174782254213724,
+      "contrast": "20x20 minus 10x10",
+      "mean_delta": -0.05795377203066799,
+      "metric": "auroc_lowconf",
+      "share_reps_big_better": 0.015,
+      "verdict": "10x10 better"
+    }
+  ],
+  "largest_difference": 6.071532165918825e-18,
+  "low_confidence_threshold": 0.9957375526428223,
+  "maps_dir": "./outputs/v1_mnist/p2_som_training_visualization/grid_comparison/grid_comparison_initial/models",
+  "numbers_compared": 102,
+  "passed": true,
+  "tolerance": 1e-12,
+  "verdicts_same": true
+}

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.mnist_dataset import get_dataloaders
+from src.v1_mnist.component.p1_model_training_baseline.data_pipeline.image_dataset import get_dataloaders
 
 
 def make_config() -> SimpleNamespace:

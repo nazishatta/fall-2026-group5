@@ -28,6 +28,9 @@ from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.curriculum_
 from src.v1_mnist.component.p4_guided_retraining.hard_example_mining.pool_selection import (
     resolve_pool,
 )
+from src.v1_mnist.component.p4_guided_retraining.targeted_augmentation.transform_rule import (
+    accepted_transforms,
+)
 from src.v1_mnist.component.utils.image_transforms import TransformRanges, make_copies
 from src.v1_mnist.component.utils.retraining_data import RetrainingData
 from src.v1_mnist.component.utils.retraining_plans import (
@@ -53,7 +56,7 @@ def ranges_from_options(options: dict[str, Any]) -> TransformRanges:
 def make_augmentation_builder(settings: ExperimentSettings) -> BuildArm:
     """The ``build(arm, data, seed)`` function for this experiment's arms."""
     copies = int(settings.options["copies_per_image"])
-    ranges = ranges_from_options(settings.options)
+    ranges = ranges_from_options({"transforms": accepted_transforms(settings)})
     schedules = schedules_from_options(settings.options)
 
     def build(arm: ArmSpec, data: RetrainingData, seed: int) -> ArmPlan:
@@ -94,7 +97,7 @@ def make_augmentation_builder(settings: ExperimentSettings) -> BuildArm:
                 "schedule": arm.schedule or "none (all copies from epoch 1)",
                 "added_images": len(extra_y),
                 "training_images_by_epoch": [len(epoch_indices(e)) for e in range(epochs)],
-                "added_per_digit": np.bincount(extra_y, minlength=settings.train.num_classes).tolist(),
+                f"added_per_{settings.dataset.class_label}": np.bincount(extra_y, minlength=settings.train.num_classes).tolist(),
                 "added_images_sha256": hashlib.sha256(extra_x.tobytes()).hexdigest(),
             },
         )

@@ -1,0 +1,5 @@
+outs:
+- md5: 40a78b1a248e36bb428761c3ddcca8c6
+  size: 1411328
+  hash: md5
+  path: novel_features.npy

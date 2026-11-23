@@ -1,0 +1,5 @@
+outs:
+- md5: 635420d26202505188689f50863046ab
+  size: 84128
+  hash: md5
+  path: u_matrix_fashion_mnist_val_scores.npy

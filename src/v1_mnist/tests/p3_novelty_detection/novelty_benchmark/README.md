@@ -15,6 +15,7 @@ Tests for the code in `component/p3_novelty_detection/novelty_benchmark/`. Run t
 | `test_historical_baseline_verification.py` | Regression checks for historical summary comparisons and safe run creation. |
 | `test_historical_svhn_inspection.py` | Tests for the configured historical SVHN inspection runner. |
 | `test_knn_baseline.py` | Tests for the kNN novelty baseline. |
+| `test_novelty_statements.py` | The verdict rules of statements O1 to O4 and the judged result, on small made-up scores. |
 | `test_ood_comparison.py` | Small deterministic tests that never touch official MNIST test or OOD data. |
 | `test_paired_bootstrap.py` | Tests for paired QE-versus-MSP bootstrap comparisons. |
 | `test_provenance_validation.py` | Safety tests for frozen Phase 3 provenance. |

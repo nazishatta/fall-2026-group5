@@ -1,0 +1,130 @@
+{
+  "run_id": "fashion_mnist_svhn_qe_msp_paired_s42_v1",
+  "id_dataset": "fashion_mnist",
+  "id_split": "validation",
+  "ood_dataset": "svhn",
+  "ood_split": "test",
+  "training_samples": 49000,
+  "id_samples": 10500,
+  "ood_samples": 26032,
+  "methods": {
+    "max_softmax": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.8837241526911932,
+      "aupr": 0.9355365706353104,
+      "fpr_at_95_tpr": 0.30733333333333335,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8796404114350104,
+          0.8878904261604764
+        ],
+        "aupr": [
+          0.9328819687472325,
+          0.9381782022442197
+        ],
+        "fpr_at_95_tpr": [
+          0.2978071428571428,
+          0.3165738095238095
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "energy": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.9821428168993472,
+      "aupr": 0.9879640425517824,
+      "fpr_at_95_tpr": 0.06342857142857143,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.9805822739229374,
+          0.9837284110033072
+        ],
+        "aupr": [
+          0.9861335708014801,
+          0.9897607027352442
+        ],
+        "fpr_at_95_tpr": [
+          0.05857142857142857,
+          0.06885714285714285
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "mahalanobis": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.7129084167471537,
+      "aupr": 0.7678876416020748,
+      "fpr_at_95_tpr": 0.4542857142857143,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.7056074119398834,
+          0.720169827611438
+        ],
+        "aupr": [
+          0.7627963163856187,
+          0.7730190293121023
+        ],
+        "fpr_at_95_tpr": [
+          0.44361904761904764,
+          0.4637142857142857
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    },
+    "knn": {
+      "n_id": 10500,
+      "n_ood": 26032,
+      "seed": 42,
+      "bootstrap_repeats": 2000,
+      "target_tpr": 0.95,
+      "auroc": 0.8636147891240086,
+      "aupr": 0.8984210048232433,
+      "fpr_at_95_tpr": 0.3141904761904762,
+      "confidence_intervals_95": {
+        "auroc": [
+          0.8587287003907278,
+          0.8686747009175521
+        ],
+        "aupr": [
+          0.894024668347797,
+          0.9030350084807166
+        ],
+        "fpr_at_95_tpr": [
+          0.3042833333333333,
+          0.3238095238095238
+        ]
+      },
+      "metric_definition": "Positive class is OOD; higher scores indicate more novelty"
+    }
+  },
+  "energy_temperature": 1.0,
+  "input_sha256": {
+    "checkpoint": "3da3327bbaac791be5ef68107227f00334c801f983e97c8a2b3d08d5773e8860",
+    "train_features": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "train_labels": "a4bcdd682c2ef2d05480899400ed42ddd8ba69fc19aec9cae30b654e58d8b4f6",
+    "validation_features": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+    "validation_predictions": "81ec1b60cfc36f65b6100f4a8cdcc3904dd3c62b2e9f2af034ab2af8ed9b9d1d",
+    "validation_confidence": "da790c1a27cd0133193ebb967b1f82ea516b53d388a8030b910a5bf847179ea7",
+    "svhn_file": "cdce80dfb2a2c4c6160906d0bd7c68ec5a99d7ca4831afa54f09182025b6a75b"
+  },
+  "config_sha256": "5a2a51d3a82725c6b19727df8af78dd2baaac901c54f3a8e87249991f55b0b6a",
+  "leakage_control": "Frozen CNN. Mahalanobis fitted on Fashion-MNIST training embeddings only. Fashion-MNIST validation and SVHN used for evaluation, not tuning. No Fashion-MNIST final-test samples accessed.",
+  "limitations": [
+    "Single CNN checkpoint and single evaluation dataset.",
+    "Energy temperature fixed at 1.0 for this new comparison.",
+    "Mahalanobis uses shared LedoitWolf covariance shrinkage.",
+    "These method settings are not claimed to be historical preregistration."
+  ]
+}

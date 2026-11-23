@@ -2,13 +2,13 @@
 
 Helpers used by more than one step of the project. Nothing here runs on its own: every file is imported by the step scripts in `p1_model_training_baseline/`, `p2_som_training_visualization/` and `pipeline/`, or by another file in this folder.
 
-The trees below follow the code's own layout: each **phase folder**, then its **step folders** (one per proposal week), then each script, and under the script the **utils files it calls** with the functions it imports. Paths are relative to `src/v1_mnist/component/`.
+The trees below follow the code's own layout: each **phase folder**, then its **step folders** (one per proposal step), then each script, and under the script the **utils files it calls** with the functions it imports. Paths are relative to `src/v1_mnist/component/`.
 
 ## The files
 
 | File                  | What it does                                                                                                                                                                             |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config.py`           | Loads a YAML config with `base.yaml` merged in (`load_config`); sets seeds (`set_seed`, `require_seed`); picks the device (`get_device`). Refuses the old run names `week_2` / `week_3`. |
+| `config.py`           | Loads a YAML config with `base.yaml` merged in (`load_config`); sets seeds (`set_seed`, `require_seed`); picks the device (`get_device`). Refuses old run names that carry a week number. |
 | `dataset_info.py`     | What the SOM code needs to know about the dataset and the CNN (classes, feature size, display names), read from the config.                                                              |
 | `file_hash.py`        | SHA-256 fingerprint of a file (`sha256_file`), used for every provenance check; `som_io.py` re-exports it.                                                                                 |
 | `figures.py`          | Saves every results figure the same way: one PDF with embedded fonts (`save_pdf`).                                                                                                       |
@@ -97,10 +97,12 @@ One line per file, taken from the file's own description. The trees above show w
 | `dataset_info.py` | What the SOM code needs to know about the dataset and the CNN, read from the config. |
 | `figures.py` | Save every results figure the same way: one PDF, fonts embedded as TrueType. |
 | `file_hash.py` | SHA-256 fingerprints of files, used for provenance checks. |
-| `frozen_split.py` | Rebuild the project's frozen data split from the saved sample IDs. |
+| `frozen_split.py` | Rebuild the project's frozen data split from the saved sample IDs, for the dataset named in the config (MNIST by default). |
+| `image_datasets.py` | The datasets the pipeline can load (MNIST, Fashion-MNIST, KMNIST, CIFAR-10), and the conversion of stored images to the channels and size the network expects (`dataset.channels`, `dataset.image_size`). To add a dataset, add one entry to `SOURCES`. |
 | `heatmaps.py` | Draws neuron-by-neuron heatmaps on the SOM grid. |
 | `hotspots.py` | The project's error-hotspot rule (Error Pattern Analysis). |
 | `image_transforms.py` | Label-preserving image changes for targeted augmentation (small affine moves only). |
+| `in_distribution.py` | The in-distribution dataset of a Phase 3 or 4 config (from the `base.yaml` in the config's folder), and the file names, result keys and wording built from it. MNIST keeps exactly its historical names (`mnist_val`, `mnist_validation`, ...). |
 | `logging.py` | Sets up logging to the console and to a log file. |
 | `paired_stats.py` | Uncertainty for the arm-against-arm comparison. |
 | `protocol_stamp.py` | Freeze the retraining protocol, and refuse the test split until it is frozen. |
@@ -120,13 +122,13 @@ One line per file, taken from the file's own description. The trees above show w
 | `run_provenance.py` | Run-ID preflight and SHA-256 provenance helpers shared by the Phase 4 steps. |
 | `run_settings.py` | Which SOM the cluster and error pattern analysis uses, and checks that it is the right one. |
 | `scores.py` | Per-sample scores computed from the CNN's output that several analyses share. |
-| `shared_provenance.py` | Validate Phase 3 frozen input provenance against the shared manifest. |
+| `shared_provenance.py` | Validate Phase 3 frozen input provenance against the manifest of the config's dataset (`phase3_shared_provenance.yaml` in its config folder; MNIST's when none is named). |
 | `som_cells.py` | Assign embeddings to the neurons (cells) of the selected SOM. |
 | `som_data.py` | Data loading and validation utilities for the SOM experiments. |
 | `som_figure_setup.py` | Shared setup for the SOM figure scripts of SOM training, cluster analysis and error pattern analysis. |
 | `som_io.py` | Loads the embedding splits and the chosen SOM, rebuilds the neuron of every image and writes the assignment tables. |
 | `som_neuron_maps.py` | Per-neuron class and error statistics, and the simple grid map used by the cluster analysis and error pattern analysis figure scripts (cluster_figures.py, error_figures.py). |
-| `som_plotting.py` | Shared SOM plotting helpers for every week. |
+| `som_plotting.py` | Shared SOM plotting helpers for every phase. |
 | `som_text_style.py` | Text styling for NNSOM's dense SOM plots (neuron labels on hexagons). |
 | `som_types.py` | Type names for annotations of NNSOM objects. |
 | `stats.py` | Entropy, the Wilson bound and Spearman correlation. |

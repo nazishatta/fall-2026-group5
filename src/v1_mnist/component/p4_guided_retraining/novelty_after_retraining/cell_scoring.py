@@ -15,8 +15,12 @@ from typing import Any
 import numpy as np
 import torch
 
-from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import FeatureExtractor
-from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import svhn_test_loader
+from src.v1_mnist.component.p1_model_training_baseline.cnn_baseline_training.extractor import (
+    FeatureExtractor,
+)
+from src.v1_mnist.component.p3_novelty_detection.qe_novelty_detection.ood_adapters import (
+    svhn_test_loader,
+)
 from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.provenance import (
     arm_and_seed,
     start_run,
@@ -27,13 +31,24 @@ from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.scorin
     relu_logits,
     score_split,
 )
-from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.settings import NoveltySettings
-from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import embeddings_folder
-from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.som_cell import assign, model_path
+from src.v1_mnist.component.p4_guided_retraining.novelty_after_retraining.settings import (
+    NoveltySettings,
+)
+from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.settings import (
+    embeddings_folder,
+)
+from src.v1_mnist.component.p4_guided_retraining.som_reanalysis.som_cell import (
+    assign,
+    model_path,
+)
 from src.v1_mnist.component.utils.cnn_retraining import load_model, resolve_device
 from src.v1_mnist.component.utils.run_provenance import write_json
 from src.v1_mnist.component.utils.run_settings import verify_selected_model
-from src.v1_mnist.component.utils.som_io import load_selected_som, load_split, sha256_file
+from src.v1_mnist.component.utils.som_io import (
+    load_selected_som,
+    load_split,
+    sha256_file,
+)
 
 log = logging.getLogger("v1_mnist.novelty_after_retraining")
 
@@ -81,7 +96,8 @@ def score_cell(settings: NoveltySettings, cell: str, device: torch.device) -> No
         return
     retr = settings.reanalysis.retraining
     inputs = _inputs_for(settings, cell)
-    model = load_model(torch.load(inputs["checkpoint"], map_location="cpu"), retr.train.num_classes, device)
+    model = load_model(torch.load(inputs["checkpoint"], map_location="cpu"), retr.train.num_classes, device,
+                       retr.train.in_channels, retr.train.image_size)
     w = model.fc3.weight.detach().cpu().numpy()
     b = model.fc3.bias.detach().cpu().numpy()
     svhn_x, svhn_pred = _svhn_features(model, settings, device)
@@ -113,7 +129,7 @@ def score_cell(settings: NoveltySettings, cell: str, device: torch.device) -> No
                                                     for n, v in scores[k].items()})
     write_json(out, {"cell": cell, "n_normal": int(len(inputs["val_x"])), "n_novel": int(len(svhn_x)),
                      "checkpoint_sha256": sha256_file(inputs["checkpoint"]),
-                     "som_model_sha256": sha256_file(inputs["som_path"]), "mnist_test_read": False, **metrics})
+                     "som_model_sha256": sha256_file(inputs["som_path"]), f"{retr.dataset.name}_test_read": False, **metrics})
     log.info("%s: QE AUROC %.4f, max-softmax %.4f, energy %.4f, Mahalanobis %.4f.", cell,
              *(metrics["scores"][n]["auroc"] for n in ("qe", "msp", "energy", "mahalanobis")))
 

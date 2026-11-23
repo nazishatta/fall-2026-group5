@@ -6,7 +6,7 @@ Steps:
   2. extract_embeddings: save the 84-D fc2 embeddings (plus labels, predictions,
      confidence, sample IDs) for train, val and test, using the checkpoint from step 1.
 
-Results go to outputs/v1_mnist/p1_model_training_baseline/cnn_baseline_training/.
+Results go to <output_root>/p1_model_training_baseline/cnn_baseline_training/.
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p1_model_training_baseline/run_cnn_baseline_training.py [--config CONFIG] [--dry-run]

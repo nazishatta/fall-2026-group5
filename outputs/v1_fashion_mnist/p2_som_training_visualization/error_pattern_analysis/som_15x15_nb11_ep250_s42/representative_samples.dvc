@@ -1,0 +1,6 @@
+outs:
+- md5: d755ec5f0ea3713ed6f6f16a3f0fe72b.dir
+  size: 319913
+  nfiles: 12
+  hash: md5
+  path: representative_samples

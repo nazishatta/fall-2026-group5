@@ -1,0 +1,14 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/qe_random_control.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p3_novelty_detection/NOVELTY_DETECTION_PROTOCOL.md
+# Validation-only: do QE-flagged images hold more CNN errors than random picks of the same size?
+# A first run here (for MNIST this config re-creates an earlier run).
+# Values marked [TBD] come from an earlier Fashion-MNIST step; a script given one stops.
+run_id: fashion_mnist_qe_random_control_s42_v1
+source_summary: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection/fashion_mnist_qe_training_calibrated_s42_v1/qe_summary.json
+validation_distances: outputs/v1_fashion_mnist/p2_som_training_visualization/cluster_analysis/som_15x15_nb11_ep250_s42/assignments/val_bmu_distance.npy
+validation_correct: outputs/v1_fashion_mnist/p1_model_training_baseline/cnn_baseline_training/embeddings/val_correct.npy
+output_root: outputs/v1_fashion_mnist/p3_novelty_detection/qe_novelty_detection
+random_control:
+  seeds: [11, 23, 37, 47, 59]
+  sampling: uniform_without_replacement

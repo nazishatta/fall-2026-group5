@@ -1,0 +1,25 @@
+# Fashion-MNIST settings. Made from src/v1_mnist/component/configs/error_detector_budget.yaml with only the
+# dataset-specific values changed (paths, run IDs, frozen hashes); protocol:
+# src/v1_fashion_mnist/docs/p2_som_training_visualization/SOM_ANALYSIS_PROTOCOL.md
+# ==============================================================================
+# Same-budget comparison of the error detectors (Phase 2, exploratory).
+# If kNN impurity and max-softmax flag the same share of validation images as the SOM's (and k-means')
+# hotspot cells, what share of the CNN's mistakes do they catch? Added on 2026-11-17, after the baseline
+# results were seen, so it is labelled exploratory (docs/.../baselines/PLAN.md, change log).
+# Reads the finished error-pattern baseline run; validation split only; the test split is never loaded.
+# ==============================================================================
+
+run:
+  name: error_detector_budget
+  # Run folder: <name>_som_<height>x<width>[_<revision>]. Empty for the first run; never overwritten.
+  revision: ""
+
+inputs:
+  baselines_config: src/v1_fashion_mnist/component/configs/error_pattern_baselines.yaml
+
+paths:
+  output_root: ./outputs/v1_fashion_mnist/p2_som_training_visualization/error_pattern_analysis/error_detector_budget
+
+bootstrap:
+  resamples: 2000   # over validation images, the same resamples for every score
+  seed: 2026        # the baseline run's bootstrap seed

@@ -1,0 +1,16 @@
+{
+  "config_sha256": "eb3a7062258611a8d89d4f5f111b4a216efa6f324528debe37f33eb7dc1d6a62",
+  "embeddings_sha256": {
+    "train_features.npy": "e7e52125f424baa16ace8ec4d55a33311a7a25717fd68bbbe3b6d484c27d1527",
+    "val_confidence.npy": "da790c1a27cd0133193ebb967b1f82ea516b53d388a8030b910a5bf847179ea7",
+    "val_correct.npy": "8eab235e19b1e03c21626c9b4f73e75962fbe22f0de0db57139ae2c7cf771828",
+    "val_features.npy": "ec82ed44d9c50b696fbf29f99633d95a91a857710ce69478a2e1a409743cf08d",
+    "val_labels.npy": "ca683bf329bb6354160efb86806f2b86549f720039caa31c0ba6231877128d8a"
+  },
+  "input_configs_sha256": {
+    "cnn_config": "1de7135b3057f0f54e149a15c5173c38302db9658456a02007cbd1c808d1e717",
+    "som_config": "0c0cbfe2ba9fba8fa48e0e2bc5aafcf76104051ddf16063096115846f139b1f3"
+  },
+  "protocol_sha256": "69496ffccefe7012c895385493c96ea46b6738170db949ba4bf2fba8bee373c2",
+  "run_id": "grid_comparison_g10_15_20_b10_r200"
+}

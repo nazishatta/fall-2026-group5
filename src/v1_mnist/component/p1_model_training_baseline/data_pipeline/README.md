@@ -9,7 +9,7 @@ Runner: `pipeline/p1_model_training_baseline/run_data_pipeline.py`. Results: `ou
 | File | What it is |
 |---|---|
 | `data_plots.py` | Environment Setup & Data Pipeline figures: class distributions and sample images. |
-| `mnist_dataset.py` | Loads MNIST and makes the stratified 70/15/15 train/validation/test split. |
+| `image_dataset.py` | Loads the dataset named in the config (through `utils/image_datasets.py`) and makes the stratified 70/15/15 train/validation/test split. |
 | `prepare_data.py` ▶ | Builds the split, the class-distribution charts and the sample-image grid. |
 
 ▶ = a script that can also be run on its own. The runners in `component/pipeline/` call these scripts in order.

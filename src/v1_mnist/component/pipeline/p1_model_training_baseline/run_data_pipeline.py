@@ -1,11 +1,11 @@
-"""Data pipeline: environment check and MNIST splits.
+"""Data pipeline: environment check and the dataset's splits.
 
 Steps:
   1. Environment check: Python, PyTorch, torchvision, NNSOM, scikit-learn,
      NumPy, matplotlib versions and whether a GPU / CuPy is available.
-  2. prepare_data: download MNIST, make the stratified 70/15/15 split, save the
+  2. prepare_data: download the dataset named in the config, make the stratified 70/15/15 split, save the
      class-distribution charts, sample images and split_stats.json to
-     outputs/v1_mnist/p1_model_training_baseline/data_pipeline/.
+     <output_root>/p1_model_training_baseline/data_pipeline/ (output_root is set in base.yaml).
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p1_model_training_baseline/run_data_pipeline.py [--config CONFIG] [--dry-run]
@@ -65,7 +65,7 @@ def environment_check() -> None:
 
 
 def main() -> None:
-    parser = base_parser("Data pipeline: environment check and MNIST splits.", CNN_CONFIG)
+    parser = base_parser("Data pipeline: environment check and the dataset's splits.", CNN_CONFIG)
     args = parser.parse_args()
 
     config = load(args.config)
@@ -74,10 +74,10 @@ def main() -> None:
 
     steps = [
         Step("Environment check", func=environment_check),
-        Step("Prepare MNIST: split, class distributions, sample images",
+        Step("Prepare the dataset: split, class distributions, sample images",
              P1 / "data_pipeline" / "prepare_data.py", ["--config", args.config]),
     ]
-    run_steps("Data pipeline: environment check and MNIST splits", steps, args.dry_run)
+    run_steps("Data pipeline: environment check and the dataset's splits", steps, args.dry_run)
 
 
 if __name__ == "__main__":

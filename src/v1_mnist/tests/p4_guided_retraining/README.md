@@ -16,3 +16,5 @@ Tests for the Phase 4 code, one folder per step, with the same names as `compone
 | File | What it is |
 |---|---|
 | `synthetic_data.py` | A tiny made-up RetrainingData for the Phase 4 tests (no MNIST files, no PyTorch). |
+| `test_dataset_settings.py` | Phase 4 builds its network (channels, image size) and finds its protocol from the dataset's config; MNIST by default. |
+| `test_protocol_stamps.py` | Both datasets' stamped Phase 4 protocols and `retraining.yaml` files still match their stamps (results live in separate files). |

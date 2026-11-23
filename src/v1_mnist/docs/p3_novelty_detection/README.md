@@ -16,7 +16,7 @@ The held-out MNIST test split (the project's own 10,500-image split, not the off
 | U-Matrix analysis | [U-Matrix reproduction](u_matrix_analysis/U_MATRIX_REPRODUCTION.md) |
 | Novelty benchmark | [Consolidated evidence](novelty_benchmark/CONSOLIDATED_EVIDENCE.md), [why Isolation Forest and the autoencoder look odd on SVHN](novelty_benchmark/BASELINE_SCORE_ANALYSIS.md), [SVHN baseline diagnostic](novelty_benchmark/SVHN_BASELINE_DIAGNOSTIC.md) |
 | Held-out-class novelty (near novelty: train on 6 digits, the other 4 are novel; Review #5) | [Protocol](held_out_class_novelty/HELD_OUT_CLASS_NOVELTY_PROTOCOL.md) |
-| Report | `reports/Latex_report/v1_mnist/p3_novelty_detection/novelty_detection.tex` |
+| Report | `reports/Latex_report/v1_mnist/Final_report/final_report.tex` (Phase 3 section) |
 
 ## Implementation and configuration
 
@@ -50,11 +50,14 @@ the `reorg_20261102_` reproductions, which repeat them with the current scripts;
 random-control repeat differs from its original in six per-seed counts. Details are in
 the [historical provenance audit](qe_novelty_detection/HISTORICAL_PROVENANCE_AUDIT.md).
 
-Each figure in the Phase 3 report is the PDF a saved run wrote, copied by hand from the
-run's `pdf/` folder into `reports/Latex_report/v1_mnist/p3_novelty_detection/fig/`. Each
-caption names its source run. The framework diagram and the GWU logo are not run outputs.
+Each figure is the PDF a saved run wrote, copied by hand from the run's `pdf/` folder. The
+final report keeps one Phase 3 figure, the SVHN overlay
+(`reports/Latex_report/v1_mnist/Final_report/fig/p3_svhn_som_overlay.pdf`, the same file as the
+`svhn_som_overlay.pdf` row below). The earlier stand-alone Phase 3 report, which also used the
+other four figures, is no longer in the working tree and stays in the git history; the table keeps
+the source run of every figure it used. The framework diagram and the GWU logo are not run outputs.
 
-| Report figure (`fig/...`) | Source run folder (`outputs/v1_mnist/p3_novelty_detection/...`) |
+| Earlier report figure (`fig/...`) | Source run folder (`outputs/v1_mnist/p3_novelty_detection/...`) |
 |---|---|
 | `qe_novelty_detection/qe_score_distribution.pdf` | `qe_novelty_detection/qe_training_calibrated_v2/pdf/` |
 | `u_matrix_analysis/u_matrix_novelty_som_grid.pdf` | `u_matrix_analysis/mnist_umatrix_hex_grid_s42_v2/pdf/` |

@@ -1,0 +1,109 @@
+{
+  "cell": "augmented_random_seed5",
+  "checkpoint_sha256": "1c2c7acb341803e6f01d5d9e233d14abb6b9bce1aafa2321f64e3211566e6e08",
+  "fashion_mnist_test_read": false,
+  "n_normal": 10500,
+  "n_novel": 26032,
+  "qe_length_spearman": -0.1990269788992614,
+  "qe_minus": {
+    "energy": {
+      "difference": -0.21414840343021035,
+      "interval": [
+        -0.22047852661193543,
+        -0.2076557783277724
+      ]
+    },
+    "mahalanobis": {
+      "difference": 0.1441236280621654,
+      "interval": [
+        0.13901959026619273,
+        0.14910614353762405
+      ]
+    },
+    "msp": {
+      "difference": -0.13087374879269453,
+      "interval": [
+        -0.13824454142520576,
+        -0.12357164414859373
+      ]
+    }
+  },
+  "scores": {
+    "energy": {
+      "aupr_ood": 0.9862194832340143,
+      "auroc": 0.9737185295753212,
+      "auroc_interval": [
+        0.9719404956719934,
+        0.9753909883806013
+      ],
+      "fpr_at_target_tpr": 0.11438095238095237,
+      "id_count": 10500,
+      "id_false_positive_rate": 0.058761904761904765,
+      "ood_count": 26032,
+      "ood_detection_rate": 0.8892901044867855,
+      "target_tpr": 0.95,
+      "threshold_from_training": -4.219723629234589
+    },
+    "length": {
+      "aupr_ood": 0.9729453625572031,
+      "auroc": 0.939756138964498,
+      "auroc_interval": [
+        0.9370951989492786,
+        0.9422103507221881
+      ],
+      "fpr_at_target_tpr": 0.2742857142857143,
+      "id_count": 10500,
+      "id_false_positive_rate": 0.05466666666666667,
+      "ood_count": 26032,
+      "ood_detection_rate": 0.6969499078057775,
+      "target_tpr": 0.95,
+      "threshold_from_training": -14.19084215622512
+    },
+    "mahalanobis": {
+      "aupr_ood": 0.7384907994258461,
+      "auroc": 0.6154464980829455,
+      "auroc_interval": [
+        0.6085159495090292,
+        0.6225368212566219
+      ],
+      "fpr_at_target_tpr": 0.7251428571428571,
+      "id_count": 10500,
+      "id_false_positive_rate": 0.04980952380952381,
+      "ood_count": 26032,
+      "ood_detection_rate": 0.023509526736324525,
+      "target_tpr": 0.95,
+      "threshold_from_training": 130.47547133244356
+    },
+    "msp": {
+      "aupr_ood": 0.939945146776706,
+      "auroc": 0.8904438749378054,
+      "auroc_interval": [
+        0.8865059552162906,
+        0.8945375754565809
+      ],
+      "fpr_at_target_tpr": 0.31733333333333336,
+      "id_count": 10500,
+      "id_false_positive_rate": 0.06714285714285714,
+      "ood_count": 26032,
+      "ood_detection_rate": 0.4445298094652735,
+      "target_tpr": 0.95,
+      "threshold_from_training": 0.3137648604868215
+    },
+    "qe": {
+      "aupr_ood": 0.8131619125587121,
+      "auroc": 0.7595701261451109,
+      "auroc_interval": [
+        0.7529512862374513,
+        0.7659464291202038
+      ],
+      "fpr_at_target_tpr": 0.49942857142857144,
+      "id_count": 10500,
+      "id_false_positive_rate": 0.05152380952380953,
+      "ood_count": 26032,
+      "ood_detection_rate": 0.031499692685925014,
+      "target_tpr": 0.95,
+      "threshold_from_training": 1.503469385768823
+    }
+  },
+  "som_model_sha256": "f13f60cf0d6f4f7bc4b5d481eb09717099d0f09b34017e8ee7d602c2fbc1aa0f"
+}

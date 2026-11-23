@@ -8,7 +8,7 @@ Steps:
   3. cluster_heatmaps: cluster heatmaps (hit count, purity, entropy, dominant class).
   4. confusion_overlay: the most frequent confusions drawn on the SOM map.
 
-Results go to outputs/v1_mnist/p2_som_training_visualization/cluster_analysis/.
+Results go to <output_root>/p2_som_training_visualization/cluster_analysis/.
 
 Usage (from the code root, the folder that holds src/ and outputs/):
   python src/v1_mnist/component/pipeline/p2_som_training_visualization/run_cluster_analysis.py \

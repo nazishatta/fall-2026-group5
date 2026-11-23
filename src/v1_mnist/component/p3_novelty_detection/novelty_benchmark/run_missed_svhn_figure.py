@@ -13,6 +13,7 @@ import yaml
 from scipy.io import loadmat
 
 from src.v1_mnist.component.utils.figures import save_pdf
+from src.v1_mnist.component.utils.in_distribution import in_distribution
 from src.v1_mnist.component.utils.logging import setup_logger
 from src.v1_mnist.component.utils.repo_paths import resolve_inside
 from src.v1_mnist.component.utils.run_ids import check_run_id
@@ -40,8 +41,11 @@ def run(config_path: Path) -> Path:
         raise FileExistsError(f"Existing run: {destination}")
 
     historical = repository_path(config["historical_run"])
-    scores_path = historical / "score_arrays/qe_svhn_test_scores.npy"
-    labels_path = historical / "score_arrays/svhn_labels.npy"
+    # MNIST's historical run keeps its arrays in score_arrays/; runs of the current benchmark code
+    # write them in the run folder itself (scores_subfolder: "").
+    arrays = historical / str(config.get("scores_subfolder", "score_arrays"))
+    scores_path = arrays / "qe_svhn_test_scores.npy"
+    labels_path = arrays / "svhn_labels.npy"
     comparison_path = historical / "comparison_metrics.json"
     # The verified SVHN file may be a symlink to external data storage.
     # Restrict the configured location and retain the SHA-256 check below.
@@ -169,7 +173,7 @@ def run(config_path: Path) -> Path:
         "sample_indices": recorded_indices.tolist(),
         "sample_qe_scores": scores[recorded_indices].tolist(),
         "sample_labels": labels[recorded_indices].tolist(),
-        "leakage_control": (
+        "leakage_control": in_distribution(config_path).wording(
             "Frozen historical SVHN evaluation only; no refitting, "
             "threshold selection, or final MNIST test access."
         ),

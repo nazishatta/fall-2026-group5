@@ -22,6 +22,13 @@ class DatasetInfo:
     model_display_name: str   # model.display_name, e.g. "LeNet" (figure titles)
     feature_layer: str        # model.feature_layer, e.g. "fc2"
     feature_dim: int          # model.feature_dim, e.g. 84
+    class_names: tuple[str, ...] = ()   # dataset.class_names; empty means the class numbers
+
+    def class_name(self, class_id: int) -> str:
+        """The name of a class for figure titles (its number if the config names none)."""
+        if 0 <= class_id < len(self.class_names):
+            return self.class_names[class_id]
+        return str(class_id)
 
 
 def _required(section: Any, section_name: str, key: str) -> Any:
@@ -39,14 +46,21 @@ def dataset_info(config: Any) -> DatasetInfo:
         raise KeyError("The config has no dataset or model section (see configs/base.yaml).")
 
     name = str(_required(dataset, "dataset", "name"))
+    num_classes = int(_required(dataset, "dataset", "num_classes"))
+    class_names = tuple(str(n) for n in (getattr(dataset, "class_names", None) or ()))
+    if class_names and len(class_names) != num_classes:
+        raise ValueError(
+            f"dataset.class_names has {len(class_names)} names but dataset.num_classes is {num_classes}."
+        )
     return DatasetInfo(
         name=name,
         display_name=str(getattr(dataset, "display_name", None) or name.upper()),
-        num_classes=int(_required(dataset, "dataset", "num_classes")),
+        num_classes=num_classes,
         class_label=str(getattr(dataset, "class_label", None) or "class"),
         model_display_name=str(
             getattr(model, "display_name", None) or _required(model, "model", "architecture")
         ),
         feature_layer=str(_required(model, "model", "feature_layer")),
         feature_dim=int(_required(model, "model", "feature_dim")),
+        class_names=class_names,
     )

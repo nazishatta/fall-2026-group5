@@ -1,0 +1,51 @@
+{
+  "evaluation": "cnn_error_enrichment_vs_uniform_random_selection",
+  "validation_samples": 10500,
+  "qe_flagged_samples": 536,
+  "cnn_errors": 876,
+  "qe_captured_errors": 73,
+  "qe_error_capture_rate": 0.08333333333333333,
+  "wilson_95_interval": [
+    0.06679961713299677,
+    0.1035054501248429
+  ],
+  "random_expected_errors": 44.71771428571429,
+  "random_exact_one_sided_p_value": 1.6172656239078378e-05,
+  "random_seeded_control": {
+    "seeds": [
+      11,
+      23,
+      37,
+      47,
+      59
+    ],
+    "captured_errors": [
+      50,
+      44,
+      44,
+      48,
+      43
+    ],
+    "mean": 45.8,
+    "sampling": "numpy.default_rng(seed).choice without replacement",
+    "historical_counts_not_assumed_reproduced": true
+  },
+  "leakage_control": {
+    "threshold_source": "train_only",
+    "final_test_used": false,
+    "external_ood_evaluated": false
+  },
+  "limitations": [
+    "Uniform random selection is a control, not an OOD detector.",
+    "The selected sample count is held equal to QE's flag count.",
+    "No final Fashion-MNIST test samples or external OOD samples were used."
+  ],
+  "run_id": "fashion_mnist_qe_random_control_s42_v1",
+  "source_summary_run_id": "fashion_mnist_qe_training_calibrated_s42_v1",
+  "input_sha256": {
+    "val_bmu_distance": "ee6ab2770becc12a5da5492c7eb0ed5e60b9478f6f6473cfcd691256b6603da7",
+    "val_correct": "8eab235e19b1e03c21626c9b4f73e75962fbe22f0de0db57139ae2c7cf771828"
+  },
+  "source_summary_sha256": "c0bd916ba16d9b698eaab88cef0f9eb5aa88a96f90bc0e7172c89cddff9391c9",
+  "config_sha256": "8466c5621e2f89688b6f716923d4561776a356bbc483c9fdedbe2874ade3b4a1"
+}
