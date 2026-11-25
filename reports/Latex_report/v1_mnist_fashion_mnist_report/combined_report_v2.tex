@@ -194,7 +194,8 @@ The project follows the four phases of the proposal: model training baseline, SO
 \subsection{Phase 4: Guided Retraining}
 
 \begin{itemize}
-  \item \textbf{Hard-example pool.} A training image is considered hard if its cell is one of the 11 hotspots, if its cell's purity is below 0.95, or if its distance to its BMU exceeds the 95th percentile. Two control pools of the same size and class composition are formed: randomly selected images, and the least-confident images (lowest maximum softmax probability).
+  \item \textbf{Retraining algorithm.} (1)~Train the SOM on the training embeddings and keep it fixed. (2)~Rank its cells by the lower bound of the Wilson interval of their error rate on validation images and mark the top 5\% (11 cells) as hotspots. (3)~Build the hard pool from the three rules below, and two control pools of the same size and class composition. (4)~For each arm, add three augmented copies of every pool image to the original training set, or order the pool for curriculum learning. (5)~Retrain a new LeNet-5 from scratch with the Phase 1 recipe for seeds 1 to 5. (6)~Compare the arms on the hotspot test images and on all other test images with paired bootstrap intervals, and train a new SOM on each retrained network.
+  \item \textbf{Hard-example pool.} A training image is considered hard if its cell is one of the 11 hotspots, if its cell's purity is below 0.95, or if its distance to its BMU exceeds the 95th percentile. Two control pools of the same size and class composition are formed: randomly selected images, and the least-confident images (lowest maximum softmax probability). A smaller hotspot-only pool (the first rule alone; 685 images on MNIST) and its random control are also evaluated.
   \item \textbf{Curriculum learning.} Training starts with the easy images and 10\% of the hard pool, and a further 10\% of the pool is added every 5 epochs, following the pacing function suggested in the proposal.
   \item \textbf{Targeted augmentation.} Three augmented copies (small rotation, translation, scaling and shear) of every pool image are added to the training set. Before any training, the augmentation ranges must pass a check: the baseline network may lose at most 2 percentage points of validation accuracy on augmented images. Gradually paced variants are also evaluated.
   \item \textbf{Training and evaluation.} Each arm is retrained from scratch with the Phase 1 recipe for seeds 1 to 5, using the same seeds in every arm. The test set is evaluated once, after the success criteria (Table~\ref{tab:criteria}) and a macro-F1 guard had been recorded and time-stamped with a SHA-256 hash. Differences between arms are assessed with paired bootstrap intervals over the test images.
@@ -276,6 +277,8 @@ Topological error TE1 & 6.18\% & 5.37\% \\ \hline
 Purity (with shuffled labels) & 98.2\% (17.4\%) & 89.3\% (17.3\%) \\ \hline
 Cells with purity below 95\% & 44 & 121 \\ \hline
 Hotspot concentration ratio, held out (spread over half-splits) & 11.1 (6.1--17.6) & 3.9 (3.2--4.4) \\ \hline
+k-means hotspot concentration ratio (median; range over 10 k-means seeds) & 5.6 (4.6--6.1) & 4.0 (3.7--4.5) \\ \hline
+Spread over 10 retrained maps (SD): purity / TE1 & 0.12 / 0.28 points & 0.18 / 0.45 points \\ \hline
 Chance level of the ratio & about 1.0 & about 1.0 \\ \hline
 Spearman, cell error rate vs.\ purity & $-0.810$ & $-0.946$ \\ \hline
 Spearman, cell error rate vs.\ class mix (entropy) & $+0.816$ & $+0.956$ \\ \hline
@@ -284,7 +287,7 @@ Mean distance to cell, wrong / correct images & 1.349 / 0.960 & 0.994 / 0.840 \\
 \end{tabular}
 
 \par\vspace{3pt}
-{\footnotesize\raggedright\noindent All label-shuffle tests give $p=0.001$ (purity) or $p=0.005$ (hotspots, Spearman). The concentration ratio cannot exceed one divided by the error rate (about 114 on MNIST, about 12 on Fashion-MNIST), so the two ratios are not comparable. The bracketed range of the concentration ratio is the 2.5th to 97.5th percentile of 200 half-split ratios (100 random splits, each used in both directions); it shows how much the ratio depends on which images fall in each half, and is not a confidence interval.\par}
+{\footnotesize\raggedright\noindent All label-shuffle tests give $p=0.001$ (purity) or $p=0.005$ (hotspots, Spearman). The concentration ratio cannot exceed one divided by the error rate (about 114 on MNIST, about 12 on Fashion-MNIST), so the two ratios are not comparable. The bracketed range of the concentration ratio is the 2.5th to 97.5th percentile of 200 half-split ratios (100 random splits, each used in both directions); it shows how much the ratio depends on which images fall in each half, and is not a confidence interval. The k-means ratio uses the same test with 225 clusters. The spread row uses the 10 maps per grid trained with different seeds for the grid comparison.\par}
 \end{table}
 
 \begin{itemize}
@@ -334,7 +337,7 @@ Network max-softmax confidence & \textbf{0.981} & \textbf{53.3\%} & \textbf{0.90
 {\footnotesize\raggedright\noindent ``Mistakes caught'': share of mistakes among the images flagged when every method flags the same share as the SOM's hotspots (MNIST 1.6\%, Fashion-MNIST 3.5\%); $^*$k-means flags its own hotspot share (3.8\% and 4.0\%). The same-budget check is exploratory.\par}
 \end{table}
 
-\textbf{The SOM is not the best error detector.} On both datasets, k-means clustering locates the errors as well as the SOM, and the network's own confidence performs best. The gap is smaller on Fashion-MNIST, where the network is more often wrong with high confidence.
+\textbf{The SOM is not the best error detector.} On both datasets, k-means clustering locates the errors as well as the SOM in AUROC, and the network's own confidence performs best. The concentration ratios agree on Fashion-MNIST (k-means 4.0, SOM 3.9) but not on MNIST, where the SOM's hotspots concentrate the errors about twice as strongly as k-means (11.1 against 5.6, Table~\ref{tab:som}); the SOM's advantage over k-means on MNIST is therefore in how strongly its hotspots concentrate errors, not in how well it ranks images. The gap is smaller on Fashion-MNIST, where the network is more often wrong with high confidence.
 
 \subsubsection*{Phase 3: novelty detection}
 
@@ -368,7 +371,7 @@ SVHN caught by the fixed QE alarm (normal flagged) & \multicolumn{2}{c|}{96.2\% 
   \item \textbf{Detection of SVHN.} The SOM detects SVHN on both datasets, with QE well above chance: strongly on MNIST and weakly on Fashion-MNIST. The energy score and the maximum softmax probability perform better on both. The difference between QE and the maximum softmax probability is $-0.017$ AUROC ($-0.019$ to $-0.015$) on MNIST and $-0.094$ on Fashion-MNIST.
   \item \textbf{Paired comparisons.} On MNIST, QE is slightly better than the nearest-neighbour distance ($+0.005$, $+0.002$ to $+0.007$), the U-matrix score ($+0.011$) and the Mahalanobis distance ($+0.205$), but worse than the energy score ($-0.019$, $-0.021$ to $-0.017$). On Fashion-MNIST, QE is worse than the energy score ($-0.193$), the maximum softmax probability, the nearest-neighbour distance ($-0.074$) and the U-matrix score ($-0.022$), and better only than the Mahalanobis distance ($+0.076$). On both datasets the SOM detects SVHN but is not competitive with the strongest baseline.
   \item \textbf{Fixed threshold.} The QE threshold works on MNIST but not on Fashion-MNIST, where it flags a smaller proportion of SVHN images than of normal images.
-  \item \textbf{Embedding length.} SVHN embeddings have a much smaller norm (mean length 5.8 against 40.3 on MNIST, and 8.5 against 20.7 on Fashion-MNIST). On MNIST, QE is strongly correlated with length (Spearman $-0.83$), which favours it; on Fashion-MNIST the correlation is weak ($-0.29$), while length alone separates SVHN almost perfectly (0.995).
+  \item \textbf{Embedding length.} SVHN embeddings have a much smaller norm (mean length 5.8 against 40.3 on MNIST, and 8.5 against 20.7 on Fashion-MNIST). On MNIST, QE is strongly correlated with length (Spearman $-0.83$), which favours it; on Fashion-MNIST the correlation is weak ($-0.29$), while length alone separates SVHN almost perfectly (0.995). When the comparison is restricted to images whose embedding length lies within the 5th to 95th percentile of the Fashion-MNIST training lengths (9,478 Fashion-MNIST and 532 SVHN images), QE separates SVHN from Fashion-MNIST with an AUROC of 0.958 (95\% interval 0.953 to 0.962), far above the 0.789 of the full comparison. This suggests that the weak overall result is largely due to the length difference. On MNIST only 8 SVHN images fall in the matching band, so no length-matched comparison is possible. This analysis is exploratory.
   \item \textbf{Inverted detectors.} Isolation Forest rates SVHN as more normal than the in-distribution data on both datasets, consistent with previous findings for models of normal data~\cite{nalisnick2019deep}. The autoencoder is sensitive to input scaling (0.979 on MNIST with standardised inputs).
   \item \textbf{Location of SVHN on the map.} On MNIST, all SVHN images fall in 28 of the 225 cells, and a single cell, mostly containing the digit 4, receives 86.5\% of them. On Fashion-MNIST they fall in 42 cells, 91\% of them in cells whose majority class is Bag.
 \end{itemize}
@@ -446,7 +449,7 @@ Curriculum, random order & 99.07\% & 12.2\% & 89.15\% & 42.1\% \\ \hline
 \end{tabular}
 
 \par\vspace{3pt}
-{\footnotesize\raggedright\noindent Hotspot error is measured on the test images that fall on the 11 hotspot cells of the original map. The single Phase 1 networks scored 99.18\% and 90.90\%.\par}
+{\footnotesize\raggedright\noindent Hotspot error is measured on the test images that fall on the 11 hotspot cells of the original map (146 on MNIST, 422 on Fashion-MNIST). The hotspots were chosen from validation errors, so the test set is the independent confirmation of the hotspot result. The single Phase 1 networks scored 99.18\% and 90.90\%.\par}
 \end{table}
 
 \begin{table}[H]
@@ -469,10 +472,34 @@ C2: SOM curriculum beats random curriculum on hotspots & $+9.18$: worse & $+9.76
 {\footnotesize\raggedright\noindent Difference in test error (percentage points, first arm minus second) with the 95\% paired bootstrap interval. C1, C2, A1 and A2 also require the macro-F1 guard to hold.\par}
 \end{table}
 
+\begin{table}[H]
+\centering
+\caption{Additional Phase 4 Comparisons on the Test Set}
+\label{tab:p4extra}
+\renewcommand{\arraystretch}{1.12}
+\footnotesize
+\begin{tabular}{|L{0.46\textwidth}|C{0.22\textwidth}|C{0.22\textwidth}|}
+\hline
+\textbf{Hotspot error, difference in points (first arm minus second)} & \textbf{MNIST} & \textbf{Fashion-MNIST} \\ \hline
+SOM-chosen minus least-confident images & $-0.7$ ($-2.9$, $+1.2$) & $-1.2$ ($-3.3$, $+0.8$) \\ \hline
+Hotspot-only images minus normal training & $-1.9$ ($-4.4$, $+0.7$) & $+0.4$ ($-1.8$, $+2.5$) \\ \hline
+Hotspot-only images minus their random control & $-2.2$ ($-4.5$, $+0.1$) & $-0.3$ ($-2.3$, $+1.7$) \\ \hline
+Paced SOM copies minus normal training & $-0.1$ ($-2.7$, $+2.3$) & $-0.9$ ($-2.7$, $+0.9$) \\ \hline
+Paced SOM copies minus paced random copies & $-0.3$ ($-2.5$, $+1.9$) & $-1.5$ ($-3.3$, $+0.4$) \\ \hline
+Paced SOM copies minus unpaced SOM copies & $+3.4$ ($+1.6$, $+5.3$) & $+1.0$ ($-1.5$, $+3.6$) \\ \hline
+\end{tabular}
+
+\par\vspace{3pt}
+{\footnotesize\raggedright\noindent Intervals are 95\% paired bootstrap intervals over the test images in the 11 hotspot cells (146 images on MNIST, 422 on Fashion-MNIST), mean of 5 seeds. A negative value means a lower error for the first arm. These comparisons were specified as secondary and are not part of the success criteria.\par}
+\end{table}
+
 \begin{itemize}
   \item \textbf{MNIST: SOM-guided augmentation reduced the errors in the hotspots}, by about 5 of the 146 hotspot images, without increasing the error elsewhere. Random and least-confident augmentation also slightly reduced the overall error, so only the hotspot improvement is specific to the SOM.
+  \item \textbf{Seed-level check of the MNIST result.} The image-level interval for criterion A1 excludes zero, but it treats the five networks as one fixed sample. Computed from the five per-seed hotspot errors saved with the test results (an additional calculation, not a new experiment), the difference between SOM-chosen and random augmentation is $-2.47$ points with a 95\% $t$-interval of $-6.66$ to $+1.73$, which includes zero, whereas the difference from normal training stays clear ($-3.56$, $-5.92$ to $-1.20$). The benefit of the SOM-chosen images over random images on MNIST is therefore suggestive, not established. On Fashion-MNIST the corresponding values are $-1.04$ ($-2.37$ to $+0.28$) and $-1.99$ ($-4.42$ to $+0.44$).
+  \item \textbf{Per-class error (independent of the map).} On MNIST, the only class whose test error changes significantly is the digit 9 (1.30\% to 0.98\%, $-0.33$ points, $-0.67$ to $-0.04$), one of the digits of the dominant 4--9 confusion. On Fashion-MNIST, the error of Shirt falls from 28.7\% to 26.4\% ($-2.3$ points, $-3.5$ to $-1.0$), whereas those of T-shirt/top (13.4\% to 14.8\%), Dress (7.5\% to 8.4\%) and Bag (1.7\% to 2.7\%) rise significantly, which is the exchange of errors seen in the confusion matrices.
+  \item \textbf{Hotspot-only and paced arms.} Using only the hotspot-cell images, or bringing the augmented images in gradually, did not improve on normal training on either dataset (Table~\ref{tab:p4extra}); on MNIST the gradually paced SOM arm was clearly worse than the unpaced one ($+3.4$ points, $+1.6$ to $+5.3$).
   \item \textbf{Fashion-MNIST: no significant improvement.} The hard pool contains 41\% of the training images and is therefore much less selective, and the augmentation ranges had to be four times smaller than on MNIST.
-  \item \textbf{The SOM is not a better selector than confidence.} On both datasets, SOM-selected and least-confident images cannot be distinguished.
+  \item \textbf{The SOM is not a better selector than confidence.} On both datasets, SOM-selected and least-confident images cannot be distinguished: the difference in hotspot error (SOM minus least-confident) is $-0.7$ points ($-2.9$ to $+1.2$) on MNIST and $-1.2$ points ($-3.3$ to $+0.8$) on Fashion-MNIST (Table~\ref{tab:p4extra}). The two pools share 81\% of their images on Fashion-MNIST (16,213 of 19,997) and 47\% on MNIST (1,965 of 4,217), which is one reason why they behave alike.
   \item \textbf{Curriculum learning degraded accuracy on both datasets}, more strongly on Fashion-MNIST. Because the schedule never uses more than 40\% of the hard pool, the hardest 60\% is never trained on; this corresponds to about 5\% of all training images on MNIST and about a quarter on Fashion-MNIST.
   \item \textbf{No catastrophic forgetting:} the largest drop in validation accuracy between consecutive epochs was at most 0.6 percentage points (MNIST) and 0.9 points (Fashion-MNIST) in every arm.
 \end{itemize}
@@ -538,7 +565,7 @@ Figure~\ref{fig:errormaps} shows the location of the validation errors on each m
 \begin{minipage}[c]{0.49\textwidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio]{fashion_mnist_p2_validation_complex_error_map.pdf}\\{\small (b) Fashion-MNIST}
 \end{minipage}
-\caption{Validation error maps of the 15$\times$15 SOMs. Fill: most common true class of the cell; edge colour: most common wrong answer; size: number of mistakes.}
+\caption{Validation error maps of the 15$\times$15 SOMs. Fill: most common true class of the cell; edge colour: most common wrong answer; size: number of mistakes. On MNIST the frequent confusions are 4 predicted as 9, 5 as 0 and 9 as 4, and the hotspot images suggest shared strokes between 4 and 9, between 7 and 9, and among 5, 6 and 8 (a hypothesis, not a tested result). On Fashion-MNIST the hotspots mix Shirt, T-shirt/top, Pullover, Coat and Dress.}
 \label{fig:errormaps}
 \end{figure}
 
@@ -600,7 +627,7 @@ Figure~\ref{fig:cf} compares CF1 and CF2. On MNIST, a few confusions become less
 
 \textbf{Where simpler methods perform better.}
 \begin{itemize}
-  \item For error detection, the network's confidence is clearly superior and k-means is equally good.
+  \item For error detection, the network's confidence is clearly superior and k-means is equally good in AUROC (but concentrates the MNIST errors less than the SOM).
   \item For far novelty, the energy score and the maximum softmax probability are superior on both datasets, and the SVHN results are largely explained by embedding length.
   \item For near novelty, the nearest-neighbour distance on the same embeddings outperforms the map on both datasets.
   \item For selecting retraining images, the least-confident images are as effective as SOM-selected ones.
