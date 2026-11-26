@@ -1,0 +1,27 @@
+% TikZ drawing of the study pipeline (Fig. 1). Included with \input{Fig/fig_pipeline}.
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+\begin{tikzpicture}[
+  font=\scriptsize,
+    box/.style={draw, rounded corners=2pt, align=center, line width=0.45pt, fill=gray!6, inner sep=3pt},
+  databox/.style={box, text width=2.6cm, minimum height=2.4cm},
+  phasebox/.style={box, text width=2.6cm, minimum height=2.4cm, fill=gray!20},
+  midbox/.style={box, text width=2.4cm, minimum height=2.4cm},
+  taskbox/.style={box, text width=5.0cm, minimum height=2.2cm, align=left},
+  band/.style={draw, rounded corners=2pt, dashed, line width=0.45pt, align=center, inner sep=3pt},
+  arr/.style={-{Stealth[length=1.9mm,width=1.5mm]}, line width=0.55pt}
+]
+\node[databox] (d1) at (0,0) {\textbf{Images}\\MNIST or\\[-1pt]Fashion-MNIST\\[-1pt]70\,\% train (49,000)\\[-1pt]15\,\% validation (10,500)\\[-1pt]15\,\% test (10,500)};
+\node[phasebox] (p1) at (3.3,0) {\textbf{Phase 1}\\LeNet-5, 20 epochs\\[-1pt](Adam); best validation\\[-1pt]checkpoint, then\\[-1pt]kept fixed};
+\node[midbox] (emb) at (6.3,0) {\textbf{Embeddings}\\84 numbers per image (layer fc2), scaled to $[-1,1]$ with training statistics};
+\node[phasebox] (p2) at (9.3,0) {\textbf{Phase 2}\\SOM, $15\times15$ hexagonal grid, 250 epochs, modified NNSOM loop ($10\times10$ and $20\times20$ as checks)};
+\node[taskbox] (t1) at (14.6,2.6) {\textbf{Error analysis} (Phase 2)\\purity, hotspots (top 5\,\% of cells), concentration ratio; controls: shuffled labels, k-means, nearest neighbors, max-softmax};
+\node[taskbox] (t2) at (14.6,0) {\textbf{Novelty detection} (Phase 3)\\QE and U-matrix scores against max-softmax, energy, Mahalanobis and nearest-neighbor scores; far: SVHN images; near: 4 held-out classes, 5 splits; AUROC};
+\node[taskbox] (t3) at (14.6,-2.6) {\textbf{Guided retraining} (Phase 4)\\hard pool $\rightarrow$ augmented copies; arms: SOM, least-confident, random; curriculum; 5 seeds; test set used once};
+\draw[arr] (d1) -- (p1);
+\draw[arr] (p1) -- (emb);
+\draw[arr] (emb) -- (p2);
+\foreach \t in {t1,t2,t3}{\draw[arr] (p2.east) -- ++(0.4,0) |- (\t.west);}
+\draw[arr, dashed] (t3.south) -- ++(0,-0.4) -| (p1.south);
+\node[fill=white, inner sep=1pt, font=\scriptsize] at (8.6,-3.75) {retrained networks are compared with the original network};
+\node[band, text width=18.0cm] (prot) at (7.3,-5.0) {\textbf{Protocol for all phases:} success criteria fixed before the test set is used; tuning on validation data only; scaler, SOM and detectors fitted on training data only (leakage control); shuffled-label and random controls; unique run identifiers with SHA-256 checks};
+\end{tikzpicture}
