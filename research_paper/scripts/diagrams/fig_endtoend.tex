@@ -1,0 +1,23 @@
+% TikZ drawing of the end-to-end comparison (Fig. 4). Included with \input{Fig/fig_endtoend}.
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, rounded corners=2pt, align=center, line width=0.45pt, fill=gray!6, minimum height=0.9cm, minimum width=2.1cm},
+  key/.style={box, fill=gray!22},
+  dbox/.style={box, dashed},
+  arr/.style={-{Stealth[length=2mm,width=1.6mm]}, line width=0.55pt}
+]
+\node[font=\small\bfseries, anchor=west] at (0,1.0) {Path 1: normally trained CNN};
+\node[box] (s1) at (1.1,0) {Test image};
+\node[box, right=0.8cm of s1] (n1) {CNN};
+\node[box, right=0.8cm of n1] (p1) {Prediction};
+\node[key, right=0.8cm of p1, minimum width=3.0cm] (c1) {CF1\\[-1pt]\scriptsize confusion matrix};
+\node[font=\small\bfseries, anchor=west] at (0,-1.6) {Path 2: CNN retrained with SOM-guided augmentation};
+\node[box] (s2) at (1.1,-2.6) {Test image};
+\node[dbox, right=0.8cm of s2, minimum width=3.0cm] (g2) {SOM-guided\\[-1pt]\scriptsize augmented copies};
+\node[box, right=0.8cm of g2] (n2) {CNN};
+\node[box, right=0.8cm of n2] (p2) {Prediction};
+\node[key, right=0.8cm of p2, minimum width=3.0cm] (c2) {CF2\\[-1pt]\scriptsize confusion matrix};
+\draw[arr] (s1) -- (n1); \draw[arr] (n1) -- (p1); \draw[arr] (p1) -- (c1);
+\draw[arr] (s2) -- (g2); \draw[arr] (g2) -- (n2); \draw[arr] (n2) -- (p2); \draw[arr] (p2) -- (c2);
+\draw[arr, dashed] (c1) -- node[right=2pt, font=\scriptsize]{compare predictions} (c2);
+\end{tikzpicture}

@@ -1,0 +1,42 @@
+% Cover letter for the Neurocomputing submission. Build: pdflatex cover_letter.tex
+\documentclass[11pt]{letter}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\signature{}
+\address{}
+\date{\today}
+
+\begin{document}
+\begin{letter}{The Editors-in-Chief\\ Neurocomputing}
+
+\opening{Dear Editors,}
+\setlength{\longindentation}{0pt}\setlength{\indentedwidth}{\textwidth}
+
+We are pleased to submit our manuscript ``Post-Training Analysis and Novelty Detection Using Neural Network Self-Organizing Maps (NNSOM)'' as a regular research article in \emph{Neurocomputing}.
+
+We train a self-organizing map (SOM) on the features of a fixed convolutional network and use it for error analysis, novelty detection and guided retraining on MNIST and Fashion-MNIST, under one pre-registered design with chance-level controls and simple baselines.
+
+The main findings are:
+\begin{itemize}
+  \item The map separates the classes into clear regions (purity 98.2\% on MNIST and 89.3\% on Fashion-MNIST, against about 17\% for shuffled labels).
+  \item It shows where, and between which classes, the network fails: errors concentrate in a few cells at 11.1 (MNIST) and 3.9 (Fashion-MNIST) times their share.
+  \item On unseen clothing classes, its quantization error detects novelty better than the network's confidence, although a nearest-neighbor distance does better still.
+  \item Map-guided retraining reduced the MNIST hotspot error from 11.4\% to 7.8\%, about as much as choosing the network's least-confident images.
+\end{itemize}
+
+The paper fits \emph{Neurocomputing} because it revisits a classical neural model as a practical tool for understanding deep networks, and it reports clearly what works and what does not.
+
+This manuscript is original, is not under consideration elsewhere, and all authors approve its submission. We declare no competing interests, and the work received no specific grant funding. The use of generative AI is described in the manuscript. Code: \url{https://github.com/nazishatta/fall-2026-group5}.
+
+Thank you for considering our work.
+
+\closing{Sincerely,\\[4pt]
+Fyrooz Anika Khan (corresponding author),\\
+Nazish Atta and Amir Hossein Jafari\\
+Data Science Program, The George Washington University,\\
+2127 G Street NW, Washington, DC 20052, USA\\
+\href{mailto:f.khan1@gwmail.gwu.edu}{f.khan1@gwmail.gwu.edu}\\
+ORCID of corresponding author: \href{https://orcid.org/0009-0001-4265-4040}{0009-0001-4265-4040}}
+
+\end{letter}
+\end{document}

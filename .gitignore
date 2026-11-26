@@ -114,3 +114,6 @@ research_paper/**/*.synctex.gz
 research_paper/**/*.toc
 !reports/Latex_report/v1_fashion_mnist/Final_report/fig/*.pdf
 !reports/Latex_report/v1_mnist_fashion_mnist_report/fig/*.pdf
+
+# Generated journal submission bundle (rebuild with research_paper/scripts/package_submission.py)
+research_paper/submission_package/
