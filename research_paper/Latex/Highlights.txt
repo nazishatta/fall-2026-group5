@@ -1,0 +1,5 @@
+Map regions separate classes: purity 98.2% (MNIST), 89.3% (Fashion-MNIST)
+Errors cluster in few map cells, 11.1x and 3.9x their share of the data
+Map quantization error beats confidence on unseen clothing classes (+0.046 AUROC)
+Confidence and energy scores beat the map for error and far-novelty detection
+Map-guided retraining cut MNIST hotspot errors 11.4% to 7.8%; confidence did as well

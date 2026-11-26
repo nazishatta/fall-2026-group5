@@ -1,0 +1,88 @@
+% TikZ drawing of how the SOM works (Fig. 2). Included with \input{Fig/fig_som}.
+\newcommand{\hexr}{0.3}
+\newcommand{\hexcell}[4]{% x, y, style, label
+  \draw[#3] (#1,#2) ++(90:\hexr) -- ++(-30:\hexr) -- ++(-90:\hexr) -- ++(-150:\hexr) -- ++(150:\hexr) -- ++(90:\hexr) -- cycle;
+  \node[font=\tiny] at (#1,#2) {#4};}
+\begin{tikzpicture}[
+  font=\scriptsize,
+  cell/.style={draw=black!70, line width=0.3pt, fill=white},
+  clsa/.style={cell, fill=orange!35},
+  clsb/.style={cell, fill=cyan!25},
+  clsc/.style={cell, fill=green!25!gray!25},
+  win/.style={cell, fill=gray!70},
+  nbr/.style={cell, fill=gray!28},
+  hot/.style={draw=black, line width=1.3pt},
+  layer/.style={draw, line width=0.45pt, fill=gray!8, inner sep=0pt, align=center},
+  arr/.style={-{Stealth[length=1.8mm,width=1.4mm]}, line width=0.5pt},
+  ttl/.style={font=\small\bfseries, anchor=west}
+]
+% ---------- (a) network and embedding ----------
+\node[ttl] at (0,0.4) {(a) The fixed CNN turns each image into an embedding};
+\node[layer, minimum width=1.2cm, minimum height=1.2cm] (in) at (0.8,-0.9) {image\\[-1pt]$28\times28$};
+\node[layer, minimum width=1.4cm, minimum height=1.0cm, right=0.45cm of in] (c1) {conv + pool\\[-1pt]$6\times$};
+\node[layer, minimum width=1.4cm, minimum height=0.85cm, right=0.45cm of c1] (c2) {conv + pool\\[-1pt]$16\times$};
+\node[layer, minimum width=1.2cm, minimum height=0.8cm, right=0.45cm of c2] (f1) {fc1\\[-1pt]120};
+\node[layer, minimum width=1.2cm, minimum height=0.7cm, right=0.45cm of f1, fill=gray!35, line width=0.9pt] (f2) {fc2\\[-1pt]84};
+\node[layer, minimum width=1.2cm, minimum height=0.6cm, right=0.45cm of f2] (out) {output\\[-1pt]10};
+\foreach \a/\b in {in/c1,c1/c2,c2/f1,f1/f2,f2/out}{\draw[arr] (\a) -- (\b);}
+\draw[decorate, decoration={brace, amplitude=3pt, mirror}] ([yshift=-0.55cm]f2.south west) -- ([yshift=-0.55cm]f2.south east) node[midway, below=2pt, align=center] {embedding $\mathbf{x}\in\mathbb{R}^{84}$\\[-1pt]used by the SOM};
+% ---------- (b) training step ----------
+\begin{scope}[yshift=-3.9cm]
+\node[ttl] at (0,0.4) {(b) Training step};
+\foreach \r in {0,...,5}{\foreach \c in {0,...,5}{
+  \pgfmathsetmacro{\x}{sqrt(3)*\hexr*(\c+0.5*mod(\r,2))+0.2}
+  \pgfmathsetmacro{\y}{-1.5*\hexr*\r-0.35}
+  \hexcell{\x}{\y}{cell}{}
+}}
+\foreach \r/\c in {1/2,1/3,3/2,3/3,2/2,2/4}{
+  \pgfmathsetmacro{\x}{sqrt(3)*\hexr*(\c+0.5*mod(\r,2))+0.2}
+  \pgfmathsetmacro{\y}{-1.5*\hexr*\r-0.35}
+  \hexcell{\x}{\y}{nbr}{}
+}
+\pgfmathsetmacro{\wx}{sqrt(3)*\hexr*3+0.2}
+\pgfmathsetmacro{\wy}{-1.5*\hexr*2-0.35}
+\hexcell{\wx}{\wy}{win}{}
+\node[draw, circle, fill=black, inner sep=1.1pt] (xin) at (3.6,-0.5) {};
+\node[font=\scriptsize, anchor=west] at (3.68,-0.5) {$\mathbf{x}$};
+\draw[arr, dashed] (xin) -- (\wx+0.22,\wy+0.02);
+\node[font=\scriptsize, align=center, text width=3.9cm, anchor=north] at (1.95,-3.3) {dark: winner (closest weight vector); gray: neighbors that also move towards $\mathbf{x}$.};
+\end{scope}
+% ---------- (c) labeled map ----------
+\begin{scope}[xshift=4.9cm, yshift=-3.9cm]
+\node[ttl] at (0,0.4) {(c) Labeled map};
+\foreach \row [count=\r from 0] in {{4,4,4,9,9,9},{4,4,4,9,9,9},{4,4,9,9,7,7},{4,4,9,9,7,7},{4,9,9,7,7,7},{4,9,9,7,7,7}}{
+ \foreach \cls [count=\c from 0] in \row{
+  \pgfmathsetmacro{\x}{sqrt(3)*\hexr*(\c+0.5*mod(\r,2))+0.2}
+  \pgfmathsetmacro{\y}{-1.5*\hexr*\r-0.35}
+  \ifnum\cls=4 \hexcell{\x}{\y}{clsa}{\cls}\fi
+  \ifnum\cls=9 \hexcell{\x}{\y}{clsb}{\cls}\fi
+  \ifnum\cls=7 \hexcell{\x}{\y}{clsc}{\cls}\fi
+ }}
+\foreach \r/\c in {1/2,2/2,3/1,4/1}{
+  \pgfmathsetmacro{\x}{sqrt(3)*\hexr*(\c+0.5*mod(\r,2))+0.2}
+  \pgfmathsetmacro{\y}{-1.5*\hexr*\r-0.35}
+  \hexcell{\x}{\y}{hot}{}
+}
+\node[font=\scriptsize, align=center, text width=3.9cm, anchor=north] at (1.95,-3.3) {Number and fill: most common class of the cell. Thick outline: hotspot, a cell with many mistakes where two classes meet.};
+\end{scope}
+% ---------- (d) novelty ----------
+\begin{scope}[xshift=9.8cm, yshift=-3.9cm]
+\node[ttl] at (0,0.4) {(d) Novelty score};
+\foreach \r in {0,...,5}{\foreach \c in {0,...,5}{
+  \pgfmathsetmacro{\x}{sqrt(3)*\hexr*(\c+0.5*mod(\r,2))+0.2}
+  \pgfmathsetmacro{\y}{-1.5*\hexr*\r-0.35}
+  \hexcell{\x}{\y}{cell}{}
+}}
+\pgfmathsetmacro{\ax}{sqrt(3)*\hexr*2+0.2}
+\pgfmathsetmacro{\ay}{-1.5*\hexr*3-0.35}
+\node[draw, circle, fill=black, inner sep=1.1pt] (typ) at (\ax+0.12,\ay+0.1) {};
+\draw[arr] (typ) -- (\ax,\ay);
+\node[draw, diamond, fill=white, inner sep=1.1pt] (nov) at (3.85,-0.05) {};
+\pgfmathsetmacro{\bx}{sqrt(3)*\hexr*5.5+0.2}
+\pgfmathsetmacro{\by}{-1.5*\hexr*0-0.35}
+\draw[arr, dashed] (nov) -- (\bx+0.1,\by-0.05);
+\node[font=\scriptsize, fill=white, inner sep=1pt, anchor=north] at (\ax+0.15,\ay-0.3) {typical};
+\node[font=\scriptsize, fill=white, inner sep=1pt, anchor=west] at (3.95,-0.05) {novel};
+\node[font=\scriptsize, align=center, text width=3.9cm, anchor=north] at (1.95,-3.3) {QE is the distance between an image and its closest cell. A small QE (solid arrow) means the image resembles the training data; a large QE (dashed arrow) suggests a novel input.};
+\end{scope}
+\end{tikzpicture}
