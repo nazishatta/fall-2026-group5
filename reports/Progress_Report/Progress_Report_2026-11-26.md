@@ -315,7 +315,7 @@
 * [ ] Proof-read the paper (both authors, by 11-29)
 * [ ] Journal named in #40; submission confirmation e-mail (12-08)
 * [x] Every pull request merged or closed; merged branches and `backup/*` deleted
-* [ ] Paper and reports build from a clean clone (with `biber`)
+* [x] Paper and reports build from a clean clone (with `biber`)
 * [ ] Poster draft by 11-29; poster final by 12-01
 * [ ] Final presentation deck and one-minute video script by 12-01
 * [ ] Recorded video and one-minute video by 12-08
