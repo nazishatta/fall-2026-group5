@@ -12,7 +12,7 @@ and the sections Introduction, Problem Statement, Related Work, Solution and Met
 
 | Path | What it is |
 |---|---|
-| `combined_report.tex` | Source of the report |
+| `combined_report_v2.tex` | Source of the report (the earlier `combined_report.tex` was removed on 2026-11-26; it is in git history) |
 | `File_Setup.tex` | Page and package setup from the sample report |
 | `references.bib` | Every cited work (BibTeX, IEEEtran style) |
 | `fig/` | PDF figures: the GW logo, and figures copied from both final reports, prefixed `mnist_` or `fashion_mnist_` |
@@ -22,8 +22,8 @@ and the sections Introduction, Problem Statement, Related Work, Solution and Met
 This report uses BibTeX (as the sample does), not biber. From this folder:
 
 ```bash
-latexmk -pdf combined_report.tex
+latexmk -pdf combined_report_v2.tex
 ```
 
-or `pdflatex combined_report`, `bibtex combined_report`, then `pdflatex combined_report` twice. Build files
+or `pdflatex combined_report_v2`, `bibtex combined_report_v2`, then `pdflatex combined_report_v2` twice. Build files
 (`.aux`, `.bbl`, `.blg`, …) are ignored by git.

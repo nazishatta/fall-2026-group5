@@ -157,7 +157,7 @@ the compiled PDF and a `fig/` folder with the figures it uses.
 | ------ | -------------- |
 | [`final_report.pdf` (MNIST)](reports/Latex_report/v1_mnist/Final_report/final_report.pdf) | The whole MNIST study, Phases 1 to 4 |
 | [`final_report.pdf` (Fashion-MNIST)](reports/Latex_report/v1_fashion_mnist/Final_report/final_report.pdf) | The whole Fashion-MNIST study, Phases 1 to 4 |
-| [`combined_report.pdf`](reports/Latex_report/v1_mnist_fashion_mnist_report/combined_report.pdf) | MNIST and Fashion-MNIST side by side |
+| [`combined_report_v2.pdf`](reports/Latex_report/v1_mnist_fashion_mnist_report/combined_report_v2.pdf) | MNIST and Fashion-MNIST side by side |
 
 Progress report: [`reports/Progress_Report/`](reports/Progress_Report/README.md) (named by date).
 Technical notes and protocols: [`src/v1_mnist/docs/`](src/v1_mnist/docs/) and [`src/v1_fashion_mnist/docs/`](src/v1_fashion_mnist/docs/).
