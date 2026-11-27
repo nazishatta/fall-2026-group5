@@ -12,6 +12,7 @@ The documents follow the project proposal (`proposals/Project_proposal.md`): one
 | **3: Novelty Detection** | [`p3_novelty_detection/`](p3_novelty_detection/README.md) | QE novelty detection, U-Matrix analysis, benchmark evidence, reproducibility notes, and the held-out-digit test protocol |
 | **4: Guided Retraining** | [`p4_guided_retraining/`](p4_guided_retraining/README.md) | The retraining protocol and its stamp, the SOM re-analysis protocol and results, the max-softmax-arm addendum, and the novelty-after-retraining protocol |
 | All | `DEVIATIONS.md` | Every time a written rule was not followed or was changed, and what we did about it |
+| All | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | One-page reproducibility statement for both datasets: environment, seeds, run IDs, DVC, how to regenerate |
 
 ## Files that are never edited
 

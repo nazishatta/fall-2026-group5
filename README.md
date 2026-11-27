@@ -52,7 +52,8 @@ The phases follow the project proposal ([`proposals/Project_proposal.md`](propos
 Success criteria and thresholds are fixed **before** the test set is used, in the protocol of each step
 (`src/v1_mnist/docs/` and `src/v1_fashion_mnist/docs/`). Every change to a written rule is logged in
 [`src/v1_mnist/docs/DEVIATIONS.md`](src/v1_mnist/docs/DEVIATIONS.md) and
-[`src/v1_fashion_mnist/docs/DEVIATIONS.md`](src/v1_fashion_mnist/docs/DEVIATIONS.md).
+[`src/v1_fashion_mnist/docs/DEVIATIONS.md`](src/v1_fashion_mnist/docs/DEVIATIONS.md). How to reproduce the results is in
+[`src/v1_mnist/docs/REPRODUCIBILITY.md`](src/v1_mnist/docs/REPRODUCIBILITY.md).
 
 **Datasets:** MNIST and Fashion-MNIST are both finished through Phase 4. They run through the same pipeline and
 step code, each in its own versioned folders (`v1_mnist`, `v1_fashion_mnist`). SVHN is the outside (novelty)
@@ -156,7 +157,7 @@ the compiled PDF and a `fig/` folder with the figures it uses.
 | ------ | -------------- |
 | [`final_report.pdf` (MNIST)](reports/Latex_report/v1_mnist/Final_report/final_report.pdf) | The whole MNIST study, Phases 1 to 4 |
 | [`final_report.pdf` (Fashion-MNIST)](reports/Latex_report/v1_fashion_mnist/Final_report/final_report.pdf) | The whole Fashion-MNIST study, Phases 1 to 4 |
-| [`combined_report.pdf`](reports/Latex_report/v1_mnist_fashion_mnist_report/combined_report.pdf) | MNIST and Fashion-MNIST side by side |
+| [`combined_report_v2.pdf`](reports/Latex_report/v1_mnist_fashion_mnist_report/combined_report_v2.pdf) | MNIST and Fashion-MNIST side by side |
 
 Progress report: [`reports/Progress_Report/`](reports/Progress_Report/README.md) (named by date).
 Technical notes and protocols: [`src/v1_mnist/docs/`](src/v1_mnist/docs/) and [`src/v1_fashion_mnist/docs/`](src/v1_fashion_mnist/docs/).
@@ -189,7 +190,7 @@ src/v1_mnist/
       som_reanalysis/                new SOMs on the retrained CNNs
       novelty_after_retraining/      SVHN novelty on the retrained networks
     utils/                           config, logging, run IDs and SHA-256 checks, stats, figures, retraining
-  docs/                              protocols, results, DEVIATIONS.md
+  docs/                              protocols, results, DEVIATIONS.md, REPRODUCIBILITY.md
   shellscripts/                      run_pipeline.sh: runs the whole pipeline (run_all.py) from any folder
   tests/                             pytest tests, same phase/step folders as component/
 src/v1_fashion_mnist/
