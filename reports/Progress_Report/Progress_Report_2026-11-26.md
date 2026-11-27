@@ -293,19 +293,26 @@
 
 ---
 
-## Date: Week 15 - December 1, 2026 (planned: only documents and repo clean-up; no new experiments)
+## Date: Week 15 - December 1, 2026 (work done November 23 to 26; plan to December 8)
 
 - Topics of discussion
-  - **Today, 11-22:** open the pull requests that bring the Fashion-MNIST work into develop and develop into main, with Nazish reviewing them in writing.
-  - **By 11-26:** open, review and merge the paper (`feature/integrated-research-paper`) and add the Fashion-MNIST results to it. The paper states the SOM's contribution as the map, not as a better detector, and states that LeNet-5 is the only CNN (no ResNet run). Confirm the target journal in ticket #40 (Neurocomputing was chosen in Week 12) and move the paper into its template. Every pull request merged or closed; delete the merged branches and the `backup/*` branches once main has everything; reply on the review issue (#30).
-  - **By 11-29:** both of us proof-read the paper; build the paper and reports from a clean clone (citations need `biber`); poster draft (Nazish); progress report brought up to date.
-  - **By 12-01 (last working session):** final presentation deck, poster and the script for the one-minute video; dry run of the talk.
-  - **By 12-08:** journal submission and its confirmation e-mail, final presentation, poster, recorded video, one-minute video, Blackboard uploads.
+  - **PHASE 5: PAPER WRITING & CODE RELEASE**
+  - Final report v2: added the retraining algorithm, the k-means ratio, the length-matched novelty check and the per-class and seed-level Phase 4 results; softened the claims to what the intervals support.
+  - Wrote the journal paper in the *Neurocomputing* template with both datasets, a cover letter, highlights and 50 references; checked the key numbers against the saved results.
+  - Made all paper figures PDF, with larger labels and the titles moved into the captions.
+  - Built the submission folder (paper, bibliography, figures, highlights) with one script.
+  - Merged the paper and the reports into `main` through pull requests (#52 and #53).
+  - Started the repo clean-up: ticked the finished pull requests and began removing merged and `backup/*` branches.
 
 - Action Items:
 
+* [x] Final report v2
+* [x] Journal paper in the *Neurocomputing* template, with cover letter and highlights
+* [x] Submission folder script
 * [x] Fashion-MNIST merged into main
 * [x] Paper merged into main, with both datasets, in the journal template
+* [ ] Author biographies and photos; Zenodo DOI; journal declarations form
+* [ ] Proof-read the paper (both authors, by 11-29)
 * [ ] Journal named in #40; submission confirmation e-mail (12-08)
 * [ ] Every pull request merged or closed; merged branches and `backup/*` deleted
 * [ ] Paper and reports build from a clean clone (with `biber`)
@@ -313,4 +320,4 @@
 * [ ] Final presentation deck and one-minute video script by 12-01
 * [ ] Recorded video and one-minute video by 12-08
 * [ ] Decide whether one Jupyter notebook per phase (proposal) fits in the time left
-* [ ] Progress report: add the December 1 and final entries
+* [ ] Progress report: add the final entry
