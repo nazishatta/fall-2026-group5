@@ -13,6 +13,7 @@ folder per **phase**, and inside it one folder per **step**, with the same names
 | **3: Novelty Detection** | [`p3_novelty_detection/`](p3_novelty_detection/README.md) | `NOVELTY_DETECTION_PROTOCOL.md`: the outside set (SVHN), the six scores, statements O1-O4, the further MNIST steps and the held-out classes |
 | **4: Guided Retraining** | [`p4_guided_retraining/`](p4_guided_retraining/README.md) | `RETRAINING_PROTOCOL.md`: hard-image pools, arms, the macro-F1 guard, statements A1-A3 and C1-C2, the SOM re-analysis and novelty after retraining |
 | All | `DEVIATIONS.md` | The changes from the MNIST design, and every amendment or deviation, with dates and commits |
+| All | [`../../v1_mnist/docs/REPRODUCIBILITY.md`](../../v1_mnist/docs/REPRODUCIBILITY.md) | The reproducibility statement, shared with MNIST |
 
 ## Why this study exists
 
