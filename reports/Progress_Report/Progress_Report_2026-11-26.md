@@ -302,7 +302,7 @@
   - Made all paper figures PDF, with larger labels and the titles moved into the captions.
   - Built the submission folder (paper, bibliography, figures, highlights) with one script.
   - Merged the paper and the reports into `main` through pull requests (#52 and #53).
-  - Started the repo clean-up: ticked the finished pull requests and began removing merged and `backup/*` branches.
+  - Cleaned up the repo: ticked the finished pull requests and removed the merged branches and the `backup/*` branches and tags.
 
 - Action Items:
 
@@ -314,7 +314,7 @@
 * [ ] Author biographies and photos; Zenodo DOI; journal declarations form
 * [ ] Proof-read the paper (both authors, by 11-29)
 * [ ] Journal named in #40; submission confirmation e-mail (12-08)
-* [ ] Every pull request merged or closed; merged branches and `backup/*` deleted
+* [x] Every pull request merged or closed; merged branches and `backup/*` deleted
 * [ ] Paper and reports build from a clean clone (with `biber`)
 * [ ] Poster draft by 11-29; poster final by 12-01
 * [ ] Final presentation deck and one-minute video script by 12-01
