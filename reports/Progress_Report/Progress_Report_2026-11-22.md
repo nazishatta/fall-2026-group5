@@ -194,7 +194,6 @@
   - **PHASE 4: GUIDED RETRAINING**
   - Hard example mining: built the hard-example pool and compared curriculum training with standard training.
   - Targeted data augmentation: retrained with augmented copies of the hotspot samples and measured the change in hotspot error and elsewhere (CF1 and CF2).
-  - SOM-guided augmentation lowered the hotspot test error from 11.4% to 7.8% without harming the rest of the data; curriculum training did not help.
   - Iterative SOM re-analysis: re-extracted features from the retrained models, re-trained the SOM, and compared the old and new maps.
   - Wrote the Phase 4 report.
 
@@ -251,8 +250,8 @@
 * [x] README in every folder, matching the real folder tree; full author name in all reports and slides
 * [x] Feature-layer ablation: protocol, code and tests (fc1 against fc2, 5 SOM seeds)
 * [x] Feature-layer ablation results
-* [ ] Pull request feature/dataset-mnist-fixes into develop, reviewed by Nazish
-* [ ] Merge develop into main
+* [x] Pull request feature/dataset-mnist-fixes into develop, reviewed by Nazish
+* [x] Merge develop into main
 * [x] Fashion-MNIST pipeline and results
 * [ ] Research paper draft
 
@@ -289,8 +288,8 @@
 * [x] Fashion-MNIST reports (Phases 1 to 4) and combined MNIST and Fashion-MNIST report
 * [x] Runner resumes half-finished steps; Phase 3 completion records; full test suite passes on EC2
 * [x] Proposal: no open placeholder left (ticket #35); owners table to be confirmed with Nazish
-* [ ] Pull request for Fashion-MNIST Phases 3 and 4 into develop, reviewed by Nazish (written comments)
-* [ ] Pull request develop into main (Fashion-MNIST)
+* [x] Pull request for Fashion-MNIST Phases 3 and 4 into develop, reviewed by Nazish (written comments)
+* [x] Pull request develop into main (Fashion-MNIST)
 
 ---
 
@@ -305,8 +304,8 @@
 
 - Action Items:
 
-* [ ] Fashion-MNIST merged into main
-* [ ] Paper merged into main, with both datasets, in the journal template
+* [x] Fashion-MNIST merged into main
+* [x] Paper merged into main, with both datasets, in the journal template
 * [ ] Journal named in #40; submission confirmation e-mail (12-08)
 * [ ] Every pull request merged or closed; merged branches and `backup/*` deleted
 * [ ] Paper and reports build from a clean clone (with `biber`)
