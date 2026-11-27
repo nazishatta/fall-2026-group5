@@ -62,7 +62,7 @@
         <mxCell id="baseline" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;Baseline evaluation&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Test accuracy: 99.18% / 90.90%&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#0d2539;gradientColor=#071525;gradientDirection=south;strokeColor=#D5E8FF;strokeWidth=1.45;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
           <mxGeometry x="943" y="126" width="236" height="57" as="geometry"/>
         </mxCell>
-        <mxCell id="som" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;NNSOM training&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;15×15 hex grid · 250 epochs · radius 11→1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#064633;gradientColor=#071525;gradientDirection=south;strokeColor=#28dca0;strokeWidth=2;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
+        <mxCell id="som" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;Modified NNSOM batch loop&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;15×15 hex grid · 250 epochs · radius 11→1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#064633;gradientColor=#071525;gradientDirection=south;strokeColor=#28dca0;strokeWidth=2;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
           <mxGeometry x="59" y="284" width="250" height="62" as="geometry"/>
         </mxCell>
         <mxCell id="viz" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;SOM structure &amp;amp; visualization&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;BMU assignments · U-matrix · hit histogram&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#0d2539;gradientColor=#071525;gradientDirection=south;strokeColor=#D5E8FF;strokeWidth=1.45;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
@@ -95,7 +95,7 @@
         <mxCell id="new" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;New CNN embeddings → new SOMs&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;15×15 maps · purity / TE1 / hotspot error · SVHN QE&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#0d2539;gradientColor=#071525;gradientDirection=south;strokeColor=#D5E8FF;strokeWidth=1.45;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
           <mxGeometry x="925" y="647" width="255" height="67" as="geometry"/>
         </mxCell>
-        <mxCell id="eval" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;End-to-end final evaluation&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;CF1 (normal CNN) vs CF2 (SOM-guided CNN) · same test data / seeds&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#674c20;gradientColor=#2f2415;gradientDirection=south;strokeColor=#f7b643;strokeWidth=2;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
+        <mxCell id="eval" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b style=&quot;font-size:14px&quot;&gt;End-to-end final evaluation&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px&quot;&gt;CF1 (normal training) vs CF2 (SOM-guided augmentation) · same test images / five matched seeds&lt;/span&gt;&lt;/div&gt;" style="rounded=1;arcSize=18;fillColor=#674c20;gradientColor=#2f2415;gradientDirection=south;strokeColor=#f7b643;strokeWidth=2;fontColor=#FFFFFF;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=14;spacing=3;" vertex="1" parent="1">
           <mxGeometry x="224" y="749" width="520" height="68" as="geometry"/>
         </mxCell>
         <mxCell id="e0" value="" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#F4F8FF;strokeWidth=2.4;" edge="1" parent="1">
@@ -188,13 +188,7 @@
             <mxPoint x="618" y="401" as="targetPoint"/>
           </mxGeometry>
         </mxCell>
-        <mxCell id="down2" value="" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#F4F8FF;strokeWidth=2.4;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="618" y="575" as="sourcePoint"/>
-            <mxPoint x="618" y="596" as="targetPoint"/>
-          </mxGeometry>
-        </mxCell>
-      </root>
+        <mxCell id="phase2_to_phase4" value="" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#F4F8FF;strokeWidth=2.4;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="57" y="315" as="sourcePoint"/><mxPoint x="63" y="680" as="targetPoint"/><Array as="points"><mxPoint x="25" y="315"/><mxPoint x="25" y="680"/></Array></mxGeometry></mxCell></root>
     </mxGraphModel>
   </diagram>
 </mxfile>
